@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Goal Timeline</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(172, 199, 230, 0.1));
+            color: #333;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .timeline-container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #2c5282;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline-event {
+            position: relative;
+            margin-bottom: 40px;
+            padding-left: 30px;
+            border-left: 3px solid #60a5fa;
+        }
+        .timeline-event:last-child {
+            margin-bottom: 0;
+        }
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 5px;
+            width: 18px;
+            height: 18px;
+            background-color: #ffffff;
+            border: 4px solid #3b82f6;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .timeline-date {
+            font-size: 1em;
+            font-weight: 600;
+            color: #4299e1;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .timeline-content {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+        .timeline-content strong {
+            color: #2c5282;
+        }
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="timeline-container">
+        <h1>Running Goal Progress 🏃‍♀️</h1>
+        <div class="timeline">
+            <div class="timeline-event">
+                <span class="timeline-date">Jan 16, 2026</span>
+                <div class="timeline-content">
+                    <span class="emoji">✅</span> <strong>Hit Goal!</strong> Ran 3 times this week. Felt significantly better with more energy and better stress management.
+                </div>
+            </div>
+            <div class="timeline-event">
+                <span class="timeline-date">Jan 10, 2026</span>
+                <div class="timeline-content">
+                    <span class="emoji">😔</span> <strong>Missed Week</strong> Skipped running entirely due to fatigue and competing priorities.
+                </div>
+            </div>
+            <div class="timeline-event">
+                <span class="timeline-date">Jan 3, 2026</span>
+                <div class="timeline-content">
+                    <span class="emoji">🎯</span> <strong>Set Goal</strong> Aimed for 3 runs per week, recognizing its positive impact.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

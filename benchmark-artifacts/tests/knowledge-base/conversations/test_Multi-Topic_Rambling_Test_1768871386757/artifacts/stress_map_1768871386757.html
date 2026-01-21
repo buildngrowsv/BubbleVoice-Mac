@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(245, 158, 11, 0.8) 50%, rgba(251, 191, 36, 0.8) 100%);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .subheading {
+            font-size: 1.4em;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+            letter-spacing: 0.2px;
+        }
+        .stress-areas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .stress-area {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .stress-area:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        .stress-area-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stress-area-title i {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        .stress-area-content {
+            font-size: 1.1em;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stress-area-content p {
+            margin: 0;
+        }
+        .icon-work { content: "💼"; }
+        .icon-personal { content: "🏃"; }
+        .icon-relationship { content: "❤️"; }
+        .icon-family { content: "🏡"; }
+        .icon-general { content: "✨"; }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2em;
+            }
+            .subheading {
+                font-size: 1.2em;
+            }
+            .stress-area-title {
+                font-size: 1.3em;
+            }
+            .stress-area-content {
+                font-size: 1em;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="stress-map-container">
+        <h1>Your Current Stress Landscape</h1>
+        <p class="subheading">Navigating multiple demands requires awareness and care. Let's map it out. 🗺️</p>
+        <div class="stress-areas">
+            <div class="stress-area">
+                <div class="stress-area-title"><span class="icon-work">💼</span> Work & Startup</div>
+                <div class="stress-area-content">
+                    <p>Investor pressure and fundraising are significant sources of stress, impacting overall energy.</p>
+                </div>
+            </div>
+            <div class="stress-area">
+                <div class="stress-area-title"><span class="icon-personal">🏃</span> Personal Well-being</div>
+                <div class="stress-area-content">
+                    <p>Exhaustion is high, making it difficult to prioritize exercise, even though you know it helps.</p>
+                </div>
+            </div>
+            <div class="stress-area">
+                <div class="stress-area-title"><span class="icon-relationship">❤️</span> Relationship with Jordan</div>
+                <div class="stress-area-content">
+                    <p>Quality time is lacking, with date nights being a distant memory. This area needs attention.</p>
+                </div>
+            </div>
+             <div class="stress-area">
+                <div class="stress-area-title"><span class="icon-family">🏡</span> Emma's School</div>
+                <div class="stress-area-content">
+                    <p>Positive progress with reading today, which is a great win! 🎉</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

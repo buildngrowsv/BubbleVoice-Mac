@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' ws://localhost:* http://localhost:*; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>BubbleVoice</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/liquid-glass.css">
+</head>
+<body>
+  <!-- 
+    BUBBLEVOICE MAC - MAIN UI
+    
+    PRODUCT VISION:
+    A unified interface where voice and chat are seamlessly integrated.
+    Voice is the primary input method, but users can also type or edit
+    transcribed text before sending. The UI feels modern, minimal, and
+    focuses on the conversation, not the interface.
+    
+    DESIGN PHILOSOPHY:
+    - iOS 26 Liquid Glass aesthetic (translucent, blurred, vibrant)
+    - Voice button next to send button (equal prominence)
+    - Real-time transcription appears as you speak
+    - Conversation flows naturally with AI responses
+    - Proactive "bubbles" appear contextually
+    - Artifacts render inline with conversation
+    
+    LAYOUT STRUCTURE:
+    - Custom title bar (frameless window)
+    - Main conversation area (scrollable)
+    - Input area at bottom (voice + text + send)
+    - Bubble suggestions float above input
+    - Artifacts render in-line or in side panel
+  -->
+
+  <!-- CUSTOM TITLE BAR -->
+  <!-- TEST ID: title-bar - The custom window title bar for frameless window -->
+  <div class="title-bar" data-testid="title-bar" role="banner">
+    <div class="title-bar-left">
+      <div class="traffic-lights">
+        <!-- macOS traffic lights are native, positioned by Electron -->
+      </div>
+      <!-- TEST ID: app-title - The application name in the title bar -->
+      <div class="app-title" data-testid="app-title">BubbleVoice</div>
+    </div>
+    <div class="title-bar-right" data-testid="title-bar-actions" role="group" aria-label="Window controls">
+      <!-- TEST ID: settings-button - Opens the settings panel -->
+      <button class="title-bar-button"
+              id="settings-button"
+              data-testid="settings-button"
+              title="Settings"
+              aria-label="Open settings"
+              aria-haspopup="dialog">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 10a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M14 8a6 6 0 11-12 0 6 6 0 0112 0z" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </button>
+      <!-- TEST ID: pin-button - Toggles always-on-top window behavior -->
+      <button class="title-bar-button"
+              id="pin-button"
+              data-testid="pin-button"
+              title="Always on Top"
+              aria-label="Toggle always on top"
+              aria-pressed="false">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 2v6m0 0L5 5m3 3l3-3M8 14v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <!-- TEST ID: minimize-button - Minimizes the application window -->
+      <button class="title-bar-button"
+              id="minimize-button"
+              data-testid="minimize-button"
+              title="Minimize"
+              aria-label="Minimize window">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M4 8h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <!-- TEST ID: close-button - Closes the application window -->
+      <button class="title-bar-button"
+              id="close-button"
+              data-testid="close-button"
+              title="Close"
+              aria-label="Close window">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT AREA -->
+  <!-- TEST ID: main-container - The primary content container below the title bar -->
+  <div class="main-container" data-testid="main-container" role="main">
+
+    <!-- CONVERSATION AREA -->
+    <!-- TEST ID: conversation-container - Container for all conversation content -->
+    <div class="conversation-container"
+         id="conversation-container"
+         data-testid="conversation-container">
+
+      <!-- WELCOME STATE (shown when no conversation) -->
+      <!-- TEST ID: welcome-state - The initial welcome screen before any conversation -->
+      <div class="welcome-state"
+           id="welcome-state"
+           data-testid="welcome-state"
+           role="region"
+           aria-label="Welcome screen">
+        <div class="welcome-icon" data-testid="welcome-icon" aria-hidden="true">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="28" stroke="url(#gradient1)" stroke-width="2"/>
+            <circle cx="32" cy="32" r="20" fill="url(#gradient2)" opacity="0.2"/>
+            <path d="M32 20v24M20 32h24" stroke="url(#gradient1)" stroke-width="2" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="gradient1" x1="0" y1="0" x2="64" y2="64">
+                <stop offset="0%" stop-color="#667eea"/>
+                <stop offset="100%" stop-color="#764ba2"/>
+              </linearGradient>
+              <linearGradient id="gradient2" x1="0" y1="0" x2="64" y2="64">
+                <stop offset="0%" stop-color="#667eea"/>
+                <stop offset="100%" stop-color="#764ba2"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <!-- TEST ID: welcome-title - Main heading on the welcome screen -->
+        <h1 class="welcome-title" data-testid="welcome-title">Welcome to BubbleVoice</h1>
+        <!-- TEST ID: welcome-subtitle - Tagline describing the app purpose -->
+        <p class="welcome-subtitle" data-testid="welcome-subtitle">Your personal AI companion that remembers your life</p>
+        <!-- TEST ID: welcome-suggestions - Container for quick-start suggestion buttons -->
+        <div class="welcome-suggestions"
+             data-testid="welcome-suggestions"
+             role="group"
+             aria-label="Conversation starters">
+          <!-- TEST ID: suggestion-chip-* - Quick-start suggestion buttons -->
+          <button class="suggestion-chip" data-testid="suggestion-chip-1">"Tell me about your day"</button>
+          <button class="suggestion-chip" data-testid="suggestion-chip-2">"Help me think through a decision"</button>
+          <button class="suggestion-chip" data-testid="suggestion-chip-3">"Show me what I've been worried about"</button>
+        </div>
+        <!-- TEST ID: welcome-hint - Keyboard shortcut hint for starting voice -->
+        <p class="welcome-hint" data-testid="welcome-hint">Press <kbd>⌘⇧Space</kbd> or click the voice button to start</p>
+      </div>
+
+      <!-- CONVERSATION MESSAGES (populated dynamically) -->
+      <!-- TEST ID: messages-container - The scrollable area where conversation messages appear -->
+      <div class="messages"
+           id="messages"
+           data-testid="messages-container"
+           role="log"
+           aria-live="polite"
+           aria-label="Conversation messages">
+        <!-- Messages will be inserted here by JavaScript -->
+      </div>
+
+    </div>
+
+    <!-- BUBBLE SUGGESTIONS AREA -->
+    <!-- TEST ID: bubbles-container - Container for proactive AI suggestion bubbles -->
+    <div class="bubbles-container"
+         id="bubbles-container"
+         data-testid="bubbles-container"
+         role="complementary"
+         aria-label="Proactive suggestions"
+         aria-live="polite">
+      <!-- Proactive bubble suggestions appear here -->
+      <!-- Example: <div class="bubble">how's Emma doing?</div> -->
+    </div>
+
+    <!-- INPUT AREA -->
+    <!-- TEST ID: input-container - The entire input section at the bottom -->
+    <div class="input-container" data-testid="input-container">
+
+      <!-- VOICE VISUALIZATION (shown when listening) -->
+      <!-- TEST ID: voice-visualization - Audio waveform visualization during recording -->
+      <div class="voice-visualization"
+           id="voice-visualization"
+           data-testid="voice-visualization"
+           role="status"
+           aria-label="Voice input active"
+           aria-live="assertive">
+        <div class="voice-wave" data-testid="voice-wave-1"></div>
+        <div class="voice-wave" data-testid="voice-wave-2"></div>
+        <div class="voice-wave" data-testid="voice-wave-3"></div>
+        <div class="voice-wave" data-testid="voice-wave-4"></div>
+        <div class="voice-wave" data-testid="voice-wave-5"></div>
+      </div>
+
+      <!-- INPUT FIELD -->
+      <!-- TEST ID: input-wrapper - Wrapper around the text input and action buttons -->
+      <div class="input-wrapper" data-testid="input-wrapper">
+        <!-- TEST ID: message-input - The main text input field for typing messages -->
+        <div class="input-field"
+             id="input-field"
+             data-testid="message-input"
+             contenteditable="true"
+             data-placeholder="Speak or type your message..."
+             role="textbox"
+             aria-label="Message input"
+             aria-multiline="true">
+        </div>
+
+        <!-- INPUT ACTIONS -->
+        <!-- TEST ID: input-actions - Container for voice and send buttons -->
+        <div class="input-actions" data-testid="input-actions" role="group" aria-label="Message actions">
+
+          <!-- VOICE BUTTON (primary action) -->
+          <!-- TEST ID: voice-button - Primary button to start/stop voice recording -->
+          <button class="action-button voice-button"
+                  id="voice-button"
+                  data-testid="voice-button"
+                  title="Hold to speak (⌘⇧Space)"
+                  aria-label="Voice input - hold to speak"
+                  aria-pressed="false">
+            <svg class="voice-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" fill="currentColor"/>
+              <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <svg class="stop-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;" aria-hidden="true">
+              <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/>
+            </svg>
+          </button>
+
+          <!-- SEND BUTTON -->
+          <!-- TEST ID: send-button - Button to send the current message -->
+          <button class="action-button send-button"
+                  id="send-button"
+                  data-testid="send-button"
+                  title="Send message (Enter)"
+                  aria-label="Send message"
+                  disabled>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- STATUS INDICATOR -->
+      <!-- TEST ID: status-indicator - Shows current connection/processing status -->
+      <div class="status-indicator"
+           id="status-indicator"
+           data-testid="status-indicator"
+           role="status"
+           aria-live="polite">
+        <!-- TEST ID: status-dot - Visual indicator dot (color changes based on status) -->
+        <span class="status-dot" data-testid="status-dot"></span>
+        <!-- TEST ID: status-text - Text description of current status -->
+        <span class="status-text" data-testid="status-text">Ready</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- SETTINGS PANEL (slides in from right) -->
+  <!-- TEST ID: settings-panel - The slide-out settings panel -->
+  <div class="settings-panel"
+       id="settings-panel"
+       data-testid="settings-panel"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="settings-title"
+       aria-hidden="true">
+    <div class="settings-header" data-testid="settings-header">
+      <!-- TEST ID: settings-title - Heading for the settings panel -->
+      <h2 id="settings-title" data-testid="settings-title">Settings</h2>
+      <!-- TEST ID: close-settings-button - Button to close the settings panel -->
+      <button class="close-settings"
+              id="close-settings"
+              data-testid="close-settings-button"
+              aria-label="Close settings">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M5 5l10 10M15 5l-10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <!-- TEST ID: settings-content - Scrollable content area for settings -->
+    <div class="settings-content" data-testid="settings-content">
+
+      <!-- MODEL SELECTION -->
+      <!-- TEST ID: settings-section-model - AI model selection section -->
+      <div class="settings-section" data-testid="settings-section-model">
+        <h3 id="model-section-heading">AI Model</h3>
+        <!-- TEST ID: model-select - Dropdown to select AI model -->
+        <select class="settings-select"
+                id="model-select"
+                data-testid="model-select"
+                aria-labelledby="model-section-heading">
+          <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Recommended)</option>
+          <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+          <option value="claude-sonnet-4.5">Claude Sonnet 4.5</option>
+          <option value="gpt-5.2-turbo">GPT-5.2 Turbo</option>
+        </select>
+      </div>
+
+      <!-- VOICE SETTINGS -->
+      <!-- TEST ID: settings-section-voice - Voice and audio settings section -->
+      <div class="settings-section" data-testid="settings-section-voice">
+        <h3>Voice</h3>
+        <label class="settings-label">
+          <span id="microphone-label">Microphone</span>
+          <!-- TEST ID: microphone-select - Dropdown to select input microphone -->
+          <select class="settings-select"
+                  id="microphone-select"
+                  data-testid="microphone-select"
+                  aria-labelledby="microphone-label">
+            <option value="">Loading...</option>
+          </select>
+        </label>
+        <label class="settings-label">
+          <span id="voice-label">Speaker / Voice</span>
+          <!-- TEST ID: voice-select - Dropdown to select TTS voice -->
+          <select class="settings-select"
+                  id="voice-select"
+                  data-testid="voice-select"
+                  aria-labelledby="voice-label">
+            <option value="">Default</option>
+          </select>
+        </label>
+        <label class="settings-label">
+          <span id="speed-label">Voice Speed</span>
+          <!-- TEST ID: voice-speed-slider - Slider to adjust TTS playback speed -->
+          <input type="range"
+                 min="0.5"
+                 max="2"
+                 step="0.1"
+                 value="1"
+                 id="voice-speed"
+                 data-testid="voice-speed-slider"
+                 aria-labelledby="speed-label"
+                 aria-valuemin="0.5"
+                 aria-valuemax="2"
+                 aria-valuenow="1">
+          <!-- TEST ID: voice-speed-value - Display of current speed value -->
+          <span class="range-value" id="voice-speed-value" data-testid="voice-speed-value" aria-live="polite">1.0x</span>
+        </label>
+        <label class="settings-label">
+          <span>Auto-send after speaking</span>
+          <!-- TEST ID: auto-send-checkbox - Toggle for automatic message sending -->
+          <input type="checkbox"
+                 id="auto-send"
+                 data-testid="auto-send-checkbox"
+                 checked
+                 aria-describedby="auto-send-description">
+        </label>
+      </div>
+
+      <!-- DATA STORAGE -->
+      <!-- TEST ID: settings-section-storage - Data storage location settings -->
+      <div class="settings-section" data-testid="settings-section-storage">
+        <h3>Data Storage</h3>
+        <label class="settings-label">
+          <span id="folder-label">Target Folder</span>
+          <div class="folder-selector" data-testid="folder-selector">
+            <!-- TEST ID: target-folder-path - Display of selected folder path -->
+            <input type="text"
+                   class="settings-input"
+                   id="target-folder-path"
+                   data-testid="target-folder-path"
+                   placeholder="No folder selected"
+                   readonly
+                   aria-labelledby="folder-label"
+                   aria-describedby="folder-hint">
+            <!-- TEST ID: select-folder-button - Button to open folder picker -->
+            <button class="settings-button"
+                    id="select-folder-button"
+                    data-testid="select-folder-button"
+                    aria-label="Choose folder for data storage">Choose Folder</button>
+          </div>
+          <!-- TEST ID: folder-hint - Helper text for folder selection -->
+          <small class="settings-hint" id="folder-hint" data-testid="folder-hint">Where conversations and recordings will be saved</small>
+        </label>
+      </div>
+
+      <!-- PERMISSIONS -->
+      <!-- TEST ID: settings-section-permissions - System permissions section -->
+      <div class="settings-section" data-testid="settings-section-permissions">
+        <h3>Permissions</h3>
+
+        <!-- Microphone Permission -->
+        <!-- TEST ID: permission-microphone - Microphone permission status and controls -->
+        <div class="permission-item" data-testid="permission-microphone">
+          <div class="permission-info">
+            <div class="permission-title">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="permission-icon" aria-hidden="true">
+                <path d="M8 1a2 2 0 00-2 2v5a2 2 0 004 0V3a2 2 0 00-2-2z" fill="currentColor"/>
+                <path d="M12 8v1a4 4 0 01-8 0V8M8 12v3M6 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span>Microphone Access</span>
+            </div>
+            <p class="permission-description">Required for voice input</p>
+          </div>
+          <div class="permission-status">
+            <!-- TEST ID: microphone-permission-status - Badge showing microphone permission state -->
+            <span class="permission-badge"
+                  id="microphone-status"
+                  data-testid="microphone-permission-status"
+                  role="status"
+                  aria-live="polite">Checking...</span>
+            <!-- TEST ID: request-microphone-button - Button to request microphone permission -->
+            <button class="settings-button"
+                    id="request-microphone-button"
+                    data-testid="request-microphone-button"
+                    style="display: none;"
+                    aria-label="Grant microphone access">Grant Access</button>
+          </div>
+        </div>
+
+        <!-- Accessibility Permission -->
+        <!-- TEST ID: permission-accessibility - Accessibility permission status and controls -->
+        <div class="permission-item" data-testid="permission-accessibility">
+          <div class="permission-info">
+            <div class="permission-title">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="permission-icon" aria-hidden="true">
+                <path d="M8 2a1 1 0 100-2 1 1 0 000 2zM8 5v6M5 8h6M8 11l-3 4M8 11l3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span>Accessibility</span>
+            </div>
+            <p class="permission-description">Required for global hotkeys (⌘⇧Space)</p>
+          </div>
+          <div class="permission-status">
+            <!-- TEST ID: accessibility-permission-status - Badge showing accessibility permission state -->
+            <span class="permission-badge"
+                  id="accessibility-status"
+                  data-testid="accessibility-permission-status"
+                  role="status"
+                  aria-live="polite">Checking...</span>
+            <!-- TEST ID: open-accessibility-button - Button to open system accessibility settings -->
+            <button class="settings-button"
+                    id="open-accessibility-button"
+                    data-testid="open-accessibility-button"
+                    style="display: none;"
+                    aria-label="Open accessibility settings in System Preferences">Open Settings</button>
+          </div>
+        </div>
+
+        <!-- TEST ID: permissions-hint - Helper text for permissions section -->
+        <small class="settings-hint" data-testid="permissions-hint">
+          Permissions are managed by macOS System Preferences.
+          Changes may require restarting the app.
+        </small>
+      </div>
+
+      <!-- APPEARANCE -->
+      <!-- TEST ID: settings-section-appearance - UI appearance settings -->
+      <div class="settings-section" data-testid="settings-section-appearance">
+        <h3>Appearance</h3>
+        <label class="settings-label">
+          <span>Always on top</span>
+          <!-- TEST ID: always-on-top-checkbox - Toggle for window always-on-top behavior -->
+          <input type="checkbox"
+                 id="always-on-top"
+                 data-testid="always-on-top-checkbox"
+                 aria-label="Keep window always on top">
+        </label>
+        <label class="settings-label">
+          <span>Show bubbles</span>
+          <!-- TEST ID: show-bubbles-checkbox - Toggle for proactive bubble suggestions -->
+          <input type="checkbox"
+                 id="show-bubbles"
+                 data-testid="show-bubbles-checkbox"
+                 checked
+                 aria-label="Show proactive suggestion bubbles">
+        </label>
+      </div>
+
+      <!-- API KEYS -->
+      <!-- TEST ID: settings-section-api-keys - API key configuration section -->
+      <div class="settings-section" data-testid="settings-section-api-keys">
+        <h3>API Keys</h3>
+        <label class="settings-label">
+          <span id="google-key-label">Google API Key</span>
+          <!-- TEST ID: google-api-key-input - Input for Google API key -->
+          <input type="password"
+                 class="settings-input"
+                 id="google-api-key"
+                 data-testid="google-api-key-input"
+                 placeholder="Enter your API key"
+                 aria-labelledby="google-key-label"
+                 autocomplete="off">
+        </label>
+        <label class="settings-label">
+          <span id="anthropic-key-label">Anthropic API Key</span>
+          <!-- TEST ID: anthropic-api-key-input - Input for Anthropic API key -->
+          <input type="password"
+                 class="settings-input"
+                 id="anthropic-api-key"
+                 data-testid="anthropic-api-key-input"
+                 placeholder="Optional"
+                 aria-labelledby="anthropic-key-label"
+                 autocomplete="off">
+        </label>
+        <label class="settings-label">
+          <span id="openai-key-label">OpenAI API Key</span>
+          <!-- TEST ID: openai-api-key-input - Input for OpenAI API key -->
+          <input type="password"
+                 class="settings-input"
+                 id="openai-api-key"
+                 data-testid="openai-api-key-input"
+                 placeholder="Optional"
+                 aria-labelledby="openai-key-label"
+                 autocomplete="off">
+        </label>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="components/web-speech-service.js"></script>
+  <script src="components/conversation-manager.js"></script>
+  <script src="components/voice-controller.js"></script>
+  <script src="components/websocket-client.js"></script>
+  <script src="components/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Stress Map</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); color: #333; margin: 0; padding: 40px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        .stressors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .stressor {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 150px;
+        }
+        .stressor:hover {
+            transform: translateY(-8px);
+        }
+        .stressor-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+        .stressor-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+        .stressor-detail {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Feeling the Pressure?</h1>
+        <p style="font-size: 1.1em; color: rgba(255, 255, 255, 0.9); margin-bottom: 30px;">Let's visualize the many demands on your plate right now.</p>
+        <div class="stressors">
+            <div class="stressor">
+                <div class="stressor-icon">📚</div>
+                <div class="stressor-title">Emma's Reading</div>
+                <div class="stressor-detail">Teacher meeting next week. Focus on strategies.</div>
+            </div>
+            <div class="stressor">
+                <div class="stressor-icon">💼</div>
+                <div class="stressor-title">Startup</div>
+                <div class="stressor-detail">Urgent need for Q1 numbers. Fundraising stress.</div>
+            </div>
+            <div class="stressor">
+                <div class="stressor-icon">🏃</div>
+                <div class="stressor-title">Exercise Goals</div>
+                <div class="stressor-detail">Two weeks without a run. Feeling exhausted.</div>
+            </div>
+            <div class="stressor">
+                <div class="stressor-icon">⚽</div>
+                <div class="stressor-title">Max's Soccer</div>
+                <div class="stressor-detail">Game this Saturday.</div>
+            </div>
+             <div class="stressor">
+                <div class="stressor-icon">❤️</div>
+                <div class="stressor-title">Partner Time</div>
+                <div class="stressor-detail">Date night overdue.</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c5d2d9 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            color: #1a365d;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .stressors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+            text-align: left;
+        }
+        .stressor-category {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .stressor-category:hover {
+            transform: translateY(-8px);
+        }
+        .stressor-category h2 {
+            color: #3b82f6;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stressor-category ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .stressor-category li {
+            background: rgba(59, 130, 246, 0.08);
+            margin-bottom: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+            transition: background 0.2s ease;
+        }
+        .stressor-category li:hover {
+            background: rgba(59, 130, 246, 0.15);
+        }
+        .stressor-category li.highlight {
+             background: rgba(255, 165, 0, 0.15);
+             font-weight: 600;
+             color: #e67e22;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .icon {
+            font-size: 1.4em;
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map-container">
+        <h1>Your Current Stress Landscape</h1>
+        <p>It's okay to feel overwhelmed. Let's visualize what's on your plate.</p>
+        <div class="stressors">
+            <div class="stressor-category">
+                <h2><span class="icon">🚀</span> Startup</h2>
+                <ul>
+                    <li>Fundraising (Investor meeting success, but overall stress remains)</li>
+                    <li>Team Hiring (Currently 1 entry)</li>
+                    <li><span class="highlight">Overall High Stress Area</span></li>
+                </ul>
+            </div>
+            <div class="stressor-category">
+                <h2><span class="icon">📚</span> Emma's School</h2>
+                <ul>
+                    <li>Reading Comprehension Challenges</li>
+                    <li>Upcoming Parent-Teacher Conference</li>
+                    <li>Emma's Emotional State & Self-Esteem</li>
+                    <li>User's Guilt & Anxiety about Testing</li>
+                </ul>
+            </div>
+            <div class="stressor-category">
+                <h2><span class="icon">🏃</span> Personal Goals</h2>
+                <ul>
+                    <li>Running Progress (Struggling Area)</li>
+                </ul>
+            </div>
+            <div class="stressor-category">
+                <h2><span class="icon">🧘</span> Mental Health</h2>
+                <ul>
+                    <li>Processing Guilt with Therapist</li>
+                    <li>Managing Overwhelm</li>
+                </ul>
+            </div>
+             <div class="stressor-category">
+                <h2><span class="icon">❤️</span> Partner</h2>
+                <ul>
+                    <li>Quality Time Balance</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer">Visualizing your concerns helps in understanding and managing them.</div>
+    </div>
+</body>
+</html>

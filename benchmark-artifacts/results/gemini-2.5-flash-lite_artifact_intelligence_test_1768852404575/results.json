@@ -1,0 +1,904 @@
+{
+  "run_id": "gemini-2.5-flash-lite_artifact_intelligence_test_1768852404575",
+  "scenario_id": "artifact_intelligence_test",
+  "model_id": "gemini-2.5-flash-lite",
+  "model_display_name": "Gemini 2.5 Flash Lite",
+  "started_at": "2026-01-19T19:53:24.575Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I'm feeling overwhelmed with everything going on",
+      "expected_behavior": {
+        "response": "empathize, ask clarifying questions",
+        "artifact_action": "none",
+        "reasoning": "Too vague, casual emotional expression - no artifact warranted yet"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "It sounds like you're carrying a lot right now. It's completely understandable to feel overwhelmed when there's so much on your plate. Would you like to try and map out what's contributing to that feeling? Sometimes seeing it all laid out can help.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is expressing feelings of being overwhelmed. This indicates a need for validation and a structured way to process their concerns.",
+          "reasoning": "The user is feeling overwhelmed, which suggests a 'stress_map' artifact would be appropriate to help them visualize and organize their concerns. The empathetic tone validates their feelings."
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_type": "stress_map",
+          "data_json": "{\"title\": \"What's Overwhelming You?\", \"domains\": [{\"name\": \"Work\", \"concerns\": []}, {\"name\": \"Personal Life\", \"concerns\": []}, {\"name\": \"Health\", \"concerns\": []}, {\"name\": \"Finances\", \"concerns\": []}, {\"name\": \"Relationships\", \"concerns\": []}, {\"name\": \"Other\", \"concerns\": []}]}",
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "It sounds like you're carrying a lot right now. It's completely understandable to feel overwhelmed when there's so much on your plate. Would you like to try and map out what's contributing to that feeling? Sometimes seeing it all laid out can help.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is expressing feelings of being overwhelmed. This indicates a need for validation and a structured way to process their concerns.",
+          "context_updates": "",
+          "reasoning": "The user is feeling overwhelmed, which suggests a 'stress_map' artifact would be appropriate to help them visualize and organize their concerns. The empathetic tone validates their feelings."
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "auto_1768852409052",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "What's Overwhelming You?",
+            "domains": [
+              {
+                "name": "Work",
+                "concerns": []
+              },
+              {
+                "name": "Personal Life",
+                "concerns": []
+              },
+              {
+                "name": "Health",
+                "concerns": []
+              },
+              {
+                "name": "Finances",
+                "concerns": []
+              },
+              {
+                "name": "Relationships",
+                "concerns": []
+              },
+              {
+                "name": "Other",
+                "concerns": []
+              }
+            ]
+          },
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n</style>"
+        }
+      },
+      "latency_ms": 4474,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created",
+        "data": {
+          "title": "What's Overwhelming You?",
+          "domains": [
+            {
+              "name": "Work",
+              "concerns": []
+            },
+            {
+              "name": "Personal Life",
+              "concerns": []
+            },
+            {
+              "name": "Health",
+              "concerns": []
+            },
+            {
+              "name": "Finances",
+              "concerns": []
+            },
+            {
+              "name": "Relationships",
+              "concerns": []
+            },
+            {
+              "name": "Other",
+              "concerns": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "turn_id": 2,
+      "user_input": "It's just... I have the startup launch next week, Emma's science fair project is due Friday, Jake is struggling with reading, the house needs repairs, and I haven't exercised in a month. I don't even know where to start.",
+      "expected_behavior": {
+        "response": "validate overwhelm, acknowledge complexity",
+        "artifact_action": "create",
+        "artifact_type": "stress_map_or_priority_matrix",
+        "reasoning": "PROACTIVE: Complex multi-domain problem with clear overwhelm - visual map would help without being asked",
+        "artifact_should_contain": {
+          "domains": [
+            "startup",
+            "family/kids",
+            "health",
+            "home"
+          ],
+          "urgency_indicators": true,
+          "visual_organization": "helps user see the landscape"
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Wow, that's a lot to juggle all at once. It makes perfect sense that you're feeling overwhelmed. Let's break this down. We can use this stress map to visualize everything you're managing. Seeing it laid out might help you find a starting point.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User has provided specific, actionable items contributing to their feeling of overwhelm. These fall into distinct categories (startup, kids' projects, family, home, personal health). This is a clear signal to populate the existing stress map artifact.",
+          "reasoning": "The user has given concrete examples of their stressors. The 'stress_map' artifact is ideal for this, and we can now populate it with the details they've provided. The tone remains empathetic as they are still expressing a high level of stress."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data_json": "{\"title\": \"What's Overwhelming You?\", \"domains\": [{\"name\": \"Work\", \"concerns\": [{\"id\": \"c1\", \"text\": \"Startup launch next week\"}]}, {\"name\": \"Personal Life\", \"concerns\": [{\"id\": \"c2\", \"text\": \"Emma's science fair project due Friday\"}, {\"id\": \"c3\", \"text\": \"Jake struggling with reading\"}]}, {\"name\": \"Health\", \"concerns\": [{\"id\": \"c4\", \"text\": \"Haven't exercised in a month\"}]}, {\"name\": \"Finances\", \"concerns\": []}, {\"name\": \"Relationships\", \"concerns\": []}, {\"name\": \"Other\", \"concerns\": [{\"id\": \"c5\", \"text\": \"House needs repairs\"}]}]}",
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\">Startup launch next week</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\">Emma's science fair project due Friday</li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Wow, that's a lot to juggle all at once. It makes perfect sense that you're feeling overwhelmed. Let's break this down. We can use this stress map to visualize everything you're managing. Seeing it laid out might help you find a starting point.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User has provided specific, actionable items contributing to their feeling of overwhelm. These fall into distinct categories (startup, kids' projects, family, home, personal health). This is a clear signal to populate the existing stress map artifact.",
+          "context_updates": "",
+          "reasoning": "The user has given concrete examples of their stressors. The 'stress_map' artifact is ideal for this, and we can now populate it with the details they've provided. The tone remains empathetic as they are still expressing a high level of stress."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "What's Overwhelming You?",
+            "domains": [
+              {
+                "name": "Work",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "text": "Startup launch next week"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Life",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "text": "Emma's science fair project due Friday"
+                  },
+                  {
+                    "id": "c3",
+                    "text": "Jake struggling with reading"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "text": "Haven't exercised in a month"
+                  }
+                ]
+              },
+              {
+                "name": "Finances",
+                "concerns": []
+              },
+              {
+                "name": "Relationships",
+                "concerns": []
+              },
+              {
+                "name": "Other",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "text": "House needs repairs"
+                  }
+                ]
+              }
+            ]
+          },
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\">Startup launch next week</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\">Emma's science fair project due Friday</li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n</style>"
+        }
+      },
+      "latency_ms": 5348,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Yeah that helps. Actually Emma's project is due Thursday, not Friday",
+      "expected_behavior": {
+        "response": "acknowledge correction",
+        "artifact_action": "update",
+        "modification_type": "data_only",
+        "artifact_should_update": {
+          "emma_deadline": "Thursday"
+        },
+        "artifact_should_preserve": [
+          "all styling",
+          "all other data",
+          "layout",
+          "visual hierarchy"
+        ],
+        "reasoning": "Simple data correction - change ONLY the deadline, touch nothing else"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Thanks for the clarification! It's easy to lose track of days when you're juggling so much. I've updated Emma's project deadline on the stress map. Knowing it's due Thursday might shift your planning slightly.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is providing a correction to a previously stated detail (deadline for Emma's project). This indicates they are engaging with the artifact and trying to refine the information.",
+          "reasoning": "The user has provided a correction to the data. The 'update' action on the 'stress_map' artifact is appropriate here. The `data_json` needs to be modified to reflect the new deadline. The tone remains supportive as the user is actively refining the situation."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data_json": "{\"title\": \"What's Overwhelming You?\", \"domains\": [{\"name\": \"Work\", \"concerns\": [{\"id\": \"c1\", \"text\": \"Startup launch next week\"}]}, {\"name\": \"Personal Life\", \"concerns\": [{\"id\": \"c2\", \"text\": \"Emma's science fair project due Thursday\"}, {\"id\": \"c3\", \"text\": \"Jake struggling with reading\"}]}, {\"name\": \"Health\", \"concerns\": [{\"id\": \"c4\", \"text\": \"Haven't exercised in a month\"}]}, {\"name\": \"Finances\", \"concerns\": []}, {\"name\": \"Relationships\", \"concerns\": []}, {\"name\": \"Other\", \"concerns\": [{\"id\": \"c5\", \"text\": \"House needs repairs\"}]}]}",
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\">Startup launch next week</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\">Emma's science fair project due Thursday</li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Thanks for the clarification! It's easy to lose track of days when you're juggling so much. I've updated Emma's project deadline on the stress map. Knowing it's due Thursday might shift your planning slightly.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is providing a correction to a previously stated detail (deadline for Emma's project). This indicates they are engaging with the artifact and trying to refine the information.",
+          "context_updates": "",
+          "reasoning": "The user has provided a correction to the data. The 'update' action on the 'stress_map' artifact is appropriate here. The `data_json` needs to be modified to reflect the new deadline. The tone remains supportive as the user is actively refining the situation."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "What's Overwhelming You?",
+            "domains": [
+              {
+                "name": "Work",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "text": "Startup launch next week"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Life",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "text": "Emma's science fair project due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "text": "Jake struggling with reading"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "text": "Haven't exercised in a month"
+                  }
+                ]
+              },
+              {
+                "name": "Finances",
+                "concerns": []
+              },
+              {
+                "name": "Relationships",
+                "concerns": []
+              },
+              {
+                "name": "Other",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "text": "House needs repairs"
+                  }
+                ]
+              }
+            ]
+          },
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\">Startup launch next week</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\">Emma's science fair project due Thursday</li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n</style>"
+        }
+      },
+      "latency_ms": 5639,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Can you make the startup stuff stand out more? That's the most urgent",
+      "expected_behavior": {
+        "response": "acknowledge priority shift",
+        "artifact_action": "update",
+        "modification_type": "ui_only",
+        "artifact_should_update": {
+          "visual_emphasis": "startup section highlighted/enlarged/colored",
+          "styling": "adjusted to show urgency"
+        },
+        "artifact_should_preserve": [
+          "all data",
+          "other sections styling",
+          "structure"
+        ],
+        "reasoning": "Visual/UI request - change ONLY styling/emphasis, data stays identical"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Absolutely. I've highlighted the startup launch as the most urgent item on your stress map. Seeing it stand out might help you focus your energy there first.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User wants to emphasize the 'startup launch' item, indicating it's the highest priority and source of urgency. This requires a visual distinction within the existing artifact.",
+          "reasoning": "The user explicitly asked to make the startup item 'stand out more' due to urgency. This calls for a visual modification of the existing 'stress_map' artifact. I will update the HTML to visually differentiate this item, perhaps with a bolder color or styling, and update the `data_json` to reflect this emphasis (e.g., with a flag). The tone is supportive, acknowledging their need for prioritization."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data_json": "{\"title\": \"What's Overwhelming You?\", \"domains\": [{\"name\": \"Work\", \"concerns\": [{\"id\": \"c1\", \"text\": \"Startup launch next week\", \"urgent\": true}]}, {\"name\": \"Personal Life\", \"concerns\": [{\"id\": \"c2\", \"text\": \"Emma's science fair project due Thursday\"}, {\"id\": \"c3\", \"text\": \"Jake struggling with reading\"}]}, {\"name\": \"Health\", \"concerns\": [{\"id\": \"c4\", \"text\": \"Haven't exercised in a month\"}]}, {\"name\": \"Finances\", \"concerns\": []}, {\"name\": \"Relationships\", \"concerns\": []}, {\"name\": \"Other\", \"concerns\": [{\"id\": \"c5\", \"text\": \"House needs repairs\"}]}]}",
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\" class=\"urgent\">Startup launch next week <span class=\"urgency-badge\">🔥 Urgent!</span></li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\">Emma's science fair project due Thursday</li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n  .urgent {\n    border-left: 4px solid #e53e3e !important;\n    font-weight: 700;\n    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.2);\n  }\n  .urgency-badge {\n    background-color: #e53e3e;\n    color: white;\n    padding: 4px 8px;\n    border-radius: 8px;\n    font-size: 11px;\n    margin-left: 10px;\n    font-weight: 600;\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Absolutely. I've highlighted the startup launch as the most urgent item on your stress map. Seeing it stand out might help you focus your energy there first.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User wants to emphasize the 'startup launch' item, indicating it's the highest priority and source of urgency. This requires a visual distinction within the existing artifact.",
+          "context_updates": "",
+          "reasoning": "The user explicitly asked to make the startup item 'stand out more' due to urgency. This calls for a visual modification of the existing 'stress_map' artifact. I will update the HTML to visually differentiate this item, perhaps with a bolder color or styling, and update the `data_json` to reflect this emphasis (e.g., with a flag). The tone is supportive, acknowledging their need for prioritization."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "What's Overwhelming You?",
+            "domains": [
+              {
+                "name": "Work",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "text": "Startup launch next week",
+                    "urgent": true
+                  }
+                ]
+              },
+              {
+                "name": "Personal Life",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "text": "Emma's science fair project due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "text": "Jake struggling with reading"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "text": "Haven't exercised in a month"
+                  }
+                ]
+              },
+              {
+                "name": "Finances",
+                "concerns": []
+              },
+              {
+                "name": "Relationships",
+                "concerns": []
+              },
+              {
+                "name": "Other",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "text": "House needs repairs"
+                  }
+                ]
+              }
+            ]
+          },
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\" class=\"urgent\">Startup launch next week <span class=\"urgency-badge\">🔥 Urgent!</span></li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\">Emma's science fair project due Thursday</li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n  .urgent {\n    border-left: 4px solid #e53e3e !important;\n    font-weight: 700;\n    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.2);\n  }\n  .urgency-badge {\n    background-color: #e53e3e;\n    color: white;\n    padding: 4px 8px;\n    border-radius: 8px;\n    font-size: 11px;\n    margin-left: 10px;\n    font-weight: 600;\n  }\n</style>"
+        }
+      },
+      "latency_ms": 6055,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 5,
+      "user_input": "I talked to my co-founder and we're pushing the launch to next month",
+      "expected_behavior": {
+        "response": "acknowledge timeline change, note reduced pressure",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "artifact_should_update": {
+          "startup_deadline": "next month",
+          "urgency_level": "reduced",
+          "visual_emphasis": "de-emphasize startup, re-balance priorities"
+        },
+        "reasoning": "Data change (deadline) + UI change (urgency) - both needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "That's great news! Pushing the launch to next month sounds like a wise decision, giving you more breathing room. I've updated the stress map to reflect this change. Let's see what else we can tackle.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User has successfully resolved one of their stressors by pushing back the startup launch. This is a positive development and should be reflected in the artifact.",
+          "reasoning": "The user has informed me that the startup launch has been postponed. This directly impacts the 'Work' domain in the 'stress_map'. I need to update the `data_json` to remove or modify the 'Startup launch next week' concern and reflect the new timeline. The HTML should also be updated to show the revised status. The tone is supportive, acknowledging the positive resolution."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data_json": "{\"title\": \"What's Overwhelming You?\", \"domains\": [{\"name\": \"Work\", \"concerns\": [{\"id\": \"c1\", \"text\": \"Startup launch next month (Postponed)\", \"urgent\": false}]}, {\"name\": \"Personal Life\", \"concerns\": [{\"id\": \"c2\", \"text\": \"Emma's science fair project due Thursday\"}, {\"id\": \"c3\", \"text\": \"Jake struggling with reading\"}]}, {\"name\": \"Health\", \"concerns\": [{\"id\": \"c4\", \"text\": \"Haven't exercised in a month\"}]}, {\"name\": \"Finances\", \"concerns\": []}, {\"name\": \"Relationships\", \"concerns\": []}, {\"name\": \"Other\", \"concerns\": [{\"id\": \"c5\", \"text\": \"House needs repairs\"}]}]}",
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\" class=\"resolved\">Startup launch next month (Postponed)</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\">Emma's science fair project due Thursday</li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n  .urgent {\n    border-left: 4px solid #e53e3e !important;\n    font-weight: 700;\n    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.2);\n  }\n  .urgency-badge {\n    background-color: #e53e3e;\n    color: white;\n    padding: 4px 8px;\n    border-radius: 8px;\n    font-size: 11px;\n    margin-left: 10px;\n    font-weight: 600;\n  }\n  .resolved {\n    text-decoration: line-through;\n    color: #718096;\n    background: rgba(237, 242, 247, 0.7);\n    border-left-color: #a0aec0 !important;\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's great news! Pushing the launch to next month sounds like a wise decision, giving you more breathing room. I've updated the stress map to reflect this change. Let's see what else we can tackle.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User has successfully resolved one of their stressors by pushing back the startup launch. This is a positive development and should be reflected in the artifact.",
+          "context_updates": "",
+          "reasoning": "The user has informed me that the startup launch has been postponed. This directly impacts the 'Work' domain in the 'stress_map'. I need to update the `data_json` to remove or modify the 'Startup launch next week' concern and reflect the new timeline. The HTML should also be updated to show the revised status. The tone is supportive, acknowledging the positive resolution."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "What's Overwhelming You?",
+            "domains": [
+              {
+                "name": "Work",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "text": "Startup launch next month (Postponed)",
+                    "urgent": false
+                  }
+                ]
+              },
+              {
+                "name": "Personal Life",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "text": "Emma's science fair project due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "text": "Jake struggling with reading"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "text": "Haven't exercised in a month"
+                  }
+                ]
+              },
+              {
+                "name": "Finances",
+                "concerns": []
+              },
+              {
+                "name": "Relationships",
+                "concerns": []
+              },
+              {
+                "name": "Other",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "text": "House needs repairs"
+                  }
+                ]
+              }
+            ]
+          },
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\" class=\"resolved\">Startup launch next month (Postponed)</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\">Emma's science fair project due Thursday</li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n  .urgent {\n    border-left: 4px solid #e53e3e !important;\n    font-weight: 700;\n    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.2);\n  }\n  .urgency-badge {\n    background-color: #e53e3e;\n    color: white;\n    padding: 4px 8px;\n    border-radius: 8px;\n    font-size: 11px;\n    margin-left: 10px;\n    font-weight: 600;\n  }\n  .resolved {\n    text-decoration: line-through;\n    color: #718096;\n    background: rgba(237, 242, 247, 0.7);\n    border-left-color: #a0aec0 !important;\n  }\n</style>"
+        }
+      },
+      "latency_ms": 5806,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 6,
+      "user_input": "So what should I focus on this week?",
+      "expected_behavior": {
+        "response": "suggest focusing on Emma's project (Thu) and Jake's reading based on the artifact",
+        "artifact_action": "none",
+        "reasoning": "Conversational question - artifact already shows priorities, no update needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "That's a great question. Now that the startup launch is off your plate for this week, let's look at what's left. Emma's project is due Thursday, which is very soon. Jake's reading struggles and the house repairs are ongoing concerns, and getting back to exercise is important for your well-being. Given the tight deadline, focusing on Emma's project first makes a lot of sense.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is asking for prioritization advice based on the remaining items in the stress map. The immediate deadline for Emma's project is the most pressing actionable item for this week. The user also needs to consider Jake's reading and the house repairs as ongoing, and their own health as a priority.",
+          "reasoning": "The user is seeking concrete advice on what to focus on. Based on the updated stress map, Emma's project has the nearest deadline (Thursday). Therefore, prioritizing this is the most logical next step. I will frame the response to guide them towards this, while acknowledging the other items. The tone is supportive and action-oriented."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data_json": "{\"title\": \"What's Overwhelming You?\", \"domains\": [{\"name\": \"Work\", \"concerns\": [{\"id\": \"c1\", \"text\": \"Startup launch next month (Postponed)\", \"urgent\": false}]}, {\"name\": \"Personal Life\", \"concerns\": [{\"id\": \"c2\", \"text\": \"Emma's science fair project due Thursday\", \"urgent\": true}, {\"id\": \"c3\", \"text\": \"Jake struggling with reading\", \"urgent\": false}]}, {\"name\": \"Health\", \"concerns\": [{\"id\": \"c4\", \"text\": \"Haven't exercised in a month\", \"urgent\": false}]}, {\"name\": \"Finances\", \"concerns\": []}, {\"name\": \"Relationships\", \"concerns\": []}, {\"name\": \"Other\", \"concerns\": [{\"id\": \"c5\", \"text\": \"House needs repairs\", \"urgent\": false}]}]}",
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\" class=\"resolved\">Startup launch next month (Postponed)</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\" class=\"urgent\">Emma's science fair project due Thursday <span class=\"urgency-badge\">🔥 Urgent!</span></li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n  .urgent {\n    border-left: 4px solid #e53e3e !important;\n    font-weight: 700;\n    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.2);\n  }\n  .urgency-badge {\n    background-color: #e53e3e;\n    color: white;\n    padding: 4px 8px;\n    border-radius: 8px;\n    font-size: 11px;\n    margin-left: 10px;\n    font-weight: 600;\n  }\n  .resolved {\n    text-decoration: line-through;\n    color: #718096;\n    background: rgba(237, 242, 247, 0.7);\n    border-left-color: #a0aec0 !important;\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's a great question. Now that the startup launch is off your plate for this week, let's look at what's left. Emma's project is due Thursday, which is very soon. Jake's reading struggles and the house repairs are ongoing concerns, and getting back to exercise is important for your well-being. Given the tight deadline, focusing on Emma's project first makes a lot of sense.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is asking for prioritization advice based on the remaining items in the stress map. The immediate deadline for Emma's project is the most pressing actionable item for this week. The user also needs to consider Jake's reading and the house repairs as ongoing, and their own health as a priority.",
+          "context_updates": "",
+          "reasoning": "The user is seeking concrete advice on what to focus on. Based on the updated stress map, Emma's project has the nearest deadline (Thursday). Therefore, prioritizing this is the most logical next step. I will frame the response to guide them towards this, while acknowledging the other items. The tone is supportive and action-oriented."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "stress_map_1",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "What's Overwhelming You?",
+            "domains": [
+              {
+                "name": "Work",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "text": "Startup launch next month (Postponed)",
+                    "urgent": false
+                  }
+                ]
+              },
+              {
+                "name": "Personal Life",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "text": "Emma's science fair project due Thursday",
+                    "urgent": true
+                  },
+                  {
+                    "id": "c3",
+                    "text": "Jake struggling with reading",
+                    "urgent": false
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "text": "Haven't exercised in a month",
+                    "urgent": false
+                  }
+                ]
+              },
+              {
+                "name": "Finances",
+                "concerns": []
+              },
+              {
+                "name": "Relationships",
+                "concerns": []
+              },
+              {
+                "name": "Other",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "text": "House needs repairs",
+                    "urgent": false
+                  }
+                ]
+              }
+            ]
+          },
+          "html": "<div class=\"stress-map-container\">\n  <div class=\"stress-map-header\">\n    <h2>What's Overwhelming You? 🤯</h2>\n    <p>Let's untangle these threads together.</p>\n  </div>\n  <div class=\"stress-map-domains\">\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💼</span> Work</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c1\" class=\"resolved\">Startup launch next month (Postponed)</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">❤️</span> Personal Life</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c2\" class=\"urgent\">Emma's science fair project due Thursday <span class=\"urgency-badge\">🔥 Urgent!</span></li>\n        <li data-id=\"c3\">Jake struggling with reading</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💪</span> Health</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c4\">Haven't exercised in a month</li>\n      </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">💰</span> Finances</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">👨‍👩‍👧‍👦</span> Relationships</h3>\n      <ul class=\"concerns-list\">\n        </ul>\n    </div>\n    <div class=\"domain\">\n      <h3><span class=\"icon\">✨</span> Other</h3>\n      <ul class=\"concerns-list\">\n        <li data-id=\"c5\">House needs repairs</li>\n      </ul>\n    </div>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .stress-map-container {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    width: 100%;\n    max-width: 800px;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n    border: 1px solid rgba(255, 255, 255, 0.2);\n  }\n  .stress-map-header {\n    text-align: center;\n    margin-bottom: 40px;\n  }\n  .stress-map-header h2 {\n    font-size: 36px;\n    font-weight: 700;\n    color: #2c5282;\n    margin-bottom: 10px;\n    letter-spacing: -0.5px;\n  }\n  .stress-map-header p {\n    font-size: 18px;\n    color: #4a5568;\n    font-weight: 400;\n  }\n  .stress-map-domains {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 30px;\n  }\n  .domain {\n    background: rgba(255, 255, 255, 0.8);\n    border-radius: 16px;\n    padding: 25px;\n    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);\n    border: 1px solid rgba(200, 200, 200, 0.2);\n  }\n  .domain h3 {\n    font-size: 22px;\n    font-weight: 600;\n    color: #1a365d;\n    margin-bottom: 20px;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .domain .icon {\n    font-size: 24px;\n  }\n  .concerns-list {\n    list-style: none;\n    padding: 0;\n    margin: 0;\n    min-height: 50px; /* Ensures minimum height even when empty */\n  }\n  .concerns-list li {\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    padding: 12px 18px;\n    margin-bottom: 10px;\n    font-size: 15px;\n    color: #2d3748;\n    font-weight: 500;\n    box-shadow: 0 2px 8px rgba(0,0,0,0.08);\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n    border-left: 4px solid #f59e0b;\n  }\n  .concerns-list li:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 4px 12px rgba(0,0,0,0.12);\n  }\n  .concerns-list li:last-child {\n    margin-bottom: 0;\n  }\n  .urgent {\n    border-left: 4px solid #e53e3e !important;\n    font-weight: 700;\n    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.2);\n  }\n  .urgency-badge {\n    background-color: #e53e3e;\n    color: white;\n    padding: 4px 8px;\n    border-radius: 8px;\n    font-size: 11px;\n    margin-left: 10px;\n    font-weight: 600;\n  }\n  .resolved {\n    text-decoration: line-through;\n    color: #718096;\n    background: rgba(237, 242, 247, 0.7);\n    border-left-color: #a0aec0 !important;\n  }\n</style>"
+        }
+      },
+      "latency_ms": 6398,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 7,
+      "user_input": "Actually, can you completely redesign this? I want to see it as a weekly calendar view instead of a priority matrix",
+      "expected_behavior": {
+        "response": "acknowledge complete redesign request",
+        "artifact_action": "update",
+        "modification_type": "complete_overhaul",
+        "artifact_should_update": {
+          "structure": "calendar layout instead of matrix",
+          "visualization_type": "timeline/calendar",
+          "all_styling": "rebuilt for new format"
+        },
+        "artifact_should_preserve": [
+          "all data/deadlines",
+          "priority information"
+        ],
+        "reasoning": "Complete UI overhaul - rebuild entire artifact with same data"
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "Expected ',' or '}' after property value in JSON at position 7634 (line 1 column 7635)"
+    },
+    {
+      "turn_id": 8,
+      "user_input": "Thanks, this is really helpful. I think I'll tackle Emma's project tonight.",
+      "expected_behavior": {
+        "response": "encourage, validate decision",
+        "artifact_action": "none",
+        "reasoning": "Casual update/gratitude - no artifact change needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "That sounds like a great plan! Focusing on Emma's project tonight is a solid step. Taking it one thing at a time can make a big difference. I'm here if you need to map out anything else or want to revisit this later.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User has indicated a clear action item (Emma's project) and expressed satisfaction with the current artifact. They are moving towards execution. This suggests no immediate need for a new artifact or significant update, but rather positive reinforcement and an offer of continued support.",
+          "reasoning": "The user has identified their next immediate action and seems to be in a more proactive state. The current artifact (stress_map) has been updated and served its purpose for now. The best response is to acknowledge their plan, offer encouragement, and keep the door open for future assistance. No new artifact is needed at this moment."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That sounds like a great plan! Focusing on Emma's project tonight is a solid step. Taking it one thing at a time can make a big difference. I'm here if you need to map out anything else or want to revisit this later.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User has indicated a clear action item (Emma's project) and expressed satisfaction with the current artifact. They are moving towards execution. This suggests no immediate need for a new artifact or significant update, but rather positive reinforcement and an offer of continued support.",
+          "context_updates": "",
+          "reasoning": "The user has identified their next immediate action and seems to be in a more proactive state. The current artifact (stress_map) has been updated and served its purpose for now. The best response is to acknowledge their plan, offer encouragement, and keep the door open for future assistance. No new artifact is needed at this moment."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1482,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    }
+  ],
+  "artifacts": {
+    "auto_1768852409052": {
+      "type": "stress_map",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 1,
+          "data": {
+            "title": "What's Overwhelming You?",
+            "domains": [
+              {
+                "name": "Work",
+                "concerns": []
+              },
+              {
+                "name": "Personal Life",
+                "concerns": []
+              },
+              {
+                "name": "Health",
+                "concerns": []
+              },
+              {
+                "name": "Finances",
+                "concerns": []
+              },
+              {
+                "name": "Relationships",
+                "concerns": []
+              },
+              {
+                "name": "Other",
+                "concerns": []
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total_latency_ms": 35202,
+    "avg_latency_ms": 4400.25,
+    "json_valid_count": 7,
+    "json_invalid_count": 1,
+    "artifact_creates": 1,
+    "artifact_updates": 0
+  },
+  "completed_at": "2026-01-19T19:54:14.328Z",
+  "scores": {
+    "total_points": 47,
+    "max_points": 135,
+    "percentage": 35,
+    "turn_scores": [
+      {
+        "turn_id": 1,
+        "test_type": "restraint",
+        "points": 0,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "❌ Should NOT have created artifact (got: create)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 2,
+        "test_type": "proactive_creation",
+        "points": 0,
+        "max_points": 25,
+        "breakdown": {
+          "proactive_creation": "❌ Should have proactively created artifact (got: update)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 3,
+        "test_type": "data_only_update",
+        "points": 10,
+        "max_points": 15,
+        "breakdown": {
+          "data_only": "⚠️ Updated but didn't specify modification_type (got: undefined)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 4,
+        "test_type": "ui_only_update",
+        "points": 10,
+        "max_points": 15,
+        "breakdown": {
+          "ui_only": "⚠️ Updated but didn't specify modification_type (got: undefined)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 5,
+        "test_type": "combined_update",
+        "points": 7,
+        "max_points": 10,
+        "breakdown": {
+          "combined": "⚠️ Updated but didn't specify modification_type"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 6,
+        "test_type": "preservation",
+        "points": 0,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "❌ Should NOT have created artifact (got: update)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 7,
+        "test_type": "complete_overhaul",
+        "points": 0,
+        "max_points": 10,
+        "breakdown": {
+          "overhaul": "❌ Should have performed complete overhaul (got: none)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 8,
+        "test_type": "restraint",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      }
+    ],
+    "summary": {
+      "restraint": {
+        "passed": 1,
+        "total": 3
+      },
+      "proactive_creation": {
+        "passed": 0,
+        "total": 1
+      },
+      "data_only": {
+        "passed": 0,
+        "total": 1
+      },
+      "ui_only": {
+        "passed": 0,
+        "total": 1
+      },
+      "combined": {
+        "passed": 0,
+        "total": 1
+      },
+      "overhaul": {
+        "passed": 0,
+        "total": 1
+      }
+    }
+  }
+}

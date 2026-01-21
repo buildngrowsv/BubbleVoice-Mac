@@ -1,0 +1,649 @@
+{
+  "run_id": "gemini-2.5-flash-lite_family_kids_school_1768843455628",
+  "scenario_id": "family_kids_school",
+  "model_id": "gemini-2.5-flash-lite",
+  "model_display_name": "Gemini 2.5 Flash Lite",
+  "started_at": "2026-01-19T17:24:15.628Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "Emma has this big science project due on Friday and she's been procrastinating",
+      "expected_behavior": {
+        "response": "acknowledge concern, ask about the project or how user can help",
+        "artifact_action": "none",
+        "notes_should_capture": "Emma - science project, due Friday, procrastinating"
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "emma_project_due_date": "Friday",
+          "emma_project_status": "procrastinating"
+        },
+        "response": "Oh no, that sounds stressful for Emma! It's completely understandable to feel overwhelmed when a big project is looming, especially with procrastination adding to the pressure.  Has she talked about what's making it hard to start?",
+        "artifact": {
+          "artifact_action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Oh no, that sounds stressful for Emma! It's completely understandable to feel overwhelmed when a big project is looming, especially with procrastination adding to the pressure.  Has she talked about what's making it hard to start?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emma_project_due_date\":\"Friday\",\"emma_project_status\":\"procrastinating\"}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1127,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 2,
+      "user_input": "It's about volcanoes. She needs to build a model and write a report. I'm worried she won't finish in time.",
+      "expected_behavior": {
+        "response": "empathize with worry, maybe suggest breaking it down or timeline",
+        "artifact_action": "none",
+        "notes_should_capture": "Emma's project: volcanoes, model + report required"
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "emma_project_due_date": "Friday",
+          "emma_project_status": "procrastinating",
+          "emma_project_details": {
+            "topic": "volcanoes",
+            "components": [
+              "model building",
+              "report writing"
+            ]
+          },
+          "user_concern": "Emma won't finish in time"
+        },
+        "response": "A volcano model and report, wow! That's a substantial project. It's natural to feel worried when you see her struggling with it, especially with the deadline so close.  Sometimes breaking down a big task like that can make it feel more manageable. Have you two thought about how to tackle the model versus the report first?",
+        "artifact": {
+          "artifact_action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "A volcano model and report, wow! That's a substantial project. It's natural to feel worried when you see her struggling with it, especially with the deadline so close.  Sometimes breaking down a big task like that can make it feel more manageable. Have you two thought about how to tackle the model versus the report first?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emma_project_due_date\":\"Friday\",\"emma_project_status\":\"procrastinating\",\"emma_project_details\":{\"topic\":\"volcanoes\",\"components\":[\"model building\",\"report writing\"]},\"user_concern\":\"Emma won't finish in time\"}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1015,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Jake is doing better in school actually. His reading improved a lot since we started doing 20 minutes every night.",
+      "expected_behavior": {
+        "response": "celebrate Jake's progress, acknowledge the effort",
+        "artifact_action": "none",
+        "notes_should_capture": "Jake - reading improved, 20 min nightly reading routine working"
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "jake_school_progress": "improved",
+          "jake_reading_habit": {
+            "duration": "20 minutes",
+            "frequency": "every night",
+            "impact": "reading improved a lot"
+          }
+        },
+        "response": "That's wonderful to hear about Jake! Consistency really pays off, and it sounds like those 20 minutes every night are making a huge difference in his reading. What a great accomplishment for him, and for you both!",
+        "artifact": {
+          "artifact_action": "update",
+          "artifact_type": "goal_tracker",
+          "artifact_data": {
+            "goal_name": "Jake's Reading Practice",
+            "target_frequency": 7,
+            "frequency_unit": "per_week",
+            "preferred_days": [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "constraints": [
+              "20 minutes each night"
+            ],
+            "progress": [
+              {
+                "date": "current",
+                "notes": "Reading improved significantly since starting this routine."
+              }
+            ]
+          }
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's wonderful to hear about Jake! Consistency really pays off, and it sounds like those 20 minutes every night are making a huge difference in his reading. What a great accomplishment for him, and for you both!",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"jake_school_progress\":\"improved\",\"jake_reading_habit\":{\"duration\":\"20 minutes\",\"frequency\":\"every night\",\"impact\":\"reading improved a lot\"}}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "auto_1768843460161",
+          "artifact_type": "goal_tracker"
+        }
+      },
+      "latency_ms": 1384,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created"
+      }
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Can you help me track both kids' school stuff? Like a family notes thing?",
+      "expected_behavior": {
+        "response": "offer to create a family notes artifact",
+        "artifact_action": "create",
+        "artifact_type": "notes",
+        "artifact_should_contain": {
+          "title": "Kids School Notes",
+          "children": [
+            {
+              "name": "Emma",
+              "current_focus": "Science project (volcanoes) - due Friday",
+              "concerns": [
+                "procrastinating"
+              ],
+              "status": "needs attention"
+            },
+            {
+              "name": "Jake",
+              "current_focus": "Reading improvement",
+              "wins": [
+                "reading improved with 20 min nightly practice"
+              ],
+              "status": "doing well"
+            }
+          ]
+        }
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "emma_project_due_date": "Friday",
+          "emma_project_status": "procrastinating",
+          "emma_project_details": {
+            "topic": "volcanoes",
+            "components": [
+              "model building",
+              "report writing"
+            ]
+          },
+          "user_concern": "Emma won't finish in time",
+          "jake_school_progress": "improved",
+          "jake_reading_habit": {
+            "duration": "20 minutes",
+            "frequency": "every night",
+            "impact": "reading improved a lot"
+          },
+          "user_request": "track both kids' school stuff as family notes"
+        },
+        "response": "Absolutely! Creating a shared family notes space for their schoolwork sounds like a great idea to keep everything organized. We can make sure to capture both Emma's volcano project and Jake's reading progress. What should we title this family notes artifact?",
+        "artifact": {
+          "artifact_action": "create",
+          "artifact_type": "notes",
+          "artifact_data": {
+            "title": "Family Schoolwork Tracker",
+            "sections": [
+              {
+                "title": "Emma's Volcano Project",
+                "details": {
+                  "due_date": "Friday",
+                  "components": [
+                    "Model Building",
+                    "Report Writing"
+                  ],
+                  "status": "Procrastinating",
+                  "concerns": "Worry about finishing on time"
+                }
+              },
+              {
+                "title": "Jake's School Progress",
+                "details": {
+                  "reading_habit": {
+                    "activity": "Reading Practice",
+                    "duration": "20 minutes",
+                    "frequency": "Every night",
+                    "outcome": "Significant improvement in reading skills"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Absolutely! Creating a shared family notes space for their schoolwork sounds like a great idea to keep everything organized. We can make sure to capture both Emma's volcano project and Jake's reading progress. What should we title this family notes artifact?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emma_project_due_date\":\"Friday\",\"emma_project_status\":\"procrastinating\",\"emma_project_details\":{\"topic\":\"volcanoes\",\"components\":[\"model building\",\"report writing\"]},\"user_concern\":\"Emma won't finish in time\",\"jake_school_progress\":\"improved\",\"jake_reading_habit\":{\"duration\":\"20 minutes\",\"frequency\":\"every night\",\"impact\":\"reading improved a lot\"},\"user_request\":\"track both kids' school stuff as family notes\"}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "auto_1768843462994",
+          "artifact_type": "notes"
+        }
+      },
+      "latency_ms": 2334,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created"
+      }
+    },
+    {
+      "turn_id": 5,
+      "user_input": "Oh I forgot to mention Emma also has a soccer game on Saturday at 10am",
+      "expected_behavior": {
+        "response": "note the addition, update the artifact",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "children[Emma].upcoming_events": [
+            "Soccer game Saturday 10am"
+          ]
+        }
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "emma_project_due_date": "Friday",
+          "emma_project_status": "procrastinating",
+          "emma_project_details": {
+            "topic": "volcanoes",
+            "components": [
+              "model building",
+              "report writing"
+            ]
+          },
+          "user_concern": "Emma won't finish in time",
+          "jake_school_progress": "improved",
+          "jake_reading_habit": {
+            "duration": "20 minutes",
+            "frequency": "every night",
+            "impact": "reading improved a lot"
+          },
+          "emma_soccer_game": {
+            "day": "Saturday",
+            "time": "10am"
+          }
+        },
+        "response": "Thanks for adding that! It's good to keep all of Emma's commitments in mind. So, she's got the volcano project due Friday and a soccer game on Saturday morning. That's quite a busy week for her!",
+        "artifact": {
+          "artifact_action": "update",
+          "artifact_type": "notes",
+          "artifact_data": {
+            "title": "Family Schoolwork Tracker",
+            "sections": [
+              {
+                "title": "Emma's Volcano Project",
+                "details": {
+                  "due_date": "Friday",
+                  "components": [
+                    "Model Building",
+                    "Report Writing"
+                  ],
+                  "status": "Procrastinating",
+                  "concerns": "Worry about finishing on time"
+                }
+              },
+              {
+                "title": "Emma's Activities",
+                "details": {
+                  "soccer_game": {
+                    "day": "Saturday",
+                    "time": "10am"
+                  }
+                }
+              },
+              {
+                "title": "Jake's School Progress",
+                "details": {
+                  "reading_habit": {
+                    "activity": "Reading Practice",
+                    "duration": "20 minutes",
+                    "frequency": "Every night",
+                    "outcome": "Significant improvement in reading skills"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Thanks for adding that! It's good to keep all of Emma's commitments in mind. So, she's got the volcano project due Friday and a soccer game on Saturday morning. That's quite a busy week for her!",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emma_project_due_date\":\"Friday\",\"emma_project_status\":\"procrastinating\",\"emma_project_details\":{\"topic\":\"volcanoes\",\"components\":[\"model building\",\"report writing\"]},\"user_concern\":\"Emma won't finish in time\",\"jake_school_progress\":\"improved\",\"jake_reading_habit\":{\"duration\":\"20 minutes\",\"frequency\":\"every night\",\"impact\":\"reading improved a lot\"},\"emma_soccer_game\":{\"day\":\"Saturday\",\"time\":\"10am\"}}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "auto_1768843465847",
+          "artifact_type": "notes"
+        }
+      },
+      "latency_ms": 2351,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created"
+      }
+    },
+    {
+      "turn_id": 6,
+      "user_input": "What was Jake's reading routine again?",
+      "expected_behavior": {
+        "response": "recall 20 minutes every night from earlier conversation",
+        "artifact_action": "none",
+        "tests_memory": true,
+        "expected_recall": "20 minutes of reading every night"
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "emma_project_due_date": "Friday",
+          "emma_project_status": "procrastinating",
+          "emma_project_details": {
+            "topic": "volcanoes",
+            "components": [
+              "model building",
+              "report writing"
+            ]
+          },
+          "user_concern": "Emma won't finish in time",
+          "jake_school_progress": "improved",
+          "jake_reading_habit": {
+            "duration": "20 minutes",
+            "frequency": "every night",
+            "impact": "reading improved a lot"
+          },
+          "emma_soccer_game": {
+            "day": "Saturday",
+            "time": "10am"
+          },
+          "user_query": "Jake's reading routine"
+        },
+        "response": "Jake's reading routine involves 20 minutes of reading every night. It seems to be really paying off with his improved reading skills!",
+        "artifact": {
+          "artifact_action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Jake's reading routine involves 20 minutes of reading every night. It seems to be really paying off with his improved reading skills!",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emma_project_due_date\":\"Friday\",\"emma_project_status\":\"procrastinating\",\"emma_project_details\":{\"topic\":\"volcanoes\",\"components\":[\"model building\",\"report writing\"]},\"user_concern\":\"Emma won't finish in time\",\"jake_school_progress\":\"improved\",\"jake_reading_habit\":{\"duration\":\"20 minutes\",\"frequency\":\"every night\",\"impact\":\"reading improved a lot\"},\"emma_soccer_game\":{\"day\":\"Saturday\",\"time\":\"10am\"},\"user_query\":\"Jake's reading routine\"}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1180,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 7,
+      "user_input": "When is Emma's project due?",
+      "expected_behavior": {
+        "response": "recall Friday from turn 1",
+        "artifact_action": "none",
+        "tests_memory": true,
+        "expected_recall": "Friday"
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "emma_project_due_date": "Friday",
+          "emma_project_status": "procrastinating",
+          "emma_project_details": {
+            "topic": "volcanoes",
+            "components": [
+              "model building",
+              "report writing"
+            ]
+          },
+          "user_concern": "Emma won't finish in time",
+          "jake_school_progress": "improved",
+          "jake_reading_habit": {
+            "duration": "20 minutes",
+            "frequency": "every night",
+            "impact": "reading improved a lot"
+          },
+          "emma_soccer_game": {
+            "day": "Saturday",
+            "time": "10am"
+          },
+          "user_query": "Emma's project due date"
+        },
+        "response": "Emma's big science project about volcanoes is due this Friday.",
+        "artifact": {
+          "artifact_action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Emma's big science project about volcanoes is due this Friday.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emma_project_due_date\":\"Friday\",\"emma_project_status\":\"procrastinating\",\"emma_project_details\":{\"topic\":\"volcanoes\",\"components\":[\"model building\",\"report writing\"]},\"user_concern\":\"Emma won't finish in time\",\"jake_school_progress\":\"improved\",\"jake_reading_habit\":{\"duration\":\"20 minutes\",\"frequency\":\"every night\",\"impact\":\"reading improved a lot\"},\"emma_soccer_game\":{\"day\":\"Saturday\",\"time\":\"10am\"},\"user_query\":\"Emma's project due date\"}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 748,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 8,
+      "user_input": "Add a reminder that we should help Emma start the volcano model tonight",
+      "expected_behavior": {
+        "response": "confirm adding reminder/action item",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "children[Emma].action_items": [
+            "Help start volcano model tonight"
+          ]
+        }
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "emma_project_due_date": "Friday",
+          "emma_project_status": "procrastinating",
+          "emma_project_details": {
+            "topic": "volcanoes",
+            "components": [
+              "model building",
+              "report writing"
+            ]
+          },
+          "user_concern": "Emma won't finish in time",
+          "jake_school_progress": "improved",
+          "jake_reading_habit": {
+            "duration": "20 minutes",
+            "frequency": "every night",
+            "impact": "reading improved a lot"
+          },
+          "emma_soccer_game": {
+            "day": "Saturday",
+            "time": "10am"
+          },
+          "user_request": "add reminder to help Emma start volcano model tonight"
+        },
+        "response": "That's a great idea to get a head start on the volcano model tonight! Sometimes just getting started is the hardest part. It's wonderful that you're there to support her with it.",
+        "artifact": {
+          "artifact_action": "update",
+          "artifact_type": "notes",
+          "artifact_data": {
+            "title": "Family Schoolwork Tracker",
+            "sections": [
+              {
+                "title": "Emma's Volcano Project",
+                "details": {
+                  "due_date": "Friday",
+                  "components": [
+                    "Model Building",
+                    "Report Writing"
+                  ],
+                  "status": "Procrastinating",
+                  "concerns": "Worry about finishing on time",
+                  "action_items": [
+                    "Start volcano model tonight (with help)"
+                  ]
+                }
+              },
+              {
+                "title": "Emma's Activities",
+                "details": {
+                  "soccer_game": {
+                    "day": "Saturday",
+                    "time": "10am"
+                  }
+                }
+              },
+              {
+                "title": "Jake's School Progress",
+                "details": {
+                  "reading_habit": {
+                    "activity": "Reading Practice",
+                    "duration": "20 minutes",
+                    "frequency": "Every night",
+                    "outcome": "Significant improvement in reading skills"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's a great idea to get a head start on the volcano model tonight! Sometimes just getting started is the hardest part. It's wonderful that you're there to support her with it.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emma_project_due_date\":\"Friday\",\"emma_project_status\":\"procrastinating\",\"emma_project_details\":{\"topic\":\"volcanoes\",\"components\":[\"model building\",\"report writing\"]},\"user_concern\":\"Emma won't finish in time\",\"jake_school_progress\":\"improved\",\"jake_reading_habit\":{\"duration\":\"20 minutes\",\"frequency\":\"every night\",\"impact\":\"reading improved a lot\"},\"emma_soccer_game\":{\"day\":\"Saturday\",\"time\":\"10am\"},\"user_request\":\"add reminder to help Emma start volcano model tonight\"}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "auto_1768843471842",
+          "artifact_type": "notes"
+        }
+      },
+      "latency_ms": 2563,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created"
+      }
+    }
+  ],
+  "artifacts": {
+    "auto_1768843460161": {
+      "type": "goal_tracker",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 3
+        }
+      ]
+    },
+    "auto_1768843462994": {
+      "type": "notes",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 4
+        }
+      ]
+    },
+    "auto_1768843465847": {
+      "type": "notes",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 5
+        }
+      ]
+    },
+    "auto_1768843471842": {
+      "type": "notes",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 8
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total_latency_ms": 12702,
+    "avg_latency_ms": 1587.75,
+    "json_valid_count": 8,
+    "json_invalid_count": 0,
+    "artifact_creates": 4,
+    "artifact_updates": 0
+  },
+  "completed_at": "2026-01-19T17:24:32.342Z"
+}

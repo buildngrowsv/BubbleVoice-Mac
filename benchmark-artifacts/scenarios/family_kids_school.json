@@ -1,0 +1,131 @@
+{
+  "scenario_id": "family_kids_school",
+  "description": "User discusses kids' school activities, memory retention test across multiple topics",
+  "category": "family",
+  "difficulty": "medium",
+  "tests_memory": true,
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_says": "Emma has this big science project due on Friday and she's been procrastinating",
+      "expected_behavior": {
+        "response": "acknowledge concern, ask about the project or how user can help",
+        "artifact_action": "none",
+        "notes_should_capture": "Emma - science project, due Friday, procrastinating"
+      }
+    },
+    {
+      "turn_id": 2,
+      "user_says": "It's about volcanoes. She needs to build a model and write a report. I'm worried she won't finish in time.",
+      "expected_behavior": {
+        "response": "empathize with worry, maybe suggest breaking it down or timeline",
+        "artifact_action": "none",
+        "notes_should_capture": "Emma's project: volcanoes, model + report required"
+      }
+    },
+    {
+      "turn_id": 3,
+      "user_says": "Jake is doing better in school actually. His reading improved a lot since we started doing 20 minutes every night.",
+      "expected_behavior": {
+        "response": "celebrate Jake's progress, acknowledge the effort",
+        "artifact_action": "none",
+        "notes_should_capture": "Jake - reading improved, 20 min nightly reading routine working"
+      }
+    },
+    {
+      "turn_id": 4,
+      "user_says": "Can you help me track both kids' school stuff? Like a family notes thing?",
+      "expected_behavior": {
+        "response": "offer to create a family notes artifact",
+        "artifact_action": "create",
+        "artifact_type": "notes",
+        "artifact_should_contain": {
+          "title": "Kids School Notes",
+          "children": [
+            {
+              "name": "Emma",
+              "current_focus": "Science project (volcanoes) - due Friday",
+              "concerns": ["procrastinating"],
+              "status": "needs attention"
+            },
+            {
+              "name": "Jake",
+              "current_focus": "Reading improvement",
+              "wins": ["reading improved with 20 min nightly practice"],
+              "status": "doing well"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "turn_id": 5,
+      "user_says": "Oh I forgot to mention Emma also has a soccer game on Saturday at 10am",
+      "expected_behavior": {
+        "response": "note the addition, update the artifact",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "children[Emma].upcoming_events": ["Soccer game Saturday 10am"]
+        }
+      }
+    },
+    {
+      "turn_id": 6,
+      "user_says": "What was Jake's reading routine again?",
+      "expected_behavior": {
+        "response": "recall 20 minutes every night from earlier conversation",
+        "artifact_action": "none",
+        "tests_memory": true,
+        "expected_recall": "20 minutes of reading every night"
+      }
+    },
+    {
+      "turn_id": 7,
+      "user_says": "When is Emma's project due?",
+      "expected_behavior": {
+        "response": "recall Friday from turn 1",
+        "artifact_action": "none",
+        "tests_memory": true,
+        "expected_recall": "Friday"
+      }
+    },
+    {
+      "turn_id": 8,
+      "user_says": "Add a reminder that we should help Emma start the volcano model tonight",
+      "expected_behavior": {
+        "response": "confirm adding reminder/action item",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "children[Emma].action_items": ["Help start volcano model tonight"]
+        }
+      }
+    }
+  ],
+  "final_artifact_expected": {
+    "type": "notes",
+    "data": {
+      "title": "Kids School Notes",
+      "children": [
+        {
+          "name": "Emma",
+          "current_focus": "Science project (volcanoes) - due Friday",
+          "concerns": ["procrastinating"],
+          "upcoming_events": ["Soccer game Saturday 10am"],
+          "action_items": ["Help start volcano model tonight"],
+          "status": "needs attention"
+        },
+        {
+          "name": "Jake",
+          "current_focus": "Reading improvement",
+          "wins": ["reading improved with 20 min nightly practice"],
+          "status": "doing well"
+        }
+      ]
+    }
+  },
+  "evaluation_notes": {
+    "memory_tests": "Turns 6 and 7 specifically test recall of earlier conversation details",
+    "artifact_evolution": "Artifact should evolve through create and multiple updates",
+    "topic_switching": "Conversation switches between Emma and Jake - AI should track both"
+  }
+}

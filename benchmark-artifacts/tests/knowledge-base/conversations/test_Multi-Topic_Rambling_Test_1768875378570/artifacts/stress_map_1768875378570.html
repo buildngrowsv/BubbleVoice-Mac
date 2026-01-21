@@ -1,0 +1,59 @@
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; background: linear-gradient(135deg, rgba(76, 83, 103, 0.8) 0%, rgba(31, 37, 51, 0.8) 100%); color: #ffffff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); max-width: 700px; margin: 20px auto;">
+  <h1 style="text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 10px; color: #e2e8f0;">Current Stressors</h1>
+  <p style="text-align: center; font-size: 16px; color: #a0aec0; margin-bottom: 30px;">Navigating multiple life domains</p>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px;">
+    <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15);">
+      <div style="font-size: 40px; margin-bottom: 15px;">📚</div>
+      <h2 style="font-size: 20px; font-weight: 600; color: #cbd5e0; margin-bottom: 8px;">Emma's School</h2>
+      <p style="font-size: 14px; color: #90cdf4;">Reading progress is a win!</p>
+      <p style="font-size: 14px; color: #90cdf4;">Requires attention & effort.</p>
+    </div>
+
+    <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15);">
+      <div style="font-size: 40px; margin-bottom: 15px;">🚀</div>
+      <h2 style="font-size: 20px; font-weight: 600; color: #cbd5e0; margin-bottom: 8px;">Startup/Investors</h2>
+      <p style="font-size: 14px; color: #f6ad55;">High stress from fundraising.</p>
+      <p style="font-size: 14px; color: #f6ad55;">Investor demands.</p>
+    </div>
+
+    <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15);">
+      <div style="font-size: 40px; margin-bottom: 15px;">🏃</div>
+      <h2 style="font-size: 20px; font-weight: 600; color: #cbd5e0; margin-bottom: 8px;">Exercise Goals</h2>
+      <p style="font-size: 14px; color: #68d391;">Want to run, but too tired.</p>
+      <p style="font-size: 14px; color: #68d391;">Energy depletion.</p>
+    </div>
+
+    <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15);">
+      <div style="font-size: 40px; margin-bottom: 15px;">❤️</div>
+      <h2 style="font-size: 20px; font-weight: 600; color: #cbd5e0; margin-bottom: 8px;">Partner Time</h2>
+      <p style="font-size: 14px; color: #f1828d;">No date nights recently.</p>
+      <p style="font-size: 14px; color: #f1828d;">Relationship needs attention.</p>
+    </div>
+  </div>
+</div>
+<style>
+  /* Basic responsive adjustments */
+  @media (max-width: 600px) {
+    .stress-map-container {
+      padding: 20px;
+    }
+    .stress-map-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Basic interactivity for hover effect
+  document.querySelectorAll('.stress-card').forEach(card => {
+    card.addEventListener('mouseover', () => {
+      card.style.transform = 'scale(1.03)';
+      card.style.transition = 'transform 0.2s ease-in-out';
+    });
+    card.addEventListener('mouseout', () => {
+      card.style.transform = 'scale(1)';
+      card.style.transition = 'transform 0.2s ease-in-out';
+    });
+  });
+</script>

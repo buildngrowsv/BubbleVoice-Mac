@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma's Reading Journey</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .artifact-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #005288; /* Deep Blue */
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+        h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #007bff; /* Brighter Blue */
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .section:nth-child(odd) {
+            background-color: rgba(240, 248, 255, 0.8); /* Alice Blue */
+        }
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            text-align: left;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+        }
+        .timeline-item:hover {
+            transform: translateY(-5px);
+        }
+        .timeline-item .icon {
+            font-size: 2em;
+            margin-right: 15px;
+            color: #66d9ef; /* Light Blue */
+        }
+        .timeline-item .date {
+            font-weight: 600;
+            color: #555;
+            min-width: 120px;
+            display: inline-block;
+        }
+        .timeline-item .text {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .key-points {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            display: inline-block;
+        }
+        .key-points li {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            position: relative;
+            padding-left: 25px;
+        }
+        .key-points li::before {
+            content: '✨'; /* Sparkle emoji */
+            position: absolute;
+            left: 0;
+            color: #f0c419; /* Golden */
+            font-size: 1.2em;
+        }
+        .user-concern {
+            font-style: italic;
+            color: #dc3545; /* Red */
+            margin-top: 10px;
+            font-size: 1.05em;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="artifact-container">
+        <h1>Emma's Reading Journey 📚</h1>
+        <p>A snapshot for your meeting with Ms. Johnson</p>
+
+        <div class="section">
+            <h2>Key Challenges</h2>
+            <ul class="key-points">
+                <li>Decoding words, but struggling with comprehension and retention.</li>
+                <li>Significant frustration and impact on self-esteem (e.g., "I'm stupid").</li>
+                <li>Requires significant time and effort for homework.</li>
+            </ul>
+            <p class="user-concern">"I don't want her to feel like there's something wrong with her. She's already so hard on herself."</p>
+        </div>
+
+        <div class="section">
+            <h2>Recent Breakthroughs & Strategies</h2>
+            <div class="timeline-item">
+                <span class="icon">🤩</span>
+                <div class="content">
+                    <div class="date">Jan 19, 2026</div>
+                    <div class="text"><strong>Graphic Novel Success!</strong> Read Dog Man for 20 minutes straight. High engagement.</div>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <span class="icon">💡</span>
+                <div class="content">
+                    <div class="date">Jan 15, 2026</div>
+                    <div class="text"><strong>Initiated Reading!</strong> Asked for "one more chapter" - a first!</div>
+                </div>
+            </div>
+             <div class="timeline-item">
+                <span class="icon">🤝</span>
+                <div class="content">
+                    <div class="date">Ongoing</div>
+                    <div class="text"><strong>What Seems to Help:</strong> Reading together, visual aids (graphic novels), praising effort, taking breaks.</div>
+                </div>
+            </div>
+            <p class="user-concern">"The graphic novels seem to be the key. Maybe we pushed chapter books too hard."</p>
+        </div>
+
+        <div class="section">
+            <h2>Teacher's Input</h2>
+            <ul class="key-points">
+                <li>Ms. Johnson noted comprehension concerns (email sent Jan 10).</li>
+                <li>Meeting scheduled for Jan 23 to discuss testing options.</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            Prepared by Bubble | January 20, 2026
+        </div>
+    </div>
+</body>
+</html>

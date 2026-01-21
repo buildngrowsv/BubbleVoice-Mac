@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, rgba(240, 245, 255, 0.9) 0%, rgba(220, 230, 245, 0.9) 100%); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; padding: 40px; width: 100%; max-width: 1200px; }
+        .stress-card {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .stress-card:hover { transform: translateY(-8px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .card-icon { font-size: 32px; }
+        .card-title { font-size: 24px; font-weight: 600; color: #1a365d; }
+        .card-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .card-content li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .card-content li::before {
+            content: '🔹'; /* Using a subtle bullet */
+            color: #60a5fa;
+            font-size: 14px;
+        }
+        .area-label {
+            font-weight: 500;
+            color: #3b82f6;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 14px;
+        }
+        .stress-score {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ef4444;
+            text-align: right;
+            margin-top: 20px;
+        }
+        .gradient-icon.startup { background: linear-gradient(45deg, #fbbf24, #f59e0b); -webkit-background-clip: text; color: transparent; }
+        .gradient-icon.family { background: linear-gradient(45deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; }
+        .gradient-icon.personal { background: linear-gradient(45deg, #34d399, #10b981); -webkit-background-clip: text; color: transparent; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="card-container">
+        
+        <div class="stress-card">
+            <div class="card-header">
+                <div class="card-icon gradient-icon startup">🚀</div>
+                <h3 class="card-title">Startup Demands</h3>
+            </div>
+            <div class="card-content">
+                <ul>
+                    <li>Fundraising pressure</li>
+                    <li>Team hiring challenges</li>
+                    <li>Long hours impacting personal time</li>
+                </ul>
+            </div>
+            <div class="stress-score">High Intensity</div>
+        </div>
+
+        <div class="stress-card">
+            <div class="card-header">
+                <div class="card-icon gradient-icon family">👨‍👩‍👧‍👦</div>
+                <h3 class="card-title">Family Responsibilities</h3>
+            </div>
+            <div class="card-content">
+                <ul>
+                    <li>Emma's reading progress & school meetings</li>
+                    <li>Logistics of kids' activities (soccer, etc.)</li>
+                    <li>Guilt over time away from family</li>
+                </ul>
+            </div>
+             <div class="stress-score">Significant Pressure</div>
+        </div>
+
+        <div class="stress-card">
+            <div class="card-header">
+                <div class="card-icon gradient-icon personal">🏃</div>
+                <h3 class="card-title">Personal Goals & Well-being</h3>
+            </div>
+            <div class="card-content">
+                <ul>
+                    <li>Struggling with exercise consistency (running)</li>
+                    <li>Feeling burnt out, low energy</li>
+                    <li>Therapy notes on work-life balance</li>
+                </ul>
+            </div>
+             <div class="stress-score">Intermittent Strain</div>
+        </div>
+
+    </div>
+</body>
+</html>

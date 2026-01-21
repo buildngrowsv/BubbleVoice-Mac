@@ -1,0 +1,68 @@
+{
+  "scenario_name": "HTML Toggle System Test",
+  "description": "Tests AI's ability to toggle HTML generation on/off appropriately. HTML should be OFF by default (fast mode) and only toggle ON when visualization adds value.",
+  "system_prompt": "You are a personal AI companion. By default, you work in FAST MODE (HTML OFF) and only generate structured data. You can toggle HTML generation ON when the user needs a visual artifact. Follow the HTML toggle instructions carefully.",
+  "conversation_steps": [
+    {
+      "user_input": "I'm trying to decide between two job offers",
+      "expected_ai_response_pattern": "asks clarifying questions, empathetic",
+      "expected_html_toggle": false,
+      "expected_artifact_action": "none",
+      "reasoning": "First mention - need more details before creating anything. HTML OFF (fast mode)."
+    },
+    {
+      "user_input": "Offer A is at Google - $180k, great benefits, but 60 hour weeks and I'd have to relocate to SF. Offer B is at a startup - $140k, equity, flexible hours, remote, but risky.",
+      "expected_ai_response_pattern": "acknowledges complexity, offers to help visualize",
+      "expected_html_toggle": true,
+      "expected_artifact_action": "create",
+      "expected_artifact_type": "comparison_card",
+      "reasoning": "Complex decision with multiple factors - TOGGLE HTML ON. User needs to SEE the comparison."
+    },
+    {
+      "user_input": "Actually the Google salary is $190k, not $180k",
+      "expected_ai_response_pattern": "acknowledges correction, updates data",
+      "expected_html_toggle": false,
+      "expected_artifact_action": "update",
+      "expected_modification_type": "data_only",
+      "reasoning": "Simple data correction - HTML OFF. User already has the visual, just update the number."
+    },
+    {
+      "user_input": "What do you think I should prioritize?",
+      "expected_ai_response_pattern": "asks about values, explores priorities",
+      "expected_html_toggle": false,
+      "expected_artifact_action": "none",
+      "reasoning": "User asking question - HTML OFF. No artifact change needed, just conversation."
+    },
+    {
+      "user_input": "I care most about work-life balance and spending time with my kids",
+      "expected_ai_response_pattern": "reflects values, updates context",
+      "expected_html_toggle": false,
+      "expected_artifact_action": "update",
+      "expected_modification_type": "data_only",
+      "reasoning": "Adding context/values - HTML OFF. Data update only, no visual regeneration needed."
+    },
+    {
+      "user_input": "Can you show me this as a pros/cons list instead?",
+      "expected_ai_response_pattern": "confirms redesign",
+      "expected_html_toggle": true,
+      "expected_artifact_action": "update",
+      "expected_modification_type": "complete_overhaul",
+      "reasoning": "User requests visual redesign - TOGGLE HTML ON. Need to regenerate the entire visual."
+    },
+    {
+      "user_input": "Thanks, I think I'm leaning towards the startup",
+      "expected_ai_response_pattern": "supportive, acknowledges decision",
+      "expected_html_toggle": false,
+      "expected_artifact_action": "none",
+      "reasoning": "User reflecting - HTML OFF. No artifact change needed."
+    },
+    {
+      "user_input": "Actually, can you add a third option? I just got an offer from Amazon - $200k, hybrid (3 days office), good benefits, stable but corporate culture",
+      "expected_ai_response_pattern": "acknowledges new option, updates comparison",
+      "expected_html_toggle": true,
+      "expected_artifact_action": "update",
+      "expected_modification_type": "data_and_ui",
+      "reasoning": "Adding third option changes layout - TOGGLE HTML ON. Need to regenerate visual to accommodate new column/row."
+    }
+  ]
+}

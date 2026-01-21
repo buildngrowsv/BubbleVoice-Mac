@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Build output
+dist/
+build/
+.build/
+
+# macOS
+.DS_Store
+*.dmg
+*.app
+
+# Electron
+out/
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Test artifacts
+test-results/
+coverage/
+# Playwright artifacts
+playwright-report/
+playwright-results/
+test-results/
+
+# Swift Package Manager
+.swiftpm/
+*.xcodeproj
+*.xcworkspace
+
+# Temporary test files
+/tmp/

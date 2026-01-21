@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(251, 191, 36, 0.8) 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1a202c;
+            letter-spacing: -0.5px;
+        }
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .category {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        .category-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .category-title .icon {
+            font-size: 1.8em;
+        }
+        .stressors {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+            font-size: 1em;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        .stressors li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stressors li .emoji {
+            font-size: 1.2em;
+        }
+        .details {
+            font-size: 0.9em;
+            color: #718096;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        .feeling {
+            font-weight: 500;
+            color: #a0aec0;
+            margin-top: 25px;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map">
+        <h1>Your Current Stress Landscape</h1>
+        <p class="feeling">It's okay to feel all of these things at once.</p>
+        <div class="categories">
+            <div class="category">
+                <div class="category-title"><span class="icon">📚</span> Emma's School</div>
+                <ul class="stressors">
+                    <li><span class="emoji">🤔</span> Reading Comprehension Struggles</li>
+                    <li><span class="emoji">😟</span> Worry about Future Learning</li>
+                    <li><span class="emoji">💔</span> Guilt about not noticing sooner</li>
+                    <li><span class="emoji">😌</span> Pride in her effort & progress</li>
+                </ul>
+                <div class="details">Focusing on strategies like graphic novels. Teacher meeting upcoming.</div>
+            </div>
+            <div class="category">
+                <div class="category-title"><span class="icon">💼</span> Startup</div>
+                <ul class="stressors">
+                    <li><span class="emoji">🏃</span> Fundraising Pressure</li>
+                    <li><span class="emoji">👥</span> Team Hiring Challenges</li>
+                    <li><span class="emoji">⚖️</span> Balancing Work Demands</li>
+                </ul>
+                 <div class="details">Positive investor meeting, but overall stress remains high.</div>
+            </div>
+            <div class="category">
+                <div class="category-title"><span class="icon">🧘</span> Personal Well-being</div>
+                <ul class="stressors">
+                    <li><span class="emoji">🤯</span> Feeling Overwhelmed</li>
+                    <li><span class="emoji">🔋</span> Low Energy / Burnout Risk</li>
+                    <li><span class="emoji">⚖️</span> Guilt about time away from family</li>
+                </ul>
+                <div class="details">Therapy is helping with guilt, but stress is still significant.</div>
+            </div>
+             <div class="category">
+                <div class="category-title"><span class="icon">❤️</span> Partner Relationship</div>
+                <ul class="stressors">
+                    <li><span class="emoji">⏳</span> Difficulty finding quality time</li>
+                </ul>
+                 <div class="details">Need to consciously make time for connection.</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

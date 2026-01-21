@@ -1,0 +1,42 @@
+{
+  "name": "PostToolUse Verification Hook",
+  "description": "Runs verification after tool execution to ensure quality",
+  "type": "PostToolUse",
+  "enabled": true,
+  
+  "rules": [
+    {
+      "id": "swift_format_after_write",
+      "tool": "write_file",
+      "condition": "path ends with '.swift'",
+      "action": "run",
+      "command": "swiftformat {{path}} --quiet 2>/dev/null || true",
+      "on_failure": "warn",
+      "message": "Swift formatting applied (or skipped if swiftformat not installed)"
+    },
+    {
+      "id": "build_check_after_swift_change",
+      "tool": "write_file",
+      "condition": "path ends with '.swift'",
+      "action": "suggest",
+      "command": "xcodebuild -scheme BubbleVoice-Mac build 2>&1 | tail -20",
+      "message": "Consider running build verification after Swift changes"
+    },
+    {
+      "id": "log_git_operations",
+      "tool": "bash",
+      "condition": "command contains 'git commit' or command contains 'git push'",
+      "action": "log",
+      "log_message": "Git operation performed: {{command}}"
+    }
+  ],
+  
+  "verification": {
+    "on_file_write": {
+      "swift": {
+        "syntax_check": "swiftc -parse {{path}} 2>&1 || true",
+        "on_error": "report"
+      }
+    }
+  }
+}

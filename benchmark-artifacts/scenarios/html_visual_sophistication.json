@@ -1,0 +1,111 @@
+{
+  "scenario_id": "html_visual_sophistication",
+  "description": "Test AI's ability to generate STUNNING, SOPHISTICATED HTML artifacts with liquid glass styling that WOW the user",
+  "category": "visual_quality",
+  "difficulty": "expert",
+  "evaluation_criteria": {
+    "visual_wow_factor": "Does it look beautiful and polished?",
+    "liquid_glass_styling": "Uses backdrop-filter, glassmorphism, modern CSS",
+    "color_sophistication": "Gradients, color harmony, visual hierarchy",
+    "typography": "Font weights, sizes, spacing that feels premium",
+    "micro_interactions": "Hover states, transitions, visual feedback",
+    "layout_intelligence": "Smart use of space, visual flow, responsive design",
+    "emotional_resonance": "Does it feel personal and empathetic?"
+  },
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_says": "I'm trying to decide between two job offers. One is at a stable company with good pay but boring work. The other is a startup with lower pay but exciting challenges. I have a family to support.",
+      "expected_behavior": {
+        "response": "acknowledge complexity, empathize with difficult choice",
+        "artifact_action": "create",
+        "artifact_type": "comparison_card",
+        "reasoning": "PROACTIVE: Complex decision with tradeoffs - visual comparison would help",
+        "html_requirements": {
+          "must_have": [
+            "Liquid glass / glassmorphism styling (backdrop-filter: blur)",
+            "Side-by-side comparison layout",
+            "Color-coded sections (stable vs exciting)",
+            "Visual hierarchy with typography",
+            "Gradients or sophisticated color palette",
+            "Inline CSS (complete standalone HTML)",
+            "Feels premium and polished"
+          ],
+          "wow_factors": [
+            "Subtle shadows and depth",
+            "Emoji or icon usage for visual interest",
+            "Progress bars or visual indicators",
+            "Smooth transitions on hover",
+            "Thoughtful spacing and padding",
+            "Color psychology (blue for stable, orange for exciting)"
+          ]
+        }
+      },
+      "test_type": "html_creation_sophistication"
+    },
+    {
+      "turn_id": 2,
+      "user_says": "Actually, the startup just offered equity. That changes things.",
+      "expected_behavior": {
+        "response": "acknowledge significant new factor",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "html_requirements": {
+          "must_have": [
+            "Add equity as new factor in startup column",
+            "Visually emphasize the equity (maybe with icon or badge)",
+            "Preserve all existing styling",
+            "Update may shift visual balance toward startup"
+          ]
+        }
+      },
+      "test_type": "html_update_preservation"
+    },
+    {
+      "turn_id": 3,
+      "user_says": "Can you make this feel more personal? Like it understands this is a huge life decision for me and my family?",
+      "expected_behavior": {
+        "response": "acknowledge emotional weight",
+        "artifact_action": "update",
+        "modification_type": "ui_only",
+        "html_requirements": {
+          "must_have": [
+            "Add empathetic language or notes",
+            "Maybe add family-focused section or callout",
+            "Warmer color palette or softer styling",
+            "Preserve all data",
+            "Feels more human and less clinical"
+          ],
+          "wow_factors": [
+            "Personal touches (family icon, heart emoji)",
+            "Softer shadows or warmer tones",
+            "Encouraging or supportive messaging"
+          ]
+        }
+      },
+      "test_type": "emotional_sophistication"
+    }
+  ],
+  "scoring": {
+    "html_generation": {
+      "points": 40,
+      "criteria": "Generated complete, standalone HTML with inline CSS"
+    },
+    "visual_sophistication": {
+      "points": 30,
+      "criteria": "Liquid glass styling, gradients, modern design, premium feel"
+    },
+    "layout_intelligence": {
+      "points": 15,
+      "criteria": "Smart use of space, visual hierarchy, typography"
+    },
+    "emotional_resonance": {
+      "points": 10,
+      "criteria": "Feels personal, empathetic, human"
+    },
+    "preservation_on_update": {
+      "points": 5,
+      "criteria": "Updates preserve styling and structure"
+    }
+  }
+}

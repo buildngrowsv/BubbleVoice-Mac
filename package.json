@@ -1,0 +1,93 @@
+{
+  "name": "bubblevoice-mac",
+  "version": "0.1.0",
+  "description": "Personal AI companion for Mac that remembers your life - voice-first conversations with memory and artifacts",
+  "main": "src/electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron . --enable-logging",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "test": "node tests/run-all-tests.js",
+    "test:unit": "node tests/run-all-tests.js --unit",
+    "test:integration": "node tests/run-all-tests.js --integration",
+    "test:backend": "node tests/backend-server-tests.js",
+    "test:electron": "node tests/electron-main-tests.js",
+    "test:frontend": "node tests/frontend-component-tests.js",
+    "test:ui": "node tests/ui-hybrid-tests.js",
+    "test:playwright": "playwright test",
+    "test:playwright:headed": "playwright test --headed",
+    "test:playwright:debug": "playwright test --debug",
+    "test:playwright:ui": "playwright test --ui",
+    "test:playwright:report": "playwright show-report tests/playwright-report"
+  },
+  "keywords": [
+    "ai",
+    "voice",
+    "personal-assistant",
+    "memory",
+    "conversation",
+    "mac",
+    "electron"
+  ],
+  "author": "BubbleVoice Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@google/generative-ai": "^0.21.0",
+    "canvas": "^2.11.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.73.0",
+    "uuid": "^11.0.5",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "electron": "^33.3.0",
+    "electron-builder": "^25.1.8",
+    "puppeteer": "^22.15.0"
+  },
+  "build": {
+    "appId": "com.bubblevoice.mac",
+    "productName": "BubbleVoice",
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "assets/icon.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist",
+      "extendInfo": "Info.plist"
+    },
+    "files": [
+      "src/**/*",
+      "assets/**/*",
+      "package.json",
+      "Info.plist",
+      "entitlements.mac.plist"
+    ],
+    "directories": {
+      "output": "dist"
+    }
+  },
+  "notes": {
+    "required_env_vars": [
+      "GOOGLE_API_KEY - For Gemini models (primary)",
+      "OPENAI_API_KEY - For GPT models (optional)",
+      "ANTHROPIC_API_KEY - For Claude models (optional)"
+    ],
+    "architecture": [
+      "Electron frontend - Rich UI with web technologies",
+      "Node.js backend - Voice pipeline and LLM orchestration",
+      "WebSocket - Real-time communication between frontend and backend",
+      "Apple Speech Recognition - Native macOS speech-to-text",
+      "NSSpeechSynthesizer - Native macOS text-to-speech"
+    ]
+  }
+}

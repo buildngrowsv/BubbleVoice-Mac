@@ -1,0 +1,59 @@
+{
+  "name": "PreToolUse Safety Hook",
+  "description": "Validates tool usage before execution to prevent dangerous operations",
+  "type": "PreToolUse",
+  "enabled": true,
+  
+  "rules": [
+    {
+      "id": "block_production_writes",
+      "tool": "write_file",
+      "condition": "path contains 'production' or path contains 'prod/'",
+      "action": "block",
+      "message": "BLOCKED: Cannot write to production files. Use development/staging only."
+    },
+    {
+      "id": "block_secret_files",
+      "tool": "write_file", 
+      "condition": "path contains '.env' or path contains 'secrets' or path contains 'credentials'",
+      "action": "block",
+      "message": "BLOCKED: Cannot write to secret/credential files. Use secure storage."
+    },
+    {
+      "id": "warn_entitlements",
+      "tool": "write_file",
+      "condition": "path ends with '.entitlements'",
+      "action": "warn",
+      "message": "WARNING: Modifying entitlements. Verify with user before proceeding."
+    },
+    {
+      "id": "block_dangerous_bash",
+      "tool": "bash",
+      "condition": "command contains 'rm -rf /' or command contains 'sudo rm' or command contains 'chmod 777'",
+      "action": "block",
+      "message": "BLOCKED: Dangerous bash command detected."
+    },
+    {
+      "id": "require_timeout",
+      "tool": "bash",
+      "condition": "command does not contain 'timeout'",
+      "action": "warn",
+      "message": "WARNING: Bash command should use timeout. Consider: timeout 120 <command>"
+    },
+    {
+      "id": "block_default_ports",
+      "tool": "bash",
+      "condition": "command contains ':3000' or command contains ':8080' or command contains ':8000'",
+      "action": "warn",
+      "message": "WARNING: Using default port. Consider random port like :4837 or :6192"
+    }
+  ],
+  
+  "logging": {
+    "enabled": true,
+    "log_file": ".claude/logs/tool_usage.log",
+    "include_timestamp": true,
+    "include_tool": true,
+    "include_result": true
+  }
+}

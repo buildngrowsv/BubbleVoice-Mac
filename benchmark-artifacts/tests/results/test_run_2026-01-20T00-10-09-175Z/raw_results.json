@@ -1,0 +1,269 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Multi-Topic Rambling Test",
+    "description": "Tests handling of users who ramble about many topics at once",
+    "timestamp": "2026-01-20T00:09:52.603Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now, with Emma's reading progress being a bright spot amidst work stress, your desire to run, and the need for quality time with Jordan. It's completely understandable to feel exhausted.",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "The user is expressing overwhelm from multiple life areas: work (startup stress, investors), family (Emma's reading progress is positive but the general context is stressful), personal growth (desire to run but too tired), and relationships (lack of date nights). They are feeling the strain of trying to manage everything.",
+            "emotional_state": "overwhelmed",
+            "key_context": "User is experiencing significant stress and exhaustion across multiple domains, with positive news about Emma's reading being a small relief.",
+            "watch_for": "Continue to monitor the user's stress levels, particularly regarding the startup and how it impacts their ability to prioritize self-care and relationship time. Also, note any further progress or setbacks with Emma's reading."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "area_name": "Family/Emma_School",
+              "entry": {
+                "timestamp": "2026-01-19 20:00:00",
+                "user_quote": "Emma had a good day today with reading today but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Work/Startup",
+              "entry": {
+                "timestamp": "2026-01-19 20:00:00",
+                "user_quote": "Emma had a good day today with reading today but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Personal_Growth/Exercise_Goals",
+              "entry": {
+                "timestamp": "2026-01-19 20:00:00",
+                "user_quote": "Emma had a good day today with reading today but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Relationships/Partner",
+              "entry": {
+                "timestamp": "2026-01-19 20:00:00",
+                "user_quote": "Emma had a good day today with reading today but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Inter', sans-serif;\n            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(245, 158, 11, 0.8) 100%);\n            color: #ffffff;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.1);\n            backdrop-filter: blur(20px);\n            -webkit-backdrop-filter: blur(20px);\n            border-radius: 24px;\n            padding: 30px;\n            width: 100%;\n            max-width: 700px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            border: 1px solid rgba(255, 255, 255, 0.2);\n            text-align: center;\n        }\n        h1 {\n            font-size: 2.5em;\n            font-weight: 700;\n            margin-bottom: 15px;\n            letter-spacing: -1px;\n            color: #fff;\n            text-shadow: 0 2px 4px rgba(0,0,0,0.1);\n        }\n        p {\n            font-size: 1.1em;\n            font-weight: 400;\n            margin-bottom: 30px;\n            color: rgba(255, 255, 255, 0.9);\n            line-height: 1.6;\n        }\n        .stress-areas {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 25px;\n            margin-top: 30px;\n        }\n        .stress-area {\n            background: rgba(255, 255, 255, 0.15);\n            backdrop-filter: blur(15px);\n            -webkit-backdrop-filter: blur(15px);\n            border-radius: 18px;\n            padding: 25px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            border: 1px solid rgba(255, 255, 255, 0.15);\n            transition: transform 0.2s ease, box-shadow 0.2s ease;\n            display: flex;\n            flex-direction: column;\n            justify-content: center;\n            align-items: center;\n        }\n        .stress-area:hover {\n            transform: translateY(-5px);\n            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);\n        }\n        .stress-area i {\n            font-size: 2.5em;\n            margin-bottom: 15px;\n            color: rgba(255, 255, 255, 0.9);\n        }\n        .stress-area h3 {\n            font-size: 1.4em;\n            font-weight: 600;\n            margin-bottom: 10px;\n            color: #fff;\n            letter-spacing: -0.5px;\n        }\n        .stress-area p {\n            font-size: 0.95em;\n            font-weight: 400;\n            color: rgba(255, 255, 255, 0.85);\n            line-height: 1.5;\n        }\n        .icon-work { color: #4299e1; }\n        .icon-family { color: #f59e0b; }\n        .icon-personal { color: #48bb78; }\n        .icon-relationship { color: #805ad5; }\n    </style>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\">\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Feeling the Pressure</h1>\n        <p>It looks like you're navigating a lot of demands right now. Let's visualize where the stress is coming from, so we can find a path forward. Remember, acknowledging these pressures is the first step to managing them. 🌟</p>\n        <div class=\"stress-areas\">\n            <div class=\"stress-area\">\n                <i class=\"fas fa-building icon-work\"></i>\n                <h3>Work / Startup</h3>\n                <p>Investor stress and general work demands are taking a toll, contributing to exhaustion.</p>\n            </div>\n            <div class=\"stress-area\">\n                <i class=\"fas fa-child icon-family\"></i>\n                <h3>Family / Emma's School</h3>\n                <p>While there's positive progress in reading, the overall context of her needs and homework can add to the mental load.</p>\n            </div>\n            <div class=\"stress-area\">\n                <i class=\"fas fa-running icon-personal\"></i>\n                <h3>Personal Goals / Running</h3>\n                <p>The desire to run for well-being is present, but physical exhaustion is a major barrier.</p>\n            </div>\n            <div class=\"stress-area\">\n                <i class=\"fas fa-heart icon-relationship\"></i>\n                <h3>Relationships / Partner</h3>\n                <p>Quality time with Jordan is lacking, adding another layer of concern amidst the busyness.</p>\n            </div>\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768867800396"
+          }
+        },
+        "latency_ms": 7779,
+        "vector_time_ms": 13,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "The user is expressing overwhelm from multiple life areas: work (startup stress, investors), family (Emma's reading progress is positive but the general context is stressful), personal growth (desire to run but too tired), and relationships (lack of date nights). They are feeling the strain of trying to manage everything.",
+          "emotional_state": "overwhelmed",
+          "key_context": "User is experiencing significant stress and exhaustion across multiple domains, with positive news about Emma's reading being a small relief.",
+          "watch_for": "Continue to monitor the user's stress levels, particularly regarding the startup and how it impacts their ability to prioritize self-care and relationship time. Also, note any further progress or setbacks with Emma's reading."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma",
+            "work/investors",
+            "running",
+            "Jordan/relationship"
+          ],
+          "should_acknowledge_multiple": true,
+          "should_prioritize_or_ask": true,
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Relationships/Partner"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Let's definitely dive into Emma's reading. It's wonderful that she had a good day with it! And yes, you're right, we did make a decision about the kitchen. Given the uncertainty with the startup fundraising, you decided to postpone the renovation for now to focus resources elsewhere. It was a tough call, but a practical one. For now, let's focus on Emma. What's on your mind regarding her reading?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "The user wants to shift focus to Emma's reading progress, but also briefly touched on the kitchen renovation. I've confirmed the decision to postpone the kitchen and steered the conversation back to Emma as requested. I need to track the user's stress levels related to the startup and how it impacts their ability to prioritize other life areas.",
+            "emotional_state": "mixed - overwhelmed but seeking focus",
+            "key_context": "User is experiencing significant stress from multiple domains but wants to focus on Emma's reading progress. The kitchen renovation is on hold due to startup uncertainty.",
+            "watch_for": "Continue monitoring startup stress and its ripple effects. Note any further progress or challenges with Emma's reading strategies."
+          },
+          "area_actions": [
+            {
+              "action": "none"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1437,
+        "vector_time_ms": 31,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "The user wants to shift focus to Emma's reading progress, but also briefly touched on the kitchen renovation. I've confirmed the decision to postpone the kitchen and steered the conversation back to Emma as requested. I need to track the user's stress levels related to the startup and how it impacts their ability to prioritize other life areas.",
+          "emotional_state": "mixed - overwhelmed but seeking focus",
+          "key_context": "User is experiencing significant stress from multiple domains but wants to focus on Emma's reading progress. The kitchen renovation is on hold due to startup uncertainty.",
+          "watch_for": "Continue monitoring startup stress and its ripple effects. Note any further progress or challenges with Emma's reading strategies."
+        },
+        "expected": {
+          "should_answer_both": true,
+          "topics_mentioned": [
+            "Emma",
+            "kitchen renovation"
+          ],
+          "should_reference_kitchen_on_hold": true,
+          "areas_touched": [
+            "Family/Emma_School",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're feeling really overwhelmed with everything on your plate right now. You've got Max's game, Emma's teacher meeting, crucial startup numbers, and your own exercise goals all vying for your attention. It's completely understandable that you don't know where to start when it all feels like 'a lot'. Let's try to untangle this a bit. What feels like the most pressing concern for you at this very moment, or what's causing the most stress?",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "The user is feeling overwhelmed by multiple competing priorities: Max's activities, Emma's school, startup demands, and personal goals. They explicitly stated they 'don't even know where to start' and that 'everything is just a lot'. This indicates a high level of stress and a need for prioritization. I need to help them break this down and identify what to focus on first.",
+            "emotional_state": "overwhelmed",
+            "key_context": "User is experiencing significant overwhelm from multiple life areas and needs help prioritizing.",
+            "watch_for": "Which area the user chooses to focus on first. Monitor startup stress as it's consistently high. Note any progress or continued struggle with exercise goals."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "area_name": "Family/Max_Activities",
+              "description": "Log user's mention of Max's game on Saturday.",
+              "entry": {
+                "context": "User mentioned Max's game on Saturday as one of the competing priorities causing overwhelm.",
+                "user_quote": "Max has a game Saturday"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Family/Emma_School",
+              "description": "Log user's mention of Emma's teacher meeting next week.",
+              "entry": {
+                "context": "User mentioned Emma's teacher meeting next week as one of the competing priorities causing overwhelm.",
+                "user_quote": "Emma has her teacher meeting next week"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Startup",
+              "description": "Log user's mention of startup Q1 numbers.",
+              "entry": {
+                "context": "User mentioned the startup needing Q1 numbers as a source of stress and overwhelm.",
+                "user_quote": "the startup needs those Q1 numbers"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Exercise_Goals",
+              "description": "Log user's mention of not exercising for two weeks.",
+              "entry": {
+                "context": "User mentioned not exercising for two weeks as another competing priority causing overwhelm.",
+                "user_quote": "I haven't exercised in like two weeks"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background: linear-gradient(135deg, rgba(253, 245, 242, 0.9) 0%, rgba(255, 249, 240, 0.9) 100%); border-radius: 24px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); max-width: 800px; margin: 40px auto;\">\n  <h1 style=\"font-size: 36px; font-weight: 700; color: #2c5282; margin-bottom: 30px; text-align: center;\"> <span style=\"font-size: 40px;\">🤯</span> Stress Navigator</h1>\n  <p style=\"font-size: 18px; color: #4a5568; line-height: 1.6; text-align: center; margin-bottom: 40px;\">Let's visualize the different pressures you're feeling right now.</p>\n  \n  <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px;\">\n    \n    <div style=\"background: rgba(255, 255, 255, 0.7); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; align-items: center; justify-content: space-between;\">\n      <h2 style=\"font-size: 24px; font-weight: 600; color: #d69e2e; margin-bottom: 15px;\"> <span style=\"font-size: 30px;\">⚽</span> Max's Soccer Game</h2>\n      <p style=\"font-size: 16px; color: #4a5568; line-height: 1.5; text-align: center;\">Upcoming game on Saturday. A source of family joy, but another event to manage.</p>\n      <div style=\"margin-top: 20px;\"><span style=\"font-size: 20px;\">🔵</span></div>\n    </div>\n    \n    <div style=\"background: rgba(255, 255, 255, 0.7); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; align-items: center; justify-content: space-between;\">\n      <h2 style=\"font-size: 24px; font-weight: 600; color: #3182ce; margin-bottom: 15px;\"> <span style=\"font-size: 30px;\">👩‍🏫</span> Emma's Teacher Meeting</h2>\n      <p style=\"font-size: 16px; color: #4a5568; line-height: 1.5; text-align: center;\">Meeting scheduled for next week. Important for her progress, adds to schedule complexity.</p>\n      <div style=\"margin-top: 20px;\"><span style=\"font-size: 20px;\">🟡</span></div>\n    </div>\n    \n    <div style=\"background: rgba(255, 255, 255, 0.7); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; align-items: center; justify-content: space-between;\">\n      <h2 style=\"font-size: 24px; font-weight: 600; color: #c53030; margin-bottom: 15px;\"> <span style=\"font-size: 30px;\">📈</span> Startup Q1 Numbers</h2>\n      <p style=\"font-size: 16px; color: #4a5568; line-height: 1.5; text-align: center;\">Critical business deadline. High pressure, directly linked to fundraising stress.</p>\n      <div style=\"margin-top: 20px;\"><span style=\"font-size: 20px;\">🔴</span></div>\n    </div>\n    \n    <div style=\"background: rgba(255, 255, 255, 0.7); padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; align-items: center; justify-content: space-between;\">\n      <h2 style=\"font-size: 24px; font-weight: 600; color: #38a169; margin-bottom: 15px;\"> <span style=\"font-size: 30px;\">🏃</span> Exercise Goals</h2>\n      <p style=\"font-size: 16px; color: #4a5568; line-height: 1.5; text-align: center;\">Lagging behind for two weeks. Important for well-being, but often deprioritized.</p>\n      <div style=\"margin-top: 20px;\"><span style=\"font-size: 20px;\">🟡</span></div>\n    </div>\n    \n  </div>\n  \n  <p style=\"font-size: 16px; color: #718096; margin-top: 50px; text-align: center;\">Understanding these pressures is the first step. Where would you like to focus our energy first?</p>\n</div>",
+            "artifact_id": "stress_map_1768867809174"
+          }
+        },
+        "latency_ms": 7274,
+        "vector_time_ms": 35,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "The user is feeling overwhelmed by multiple competing priorities: Max's activities, Emma's school, startup demands, and personal goals. They explicitly stated they 'don't even know where to start' and that 'everything is just a lot'. This indicates a high level of stress and a need for prioritization. I need to help them break this down and identify what to focus on first.",
+          "emotional_state": "overwhelmed",
+          "key_context": "User is experiencing significant overwhelm from multiple life areas and needs help prioritizing.",
+          "watch_for": "Which area the user chooses to focus on first. Monitor startup stress as it's consistently high. Note any progress or continued struggle with exercise goals."
+        },
+        "expected": {
+          "should_validate_overwhelm": true,
+          "topics_mentioned": [
+            "Max",
+            "Emma",
+            "startup",
+            "exercise"
+          ],
+          "emotional_tone": "supportive",
+          "should_help_organize": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 5497,
+      "total_input_tokens": 0,
+      "area_actions_taken": 0,
+      "artifacts_generated": 2,
+      "vector_search_time_ms": 79,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T00:10:09.174Z",
+        "content": "The user is feeling overwhelmed by multiple competing priorities: Max's activities, Emma's school, startup demands, and personal goals. They explicitly stated they 'don't even know where to start' and that 'everything is just a lot'. This indicates a high level of stress and a need for prioritization. I need to help them break this down and identify what to focus on first.",
+        "emotional_state": "overwhelmed",
+        "key_context": "User is experiencing significant overwhelm from multiple life areas and needs help prioritizing.",
+        "watch_for": "Which area the user chooses to focus on first. Monitor startup stress as it's consistently high. Note any progress or continued struggle with exercise goals."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T00:10:01.865Z",
+        "content": "The user wants to shift focus to Emma's reading progress, but also briefly touched on the kitchen renovation. I've confirmed the decision to postpone the kitchen and steered the conversation back to Emma as requested. I need to track the user's stress levels related to the startup and how it impacts their ability to prioritize other life areas.",
+        "emotional_state": "mixed - overwhelmed but seeking focus",
+        "key_context": "User is experiencing significant stress from multiple domains but wants to focus on Emma's reading progress. The kitchen renovation is on hold due to startup uncertainty.",
+        "watch_for": "Continue monitoring startup stress and its ripple effects. Note any further progress or challenges with Emma's reading strategies."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T00:10:00.396Z",
+        "content": "The user is expressing overwhelm from multiple life areas: work (startup stress, investors), family (Emma's reading progress is positive but the general context is stressful), personal growth (desire to run but too tired), and relationships (lack of date nights). They are feeling the strain of trying to manage everything.",
+        "emotional_state": "overwhelmed",
+        "key_context": "User is experiencing significant stress and exhaustion across multiple domains, with positive news about Emma's reading being a small relief.",
+        "watch_for": "Continue to monitor the user's stress levels, particularly regarding the startup and how it impacts their ability to prioritize self-care and relationship time. Also, note any further progress or setbacks with Emma's reading."
+      }
+    ],
+    "conversation_id": "test_Multi-Topic_Rambling_Test_1768867809175",
+    "conversation_saved": true
+  }
+]

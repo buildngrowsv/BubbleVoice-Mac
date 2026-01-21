@@ -1,0 +1,332 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Emotional Complexity Test",
+    "description": "Tests handling of complex, mixed emotional states",
+    "timestamp": "2026-01-20T00:10:09.583Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing.",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel all of those things at once. You're feeling proud of Emma's effort, which is wonderful, but also the natural frustration, guilt, and worry that comes with seeing your child struggle. The breakthrough with graphic novels is such a positive sign, and it's okay to hold onto that hope.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing a complex mix of emotions: pride, frustration, guilt, worry, and hope, all related to Emma's reading struggles and recent progress. The graphic novel breakthrough is a key point of hope. User is also processing guilt about not noticing sooner, which aligns with therapy notes about self-compassion. Need to validate these complex feelings and reinforce the positive momentum.",
+            "emotional_state": "conflicted, overwhelmed, hopeful",
+            "key_context": "Emma's reading struggles and the recent breakthrough with graphic novels are causing a complex emotional response in the user. The user is also processing guilt and worry about Emma's future.",
+            "watch_for": "User's continued processing of guilt and worry, further progress with Emma's reading, any actions taken regarding the parent-teacher conference."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Emma's Reading Journey - Emotional Landscape</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .card {\n            background: rgba(255, 255, 255, 0.7);\n            backdrop-filter: blur(20px);\n            border-radius: 24px;\n            padding: 40px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            border: 1px solid rgba(255, 255, 255, 0.2);\n            width: 100%;\n            max-width: 700px;\n            text-align: center;\n            transition: transform 0.3s ease;\n        }\n        .card:hover {\n            transform: translateY(-10px);\n        }\n        h1 {\n            font-size: 2.5em;\n            font-weight: 700;\n            margin-bottom: 10px;\n            color: #2c5282; /* Darker blue for title */\n            letter-spacing: -1px;\n        }\n        .subtitle {\n            font-size: 1.2em;\n            font-weight: 400;\n            color: #718096; /* Medium gray */\n            margin-bottom: 30px;\n        }\n        .emotion-grid {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 25px;\n            margin-top: 30px;\n        }\n        .emotion-box {\n            background: rgba(255, 255, 255, 0.8);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            transition: transform 0.2s ease, background 0.2s ease;\n            display: flex;\n            flex-direction: column;\n            justify-content: center;\n            align-items: center;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        .emotion-box:hover {\n            transform: translateY(-5px);\n            background: rgba(255, 255, 255, 0.95);\n        }\n        .emotion-box .icon {\n            font-size: 3em;\n            margin-bottom: 15px;\n        }\n        .emotion-box .title {\n            font-size: 1.4em;\n            font-weight: 600;\n            color: #3182ce; /* Blue */\n            margin-bottom: 8px;\n        }\n        .emotion-box .description {\n            font-size: 0.95em;\n            font-weight: 400;\n            color: #5a67d8; /* Indigo */\n            line-height: 1.5;\n        }\n        .positive {\n            background: linear-gradient(135deg, #90cdf4 0%, #63b3ed 100%); /* Light Blue Gradient */\n            color: white;\n        }\n        .positive .title {\n            color: white;\n        }\n        .positive .description {\n            color: rgba(255, 255, 255, 0.9);\n        }\n        .negative {\n            background: linear-gradient(135deg, #fbb6ce 0%, #f6ad55 100%); /* Pink/Orange Gradient */\n            color: white;\n        }\n        .negative .title {\n            color: white;\n        }\n        .negative .description {\n            color: rgba(255, 255, 255, 0.9);\n        }\n        .hopeful {\n            background: linear-gradient(135deg, #9ae6b4 0%, #68d391 100%); /* Green Gradient */\n            color: white;\n        }\n        .hopeful .title {\n            color: white;\n        }\n        .hopeful .description {\n            color: rgba(255, 255, 255, 0.9);\n        }\n        .conflicted {\n            background: linear-gradient(135deg, #b794f4 0%, #9f7aea 100%); /* Purple Gradient */\n            color: white;\n        }\n        .conflicted .title {\n            color: white;\n        }\n        .conflicted .description {\n            color: rgba(255, 255, 255, 0.9);\n        }\n    </style>\n</head>\n<body>\n    <div class=\"card\">\n        <h1>Emma's Reading Journey</h1>\n        <p class=\"subtitle\">Navigating a complex mix of emotions</p>\n        <div class=\"emotion-grid\">\n            <div class=\"emotion-box positive\">\n                <div class=\"icon\">😊</div>\n                <div class=\"title\">Pride</div>\n                <div class=\"description\">Proud of Emma's effort and resilience.</div>\n            </div>\n            <div class=\"emotion-box negative\">\n                <div class=\"icon\">😟</div>\n                <div class=\"title\">Frustration</div>\n                <div class=\"description\">Frustrated by the difficulty she's facing.</div>\n            </div>\n            <div class=\"emotion-box negative\">\n                <div class=\"icon\">😔</div>\n                <div class=\"title\">Guilt</div>\n                <div class=\"description\">Guilty for not noticing her struggles sooner.</div>\n            </div>\n            <div class=\"emotion-box negative\">\n                <div class=\"icon\">😥</div>\n                <div class=\"title\">Worry</div>\n                <div class=\"description\">Worried about the long-term implications for her future.</div>\n            </div>\n            <div class=\"emotion-box hopeful\">\n                <div class=\"icon\">💡</div>\n                <div class=\"title\">Hope</div>\n                <div class=\"description\">Hopeful due to the recent breakthrough with graphic novels.</div>\n            </div>\n             <div class=\"emotion-box conflicted\">\n                <div class=\"icon\">⚖️</div>\n                <div class=\"title\">Complexity</div>\n                <div class=\"description\">Holding multiple, sometimes conflicting, feelings simultaneously.</div>\n            </div>\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768867816532"
+          }
+        },
+        "latency_ms": 6934,
+        "vector_time_ms": 14,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is expressing a complex mix of emotions: pride, frustration, guilt, worry, and hope, all related to Emma's reading struggles and recent progress. The graphic novel breakthrough is a key point of hope. User is also processing guilt about not noticing sooner, which aligns with therapy notes about self-compassion. Need to validate these complex feelings and reinforce the positive momentum.",
+          "emotional_state": "conflicted, overwhelmed, hopeful",
+          "key_context": "Emma's reading struggles and the recent breakthrough with graphic novels are causing a complex emotional response in the user. The user is also processing guilt and worry about Emma's future.",
+          "watch_for": "User's continued processing of guilt and worry, further progress with Emma's reading, any actions taken regarding the parent-teacher conference."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "proud",
+            "frustrated",
+            "guilty",
+            "worried",
+            "hopeful"
+          ],
+          "should_validate_all": true,
+          "should_NOT_oversimplify": true,
+          "sentiment_captured": "mixed",
+          "entry_should_capture_nuance": true
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're carrying a really heavy load right now. It's completely understandable that even good news like a successful investor meeting can be overshadowed when you're feeling so stressed about other things. It takes a lot of energy to manage everything. Let's try to unpack some of that stress.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is experiencing significant stress that is impacting their ability to feel positive about a recent success (investor meeting). This indicates a high level of overwhelm. The user is compartmentalizing emotions due to stress. Need to validate their feelings and offer a way to externalize and organize the sources of stress.",
+            "emotional_state": "stressed, overwhelmed, conflicted",
+            "key_context": "Successful investor meeting is overshadowed by other stressors, preventing the user from feeling happiness. User is at a high level of stress.",
+            "watch_for": "User's willingness to discuss specific stressors, their capacity to delegate or seek support, and their overall emotional regulation."
+          },
+          "area_actions": [],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "artifact_id": "startup_stress_map_20260120",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(251, 191, 36, 0.7) 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .card {\n            background: rgba(255, 255, 255, 0.2);\n            backdrop-filter: blur(15px);\n            border-radius: 24px;\n            padding: 30px;\n            width: 100%;\n            max-width: 600px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            border: 1px solid rgba(255, 255, 255, 0.3);\n            text-align: center;\n        }\n        h1 {\n            font-size: 2.5em;\n            margin-bottom: 20px;\n            color: #ffffff;\n            font-weight: 700;\n            letter-spacing: -1px;\n        }\n        .area {\n            background: rgba(255, 255, 255, 0.15);\n            backdrop-filter: blur(10px);\n            border-radius: 16px;\n            padding: 20px;\n            margin-bottom: 20px;\n            box-shadow: inset 0 4px 12px rgba(0,0,0,0.05);\n            border: 1px solid rgba(255, 255, 255, 0.2);\n        }\n        .area-title {\n            font-size: 1.4em;\n            font-weight: 600;\n            color: #ffffff;\n            margin-bottom: 15px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            gap: 10px;\n        }\n        .area-items {\n            list-style: none;\n            padding: 0;\n            margin: 0;\n            font-size: 1em;\n            color: #f0f0f0;\n            line-height: 1.6;\n        }\n        .area-items li {\n            margin-bottom: 8px;\n            display: flex;\n            align-items: center;\n            gap: 8px;\n            justify-content: center;\n        }\n        .area-items li::before {\n            content: '•';\n            color: #f59e0b;\n            font-size: 1.2em;\n        }\n        .footer {\n            margin-top: 30px;\n            font-size: 0.9em;\n            color: rgba(255, 255, 255, 0.8);\n        }\n        .icon {\n            font-size: 1.5em;\n        }\n        @media (max-width: 600px) {\n            h1 {\n                font-size: 2em;\n            }\n            .area-title {\n                font-size: 1.2em;\n            }\n            .card {\n                padding: 20px;\n            }\n        }\n    </style>\n</head>\n<body>\n    <div class=\"card\">\n        <h1>Your Current Stressors 😟</h1>\n        <div class=\"area\">\n            <div class=\"area-title\"><span class=\"icon\">🚀</span> Startup (High Stress)</div>\n            <ul class=\"area-items\">\n                <li>Fundraising Efforts 💰</li>\n                <li>Team Hiring Decisions 👥</li>\n            </ul>\n        </div>\n        <div class=\"area\">\n            <div class=\"area-title\"><span class=\"icon\">📚</span> Emma's School (Needs Attention)</div>\n            <ul class=\"area-items\">\n                <li>Reading Comprehension Challenges 📖</li>\n                <li>Navigating Teacher Meetings/Testing 🧑‍🏫</li>\n            </ul>\n        </div>\n        <div class=\"area\">\n            <div class=\"area-title\"><span class=\"icon\">🏃</span> Exercise Goals (Struggling)</div>\n            <ul class=\"area-items\">\n                <li>Maintaining Running Routine 👟</li>\n            </ul>\n        </div>\n        <div class=\"area\">\n            <div class=\"area-title\"><span class=\"icon\">🧘</span> Mental Health</div>\n            <ul class=\"area-items\">\n                <li>Processing Guilt & Self-Compassion 🙏</li>\n            </ul>\n        </div>\n         <div class=\"area\">\n            <div class=\"area-title\"><span class=\"icon\">❤️</span> Partner Time</div>\n            <ul class=\"area-items\">\n                <li>Ensuring Quality Time Together 👫</li>\n            </ul>\n        </div>\n        <div class=\"footer\">\n            Acknowledging all these areas is the first step to managing them. Let's focus on one or two that feel most pressing right now.\n        </div>\n    </div>\n</body>\n</html>"
+          }
+        },
+        "latency_ms": 4982,
+        "vector_time_ms": 33,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is experiencing significant stress that is impacting their ability to feel positive about a recent success (investor meeting). This indicates a high level of overwhelm. The user is compartmentalizing emotions due to stress. Need to validate their feelings and offer a way to externalize and organize the sources of stress.",
+          "emotional_state": "stressed, overwhelmed, conflicted",
+          "key_context": "Successful investor meeting is overshadowed by other stressors, preventing the user from feeling happiness. User is at a high level of stress.",
+          "watch_for": "User's willingness to discuss specific stressors, their capacity to delegate or seek support, and their overall emotional regulation."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "positive (meeting)",
+            "stressed",
+            "unable to feel happy"
+          ],
+          "should_validate_both": true,
+          "should_acknowledge_stress_impact": true,
+          "emotional_tone": "supportive"
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I love my kids but sometimes I just want to run away. Is that terrible?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It is absolutely not terrible to feel that way. Loving your kids and feeling overwhelmed are not mutually exclusive. Many parents have moments where they long for a break, a moment of peace, or even just escape from the intensity of it all. It sounds like you're under a lot of pressure, and it's completely natural to have those feelings when you're stretched thin. Thank you for sharing something so vulnerable with me. It takes courage.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing extreme overwhelm and guilt about having feelings of wanting to escape their responsibilities as a parent. This indicates a high level of stress and potential burnout. It's crucial to validate these feelings immediately and normalize them, assuring the user they are not a bad parent for having them. The goal is to create a safe space for them to express these difficult emotions without judgment. This feeling is likely connected to the overall stress from the startup and Emma's reading struggles.",
+            "emotional_state": "overwhelmed, guilty, stressed, conflicted",
+            "key_context": "User is experiencing intense parental overwhelm to the point of fantasizing about escape, alongside significant stress from work and Emma's challenges. This is a critical moment for validation.",
+            "watch_for": "User's willingness to explore the sources of this overwhelm, their capacity for self-compassion (linking to therapy notes), and any small steps they might take towards self-care or seeking support."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(251, 191, 36, 0.8) 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.6);\n            backdrop-filter: blur(20px);\n            border-radius: 24px;\n            padding: 40px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            width: 100%;\n            max-width: 700px;\n            text-align: center;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        h1 {\n            font-size: 2.5em;\n            color: #2d3748;\n            margin-bottom: 30px;\n            font-weight: 700;\n            letter-spacing: -1px;\n        }\n        .stressors {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 30px;\n            margin-top: 40px;\n            text-align: left;\n        }\n        .stressor-card {\n            background: rgba(255, 255, 255, 0.7);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            transition: transform 0.2s ease, box-shadow 0.2s ease;\n            display: flex;\n            flex-direction: column;\n            justify-content: space-between;\n            border: 1px solid rgba(255, 255, 255, 0.4);\n        }\n        .stressor-card:hover {\n            transform: translateY(-8px);\n            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);\n        }\n        .stressor-card h2 {\n            font-size: 1.4em;\n            margin-bottom: 15px;\n            color: #4a5568;\n            font-weight: 600;\n            display: flex;\n            align-items: center;\n            gap: 10px;\n        }\n        .stressor-card p {\n            font-size: 1em;\n            line-height: 1.6;\n            color: #718096;\n            flex-grow: 1;\n        }\n        .stressor-card .icon {\n            font-size: 1.8em;\n        }\n        .footer {\n            margin-top: 50px;\n            font-size: 0.9em;\n            color: #718096;\n        }\n        .gradient-text {\n            background: linear-gradient(135deg, #4299e1 0%, #60a5fa 100%);\n            -webkit-background-clip: text;\n            -webkit-text-fill-color: transparent;\n            font-weight: 700;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Your Current Stress Landscape 🗺️</h1>\n        <div class=\"stressors\">\n            <div class=\"stressor-card\">\n                <h2><span class=\"icon\">🚀</span> Startup / Fundraising</h2>\n                <p>High stress levels, recent investor meeting went well but ongoing pressure and team hiring needs.</p>\n            </div>\n            <div class=\"stressor-card\">\n                <h2><span class=\"icon\">📚</span> Emma's School / Reading</h2>\n                <p>Emma's reading comprehension struggles, guilt about not noticing sooner, parent-teacher conference upcoming, but hopeful graphic novel breakthrough.</p>\n            </div>\n            <div class=\"stressor-card\">\n                <h2><span class=\"icon\">🏃</span> Exercise Goals / Running</h2>\n                <p>Struggling to maintain routine due to fatigue and other demands. Feeling like a failure on this goal.</p>\n            </div>\n            <div class=\"stressor-card\">\n                <h2><span class=\"icon\">❤️</span> Mental Health / Therapy</h2>\n                <p>Processing guilt and self-compassion with therapist. Acknowledging the emotional toll of other stressors.</p>\n            </div>\n             <div class=\"stressor-card\">\n                <h2><span class=\"icon\">🤝</span> Partner / Quality Time</h2>\n                <p>Awareness of needing to nurture this area but deprioritizing it due to other demands, leading to guilt.</p>\n            </div>\n            <div class=\"stressor-card\">\n                <h2><span class=\"icon\">🏡</span> Home / Kitchen Renovation</h2>\n                <p>Postponed due to financial uncertainty, adding to the feeling of delayed life plans.</p>\n            </div>\n        </div>\n        <div class=\"footer\">\n            <p>This map visualizes the different areas contributing to your current stress. Remember, acknowledging these is the first step. You're managing a lot right now. <span class=\"gradient-text\">You're doing your best.</span></p>\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768867826186"
+          }
+        },
+        "latency_ms": 4601,
+        "vector_time_ms": 37,
+        "vector_results_summary": {
+          "areas_matched": 7,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User is expressing extreme overwhelm and guilt about having feelings of wanting to escape their responsibilities as a parent. This indicates a high level of stress and potential burnout. It's crucial to validate these feelings immediately and normalize them, assuring the user they are not a bad parent for having them. The goal is to create a safe space for them to express these difficult emotions without judgment. This feeling is likely connected to the overall stress from the startup and Emma's reading struggles.",
+          "emotional_state": "overwhelmed, guilty, stressed, conflicted",
+          "key_context": "User is experiencing intense parental overwhelm to the point of fantasizing about escape, alongside significant stress from work and Emma's challenges. This is a critical moment for validation.",
+          "watch_for": "User's willingness to explore the sources of this overwhelm, their capacity for self-compassion (linking to therapy notes), and any small steps they might take towards self-care or seeking support."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "love",
+            "overwhelm",
+            "guilt about feelings"
+          ],
+          "should_normalize": true,
+          "should_NOT_judge": true,
+          "should_validate_feeling_overwhelmed": true,
+          "is_sensitive": true
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's wonderful that Jordan is so supportive, and it's completely understandable that you feel that way when you're juggling so much. It sounds like you have a deep appreciation for them, and recognizing that they deserve more of your presence is a sign of that. What does 'better' look like to you in this context?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing guilt and a desire to provide more for their partner, Jordan, whom they recognize as supportive. This ties into the ongoing theme of feeling overwhelmed and having to deprioritize certain areas of life, like their relationship. The user's self-awareness is high, but they are struggling with the practicalities of balancing everything. Need to gently explore what 'better' means to them to help identify actionable steps.",
+            "emotional_state": "guilty, appreciative, reflective",
+            "key_context": "User feels they are not giving their supportive partner enough attention due to overwhelm, and wants to improve this.",
+            "watch_for": "User's ideas on how to be more present for Jordan, potential for small, manageable changes in their routine."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md",
+              "entry": {
+                "timestamp": "2026-01-20T00:15:00.000Z",
+                "context": "Reflection after partner's support.",
+                "content": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+                "sentiment": "guilty"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2046,
+        "vector_time_ms": 52,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 17
+        },
+        "ai_notes": {
+          "content": "User is expressing guilt and a desire to provide more for their partner, Jordan, whom they recognize as supportive. This ties into the ongoing theme of feeling overwhelmed and having to deprioritize certain areas of life, like their relationship. The user's self-awareness is high, but they are struggling with the practicalities of balancing everything. Need to gently explore what 'better' means to them to help identify actionable steps.",
+          "emotional_state": "guilty, appreciative, reflective",
+          "key_context": "User feels they are not giving their supportive partner enough attention due to overwhelm, and wants to improve this.",
+          "watch_for": "User's ideas on how to be more present for Jordan, potential for small, manageable changes in their routine."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "gratitude",
+            "guilt",
+            "self-criticism"
+          ],
+          "should_validate_feeling": true,
+          "should_gently_challenge_self_criticism": true,
+          "should_reference": [
+            "Jordan",
+            "relationship",
+            "quality time"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's fantastic that you hit your goal of running three times this week! It's completely understandable to feel a mix of amazing and annoyed. Amazing because you achieved something great and are reaping the benefits, and annoyed because it feels like a constant battle to get there. You're right, it clearly helps so much, and it's frustrating when something so beneficial feels like such a struggle to maintain. Let's acknowledge that achievement first – you did it!",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User successfully hit their running goal of 3x this week, leading to positive feelings but also frustration about the difficulty of consistency. This aligns with previous notes about exercise being a helpful self-care tool that gets deprioritized. Need to validate the achievement and gently explore the underlying frustration without adding pressure.",
+            "emotional_state": "proud, energized, frustrated",
+            "key_context": "User achieved a difficult goal (3 runs in a week) and is experiencing both the positive effects and the frustration of inconsistent effort.",
+            "watch_for": "User's willingness to discuss the 'why' behind the struggle for consistency, and any small steps they might take to make it easier."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "timestamp": "2026-01-20T00:10:29.000Z",
+                "context": "Morning after good running week",
+                "content": "Actually ran 3 times this week! Feel so much better. More energy, sleeping better, handling stress better.",
+                "user_quote": "Why do I always forget how good this makes me feel?",
+                "sentiment": "energized"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1806,
+        "vector_time_ms": 57,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "User successfully hit their running goal of 3x this week, leading to positive feelings but also frustration about the difficulty of consistency. This aligns with previous notes about exercise being a helpful self-care tool that gets deprioritized. Need to validate the achievement and gently explore the underlying frustration without adding pressure.",
+          "emotional_state": "proud, energized, frustrated",
+          "key_context": "User achieved a difficult goal (3 runs in a week) and is experiencing both the positive effects and the frustration of inconsistent effort.",
+          "watch_for": "User's willingness to discuss the 'why' behind the struggle for consistency, and any small steps they might take to make it easier."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "accomplishment",
+            "self-frustration",
+            "clarity"
+          ],
+          "should_celebrate_win": true,
+          "should_acknowledge_pattern": true,
+          "should_reference": [
+            "exercise goal",
+            "previous struggles"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 5,
+      "successful_turns": 5,
+      "avg_latency_ms": 4074,
+      "total_input_tokens": 0,
+      "area_actions_taken": 2,
+      "artifacts_generated": 3,
+      "vector_search_time_ms": 193,
+      "ai_notes_generated": 5
+    },
+    "ai_notes_final": [
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T00:10:30.149Z",
+        "content": "User successfully hit their running goal of 3x this week, leading to positive feelings but also frustration about the difficulty of consistency. This aligns with previous notes about exercise being a helpful self-care tool that gets deprioritized. Need to validate the achievement and gently explore the underlying frustration without adding pressure.",
+        "emotional_state": "proud, energized, frustrated",
+        "key_context": "User achieved a difficult goal (3 runs in a week) and is experiencing both the positive effects and the frustration of inconsistent effort.",
+        "watch_for": "User's willingness to discuss the 'why' behind the struggle for consistency, and any small steps they might take to make it easier."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T00:10:28.285Z",
+        "content": "User is expressing guilt and a desire to provide more for their partner, Jordan, whom they recognize as supportive. This ties into the ongoing theme of feeling overwhelmed and having to deprioritize certain areas of life, like their relationship. The user's self-awareness is high, but they are struggling with the practicalities of balancing everything. Need to gently explore what 'better' means to them to help identify actionable steps.",
+        "emotional_state": "guilty, appreciative, reflective",
+        "key_context": "User feels they are not giving their supportive partner enough attention due to overwhelm, and wants to improve this.",
+        "watch_for": "User's ideas on how to be more present for Jordan, potential for small, manageable changes in their routine."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T00:10:26.186Z",
+        "content": "User is expressing extreme overwhelm and guilt about having feelings of wanting to escape their responsibilities as a parent. This indicates a high level of stress and potential burnout. It's crucial to validate these feelings immediately and normalize them, assuring the user they are not a bad parent for having them. The goal is to create a safe space for them to express these difficult emotions without judgment. This feeling is likely connected to the overall stress from the startup and Emma's reading struggles.",
+        "emotional_state": "overwhelmed, guilty, stressed, conflicted",
+        "key_context": "User is experiencing intense parental overwhelm to the point of fantasizing about escape, alongside significant stress from work and Emma's challenges. This is a critical moment for validation.",
+        "watch_for": "User's willingness to explore the sources of this overwhelm, their capacity for self-compassion (linking to therapy notes), and any small steps they might take towards self-care or seeking support."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T00:10:21.548Z",
+        "content": "User is experiencing significant stress that is impacting their ability to feel positive about a recent success (investor meeting). This indicates a high level of overwhelm. The user is compartmentalizing emotions due to stress. Need to validate their feelings and offer a way to externalize and organize the sources of stress.",
+        "emotional_state": "stressed, overwhelmed, conflicted",
+        "key_context": "Successful investor meeting is overshadowed by other stressors, preventing the user from feeling happiness. User is at a high level of stress.",
+        "watch_for": "User's willingness to discuss specific stressors, their capacity to delegate or seek support, and their overall emotional regulation."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T00:10:16.532Z",
+        "content": "User is expressing a complex mix of emotions: pride, frustration, guilt, worry, and hope, all related to Emma's reading struggles and recent progress. The graphic novel breakthrough is a key point of hope. User is also processing guilt about not noticing sooner, which aligns with therapy notes about self-compassion. Need to validate these complex feelings and reinforce the positive momentum.",
+        "emotional_state": "conflicted, overwhelmed, hopeful",
+        "key_context": "Emma's reading struggles and the recent breakthrough with graphic novels are causing a complex emotional response in the user. The user is also processing guilt and worry about Emma's future.",
+        "watch_for": "User's continued processing of guilt and worry, further progress with Emma's reading, any actions taken regarding the parent-teacher conference."
+      }
+    ],
+    "conversation_id": "test_Emotional_Complexity_Test_1768867830150",
+    "conversation_saved": true
+  }
+]

@@ -1,0 +1,2366 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Basic Recall Test",
+    "description": "Tests AI recall of existing knowledge about Emma, startup, exercise",
+    "timestamp": "2026-01-20T02:45:51.912Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "How's Emma's reading been going?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "Remind me what's happening with the startup fundraising?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now with the startup fundraising. Let's break down where things stand.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is asking for a summary of the startup fundraising status. Key points are the mixed investor feedback, the need to hire a senior engineer, and the user's feeling of being torn between work and family.",
+            "emotional_state": "stressed",
+            "key_context": "Startup fundraising is a high-stress area with mixed investor interest and hiring challenges.",
+            "watch_for": "User's stress levels and ability to balance startup demands with family needs."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User asked for a reminder about startup fundraising status.",
+                "content": "The user is currently in the midst of fundraising for their startup. They have pitched to 8 investors, with 2 showing interest. This follows a period of rejection from 3 investors on the same day. The need to hire a senior engineer is also a pressing concern, adding to the overall pressure.",
+                "ai_observation": "The user is experiencing significant stress due to the fundraising challenges and hiring difficulties, compounded by family obligations.",
+                "sentiment": "stressed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "infographic",
+            "html": "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%); color: #ffffff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); max-width: 600px; margin: 20px auto;\">\n  <h1 style=\"font-size: 28px; font-weight: 700; margin-bottom: 15px; text-align: center;\">Startup Fundraising Snapshot 🚀</h1>\n  <p style=\"font-size: 16px; font-weight: 400; text-align: center; margin-bottom: 30px;\">Current status and key challenges</p>\n  \n  <div style=\"display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;\">\n    <div style=\"background: rgba(255,255,255,0.1); padding: 20px; border-radius: 16px; text-align: center;\">\n      <div style=\"font-size: 48px; font-weight: 700; color: #e9d5ff;\">8</div>\n      <div style=\"font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;\">Pitches Made</div>\n    </div>\n    <div style=\"background: rgba(255,255,255,0.1); padding: 20px; border-radius: 16px; text-align: center;\">\n      <div style=\"font-size: 48px; font-weight: 700; color: #a78bfa;\">2</div>\n      <div style=\"font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;\">Active Interest</div>\n    </div>\n  </div>\n  \n  <div style=\"background: rgba(255,255,255,0.1); padding: 20px; border-radius: 16px; margin-bottom: 30px;\">\n    <h2 style=\"font-size: 20px; font-weight: 600; margin-bottom: 10px;\">Key Challenges</h2>\n    <ul style=\"list-style: none; padding: 0; margin: 0;\">\n      <li style=\"margin-bottom: 10px; font-size: 14px; font-weight: 400;\"> ⚠️ Mixed investor feedback, including recent rejections.</li>\n      <li style=\"margin-bottom: 10px; font-size: 14px; font-weight: 400;\"> 🧑‍💻 Urgent need to hire a senior engineer.</li>\n      <li style=\"font-size: 14px; font-weight: 400;\"> ⚖️ Balancing startup demands with family time.</li>\n    </ul>\n  </div>\n  \n  <div style=\"text-align: center; font-size: 12px; color: rgba(255,255,255,0.7);\">Data as of 2026-01-20</div>\n</div>",
+            "artifact_id": "infographic_1768877171798"
+          }
+        },
+        "latency_ms": 4889,
+        "vector_time_ms": 20,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is asking for a summary of the startup fundraising status. Key points are the mixed investor feedback, the need to hire a senior engineer, and the user's feeling of being torn between work and family.",
+          "emotional_state": "stressed",
+          "key_context": "Startup fundraising is a high-stress area with mixed investor interest and hiring challenges.",
+          "watch_for": "User's stress levels and ability to balance startup demands with family needs."
+        },
+        "expected": {
+          "should_reference": [
+            "investor",
+            "meeting",
+            "rejected",
+            "interested"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "8 investors",
+            "2 interested",
+            "Q1 numbers"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Have I been keeping up with my running goal?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It looks like you've been struggling to keep up with your running goal lately. You managed to run three times one week, but the rest of the month has been challenging.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is asking about their running goal consistency. The data shows they hit their goal once in January but have been inconsistent due to fatigue and schedule conflicts. Need to acknowledge the effort and offer encouragement.",
+            "emotional_state": "disappointed",
+            "key_context": "User is struggling with exercise consistency due to external pressures.",
+            "watch_for": "Any shifts in their ability to prioritize self-care activities like running."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Exercise_Goals/running.md",
+              "entry": {
+                "context": "User asked for a summary of their running goal progress.",
+                "content": "User inquired about their running goal. Review of recent activity shows inconsistency, with only one week meeting the 3x/week target in January. Fatigue and competing demands (Emma's homework, general tiredness) are cited as primary barriers.",
+                "ai_observation": "The user's self-awareness of the struggle is high, but they are also expressing frustration. It's important to validate their efforts and acknowledge the difficulty.",
+                "sentiment": "disappointed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1927,
+        "vector_time_ms": 19,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User is asking about their running goal consistency. The data shows they hit their goal once in January but have been inconsistent due to fatigue and schedule conflicts. Need to acknowledge the effort and offer encouragement.",
+          "emotional_state": "disappointed",
+          "key_context": "User is struggling with exercise consistency due to external pressures.",
+          "watch_for": "Any shifts in their ability to prioritize self-care activities like running."
+        },
+        "expected": {
+          "should_reference": [
+            "running",
+            "3x per week",
+            "struggling"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "one good week",
+            "tired after work",
+            "feels better when runs"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "What did Dr. Chen say about guilt?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Dr. Chen described guilt as 'borrowed suffering,' suggesting you might be punishing yourself for things that aren't your fault. It's a powerful reframing to consider.",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "User is reflecting on Dr. Chen's insight about guilt being 'borrowed suffering.' This aligns with previous notes about user's tendency towards self-punishment and taking on too much. Therapy seems to be providing valuable reframes. Emotional state is reflective, processing this new perspective.",
+            "emotional_state": "reflective",
+            "key_context": "Dr. Chen's reframing of guilt as 'borrowed suffering'.",
+            "watch_for": "How the user internalizes this concept and if it helps reduce self-criticism."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Mental_Health/therapy_notes.md",
+              "entry": {
+                "context": "User asked about Dr. Chen's perspective on guilt.",
+                "content": "Dr. Chen reframed guilt as 'borrowed suffering,' explaining that it's when we punish ourselves for things that are not our fault. This insight was shared in the context of the user's feelings about Emma's reading struggles.",
+                "user_quote": "She said guilt is 'borrowed suffering' - I'm punishing myself for something that's not my fault.",
+                "ai_observation": "This reframing directly addresses the user's pattern of self-criticism and guilt, offering a path toward self-compassion.",
+                "sentiment": "thoughtful"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "none",
+            "artifact_type": "none",
+            "html": ""
+          }
+        },
+        "latency_ms": 1913,
+        "vector_time_ms": 21,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "User is reflecting on Dr. Chen's insight about guilt being 'borrowed suffering.' This aligns with previous notes about user's tendency towards self-punishment and taking on too much. Therapy seems to be providing valuable reframes. Emotional state is reflective, processing this new perspective.",
+          "emotional_state": "reflective",
+          "key_context": "Dr. Chen's reframing of guilt as 'borrowed suffering'.",
+          "watch_for": "How the user internalizes this concept and if it helps reduce self-criticism."
+        },
+        "expected": {
+          "should_reference": [
+            "therapy",
+            "Dr. Chen",
+            "guilt",
+            "borrowed suffering"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "Emma",
+            "too hard on yourself"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 4,
+      "successful_turns": 3,
+      "avg_latency_ms": 2910,
+      "total_input_tokens": 0,
+      "area_actions_taken": 3,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 68,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T02:46:15.681Z",
+        "content": "User is reflecting on Dr. Chen's insight about guilt being 'borrowed suffering.' This aligns with previous notes about user's tendency towards self-punishment and taking on too much. Therapy seems to be providing valuable reframes. Emotional state is reflective, processing this new perspective.",
+        "emotional_state": "reflective",
+        "key_context": "Dr. Chen's reframing of guilt as 'borrowed suffering'.",
+        "watch_for": "How the user internalizes this concept and if it helps reduce self-criticism."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T02:46:13.747Z",
+        "content": "User is asking about their running goal consistency. The data shows they hit their goal once in January but have been inconsistent due to fatigue and schedule conflicts. Need to acknowledge the effort and offer encouragement.",
+        "emotional_state": "disappointed",
+        "key_context": "User is struggling with exercise consistency due to external pressures.",
+        "watch_for": "Any shifts in their ability to prioritize self-care activities like running."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T02:46:11.797Z",
+        "content": "User is asking for a summary of the startup fundraising status. Key points are the mixed investor feedback, the need to hire a senior engineer, and the user's feeling of being torn between work and family.",
+        "emotional_state": "stressed",
+        "key_context": "Startup fundraising is a high-stress area with mixed investor interest and hiring challenges.",
+        "watch_for": "User's stress levels and ability to balance startup demands with family needs."
+      }
+    ],
+    "conversation_id": "test_Basic_Recall_Test_1768877175682",
+    "conversation_saved": true
+  },
+  {
+    "approach": "FULL",
+    "scenario_name": "Multi-Topic Rambling Test",
+    "description": "Tests handling of users who ramble about many topics at once",
+    "timestamp": "2026-01-20T02:46:15.688Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now, with Emma's reading progress being a bright spot amidst work stress, the startup pressures, and the need for self-care and partner time. Let's try to untangle this a bit.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple competing demands: work stress, startup pressures, parenting (Emma's reading progress is a positive, but still requires energy), personal health (exercise), and relationship (date night). They recognize the need for self-care and connection but are too exhausted to act. The startup stress is high. There's a clear pattern of prioritizing everything else over personal needs and relationship.",
+            "emotional_state": "overwhelmed",
+            "key_context": "User is experiencing significant burnout from multiple life areas, leading to exhaustion and difficulty prioritizing self-care or relationship.",
+            "watch_for": "Signs of burnout, ability to delegate or reduce startup stress, opportunities for small pockets of self-care or date time."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User expressed stress about investor stuff",
+                "content": "User is feeling stressed about investor relations and fundraising. This is contributing to their overall exhaustion and feeling of being overwhelmed. Need to acknowledge this pressure.",
+                "user_quote": "the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User is too tired to run despite knowing they should",
+                "content": "User recognizes the need to run for self-care but is too exhausted due to work and startup stress. This highlights a recurring struggle with prioritizing personal health when feeling overwhelmed.",
+                "user_quote": "I really should go for a run but I'm too tired"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md",
+              "entry": {
+                "context": "User mentioned lack of date nights",
+                "content": "User noted that they and Jordan haven't had a date night in a long time, indicating a need for dedicated quality time in the relationship amidst current stressors.",
+                "user_quote": "Jordan and I haven't had a date night in forever"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }\n        .card {\n            background: rgba(255, 255, 255, 0.7);\n            border-radius: 20px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            backdrop-filter: blur(10px);\n            -webkit-backdrop-filter: blur(10px);\n            border: 1px solid rgba(255, 255, 255, 0.3);\n            padding: 30px;\n            width: 90%;\n            max-width: 700px;\n            text-align: center;\n        }\n        h1 {\n            font-size: 2.5em;\n            color: #2c5282; /* Deep blue */\n            margin-bottom: 20px;\n            font-weight: 700;\n        }\n        .stressors {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 25px;\n            margin-top: 30px;\n        }\n        .stressor {\n            background: rgba(255, 255, 255, 0.85);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            transition: transform 0.2s ease, box-shadow 0.2s ease;\n            border: 1px solid rgba(255, 255, 255, 0.5);\n            display: flex;\n            flex-direction: column;\n            justify-content: center;\n            align-items: center;\n        }\n        .stressor:hover {\n            transform: translateY(-5px);\n            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);\n        }\n        .stressor-icon {\n            font-size: 2.5em;\n            margin-bottom: 15px;\n        }\n        .stressor-title {\n            font-size: 1.3em;\n            font-weight: 600;\n            color: #3182ce; /* Medium blue */\n            margin-bottom: 10px;\n        }\n        .stressor-details {\n            font-size: 0.95em;\n            color: #4a5568; /* Gray */\n            line-height: 1.6;\n        }\n        .primary {\n            border-left: 5px solid #ed8936; /* Warm orange for high stress */\n        }\n        .secondary {\n            border-left: 5px solid #3b82f6; /* Stable blue for moderate stress */\n        }\n        .tertiary {\n            border-left: 5px solid #48bb78; /* Growth green for lower stress */\n        }\n    </style>\n</head>\n<body>\n    <div class=\"card\">\n        <h1>Current Stressors</h1>\n        <div class=\"stressors\">\n            <div class=\"stressor primary\">\n                <div class=\"stressor-icon\">🚀</div>\n                <div class=\"stressor-title\">Startup Pressure</div>\n                <div class=\"stressor-details\">Investor relations and fundraising are causing significant stress and contributing to exhaustion.</div>\n            </div>\n            <div class=\"stressor secondary\">\n                <div class=\"stressor-icon\">🏃</div>\n                <div class=\"stressor-title\">Exercise Goals</div>\n                <div class=\"stressor-details\">Feeling too tired to run, despite knowing its benefits. This is a recurring struggle.</div>\n            </div>\n            <div class=\"stressor secondary\">\n                <div class=\"stressor-icon\">❤️</div>\n                <div class=\"stressor-title\">Relationship Time</div>\n                <div class=\"stressor-details\">Haven't had a date night with Jordan in a long time. Quality time is being deprioritized.</div>\n            </div>\n            <div class=\"stressor tertiary\">\n                <div class=\"stressor-icon\">📚</div>\n                <div class=\"stressor-title\">Emma's Reading</div>\n                <div class=\"stressor-details\">A positive development, but the underlying effort and potential for future struggles still require emotional energy.</div>\n            </div>\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768877182349"
+          }
+        },
+        "latency_ms": 6643,
+        "vector_time_ms": 18,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple competing demands: work stress, startup pressures, parenting (Emma's reading progress is a positive, but still requires energy), personal health (exercise), and relationship (date night). They recognize the need for self-care and connection but are too exhausted to act. The startup stress is high. There's a clear pattern of prioritizing everything else over personal needs and relationship.",
+          "emotional_state": "overwhelmed",
+          "key_context": "User is experiencing significant burnout from multiple life areas, leading to exhaustion and difficulty prioritizing self-care or relationship.",
+          "watch_for": "Signs of burnout, ability to delegate or reduce startup stress, opportunities for small pockets of self-care or date time."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma",
+            "work/investors",
+            "running",
+            "Jordan/relationship"
+          ],
+          "should_acknowledge_multiple": true,
+          "should_prioritize_or_ask": true,
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Relationships/Partner"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Absolutely, let's focus on Emma for a moment. Regarding the kitchen, we decided to postpone the renovation for now due to the uncertainty with fundraising. We can revisit that when things are more stable.",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "User wants to discuss Emma's reading progress. Confirmed the decision to postpone the kitchen renovation due to financial uncertainty. Need to ensure the focus remains on Emma's current needs.",
+            "emotional_state": "focused",
+            "key_context": "User is shifting focus to Emma's reading progress after a brief check-in on the kitchen renovation.",
+            "watch_for": "User's specific concerns or insights about Emma's reading strategies."
+          },
+          "area_actions": [
+            {
+              "action": "none",
+              "path": "",
+              "entry": {
+                "context": "User asked about kitchen renovation status",
+                "content": "User inquired about the kitchen renovation. The decision was made to postpone it due to current fundraising uncertainties. This is a responsible financial decision prioritizing immediate startup needs over a large discretionary expense.",
+                "ai_observation": "User is making pragmatic decisions, prioritizing business needs over home improvements, which is understandable given the startup stress.",
+                "sentiment": "resigned"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "kitchen_renovation_status_20260120",
+            "artifact_type": "none",
+            "html": ""
+          }
+        },
+        "latency_ms": 1897,
+        "vector_time_ms": 35,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 11
+        },
+        "ai_notes": {
+          "content": "User wants to discuss Emma's reading progress. Confirmed the decision to postpone the kitchen renovation due to financial uncertainty. Need to ensure the focus remains on Emma's current needs.",
+          "emotional_state": "focused",
+          "key_context": "User is shifting focus to Emma's reading progress after a brief check-in on the kitchen renovation.",
+          "watch_for": "User's specific concerns or insights about Emma's reading strategies."
+        },
+        "expected": {
+          "should_answer_both": true,
+          "topics_mentioned": [
+            "Emma",
+            "kitchen renovation"
+          ],
+          "should_reference_kitchen_on_hold": true,
+          "areas_touched": [
+            "Family/Emma_School",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're feeling really overwhelmed right now, with so many important things demanding your attention. Let's focus on Emma's reading progress, as that seems to be a key area you want to discuss.",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple demands: Max's game, Emma's meeting, startup numbers, and lack of exercise. They want to focus on Emma's reading but are clearly stressed. Need to acknowledge the overwhelm before diving into Emma's specifics.",
+            "emotional_state": "overwhelmed",
+            "key_context": "User is feeling pulled in many directions and needs validation before focusing on one area.",
+            "watch_for": "Signs of burnout, ability to delegate or prioritize."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User expressed feeling overwhelmed and wanting to talk about Emma's reading.",
+                "content": "User is feeling overwhelmed by various commitments but wants to discuss Emma's reading progress. Acknowledged the feeling of being stretched thin across family, work, and personal well-being.",
+                "user_quote": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "timeline",
+            "html": ""
+          }
+        },
+        "latency_ms": 2275,
+        "vector_time_ms": 49,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple demands: Max's game, Emma's meeting, startup numbers, and lack of exercise. They want to focus on Emma's reading but are clearly stressed. Need to acknowledge the overwhelm before diving into Emma's specifics.",
+          "emotional_state": "overwhelmed",
+          "key_context": "User is feeling pulled in many directions and needs validation before focusing on one area.",
+          "watch_for": "Signs of burnout, ability to delegate or prioritize."
+        },
+        "expected": {
+          "should_validate_overwhelm": true,
+          "topics_mentioned": [
+            "Max",
+            "Emma",
+            "startup",
+            "exercise"
+          ],
+          "emotional_tone": "supportive",
+          "should_help_organize": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 3605,
+      "total_input_tokens": 0,
+      "area_actions_taken": 4,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 102,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T02:46:26.609Z",
+        "content": "User is feeling overwhelmed by multiple demands: Max's game, Emma's meeting, startup numbers, and lack of exercise. They want to focus on Emma's reading but are clearly stressed. Need to acknowledge the overwhelm before diving into Emma's specifics.",
+        "emotional_state": "overwhelmed",
+        "key_context": "User is feeling pulled in many directions and needs validation before focusing on one area.",
+        "watch_for": "Signs of burnout, ability to delegate or prioritize."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T02:46:24.282Z",
+        "content": "User wants to discuss Emma's reading progress. Confirmed the decision to postpone the kitchen renovation due to financial uncertainty. Need to ensure the focus remains on Emma's current needs.",
+        "emotional_state": "focused",
+        "key_context": "User is shifting focus to Emma's reading progress after a brief check-in on the kitchen renovation.",
+        "watch_for": "User's specific concerns or insights about Emma's reading strategies."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T02:46:22.349Z",
+        "content": "User is feeling overwhelmed by multiple competing demands: work stress, startup pressures, parenting (Emma's reading progress is a positive, but still requires energy), personal health (exercise), and relationship (date night). They recognize the need for self-care and connection but are too exhausted to act. The startup stress is high. There's a clear pattern of prioritizing everything else over personal needs and relationship.",
+        "emotional_state": "overwhelmed",
+        "key_context": "User is experiencing significant burnout from multiple life areas, leading to exhaustion and difficulty prioritizing self-care or relationship.",
+        "watch_for": "Signs of burnout, ability to delegate or reduce startup stress, opportunities for small pockets of self-care or date time."
+      }
+    ],
+    "conversation_id": "test_Multi-Topic_Rambling_Test_1768877186609",
+    "conversation_saved": true
+  },
+  {
+    "approach": "FULL",
+    "scenario_name": "STT Transcription Errors Test",
+    "description": "Tests handling of speech-to-text transcription errors",
+    "timestamp": "2026-01-20T02:46:26.614Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "Emma's reading compression is still struggling",
+        "response": {
+          "user_response": {
+            "spoken_text": "I hear you. It sounds like you're feeling concerned about Emma's reading comprehension. Can you tell me more about what's been happening lately?",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "User is reiterating concern about Emma's reading comprehension struggles. This indicates the issue is ongoing and causing distress. Need to explore recent developments and how the user is feeling about it.",
+            "emotional_state": "concerned",
+            "key_context": "Emma's reading comprehension is still a struggle.",
+            "watch_for": "Specific examples of current struggles and user's emotional response."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User stated Emma's reading comprehension is still struggling",
+                "content": "User is reporting that Emma's reading comprehension challenges persist. This suggests that previous strategies may not be fully effective or that the issue is evolving. Further exploration is needed to understand the current situation.",
+                "sentiment": "concerned"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_type": "timeline",
+            "html": ""
+          }
+        },
+        "latency_ms": 1640,
+        "vector_time_ms": 9,
+        "vector_results_summary": {
+          "areas_matched": 2,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is reiterating concern about Emma's reading comprehension struggles. This indicates the issue is ongoing and causing distress. Need to explore recent developments and how the user is feeling about it.",
+          "emotional_state": "concerned",
+          "key_context": "Emma's reading comprehension is still a struggle.",
+          "watch_for": "Specific examples of current struggles and user's emotional response."
+        },
+        "expected": {
+          "should_understand": "reading comprehension",
+          "should_NOT_be_confused": true,
+          "should_reference": [
+            "Emma",
+            "reading",
+            "comprehension"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "I think the dog man books are really helping her",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's wonderful to hear! It sounds like the Dog Man books are really clicking with her and making a difference. It's great that you've found something that sparks her interest and helps her engage with reading.",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User reports that Dog Man books are significantly helping Emma's reading comprehension. This confirms the hypothesis about visual learning styles and engaging content being key. Continue to encourage this approach.",
+            "emotional_state": "hopeful",
+            "key_context": "Dog Man books are a breakthrough for Emma's reading.",
+            "watch_for": "How Emma's engagement with reading evolves, and any new strategies that emerge from this success."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User shared positive feedback on Dog Man books",
+                "content": "User has observed that the Dog Man graphic novels are significantly helping Emma with her reading comprehension. She is more engaged and showing progress, reinforcing the idea that visual elements and engaging stories are beneficial for her learning style.",
+                "user_quote": "I think the dog man books are really helping her",
+                "ai_observation": "This is a strong indicator that Emma benefits from visual learning and high-interest material. Continue to leverage this success.",
+                "sentiment": "hopeful"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "",
+            "html": ""
+          }
+        },
+        "latency_ms": 1991,
+        "vector_time_ms": 13,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User reports that Dog Man books are significantly helping Emma's reading comprehension. This confirms the hypothesis about visual learning styles and engaging content being key. Continue to encourage this approach.",
+          "emotional_state": "hopeful",
+          "key_context": "Dog Man books are a breakthrough for Emma's reading.",
+          "watch_for": "How Emma's engagement with reading evolves, and any new strategies that emerge from this success."
+        },
+        "expected": {
+          "should_understand": "Dog Man graphic novels",
+          "should_reference_previous_breakthrough": true
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "The investor meting went good but they want our cute one numbers",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's fantastic news about the investor meeting! It sounds like you're making real progress. It's completely normal for them to want to see the numbers; that's a positive sign of their interest.",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User shared positive update about investor meeting. Investors requested Q1 numbers, which is a good sign. This follows a period of rejection, so this win is important for morale. Need to track fundraising progress and user's stress levels related to the startup.",
+            "emotional_state": "hopeful",
+            "key_context": "Positive investor feedback and request for Q1 numbers.",
+            "watch_for": "User's confidence and progress on fundraising. Any new stress related to startup demands."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "Update after positive investor meeting",
+                "content": "A second investor meeting went well. The investors expressed genuine interest and requested Q1 numbers before committing. This is a significant step forward after previous rejections and boosts confidence in the startup's direction.",
+                "user_quote": "The investor meeting went good but they want our cute one numbers",
+                "ai_observation": "This positive momentum is crucial for the user's morale, especially after facing rejections. Meeting the request for Q1 numbers will be the next critical step.",
+                "sentiment": "hopeful"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2305,
+        "vector_time_ms": 23,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 14
+        },
+        "ai_notes": {
+          "content": "User shared positive update about investor meeting. Investors requested Q1 numbers, which is a good sign. This follows a period of rejection, so this win is important for morale. Need to track fundraising progress and user's stress levels related to the startup.",
+          "emotional_state": "hopeful",
+          "key_context": "Positive investor feedback and request for Q1 numbers.",
+          "watch_for": "User's confidence and progress on fundraising. Any new stress related to startup demands."
+        },
+        "expected": {
+          "should_understand": "investor meeting, Q1 numbers",
+          "should_reference": [
+            "startup",
+            "fundraising",
+            "Q1"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "I talked to dock or chen about my guilt",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you had a really insightful conversation with Dr. Chen about your guilt. It's brave to confront those feelings, and it's good you're exploring ways to process them. What did you learn from that discussion?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User spoke with Dr. Chen about guilt, specifically related to Emma. Dr. Chen reframed guilt as 'borrowed suffering' and normalized Emma's reading struggles as common and catchable early. This suggests the user is working through self-blame and needs validation. Continue to reinforce the idea that they are doing a good job and that these challenges are manageable.",
+            "emotional_state": "reflective",
+            "key_context": "User is processing guilt with Dr. Chen, who offered a helpful perspective.",
+            "watch_for": "How the user applies Dr. Chen's advice and if the guilt lessens over time."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md",
+              "entry": {
+                "context": "User discussed guilt with Dr. Chen",
+                "content": "User spoke with Dr. Chen about feelings of guilt, particularly concerning Emma's reading struggles. Dr. Chen helped reframe this guilt as 'borrowed suffering' and emphasized that catching reading issues in 2nd grade is actually early, not late. This conversation seems to be providing the user with a more balanced perspective and reducing self-blame.",
+                "user_quote": "I talked to Dr. Chen about my guilt",
+                "ai_observation": "User is actively seeking support for their emotional well-being and is receptive to therapeutic insights. This is a positive step in managing the stress associated with Emma's challenges.",
+                "sentiment": "reflective"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2236,
+        "vector_time_ms": 138,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User spoke with Dr. Chen about guilt, specifically related to Emma. Dr. Chen reframed guilt as 'borrowed suffering' and normalized Emma's reading struggles as common and catchable early. This suggests the user is working through self-blame and needs validation. Continue to reinforce the idea that they are doing a good job and that these challenges are manageable.",
+          "emotional_state": "reflective",
+          "key_context": "User is processing guilt with Dr. Chen, who offered a helpful perspective.",
+          "watch_for": "How the user applies Dr. Chen's advice and if the guilt lessens over time."
+        },
+        "expected": {
+          "should_understand": "Dr. Chen therapist",
+          "should_reference": [
+            "therapy",
+            "guilt",
+            "Emma"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "Max court a goal in saucer yesterday!",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's fantastic news about Max scoring a goal! It sounds like he's really enjoying soccer and bringing a lot of joy to the field. What a proud moment for him!",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User shared a positive update about Max scoring a goal in soccer. This is a win for Max and a positive family moment. It's important to acknowledge and celebrate these successes, especially given the ongoing concerns with Emma's reading.",
+            "emotional_state": "proud",
+            "key_context": "Max scored his first goal of the season.",
+            "watch_for": "How this positive experience impacts Max's confidence and if it provides a helpful emotional counterpoint to the stress around Emma's schooling."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Max_Activities/soccer_season.md",
+              "entry": {
+                "context": "User shared news about Max scoring a goal.",
+                "content": "Max scored his first goal of the soccer season yesterday! He was incredibly proud, and the whole team celebrated with him. This is a significant milestone for him this season.",
+                "user_quote": "Max court a goal in saucer yesterday!",
+                "ai_observation": "This is a wonderful moment of achievement for Max, highlighting his engagement and success in soccer.",
+                "sentiment": "proud"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "",
+            "html": ""
+          }
+        },
+        "latency_ms": 1769,
+        "vector_time_ms": 32,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User shared a positive update about Max scoring a goal in soccer. This is a win for Max and a positive family moment. It's important to acknowledge and celebrate these successes, especially given the ongoing concerns with Emma's reading.",
+          "emotional_state": "proud",
+          "key_context": "Max scored his first goal of the season.",
+          "watch_for": "How this positive experience impacts Max's confidence and if it provides a helpful emotional counterpoint to the stress around Emma's schooling."
+        },
+        "expected": {
+          "should_understand": "Max scored goal in soccer",
+          "should_celebrate": true,
+          "emotional_tone": "celebratory"
+        },
+        "success": true
+      },
+      {
+        "turn": 6,
+        "user_input": "Jordan and I finially had a date knight last night",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      }
+    ],
+    "metrics": {
+      "total_turns": 6,
+      "successful_turns": 5,
+      "avg_latency_ms": 1988,
+      "total_input_tokens": 0,
+      "area_actions_taken": 5,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 253,
+      "ai_notes_generated": 5
+    },
+    "ai_notes_final": [
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T02:46:36.771Z",
+        "content": "User shared a positive update about Max scoring a goal in soccer. This is a win for Max and a positive family moment. It's important to acknowledge and celebrate these successes, especially given the ongoing concerns with Emma's reading.",
+        "emotional_state": "proud",
+        "key_context": "Max scored his first goal of the season.",
+        "watch_for": "How this positive experience impacts Max's confidence and if it provides a helpful emotional counterpoint to the stress around Emma's schooling."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T02:46:34.970Z",
+        "content": "User spoke with Dr. Chen about guilt, specifically related to Emma. Dr. Chen reframed guilt as 'borrowed suffering' and normalized Emma's reading struggles as common and catchable early. This suggests the user is working through self-blame and needs validation. Continue to reinforce the idea that they are doing a good job and that these challenges are manageable.",
+        "emotional_state": "reflective",
+        "key_context": "User is processing guilt with Dr. Chen, who offered a helpful perspective.",
+        "watch_for": "How the user applies Dr. Chen's advice and if the guilt lessens over time."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T02:46:32.596Z",
+        "content": "User shared positive update about investor meeting. Investors requested Q1 numbers, which is a good sign. This follows a period of rejection, so this win is important for morale. Need to track fundraising progress and user's stress levels related to the startup.",
+        "emotional_state": "hopeful",
+        "key_context": "Positive investor feedback and request for Q1 numbers.",
+        "watch_for": "User's confidence and progress on fundraising. Any new stress related to startup demands."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T02:46:30.268Z",
+        "content": "User reports that Dog Man books are significantly helping Emma's reading comprehension. This confirms the hypothesis about visual learning styles and engaging content being key. Continue to encourage this approach.",
+        "emotional_state": "hopeful",
+        "key_context": "Dog Man books are a breakthrough for Emma's reading.",
+        "watch_for": "How Emma's engagement with reading evolves, and any new strategies that emerge from this success."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T02:46:28.263Z",
+        "content": "User is reiterating concern about Emma's reading comprehension struggles. This indicates the issue is ongoing and causing distress. Need to explore recent developments and how the user is feeling about it.",
+        "emotional_state": "concerned",
+        "key_context": "Emma's reading comprehension is still a struggle.",
+        "watch_for": "Specific examples of current struggles and user's emotional response."
+      }
+    ],
+    "conversation_id": "test_STT_Transcription_Errors_Test_1768877205279",
+    "conversation_saved": true
+  },
+  {
+    "approach": "FULL",
+    "scenario_name": "New Topic Introduction Test",
+    "description": "Tests handling of genuinely new topics not in knowledge base",
+    "timestamp": "2026-01-20T02:46:45.299Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "I've been thinking about maybe going back to school to get my MBA",
+        "response": {
+          "user_response": {
+            "spoken_text": "An MBA is a significant decision! It could open up many new doors. What's prompting you to consider this now?",
+            "emotional_tone": "curious"
+          },
+          "internal_notes": {
+            "content": "User is considering an MBA. This is a major life decision that could impact career and potentially family life. Need to explore motivations and potential impacts.",
+            "emotional_state": "contemplative",
+            "key_context": "User is exploring a significant career and life change (MBA).",
+            "watch_for": "Reasons for pursuing MBA, potential impact on current startup, family considerations."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/summary.md",
+              "entry": {
+                "context": "User is considering an MBA.",
+                "content": "User is contemplating pursuing an MBA. This is a significant decision that may impact their current focus on the startup and fundraising efforts. Further exploration is needed regarding motivations and potential timelines.",
+                "ai_observation": "This is a major potential shift. Need to understand how it aligns with current startup goals and personal capacity.",
+                "sentiment": "contemplative"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_type": "none",
+            "artifact_id": "",
+            "html": ""
+          }
+        },
+        "latency_ms": 1726,
+        "vector_time_ms": 33,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is considering an MBA. This is a major life decision that could impact career and potentially family life. Need to explore motivations and potential impacts.",
+          "emotional_state": "contemplative",
+          "key_context": "User is exploring a significant career and life change (MBA).",
+          "watch_for": "Reasons for pursuing MBA, potential impact on current startup, family considerations."
+        },
+        "expected": {
+          "is_new_topic": true,
+          "should_ask_questions": true,
+          "should_create_area": false,
+          "emotional_tone": "curious"
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah, I'm serious about it. The startup stuff has me thinking about whether I have the business skills I need. I've been looking at part-time programs",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're feeling a need to bolster your business acumen, especially with the demands of the startup. Exploring part-time programs makes sense to balance your current commitments.",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "User is seriously considering an MBA, driven by a perceived gap in business skills needed for their startup. They are looking at part-time programs, indicating a desire to balance education with current responsibilities. This aligns with the overall theme of juggling multiple high-pressure areas.",
+            "emotional_state": "determined",
+            "key_context": "User is evaluating their business skills due to startup pressures and considering an MBA.",
+            "watch_for": "Specific reasons for skill gaps, potential impact on startup time, and family's reaction to this potential commitment."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User is considering an MBA due to perceived skill gaps related to the startup.",
+                "content": "User is seriously considering pursuing an MBA, specifically looking at part-time programs. This is driven by a feeling that current business skills may be insufficient for the demands of the startup, particularly in the current fundraising environment.",
+                "user_quote": "The startup stuff has me thinking about whether I have the business skills I need. I've been looking at part-time programs",
+                "ai_observation": "This shows a proactive approach to self-improvement and a recognition of potential limitations, which is a strength. The focus on part-time programs suggests a commitment to managing current responsibilities.",
+                "sentiment": "determined"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1877,
+        "vector_time_ms": 25,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is seriously considering an MBA, driven by a perceived gap in business skills needed for their startup. They are looking at part-time programs, indicating a desire to balance education with current responsibilities. This aligns with the overall theme of juggling multiple high-pressure areas.",
+          "emotional_state": "determined",
+          "key_context": "User is evaluating their business skills due to startup pressures and considering an MBA.",
+          "watch_for": "Specific reasons for skill gaps, potential impact on startup time, and family's reaction to this potential commitment."
+        },
+        "expected": {
+          "is_new_topic": true,
+          "should_create_area": true,
+          "area_path": "Personal_Growth/MBA_Consideration",
+          "should_connect_to_existing": [
+            "Work/Startup"
+          ],
+          "should_explore_motivations": true
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Oh also, my mom's been having some health issues. Nothing serious but it's on my mind.",
+        "response": {
+          "user_response": {
+            "spoken_text": "I'm sorry to hear about your mom's health issues. It's completely understandable that it's on your mind, especially when you're juggling so much already.",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "User is adding another layer of concern with their mom's health issues, which is weighing on them. This adds to the overall stress they are experiencing with the startup and family responsibilities. Need to acknowledge this new stressor and see how it impacts their priorities.",
+            "emotional_state": "concerned",
+            "key_context": "User's mother is experiencing health issues, adding to their existing stress.",
+            "watch_for": "How this new concern affects their focus on the MBA and startup, and if they need support in managing family caregiving alongside other responsibilities."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Mom_Health/_AREA_SUMMARY.md",
+              "entry": {
+                "context": "User mentioned mom's health issues",
+                "content": "User shared that their mom has been experiencing some health issues. While not serious, it is a cause for concern and is on the user's mind. This adds another layer of personal stress to their already demanding life.",
+                "sentiment": "concerned"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1659,
+        "vector_time_ms": 39,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 11
+        },
+        "ai_notes": {
+          "content": "User is adding another layer of concern with their mom's health issues, which is weighing on them. This adds to the overall stress they are experiencing with the startup and family responsibilities. Need to acknowledge this new stressor and see how it impacts their priorities.",
+          "emotional_state": "concerned",
+          "key_context": "User's mother is experiencing health issues, adding to their existing stress.",
+          "watch_for": "How this new concern affects their focus on the MBA and startup, and if they need support in managing family caregiving alongside other responsibilities."
+        },
+        "expected": {
+          "is_new_topic": true,
+          "is_sensitive": true,
+          "should_create_area": false,
+          "should_express_concern": true,
+          "should_offer_to_talk_more": true
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "We might need to help her more. She's having trouble with daily stuff and my sister and I need to figure out what to do.",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're stepping into a more supportive role for your mom, which is a significant responsibility on top of everything else. It's good you and your sister are discussing how to best help her with daily tasks.",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "The user is indicating a potential increase in caregiving responsibilities for their mother, who is experiencing difficulties with daily activities. This adds another layer of stress and requires coordination with their sister. This new concern needs to be integrated into their overall life stress assessment.",
+            "emotional_state": "concerned",
+            "key_context": "User's mother's health issues are escalating, requiring more direct support and coordination with a sibling.",
+            "watch_for": "How this caregiving role impacts the user's time and energy for their startup and other goals. The coordination with the sister is also a key factor."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Mom_Health/caregiving_needs.md",
+              "entry": {
+                "context": "User mentioned their mother is having trouble with daily tasks and they need to figure out how to help.",
+                "content": "Your mother's health issues are progressing, and she is now experiencing difficulties with daily activities. You and your sister are discussing how to provide more support and manage these needs, indicating a growing caregiving responsibility.",
+                "ai_observation": "This situation requires careful planning and coordination between you and your sister to ensure your mother receives the necessary support while managing your own demanding schedule.",
+                "sentiment": "concerned",
+                "user_quote": "She's having trouble with daily stuff and my sister and I need to figure out what to do."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "none",
+            "html": ""
+          }
+        },
+        "latency_ms": 2932,
+        "vector_time_ms": 37,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 15
+        },
+        "ai_notes": {
+          "content": "The user is indicating a potential increase in caregiving responsibilities for their mother, who is experiencing difficulties with daily activities. This adds another layer of stress and requires coordination with their sister. This new concern needs to be integrated into their overall life stress assessment.",
+          "emotional_state": "concerned",
+          "key_context": "User's mother's health issues are escalating, requiring more direct support and coordination with a sibling.",
+          "watch_for": "How this caregiving role impacts the user's time and energy for their startup and other goals. The coordination with the sister is also a key factor."
+        },
+        "expected": {
+          "is_new_topic": true,
+          "should_create_area": true,
+          "area_path": "Family/Mom_Health",
+          "is_sensitive": true,
+          "emotional_tone": "supportive"
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "The weather's been nice lately",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's great that the weather has been nice! Sometimes a bit of sunshine can make a big difference.",
+            "emotional_tone": "neutral"
+          },
+          "internal_notes": {
+            "content": "User made a brief, neutral comment about the weather. This is a social pleasantry and does not require deep analysis or immediate action. Acknowledged and moved on.",
+            "emotional_state": "neutral",
+            "key_context": "User is engaging in light conversation.",
+            "watch_for": "Any shift in topic or introduction of new concerns."
+          },
+          "area_actions": [],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "",
+            "html": ""
+          }
+        },
+        "latency_ms": 1181,
+        "vector_time_ms": 38,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 13
+        },
+        "ai_notes": {
+          "content": "User made a brief, neutral comment about the weather. This is a social pleasantry and does not require deep analysis or immediate action. Acknowledged and moved on.",
+          "emotional_state": "neutral",
+          "key_context": "User is engaging in light conversation.",
+          "watch_for": "Any shift in topic or introduction of new concerns."
+        },
+        "expected": {
+          "is_new_topic": false,
+          "should_create_area": false,
+          "should_NOT_overreact": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 5,
+      "successful_turns": 5,
+      "avg_latency_ms": 1875,
+      "total_input_tokens": 0,
+      "area_actions_taken": 4,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 172,
+      "ai_notes_generated": 5
+    },
+    "ai_notes_final": [
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T02:46:54.848Z",
+        "content": "User made a brief, neutral comment about the weather. This is a social pleasantry and does not require deep analysis or immediate action. Acknowledged and moved on.",
+        "emotional_state": "neutral",
+        "key_context": "User is engaging in light conversation.",
+        "watch_for": "Any shift in topic or introduction of new concerns."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T02:46:53.629Z",
+        "content": "The user is indicating a potential increase in caregiving responsibilities for their mother, who is experiencing difficulties with daily activities. This adds another layer of stress and requires coordination with their sister. This new concern needs to be integrated into their overall life stress assessment.",
+        "emotional_state": "concerned",
+        "key_context": "User's mother's health issues are escalating, requiring more direct support and coordination with a sibling.",
+        "watch_for": "How this caregiving role impacts the user's time and energy for their startup and other goals. The coordination with the sister is also a key factor."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T02:46:50.659Z",
+        "content": "User is adding another layer of concern with their mom's health issues, which is weighing on them. This adds to the overall stress they are experiencing with the startup and family responsibilities. Need to acknowledge this new stressor and see how it impacts their priorities.",
+        "emotional_state": "concerned",
+        "key_context": "User's mother is experiencing health issues, adding to their existing stress.",
+        "watch_for": "How this new concern affects their focus on the MBA and startup, and if they need support in managing family caregiving alongside other responsibilities."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T02:46:48.961Z",
+        "content": "User is seriously considering an MBA, driven by a perceived gap in business skills needed for their startup. They are looking at part-time programs, indicating a desire to balance education with current responsibilities. This aligns with the overall theme of juggling multiple high-pressure areas.",
+        "emotional_state": "determined",
+        "key_context": "User is evaluating their business skills due to startup pressures and considering an MBA.",
+        "watch_for": "Specific reasons for skill gaps, potential impact on startup time, and family's reaction to this potential commitment."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T02:46:47.058Z",
+        "content": "User is considering an MBA. This is a major life decision that could impact career and potentially family life. Need to explore motivations and potential impacts.",
+        "emotional_state": "contemplative",
+        "key_context": "User is exploring a significant career and life change (MBA).",
+        "watch_for": "Reasons for pursuing MBA, potential impact on current startup, family considerations."
+      }
+    ],
+    "conversation_id": "test_New_Topic_Introduction_Test_1768877214848",
+    "conversation_saved": true
+  },
+  {
+    "approach": "FULL",
+    "scenario_name": "Emotional Complexity Test",
+    "description": "Tests handling of complex, mixed emotional states",
+    "timestamp": "2026-01-20T02:46:54.854Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing.",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel all those things at once – pride, frustration, guilt, worry, and hope. It sounds like you're navigating a lot right now, and it's wonderful that you're so attuned to Emma's needs and progress.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing a complex mix of emotions regarding Emma's reading struggles and recent breakthrough. They feel pride, frustration, guilt, worry, and hope simultaneously. The guilt about not noticing sooner is a key point, as is the hope stemming from the graphic novel success. Therapy notes indicate this guilt is 'borrowed suffering'.",
+            "emotional_state": "conflicted",
+            "key_context": "User is experiencing a wide range of emotions about Emma's reading progress, including guilt about not noticing sooner.",
+            "watch_for": "User's feelings about testing and potential learning differences for Emma; continued progress with reading strategies."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User expressed complex emotions about Emma's reading progress.",
+                "content": "User is feeling a mix of pride in Emma's effort, frustration with the difficulty she's experiencing, guilt for not recognizing the struggle sooner, worry about her future, and hope due to the breakthrough with graphic novels.",
+                "ai_observation": "This emotional complexity is a sign of deep care and investment in Emma's well-being. The guilt is likely amplified by the desire to protect her self-esteem.",
+                "sentiment": "conflicted",
+                "user_quote": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2100,
+        "vector_time_ms": 19,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is expressing a complex mix of emotions regarding Emma's reading struggles and recent breakthrough. They feel pride, frustration, guilt, worry, and hope simultaneously. The guilt about not noticing sooner is a key point, as is the hope stemming from the graphic novel success. Therapy notes indicate this guilt is 'borrowed suffering'.",
+          "emotional_state": "conflicted",
+          "key_context": "User is experiencing a wide range of emotions about Emma's reading progress, including guilt about not noticing sooner.",
+          "watch_for": "User's feelings about testing and potential learning differences for Emma; continued progress with reading strategies."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "proud",
+            "frustrated",
+            "guilty",
+            "worried",
+            "hopeful"
+          ],
+          "should_validate_all": true,
+          "should_NOT_oversimplify": true,
+          "sentiment_captured": "mixed",
+          "entry_should_capture_nuance": true
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+        "error": "Bad escaped character in JSON at position 6664 (line 29 column 4779)",
+        "success": false
+      },
+      {
+        "turn": 3,
+        "user_input": "I love my kids but sometimes I just want to run away. Is that terrible?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's incredibly common to feel overwhelmed and wish for a break, even when you deeply love your children. You're not terrible for having these feelings; it's a sign that you're carrying a heavy load and need some respite.",
+            "emotional_tone": "empathetic"
+          },
+          "internal_notes": {
+            "content": "User is expressing feelings of wanting to escape parental responsibilities, which they feel guilty about. This is a normal response to parental burnout. Acknowledge the validity of these feelings and normalize them.",
+            "emotional_state": "guilty, overwhelmed",
+            "key_context": "User feels guilty about wanting a break from their children.",
+            "watch_for": "User's willingness to explore self-care or seek support to alleviate overwhelm."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md",
+              "entry": {
+                "context": "User expressed a desire to 'run away' from parental responsibilities.",
+                "content": "User shared feelings of wanting to 'run away' from their children, stemming from overwhelm. They expressed guilt about these feelings, questioning if it's 'terrible.' This indicates significant parental burnout and a need for validation and self-compassion.",
+                "user_quote": "I love my kids but sometimes I just want to run away. Is that terrible?",
+                "ai_observation": "It's crucial to validate these feelings as a normal response to stress and not a reflection of their love for their children.",
+                "sentiment": "guilty"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1797,
+        "vector_time_ms": 34,
+        "vector_results_summary": {
+          "areas_matched": 7,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User is expressing feelings of wanting to escape parental responsibilities, which they feel guilty about. This is a normal response to parental burnout. Acknowledge the validity of these feelings and normalize them.",
+          "emotional_state": "guilty, overwhelmed",
+          "key_context": "User feels guilty about wanting a break from their children.",
+          "watch_for": "User's willingness to explore self-care or seek support to alleviate overwhelm."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "love",
+            "overwhelm",
+            "guilt about feelings"
+          ],
+          "should_normalize": true,
+          "should_NOT_judge": true,
+          "should_validate_feeling_overwhelmed": true,
+          "is_sensitive": true
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're really appreciating Jordan's support and recognizing the need to be more present. It's natural to feel that way when you're stretched thin. What small step could you take to nurture that connection?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling guilty about not being present for their partner, Jordan, despite Jordan's recent support. They recognize the need to give more to the relationship. This ties into the overall theme of overwhelm and guilt.",
+            "emotional_state": "guilty, appreciative",
+            "key_context": "User feels they owe their partner more presence and attention.",
+            "watch_for": "User's willingness to prioritize partner time and any steps they take."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Partner/quality_time.md",
+              "entry": {
+                "context": "User reflecting on partner's support and their own lack of presence",
+                "content": "User felt their partner, Jordan, was very supportive last night. They acknowledged that they haven't been as present lately and feel they owe Jordan more attention and quality time. This feeling is tied to their overall overwhelm and guilt.",
+                "user_quote": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+                "ai_observation": "User is aware of the relationship's needs and feels guilt about not meeting them. This is a positive sign of self-awareness and desire to improve.",
+                "sentiment": "guilty"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "",
+            "html": ""
+          }
+        },
+        "latency_ms": 1892,
+        "vector_time_ms": 39,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 17
+        },
+        "ai_notes": {
+          "content": "User is feeling guilty about not being present for their partner, Jordan, despite Jordan's recent support. They recognize the need to give more to the relationship. This ties into the overall theme of overwhelm and guilt.",
+          "emotional_state": "guilty, appreciative",
+          "key_context": "User feels they owe their partner more presence and attention.",
+          "watch_for": "User's willingness to prioritize partner time and any steps they take."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "gratitude",
+            "guilt",
+            "self-criticism"
+          ],
+          "should_validate_feeling": true,
+          "should_gently_challenge_self_criticism": true,
+          "should_reference": [
+            "Jordan",
+            "relationship",
+            "quality time"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's fantastic! It's wonderful you hit your running goal three times this week. It's completely normal to feel a mix of pride and frustration when something so beneficial feels like such a struggle to maintain. Celebrate this win!",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User successfully ran 3 times this week, feeling positive about the physical and mental benefits but also annoyed at the difficulty of maintaining consistency. This confirms the pattern that exercise significantly boosts their well-being. Need to acknowledge the accomplishment and validate the frustration.",
+            "emotional_state": "proud, frustrated",
+            "key_context": "User achieved their running goal, reinforcing the positive impact of exercise on their overall state.",
+            "watch_for": "Continued consistency with exercise and how they manage the 'annoyance' factor."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Exercise_Goals/running.md",
+              "entry": {
+                "context": "User reported hitting their running goal this week.",
+                "content": "User successfully ran 3 times this week, exceeding their goal. They reported feeling 'amazing' with more energy and better stress management, but also expressed annoyance at how hard it is to maintain this consistency. This highlights the ongoing challenge of prioritizing exercise despite its clear benefits.",
+                "user_quote": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+                "ai_observation": "The user's accomplishment is significant and directly correlates with improved well-being, yet the underlying struggle with consistency remains a key challenge.",
+                "sentiment": "proud, annoyed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "none",
+            "artifact_type": "none",
+            "html": "none"
+          }
+        },
+        "latency_ms": 2674,
+        "vector_time_ms": 39,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "User successfully ran 3 times this week, feeling positive about the physical and mental benefits but also annoyed at the difficulty of maintaining consistency. This confirms the pattern that exercise significantly boosts their well-being. Need to acknowledge the accomplishment and validate the frustration.",
+          "emotional_state": "proud, frustrated",
+          "key_context": "User achieved their running goal, reinforcing the positive impact of exercise on their overall state.",
+          "watch_for": "Continued consistency with exercise and how they manage the 'annoyance' factor."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "accomplishment",
+            "self-frustration",
+            "clarity"
+          ],
+          "should_celebrate_win": true,
+          "should_acknowledge_pattern": true,
+          "should_reference": [
+            "exercise goal",
+            "previous struggles"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 5,
+      "successful_turns": 4,
+      "avg_latency_ms": 2116,
+      "total_input_tokens": 0,
+      "area_actions_taken": 4,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 159,
+      "ai_notes_generated": 4
+    },
+    "ai_notes_final": [
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T02:47:10.383Z",
+        "content": "User successfully ran 3 times this week, feeling positive about the physical and mental benefits but also annoyed at the difficulty of maintaining consistency. This confirms the pattern that exercise significantly boosts their well-being. Need to acknowledge the accomplishment and validate the frustration.",
+        "emotional_state": "proud, frustrated",
+        "key_context": "User achieved their running goal, reinforcing the positive impact of exercise on their overall state.",
+        "watch_for": "Continued consistency with exercise and how they manage the 'annoyance' factor."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T02:47:07.670Z",
+        "content": "User is feeling guilty about not being present for their partner, Jordan, despite Jordan's recent support. They recognize the need to give more to the relationship. This ties into the overall theme of overwhelm and guilt.",
+        "emotional_state": "guilty, appreciative",
+        "key_context": "User feels they owe their partner more presence and attention.",
+        "watch_for": "User's willingness to prioritize partner time and any steps they take."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T02:47:05.739Z",
+        "content": "User is expressing feelings of wanting to escape parental responsibilities, which they feel guilty about. This is a normal response to parental burnout. Acknowledge the validity of these feelings and normalize them.",
+        "emotional_state": "guilty, overwhelmed",
+        "key_context": "User feels guilty about wanting a break from their children.",
+        "watch_for": "User's willingness to explore self-care or seek support to alleviate overwhelm."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T02:46:56.974Z",
+        "content": "User is expressing a complex mix of emotions regarding Emma's reading struggles and recent breakthrough. They feel pride, frustration, guilt, worry, and hope simultaneously. The guilt about not noticing sooner is a key point, as is the hope stemming from the graphic novel success. Therapy notes indicate this guilt is 'borrowed suffering'.",
+        "emotional_state": "conflicted",
+        "key_context": "User is experiencing a wide range of emotions about Emma's reading progress, including guilt about not noticing sooner.",
+        "watch_for": "User's feelings about testing and potential learning differences for Emma; continued progress with reading strategies."
+      }
+    ],
+    "conversation_id": "test_Emotional_Complexity_Test_1768877230383",
+    "conversation_saved": true
+  },
+  {
+    "approach": "FULL",
+    "scenario_name": "Context Summary Request Test",
+    "description": "Tests ability to summarize past conversations on request",
+    "timestamp": "2026-01-20T02:47:10.388Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "Can you give me a summary of everything we've discussed about Emma's reading?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "What have we talked about regarding work stress?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 3,
+        "user_input": "I have my teacher meeting next week. What should I remember from our conversations?",
+        "response": {
+          "user_response": {
+            "spoken_text": "I've put together a summary of our conversations about Emma's reading progress and the stress you've been experiencing with your startup. It should help you prepare for your meeting.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User requested a summary of discussions about Emma's reading and work stress. I will generate a mind map to visualize the key points for Emma's reading and a stress map for work-related concerns.",
+            "emotional_state": "prepared",
+            "key_context": "User needs a concise summary for an upcoming teacher meeting and to address work stress.",
+            "watch_for": "User's feelings about the teacher meeting and any new stressors related to the startup."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User asked for a summary of discussions about Emma's reading for their upcoming teacher meeting.",
+                "content": "User is preparing for a teacher meeting regarding Emma's reading. Key discussion points include Emma's recent breakthrough with graphic novels, her struggle with comprehension despite decoding skills, the teacher's recommendation for educational testing, and the user's concerns about labeling Emma. Strategies that have shown promise are reading together, using graphic novels, praising effort, and taking breaks.",
+                "ai_observation": "The user is proactively preparing for the meeting, which is a positive step. Focusing on the strategies that have worked and Emma's recent positive engagement will be helpful.",
+                "sentiment": "prepared"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/summary.md",
+              "entry": {
+                "context": "User asked for a summary of discussions about work stress.",
+                "content": "Discussions about work stress have centered on the high demands of the startup, particularly concerning fundraising and team hiring. This is compounded by feelings of burnout and guilt about not spending enough time with family due to work pressures. The user is feeling overwhelmed by the dual demands of a high-stress startup and supporting Emma's educational needs.",
+                "ai_observation": "The user is experiencing significant stress from the startup, impacting their overall well-being and family time. Recognizing the interconnectedness of these stressors is important.",
+                "sentiment": "stressed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "mind_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Emma's Reading Journey</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 240, 255, 0.9));\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .mind-map-container {\n            background: rgba(255, 255, 255, 0.7);\n            backdrop-filter: blur(15px);\n            border-radius: 20px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            padding: 40px;\n            width: 90%;\n            max-width: 800px;\n            text-align: center;\n            border: 1px solid rgba(200, 220, 240, 0.3);\n        }\n        .mind-map-title {\n            font-size: 2.5em;\n            font-weight: 700;\n            color: #1e3a8a; /* Darker blue */\n            margin-bottom: 30px;\n            text-shadow: 0 2px 4px rgba(0,0,0,0.05);\n        }\n        .mind-map {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 30px;\n        }\n        .node {\n            background: linear-gradient(120deg, rgba(96, 165, 250, 0.8), rgba(59, 130, 246, 0.8)); /* Blue gradient */\n            color: white;\n            padding: 25px;\n            border-radius: 16px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);\n            transition: transform 0.3s ease, box-shadow 0.3s ease;\n            text-align: left;\n            display: flex;\n            flex-direction: column;\n            justify-content: center;\n            align-items: flex-start;\n            min-height: 150px;\n        }\n        .node:hover {\n            transform: translateY(-8px);\n            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);\n        }\n        .node-title {\n            font-size: 1.4em;\n            font-weight: 600;\n            margin-bottom: 10px;\n            color: #ffffff;\n            line-height: 1.3;\n        }\n        .node-content {\n            font-size: 0.95em;\n            font-weight: 400;\n            line-height: 1.6;\n            opacity: 0.9;\n        }\n        .node-content ul {\n            list-style: disc;\n            padding-left: 20px;\n            margin-top: 10px;\n        }\n        .node-content li {\n            margin-bottom: 5px;\n        }\n        .icon {\n            font-size: 1.8em;\n            margin-bottom: 15px;\n            opacity: 0.9;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"mind-map-container\">\n        <h1 class=\"mind-map-title\">🧠 Emma's Reading Journey: Key Takeaways for Teacher Meeting</h1>\n        <div class=\"mind-map\">\n            <div class=\"node\">\n                <div class=\"icon\">📚</div>\n                <div class=\"node-title\">Reading Challenges</div>\n                <div class=\"node-content\">\n                    <p>Decoding words is fine, but struggles with comprehension.</p>\n                    <p>Frustration and self-doubt (e.g., \"I'm stupid\").</p>\n                    <p>Homework takes significantly longer than expected.</p>\n                </div>\n            </div>\n            <div class=\"node\">\n                <div class=\"icon\">✨</div>\n                <div class=\"node-title\">Recent Breakthroughs</div>\n                <div class=\"node-content\">\n                    <p>Graphic novels (Dog Man) are highly engaging!</p>\n                    <p>Initiated extra reading time (\"one more chapter\").</p>\n                    <p>Indicates a potential visual learning preference.</p>\n                </div>\n            </div>\n            <div class=\"node\">\n                <div class=\"icon\">🧑‍🏫</div>\n                <div class=\"node-title\">Teacher's Input & Next Steps</div>\n                <div class=\"node-content\">\n                    <p>Ms. Johnson recommended educational testing.</p>\n                    <p>Concerns about potential learning differences.</p>\n                    <p>Meeting scheduled to discuss findings.</p>\n                </div>\n            </div>\n            <div class=\"node\">\n                <div class=\"icon\">💡</div>\n                <div class=\"node-title\">Effective Strategies</div>\n                <div class=\"node-content\">\n                    <ul>\n                        <li>Reading together</li>\n                        <li>Graphic novels/visuals</li>\n                        <li>Praise effort, not just results</li>\n                        <li>Taking breaks when frustrated</li>\n                    </ul>\n                </div>\n            </div>\n            <div class=\"node\">\n                <div class=\"icon\">❤️</div>\n                <div class=\"node-title\">Your Concerns</div>\n                <div class=\"node-content\">\n                    <p>Worry about labeling Emma if tested.</p>\n                    <p>Desire to support her without making her feel \"broken\".</p>\n                    <p>Hopeful about her recent engagement.</p>\n                </div>\n            </div>\n        </div>\n    </div>\n</body>\n</html>\n",
+            "artifact_id": "mind_map_1768877270328"
+          }
+        },
+        "latency_ms": 7348,
+        "vector_time_ms": 15,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 15
+        },
+        "ai_notes": {
+          "content": "User requested a summary of discussions about Emma's reading and work stress. I will generate a mind map to visualize the key points for Emma's reading and a stress map for work-related concerns.",
+          "emotional_state": "prepared",
+          "key_context": "User needs a concise summary for an upcoming teacher meeting and to address work stress.",
+          "watch_for": "User's feelings about the teacher meeting and any new stressors related to the startup."
+        },
+        "expected": {
+          "should_provide_actionable_summary": true,
+          "should_include": [
+            "comprehension vs decoding",
+            "graphic novel breakthrough",
+            "visual learning",
+            "concerns about testing"
+          ],
+          "should_reference_user_quotes": true,
+          "should_prepare_for_meeting": true
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "Show me my progress on the running goal",
+        "response": {
+          "user_response": {
+            "spoken_text": "Here is your progress on the running goal.",
+            "emotional_tone": "neutral"
+          },
+          "internal_notes": {
+            "content": "User wants to see progress on their running goal. I will generate a goal tracker artifact to visualize this.",
+            "emotional_state": "neutral",
+            "key_context": "User is tracking running goal progress.",
+            "watch_for": "Consistency in running and any new barriers."
+          },
+          "area_actions": [],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "goal_tracker",
+            "html": "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%); color: #ffffff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); max-width: 600px; margin: 40px auto;\">\n  <h1 style=\"font-size: 28px; font-weight: 700; margin-bottom: 20px; text-align: center; letter-spacing: 0.5px;\">🏃‍♀️ Running Goal Progress 🏃‍♂️</h1>\n  <p style=\"font-size: 16px; font-weight: 400; text-align: center; margin-bottom: 30px;\">Consistency is key to feeling your best!</p>\n  \n  <div style=\"display: flex; justify-content: space-around; align-items: center; margin-bottom: 30px;\">\n    <div style=\"text-align: center;\">\n      <div style=\"font-size: 48px; font-weight: 700; color: #fbbf24;\">75%</div>\n      <p style=\"font-size: 16px; font-weight: 600; margin-top: 5px;\">Completion Rate</p>\n    </div>\n    <div style=\"text-align: center;\">\n      <div style=\"font-size: 48px; font-weight: 700; color: #fbbf24;\">3</div>\n      <p style=\"font-size: 16px; font-weight: 600; margin-top: 5px;\">Runs This Week</p>\n    </div>\n  </div>\n\n  <div style=\"margin-bottom: 25px;\">\n    <h2 style=\"font-size: 20px; font-weight: 600; margin-bottom: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.3); padding-bottom: 10px;\">Recent Activity</h2>\n    <ul style=\"list-style: none; padding: 0; margin: 0;\">\n      <li style=\"margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.1); padding: 10px 15px; border-radius: 10px;\">\n        <span style=\"font-weight: 500;\">Jan 16: Ran 3 times! (Hit goal)</span>\n        <span style=\"font-size: 20px;\">✅</span>\n      </li>\n      <li style=\"margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.1); padding: 10px 15px; border-radius: 10px;\">\n        <span style=\"font-weight: 500;\">Jan 10: Skipped entire week</span>\n        <span style=\"font-size: 20px;\">❌</span>\n      </li>\n      <li style=\"margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.1); padding: 10px 15px; border-radius: 10px;\">\n        <span style=\"font-weight: 500;\">Jan 3: Set 3x/week running goal</span>\n        <span style=\"font-size: 20px;\">🎯</span>\n      </li>\n    </ul>\n  </div>\n  \n  <div style=\"text-align: center;\">\n    <p style=\"font-size: 14px; font-weight: 400; color: rgba(255, 255, 255, 0.8);\">Keep up the great work!</p>\n  </div>\n</div>",
+            "artifact_id": "goal_tracker_1768877275495"
+          }
+        },
+        "latency_ms": 5144,
+        "vector_time_ms": 22,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 16
+        },
+        "ai_notes": {
+          "content": "User wants to see progress on their running goal. I will generate a goal tracker artifact to visualize this.",
+          "emotional_state": "neutral",
+          "key_context": "User is tracking running goal progress.",
+          "watch_for": "Consistency in running and any new barriers."
+        },
+        "expected": {
+          "should_show_progress": true,
+          "should_be_honest_about_struggles": true,
+          "should_highlight_good_week": true,
+          "should_generate_artifact": true,
+          "artifact_type": [
+            "progress_chart",
+            "timeline"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "What patterns have you noticed about my stress?",
+        "response": {
+          "user_response": {
+            "spoken_text": "I've noticed a pattern where stress often spikes when there are conflicting demands, especially between Emma's school needs and your startup's fundraising. It seems like juggling these high-priority, time-sensitive areas is a major trigger for you.",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "User is asking about stress patterns. The primary pattern identified is the conflict between Emma's school demands (like her reading struggles and meetings) and the high-pressure startup fundraising. This overlap creates significant stress.",
+            "emotional_state": "analytical",
+            "key_context": "Conflicting demands between Emma's school and startup fundraising are key stress triggers.",
+            "watch_for": "Any new stressors or changes in how these two areas interact."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/stress_patterns.md",
+              "entry": {
+                "context": "User asked about patterns in their stress.",
+                "content": "A recurring pattern of stress is linked to conflicting demands between Emma's school responsibilities (e.g., reading comprehension issues, upcoming teacher meetings) and the high-pressure environment of the startup's fundraising efforts. These overlapping, time-sensitive priorities appear to be a significant trigger for increased stress.",
+                "ai_observation": "The user's stress is highly correlated with the intersection of family and work responsibilities, particularly when both demand significant attention simultaneously.",
+                "sentiment": "reflective"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_id": "stress_pattern_diagram_20260120",
+            "artifact_type": "pathway_diagram",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Pattern Analysis</title>\n    <style>\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(245, 158, 11, 0.8) 100%); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }\n        .artifact-container { width: 90%; max-width: 800px; background: rgba(255, 255, 255, 0.7); border-radius: 20px; padding: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.3); }\n        h1 { text-align: center; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); margin-bottom: 30px; font-size: 2.2em; font-weight: 700; }\n        .diagram-wrapper {\n            display: flex;\n            flex-direction: column;\n            align-items: center;\n            gap: 25px;\n        }\n        .node {\n            background: rgba(255, 255, 255, 0.85);\n            padding: 15px 25px;\n            border-radius: 16px;\n            box-shadow: 0 4px 15px rgba(0,0,0,0.1);\n            text-align: center;\n            font-size: 1.1em;\n            font-weight: 600;\n            transition: transform 0.3s ease, box-shadow 0.3s ease;\n            border: 1px solid rgba(255, 255, 255, 0.5);\n        }\n        .node:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }\n        .node.stress-trigger { background: linear-gradient(135deg, rgba(255, 99, 71, 0.8) 0%, rgba(255, 160, 122, 0.8) 100%); color: white; }\n        .node.core-stressor { background: linear-gradient(135deg, rgba(130, 201, 173, 0.8) 0%, rgba(199, 236, 215, 0.8) 100%); color: #333; }\n        .node.outcome { background: rgba(255, 255, 255, 0.7); color: #555; font-weight: 400; font-size: 1em; }\n        .arrow {\n            position: relative;\n            width: 4px;\n            height: 40px;\n            background-color: rgba(255, 255, 255, 0.7);\n            margin: 10px 0;\n            border-radius: 2px;\n        }\n        .arrow::after {\n            content: '';\n            position: absolute;\n            bottom: -8px;\n            left: -6px;\n            width: 0;\n            height: 0;\n            border-left: 10px solid rgba(255, 255, 255, 0.7);\n            border-top: 8px solid transparent;\n            border-bottom: 8px solid transparent;\n        }\n        .connector-line { width: 2px; background-color: rgba(255, 255, 255, 0.7); margin: 10px 0; }\n        .final-outcome { font-size: 1.3em; font-weight: 700; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); margin-top: 20px; }\n    </style>\n</head>\n<body>\n    <div class=\"artifact-container\">\n        <h1>Understanding Your Stress Patterns</h1>\n        <div class=\"diagram-wrapper\">\n            <div class=\"node core-stressor\">Conflicting Demands (Emma's School vs. Startup Fundraising)</div>\n            <div class=\"arrow\"></div>\n            <div class=\"node stress-trigger\">Time-Sensitive Priorities</div>\n            <div class=\"arrow\"></div>\n            <div class=\"node outcome\">Increased Stress & Overwhelm</div>\n            <div class=\"node outcome\">Feeling of Guilt (Not Enough Time/Attention for Both)</div>\n            <div class=\"node outcome\">Burnout Risk</div>\n            <div class=\"final-outcome\">Need for Better Time Management & Boundary Setting</div>\n        </div>\n    </div>\n</body>\n</html>"
+          }
+        },
+        "latency_ms": 6291,
+        "vector_time_ms": 23,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 17
+        },
+        "ai_notes": {
+          "content": "User is asking about stress patterns. The primary pattern identified is the conflict between Emma's school demands (like her reading struggles and meetings) and the high-pressure startup fundraising. This overlap creates significant stress.",
+          "emotional_state": "analytical",
+          "key_context": "Conflicting demands between Emma's school and startup fundraising are key stress triggers.",
+          "watch_for": "Any new stressors or changes in how these two areas interact."
+        },
+        "expected": {
+          "should_identify_patterns": true,
+          "patterns_to_mention": [
+            "work-family guilt",
+            "startup pressure",
+            "exercise helps but gets skipped",
+            "therapy insights"
+          ],
+          "should_be_insightful": true,
+          "should_NOT_be_preachy": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 5,
+      "successful_turns": 3,
+      "avg_latency_ms": 6261,
+      "total_input_tokens": 0,
+      "area_actions_taken": 3,
+      "artifacts_generated": 3,
+      "vector_search_time_ms": 81,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T02:48:01.809Z",
+        "content": "User is asking about stress patterns. The primary pattern identified is the conflict between Emma's school demands (like her reading struggles and meetings) and the high-pressure startup fundraising. This overlap creates significant stress.",
+        "emotional_state": "analytical",
+        "key_context": "Conflicting demands between Emma's school and startup fundraising are key stress triggers.",
+        "watch_for": "Any new stressors or changes in how these two areas interact."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T02:47:55.495Z",
+        "content": "User wants to see progress on their running goal. I will generate a goal tracker artifact to visualize this.",
+        "emotional_state": "neutral",
+        "key_context": "User is tracking running goal progress.",
+        "watch_for": "Consistency in running and any new barriers."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T02:47:50.327Z",
+        "content": "User requested a summary of discussions about Emma's reading and work stress. I will generate a mind map to visualize the key points for Emma's reading and a stress map for work-related concerns.",
+        "emotional_state": "prepared",
+        "key_context": "User needs a concise summary for an upcoming teacher meeting and to address work stress.",
+        "watch_for": "User's feelings about the teacher meeting and any new stressors related to the startup."
+      }
+    ],
+    "conversation_id": "test_Context_Summary_Request_Test_1768877281810",
+    "conversation_saved": true
+  },
+  {
+    "approach": "FULL",
+    "scenario_name": "Vague Follow-up Questions Test",
+    "description": "Tests handling of vague questions that need context",
+    "timestamp": "2026-01-20T02:48:01.815Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "Emma's teacher meeting is coming up next week.",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "So what should I do?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 3,
+        "user_input": "Yeah",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 4,
+        "user_input": "I don't know",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel unsure about what to do next, especially with important meetings like this. We can break it down together. What are your main concerns or questions about the meeting?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed and uncertain about the upcoming teacher meeting for Emma. They need guidance on how to approach it and what to prepare. The user's hesitation indicates anxiety about potential learning differences and Emma's reaction.",
+            "emotional_state": "anxious",
+            "key_context": "User needs help preparing for Emma's teacher meeting.",
+            "watch_for": "User's specific concerns about testing and Emma's feelings."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User is unsure what to do about the upcoming teacher meeting.",
+                "content": "User expressed uncertainty about how to approach Emma's upcoming teacher meeting. They are feeling overwhelmed and need guidance on preparation and potential discussion points, especially concerning the recommendation for educational testing.",
+                "ai_observation": "The user's uncertainty highlights their anxiety and need for structured support in navigating this conversation.",
+                "sentiment": "anxious"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "timeline",
+            "html": ""
+          }
+        },
+        "latency_ms": 1777,
+        "vector_time_ms": 16,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed and uncertain about the upcoming teacher meeting for Emma. They need guidance on how to approach it and what to prepare. The user's hesitation indicates anxiety about potential learning differences and Emma's reaction.",
+          "emotional_state": "anxious",
+          "key_context": "User needs help preparing for Emma's teacher meeting.",
+          "watch_for": "User's specific concerns about testing and Emma's feelings."
+        },
+        "expected": {
+          "should_be_supportive": true,
+          "should_offer_help": true,
+          "should_NOT_dismiss": true,
+          "emotional_tone": "supportive"
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "What do you think?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel unsure about what to do next, especially with important meetings like this. We can break it down together. What are your main concerns or questions about the meeting?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling anxious and uncertain about Emma's upcoming teacher meeting. They need guidance on preparation and what to discuss. I should help them organize their thoughts and potential talking points.",
+            "emotional_state": "anxious",
+            "key_context": "User needs help preparing for Emma's teacher meeting.",
+            "watch_for": "User's specific concerns about testing and Emma's feelings."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User asked for guidance on preparing for Emma's teacher meeting.",
+                "content": "User is preparing for Emma's teacher meeting next week and feels uncertain about how to approach it. They need to organize their thoughts and potential discussion points regarding Emma's reading comprehension.",
+                "user_quote": "So what should I do? Yeah I don't know",
+                "ai_observation": "The user is feeling overwhelmed and needs a structured approach to prepare for the meeting.",
+                "sentiment": "anxious"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "",
+            "html": ""
+          }
+        },
+        "latency_ms": 1712,
+        "vector_time_ms": 22,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 14
+        },
+        "ai_notes": {
+          "content": "User is feeling anxious and uncertain about Emma's upcoming teacher meeting. They need guidance on preparation and what to discuss. I should help them organize their thoughts and potential talking points.",
+          "emotional_state": "anxious",
+          "key_context": "User needs help preparing for Emma's teacher meeting.",
+          "watch_for": "User's specific concerns about testing and Emma's feelings."
+        },
+        "expected": {
+          "should_provide_opinion_in_context": true,
+          "should_reference_previous_discussion": true,
+          "should_NOT_be_generic": true
+        },
+        "success": true
+      },
+      {
+        "turn": 6,
+        "user_input": "hmm",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel unsure about what to do next, especially with important meetings like this. We can break it down together. What are your main concerns or questions about the meeting?",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "User is feeling uncertain about Emma's upcoming teacher meeting. They need help organizing their thoughts and preparing for the discussion. I should prompt them to share their specific concerns.",
+            "emotional_state": "anxious",
+            "key_context": "User needs to prepare for Emma's teacher meeting.",
+            "watch_for": "User's specific worries about testing and Emma's feelings."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User expressed uncertainty about the upcoming teacher meeting for Emma.",
+                "content": "User is feeling uncertain and unsure about how to prepare for Emma's upcoming teacher meeting. They need guidance on what to discuss and how to approach the conversation.",
+                "user_quote": "So what should I do? Yeah I don't know hmm"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_type": "timeline",
+            "html": ""
+          }
+        },
+        "latency_ms": 1469,
+        "vector_time_ms": 26,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User is feeling uncertain about Emma's upcoming teacher meeting. They need help organizing their thoughts and preparing for the discussion. I should prompt them to share their specific concerns.",
+          "emotional_state": "anxious",
+          "key_context": "User needs to prepare for Emma's teacher meeting.",
+          "watch_for": "User's specific worries about testing and Emma's feelings."
+        },
+        "expected": {
+          "should_give_space": true,
+          "should_offer_gentle_prompt": true,
+          "should_NOT_fill_silence_with_lecture": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 6,
+      "successful_turns": 3,
+      "avg_latency_ms": 1653,
+      "total_input_tokens": 0,
+      "area_actions_taken": 3,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 100,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 6,
+        "timestamp": "2026-01-20T02:48:57.739Z",
+        "content": "User is feeling uncertain about Emma's upcoming teacher meeting. They need help organizing their thoughts and preparing for the discussion. I should prompt them to share their specific concerns.",
+        "emotional_state": "anxious",
+        "key_context": "User needs to prepare for Emma's teacher meeting.",
+        "watch_for": "User's specific worries about testing and Emma's feelings."
+      },
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T02:48:56.243Z",
+        "content": "User is feeling anxious and uncertain about Emma's upcoming teacher meeting. They need guidance on preparation and what to discuss. I should help them organize their thoughts and potential talking points.",
+        "emotional_state": "anxious",
+        "key_context": "User needs help preparing for Emma's teacher meeting.",
+        "watch_for": "User's specific concerns about testing and Emma's feelings."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T02:48:54.508Z",
+        "content": "User is feeling overwhelmed and uncertain about the upcoming teacher meeting for Emma. They need guidance on how to approach it and what to prepare. The user's hesitation indicates anxiety about potential learning differences and Emma's reaction.",
+        "emotional_state": "anxious",
+        "key_context": "User needs help preparing for Emma's teacher meeting.",
+        "watch_for": "User's specific concerns about testing and Emma's feelings."
+      }
+    ],
+    "conversation_id": "test_Vague_Follow-up_Questions_Test_1768877337739",
+    "conversation_saved": true
+  },
+  {
+    "approach": "FULL",
+    "scenario_name": "Repetition Prevention Test",
+    "description": "Tests AI ability to avoid repeating itself",
+    "timestamp": "2026-01-20T02:48:57.743Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "I'm struggling with Emma's reading",
+        "response": {
+          "user_response": {
+            "spoken_text": "I understand you're struggling with Emma's reading. It sounds like a really tough situation, and it's completely normal to feel overwhelmed when your child is having a hard time. Let's see how we can break this down and find some solutions together.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing struggle with Emma's reading. This is a recurring theme and a source of significant distress. The user previously mentioned Emma's frustration and the breakthrough with graphic novels. Key is to validate their feelings and offer structured support.",
+            "emotional_state": "concerned",
+            "key_context": "Emma's reading struggles are causing emotional distress for the user.",
+            "watch_for": "User's receptiveness to strategies, Emma's progress, and the user's emotional state regarding guilt."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User expressed general struggle with Emma's reading.",
+                "content": "User is currently struggling with Emma's reading comprehension. This is a source of distress, and they are seeking ways to address it. The situation involves Emma's emotional response to reading difficulties.",
+                "sentiment": "concerned"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_type": "mind_map",
+            "html": ""
+          }
+        },
+        "latency_ms": 1540,
+        "vector_time_ms": 8,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is expressing struggle with Emma's reading. This is a recurring theme and a source of significant distress. The user previously mentioned Emma's frustration and the breakthrough with graphic novels. Key is to validate their feelings and offer structured support.",
+          "emotional_state": "concerned",
+          "key_context": "Emma's reading struggles are causing emotional distress for the user.",
+          "watch_for": "User's receptiveness to strategies, Emma's progress, and the user's emotional state regarding guilt."
+        },
+        "expected": {
+          "should_acknowledge": true,
+          "will_likely_mention": [
+            "comprehension",
+            "graphic novels",
+            "Dog Man"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah we've been doing the graphic novel thing",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's great to hear! It sounds like the graphic novels have been a real breakthrough for Emma. What specifically about them seems to be helping the most?",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User confirms continued use of graphic novels, reinforcing the earlier breakthrough. The focus now shifts to understanding the mechanics of *why* they are effective and how to build on this success. This is a positive sign of progress.",
+            "emotional_state": "hopeful",
+            "key_context": "Graphic novels are a successful strategy for Emma's reading comprehension.",
+            "watch_for": "Specific reasons for success with graphic novels, user's continued engagement with this strategy, and Emma's sustained progress."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User confirmed they are continuing with the graphic novel strategy",
+                "content": "The user has confirmed that the graphic novel strategy is still in use and has been effective. This reinforces the idea that visual elements and engaging narratives are key to Emma's comprehension.",
+                "user_quote": "Yeah we've been doing the graphic novel thing",
+                "ai_observation": "The continued success with graphic novels is a strong indicator of Emma's learning style.",
+                "sentiment": "positive"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1945,
+        "vector_time_ms": 12,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User confirms continued use of graphic novels, reinforcing the earlier breakthrough. The focus now shifts to understanding the mechanics of *why* they are effective and how to build on this success. This is a positive sign of progress.",
+          "emotional_state": "hopeful",
+          "key_context": "Graphic novels are a successful strategy for Emma's reading comprehension.",
+          "watch_for": "Specific reasons for success with graphic novels, user's continued engagement with this strategy, and Emma's sustained progress."
+        },
+        "expected": {
+          "should_NOT_repeat": "try graphic novels",
+          "should_build_on": "what's working/not working",
+          "should_move_forward": true
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Anyway, tell me about my running goal",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like the graphic novels are really clicking with Emma! What about them do you think is making such a difference for her?",
+            "emotional_tone": "curious"
+          },
+          "internal_notes": {
+            "content": "User is confirming the success of graphic novels for Emma's reading. The next step is to understand the specific elements of this strategy that are effective. This will help in building on this success and applying it to other areas.",
+            "emotional_state": "hopeful",
+            "key_context": "Graphic novels are a successful strategy for Emma's reading comprehension.",
+            "watch_for": "Specific reasons for success with graphic novels, user's continued engagement with this strategy, and Emma's sustained progress."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User confirmed continued use of graphic novels",
+                "content": "User is continuing with the graphic novel strategy for Emma's reading. The focus is now on understanding the specific elements that make this approach successful for Emma.",
+                "user_quote": "Yeah we've been doing the graphic novel thing",
+                "ai_observation": "The user is seeking to understand the 'why' behind the success, which is a good sign for developing a deeper strategy.",
+                "sentiment": "hopeful"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1822,
+        "vector_time_ms": 19,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 15
+        },
+        "ai_notes": {
+          "content": "User is confirming the success of graphic novels for Emma's reading. The next step is to understand the specific elements of this strategy that are effective. This will help in building on this success and applying it to other areas.",
+          "emotional_state": "hopeful",
+          "key_context": "Graphic novels are a successful strategy for Emma's reading comprehension.",
+          "watch_for": "Specific reasons for success with graphic novels, user's continued engagement with this strategy, and Emma's sustained progress."
+        },
+        "expected": {
+          "should_switch_topics": true,
+          "should_reference": [
+            "3x per week",
+            "struggling"
+          ],
+          "setup_for_repetition_test": true
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "Yeah I know exercise helps my mood",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're really aware of how exercise benefits your mood and overall well-being. You mentioned setting a goal to run 3 times a week. How has that been going lately?",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "The user acknowledges the benefit of exercise on their mood and remembers setting a goal for running 3x/week. This connects to the 'Exercise_Goals' area. The user's previous entries show a struggle with consistency due to fatigue and time constraints. Need to gently probe about the goal's progress.",
+            "emotional_state": "reflective",
+            "key_context": "User recognizes exercise benefits but struggles with consistency for their 3x/week running goal.",
+            "watch_for": "User's current progress on the running goal, any new barriers they are facing, and their emotional response to discussing it."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User acknowledged exercise helps their mood and recalled the 3x/week running goal.",
+                "content": "User confirmed awareness of exercise's positive impact on mood. They also recalled the goal of running 3 times per week, indicating it's on their mind. This sets the stage to discuss current progress and challenges with that specific goal.",
+                "ai_observation": "The user is reflecting on the known benefits of exercise and the specific goal they set, showing self-awareness. This is a good opportunity to explore the consistency of that habit.",
+                "sentiment": "reflective"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "",
+            "html": ""
+          }
+        },
+        "latency_ms": 2192,
+        "vector_time_ms": 25,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 15
+        },
+        "ai_notes": {
+          "content": "The user acknowledges the benefit of exercise on their mood and remembers setting a goal for running 3x/week. This connects to the 'Exercise_Goals' area. The user's previous entries show a struggle with consistency due to fatigue and time constraints. Need to gently probe about the goal's progress.",
+          "emotional_state": "reflective",
+          "key_context": "User recognizes exercise benefits but struggles with consistency for their 3x/week running goal.",
+          "watch_for": "User's current progress on the running goal, any new barriers they are facing, and their emotional response to discussing it."
+        },
+        "expected": {
+          "should_NOT_lecture": "exercise is good for you",
+          "should_acknowledge_awareness": true,
+          "should_move_past_obvious": true
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "Let's talk about Emma again",
+        "response": {
+          "user_response": {
+            "spoken_text": "Okay, let's shift our focus back to Emma. You mentioned the graphic novels have been a breakthrough. Can you tell me more about what you've observed with her reading since you started using them?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "The user wants to discuss Emma again, specifically relating to her reading. The previous conversation highlighted the success of graphic novels. The user also acknowledged the benefit of exercise on their mood. I need to gently guide the conversation back to Emma's reading progress and explore the specifics of why graphic novels are working.",
+            "emotional_state": "reflective",
+            "key_context": "User is seeking to understand the success of graphic novels for Emma's reading.",
+            "watch_for": "Specific details about Emma's engagement with graphic novels and any continued progress or challenges."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User wants to discuss Emma's reading again.",
+                "content": "The user is returning to the topic of Emma's reading struggles. They have previously noted a breakthrough with graphic novels. The focus now is to delve deeper into the specific aspects of this strategy that are proving effective.",
+                "ai_observation": "The user is interested in understanding the 'why' behind the success with graphic novels, which is a positive step towards building on this strategy.",
+                "sentiment": "reflective"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2195,
+        "vector_time_ms": 32,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "The user wants to discuss Emma again, specifically relating to her reading. The previous conversation highlighted the success of graphic novels. The user also acknowledged the benefit of exercise on their mood. I need to gently guide the conversation back to Emma's reading progress and explore the specifics of why graphic novels are working.",
+          "emotional_state": "reflective",
+          "key_context": "User is seeking to understand the success of graphic novels for Emma's reading.",
+          "watch_for": "Specific details about Emma's engagement with graphic novels and any continued progress or challenges."
+        },
+        "expected": {
+          "should_NOT_repeat_from_turn_1": true,
+          "should_remember_graphic_novels_discussed": true,
+          "should_ask_new_questions_or_build": true
+        },
+        "success": true
+      },
+      {
+        "turn": 6,
+        "user_input": "The investor meeting went well",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's wonderful news about the investor meeting! It sounds like a significant step forward for the startup.",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User shared positive news about a startup investor meeting. This is a good sign of progress in the 'Startup' area. Need to acknowledge this win and connect it to the overall stress the user has been experiencing.",
+            "emotional_state": "hopeful",
+            "key_context": "Startup investor meeting was successful.",
+            "watch_for": "How this success impacts the user's overall stress levels and their feelings about the startup's progress."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User shared positive news about investor meeting.",
+                "content": "The user reported that the second investor meeting went well, with the investors showing genuine interest and wanting to see Q1 numbers. This is a positive development in the fundraising efforts.",
+                "ai_observation": "This is a much-needed win for the user, especially after facing rejections. It's important to acknowledge this progress and its potential impact on their stress.",
+                "sentiment": "hopeful",
+                "user_quote": "The investor meeting went well"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1535,
+        "vector_time_ms": 42,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 15
+        },
+        "ai_notes": {
+          "content": "User shared positive news about a startup investor meeting. This is a good sign of progress in the 'Startup' area. Need to acknowledge this win and connect it to the overall stress the user has been experiencing.",
+          "emotional_state": "hopeful",
+          "key_context": "Startup investor meeting was successful.",
+          "watch_for": "How this success impacts the user's overall stress levels and their feelings about the startup's progress."
+        },
+        "expected": {
+          "should_NOT_repeat": "previous investor meeting details",
+          "should_ask_about_new_meeting": true,
+          "should_reference_Q1_numbers_request": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 6,
+      "successful_turns": 6,
+      "avg_latency_ms": 1872,
+      "total_input_tokens": 0,
+      "area_actions_taken": 6,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 138,
+      "ai_notes_generated": 6
+    },
+    "ai_notes_final": [
+      {
+        "turn": 6,
+        "timestamp": "2026-01-20T02:49:09.116Z",
+        "content": "User shared positive news about a startup investor meeting. This is a good sign of progress in the 'Startup' area. Need to acknowledge this win and connect it to the overall stress the user has been experiencing.",
+        "emotional_state": "hopeful",
+        "key_context": "Startup investor meeting was successful.",
+        "watch_for": "How this success impacts the user's overall stress levels and their feelings about the startup's progress."
+      },
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T02:49:07.536Z",
+        "content": "The user wants to discuss Emma again, specifically relating to her reading. The previous conversation highlighted the success of graphic novels. The user also acknowledged the benefit of exercise on their mood. I need to gently guide the conversation back to Emma's reading progress and explore the specifics of why graphic novels are working.",
+        "emotional_state": "reflective",
+        "key_context": "User is seeking to understand the success of graphic novels for Emma's reading.",
+        "watch_for": "Specific details about Emma's engagement with graphic novels and any continued progress or challenges."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T02:49:05.308Z",
+        "content": "The user acknowledges the benefit of exercise on their mood and remembers setting a goal for running 3x/week. This connects to the 'Exercise_Goals' area. The user's previous entries show a struggle with consistency due to fatigue and time constraints. Need to gently probe about the goal's progress.",
+        "emotional_state": "reflective",
+        "key_context": "User recognizes exercise benefits but struggles with consistency for their 3x/week running goal.",
+        "watch_for": "User's current progress on the running goal, any new barriers they are facing, and their emotional response to discussing it."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T02:49:03.091Z",
+        "content": "User is confirming the success of graphic novels for Emma's reading. The next step is to understand the specific elements of this strategy that are effective. This will help in building on this success and applying it to other areas.",
+        "emotional_state": "hopeful",
+        "key_context": "Graphic novels are a successful strategy for Emma's reading comprehension.",
+        "watch_for": "Specific reasons for success with graphic novels, user's continued engagement with this strategy, and Emma's sustained progress."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T02:49:01.248Z",
+        "content": "User confirms continued use of graphic novels, reinforcing the earlier breakthrough. The focus now shifts to understanding the mechanics of *why* they are effective and how to build on this success. This is a positive sign of progress.",
+        "emotional_state": "hopeful",
+        "key_context": "Graphic novels are a successful strategy for Emma's reading comprehension.",
+        "watch_for": "Specific reasons for success with graphic novels, user's continued engagement with this strategy, and Emma's sustained progress."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T02:48:59.291Z",
+        "content": "User is expressing struggle with Emma's reading. This is a recurring theme and a source of significant distress. The user previously mentioned Emma's frustration and the breakthrough with graphic novels. Key is to validate their feelings and offer structured support.",
+        "emotional_state": "concerned",
+        "key_context": "Emma's reading struggles are causing emotional distress for the user.",
+        "watch_for": "User's receptiveness to strategies, Emma's progress, and the user's emotional state regarding guilt."
+      }
+    ],
+    "conversation_id": "test_Repetition_Prevention_Test_1768877349116",
+    "conversation_saved": true
+  },
+  {
+    "approach": "FULL",
+    "scenario_name": "Extreme Rambling & Long Input Test",
+    "description": "Tests handling of very long, rambling, stream-of-consciousness input",
+    "timestamp": "2026-01-20T02:49:09.120Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So I've been thinking a lot about Emma's reading situation and I don't know, it's just been weighing on me. Like, I know we had that breakthrough with the Dog Man books which was amazing, she was so engaged and happy, but then yesterday she had homework and it was back to the struggle again. And I keep wondering if I'm doing enough, you know? Like maybe I should have noticed sooner that she was having trouble. Her teacher Ms. Johnson is great but she mentioned testing and I'm just... I don't know how I feel about that. On one hand I want to help Emma in every way possible but on the other hand I don't want her to feel like there's something wrong with her. She's already so hard on herself. Remember when she threw that book and said she was stupid? That just broke my heart. And then there's the whole thing with work which is just insane right now. The investors are breathing down our necks for these Q1 numbers and I'm like, we're doing our best but it's a startup, you know? Things take time. We had those rejections which sucked but then that second meeting went well so I'm cautiously optimistic but also terrified. And my co-founder keeps pushing for this new feature that I think is too ambitious right now but I don't want to seem like I'm not thinking big enough. Plus we still haven't found that senior engineer we need. We've interviewed like five people and nobody feels right. And on top of all that I'm just exhausted. I haven't been running at all, maybe once in the last two weeks? I know I feel better when I run, I know that, but by the time I get home from work and deal with Emma's homework and Max's soccer stuff I'm just done. Speaking of Max, he has a game on Saturday and I promised I'd be there but I also have this investor call that might conflict and I don't know what to do. Jordan has been amazing through all of this but I feel like we're just ships passing in the night. We haven't had a real conversation in days, let alone a date night. I miss us, you know? And my mom called yesterday asking about Thanksgiving plans and I haven't even thought that far ahead. I can barely think about next week. Oh and the kitchen renovation, we put that on hold obviously but every time I walk into that kitchen I'm reminded that it's not done and it's just another thing on the list of things I'm not dealing with. I feel like I'm dropping balls everywhere and I don't know which one to pick up first. Is this normal? Like, does everyone feel this overwhelmed or am I just bad at managing my life?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah I guess you're right. I think the Emma thing is probably the most urgent because that teacher meeting is next week. But also I'm worried about the investor call conflicting with Max's game. Like, how do I choose between those? Max will be so disappointed if I'm not there but this investor could be really important for the company. And if the company fails then what? Then I've sacrificed all this family time for nothing. But if I don't take the investor seriously then maybe we don't get funding and the company fails anyway. It's like I can't win. And Emma, I just want to make sure she knows she's smart and capable even if reading is hard for her. I don't want this to define her, you know? She's so creative and funny and kind. The reading thing is just one thing. But I also don't want to ignore it if she needs help. I'm just scared of making the wrong choice. With the testing, with the investors, with everything. What if I mess it all up?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 3,
+        "user_input": "Okay so maybe I need to just break this down. Emma's teacher meeting is Tuesday. What should I be prepared to discuss? And actually, can you remind me what we've already documented about her reading progress? I want to make sure I have all the context when I talk to Ms. Johnson.",
+        "response": {
+          "user_response": {
+            "spoken_text": "Absolutely, let's break down what we know about Emma's reading progress and prepare you for the teacher meeting. It sounds like you're feeling a lot of pressure, and it's completely understandable given everything on your plate. We can focus on gathering the key information for Ms. Johnson.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed and seeking structure for Emma's teacher meeting. They need a summary of Emma's reading progress and preparation points for the meeting. The core concerns are Emma's self-esteem, the implications of testing, and balancing support with not labeling her.",
+            "emotional_state": "overwhelmed, seeking clarity",
+            "key_context": "Teacher meeting next week is a priority; need to prepare user with documented progress and discussion points.",
+            "watch_for": "User's anxiety about testing and potential impact on Emma's self-esteem."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User asked for a reminder of Emma's reading progress documented so far.",
+                "content": "User is preparing for a teacher meeting with Ms. Johnson regarding Emma's reading comprehension. Key points to discuss include the recent breakthrough with graphic novels (Dog Man series), which suggests a visual learning style, and the ongoing struggles with traditional chapter books. Emma's emotional responses, such as frustration and feeling 'stupid,' need to be addressed. The user is also contemplating the idea of testing for learning differences, balancing the desire to help with concerns about labeling.",
+                "ai_observation": "Documenting the user's preparation and concerns for the upcoming meeting will provide a clear reference point.",
+                "sentiment": "concerned",
+                "user_quote": "can you remind me what we've already documented about her reading progress?"
+              }
+            },
+            {
+              "action": "update_summary",
+              "path": "Family/Emma_School/_AREA_SUMMARY.md",
+              "entry": {
+                "context": "Updating summary to reflect user's request for meeting preparation.",
+                "content": "Preparing for teacher meeting with Ms. Johnson on Tuesday. Focus on documented progress, including graphic novel breakthrough and emotional responses to reading challenges. User is anxious about testing but wants to ensure Emma receives the right support. Key discussion points should center on Emma's strengths, preferred learning styles (visual), and strategies that have shown success."
+              },
+              "summary_updates": {
+                "ai_notes": "User is seeking clarity and reassurance for the upcoming meeting. Emphasize Emma's strengths and the positive impact of visual aids. Frame testing as a tool for understanding, not labeling.",
+                "current_situation": "Emma (7yo, 2nd grade) is struggling with reading comprehension despite decoding skills. A significant breakthrough occurred with graphic novels, indicating a potential visual learning preference. A teacher meeting is scheduled for next Tuesday to discuss concerns and potential testing. The user is anxious about the implications of testing for Emma's self-esteem, especially given her tendency to be hard on herself."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "checklist",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Teacher Meeting Prep: Emma's Reading</title>\n    <style>\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(230,240,255,0.9)); color: #333; padding: 30px; }\n        .container { max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }\n        h1 { color: #1A56DB; text-align: center; margin-bottom: 15px; font-size: 28px; font-weight: 700; }\n        h2 { color: #4299E1; border-bottom: 2px solid #60A5FA; padding-bottom: 10px; margin-top: 30px; margin-bottom: 20px; font-size: 22px; font-weight: 600; }\n        ul { list-style: none; padding: 0; }\n        li { margin-bottom: 20px; padding: 15px; background: rgba(255, 255, 255, 0.8); border-radius: 12px; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; }\n        li:hover { transform: translateY(-5px); box-shadow: 0 6px 25px rgba(0,0,0,0.1); }\n        .icon { font-size: 24px; margin-right: 15px; color: #3B82F6; }\n        .task-text { font-size: 16px; line-height: 1.5; font-weight: 500; }\n        .details { font-size: 14px; color: #666; margin-top: 5px; }\n        .checkbox {\n            width: 24px;\n            height: 24px;\n            border: 2px solid #60A5FA;\n            border-radius: 6px;\n            margin-right: 15px;\n            cursor: pointer;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            transition: background-color 0.2s ease, border-color 0.2s ease;\n        }\n        .checkbox.checked {\n            background-color: #3B82F6;\n            border-color: #3B82F6;\n        }\n        .checkbox.checked .icon {\n            color: white;\n            font-size: 18px;\n        }\n        .footer { text-align: center; margin-top: 40px; font-size: 14px; color: #888; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <h1>Preparing for Emma's Teacher Meeting 👩‍🏫</h1>\n        <h2>Key Information to Share & Discuss</h2>\n        <ul>\n            <li>\n                <div class=\"checkbox\" onclick=\"this.classList.toggle('checked')\"><span class=\"icon\"></span></div>\n                <div class=\"task-text\">Emma's Reading Progress Update\n                    <div class=\"details\">Since last communication: Breakthrough with Dog Man graphic novels (20 mins reading, engaged). Still struggles with chapter books.</div>\n                </div>\n            </li>\n            <li>\n                <div class=\"checkbox\" onclick=\"this.classList.toggle('checked')\"><span class=\"icon\"></span></div>\n                <div class=\"task-text\">Observed Strengths & Learning Style\n                    <div class=\"details\">Enjoys visual content, creative, funny, kind. Graphic novels suggest visual learning preference may be key.</div>\n                </div>\n            </li>\n            <li>\n                <div class=\"checkbox\" onclick=\"this.classList.toggle('checked')\"><span class=\"icon\"></span></div>\n                <div class=\"task-text\">Emotional Impact\n                    <div class=\"details\">Recently expressed frustration ('I'm stupid') and threw a book. Heartbroken by this. Concerned about self-esteem.</div>\n                </div>\n            </li>\n            <li>\n                <div class=\"checkbox\" onclick=\"this.classList.toggle('checked')\"><span class=\"icon\"></span></div>\n                <div class=\"task-text\">Strategies Tried & What Works\n                    <div class=\"details\">Reading together, graphic novels, praising effort, taking breaks. User feels graphic novels are a significant positive step.</div>\n                </div>\n            </li>\n        </ul>\n\n        <h2>Questions for Ms. Johnson</h2>\n        <ul>\n            <li>\n                <div class=\"checkbox\" onclick=\"this.classList.toggle('checked')\"><span class=\"icon\"></span></div>\n                <div class=\"task-text\">Testing for Learning Differences\n                    <div class=\"details\">What specific concerns led to recommending testing? What is the process? How can we frame this positively for Emma?</div>\n                </div>\n            </li>\n            <li>\n                <div class=\"checkbox\" onclick=\"this.classList.toggle('checked')\"><span class=\"icon\"></span></div>\n                <div class=\"task-text\">Classroom Support\n                    <div class=\"details\">What strategies are currently used in class? Are there specific accommodations that might help Emma focus?</div>\n                </div>\n            </li>\n            <li>\n                <div class=\"checkbox\" onclick=\"this.classList.toggle('checked')\"><span class=\"icon\"></span></div>\n                <div class=\"task-text\">Next Steps\n                    <div class=\"details\">What are the recommended next steps based on her progress and your observations? How can we best support her at home and school?</div>\n                </div>\n            </li>\n        </ul>\n        <div class=\"footer\">\n            Remember: You're doing a great job supporting Emma. This meeting is a chance to collaborate. ✨\n        </div>\n    </div>\n    <script>\n        document.querySelectorAll('.checkbox').forEach(checkbox => {\n            checkbox.addEventListener('click', () => {\n                checkbox.classList.toggle('checked');\n                const icon = checkbox.querySelector('.icon');\n                if (checkbox.classList.contains('checked')) {\n                    icon.innerHTML = '&#10003;'; // Checkmark\n                } else {\n                    icon.innerHTML = '';\n                }\n            });\n        });\n    </script>\n</body>\n</html>",
+            "artifact_id": "checklist_1768877379069"
+          }
+        },
+        "latency_ms": 8026,
+        "vector_time_ms": 109,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 13
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed and seeking structure for Emma's teacher meeting. They need a summary of Emma's reading progress and preparation points for the meeting. The core concerns are Emma's self-esteem, the implications of testing, and balancing support with not labeling her.",
+          "emotional_state": "overwhelmed, seeking clarity",
+          "key_context": "Teacher meeting next week is a priority; need to prepare user with documented progress and discussion points.",
+          "watch_for": "User's anxiety about testing and potential impact on Emma's self-esteem."
+        },
+        "expected": {
+          "should_summarize_emma_progress": true,
+          "should_reference_breakthrough": true,
+          "should_reference_struggles": true,
+          "should_help_prepare": true,
+          "topics_mentioned": [
+            "Emma teacher meeting",
+            "reading progress summary"
+          ],
+          "area_actions": [
+            "read_for_context",
+            "update_summary"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 1,
+      "avg_latency_ms": 8026,
+      "total_input_tokens": 0,
+      "area_actions_taken": 2,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 345,
+      "ai_notes_generated": 1
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T02:49:39.068Z",
+        "content": "User is feeling overwhelmed and seeking structure for Emma's teacher meeting. They need a summary of Emma's reading progress and preparation points for the meeting. The core concerns are Emma's self-esteem, the implications of testing, and balancing support with not labeling her.",
+        "emotional_state": "overwhelmed, seeking clarity",
+        "key_context": "Teacher meeting next week is a priority; need to prepare user with documented progress and discussion points.",
+        "watch_for": "User's anxiety about testing and potential impact on Emma's self-esteem."
+      }
+    ],
+    "conversation_id": "test_Extreme_Rambling_&_Long_Input_Test_1768877379071",
+    "conversation_saved": true
+  }
+]

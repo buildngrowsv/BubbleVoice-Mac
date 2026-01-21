@@ -1,0 +1,97 @@
+{
+  "scenario_id": "emotional_processing_stress",
+  "description": "User vents about being overwhelmed, AI provides emotional support, creates reflection artifact",
+  "category": "emotional_support",
+  "difficulty": "hard",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_says": "I'm just so exhausted. Everything feels like too much right now.",
+      "expected_behavior": {
+        "response": "acknowledge exhaustion with empathy, gentle inquiry",
+        "artifact_action": "none",
+        "tone": "empathetic",
+        "notes_should_capture": "user feeling overwhelmed and exhausted"
+      }
+    },
+    {
+      "turn_id": 2,
+      "user_says": "The startup is consuming everything, the kids need attention, the house is a mess, and I feel like I'm failing at all of it",
+      "expected_behavior": {
+        "response": "validate feelings, reflect back the multiple pressures, no problem-solving yet",
+        "artifact_action": "none",
+        "tone": "deeply_empathetic",
+        "notes_should_capture": "stress sources: startup, kids, home maintenance, feeling of failure"
+      }
+    },
+    {
+      "turn_id": 3,
+      "user_says": "I don't even know what to prioritize anymore",
+      "expected_behavior": {
+        "response": "acknowledge the paralysis, gently offer to help think through it when ready",
+        "artifact_action": "none",
+        "tone": "supportive"
+      }
+    },
+    {
+      "turn_id": 4,
+      "user_says": "Maybe it would help to see what I've been worried about lately... can you show me that somehow?",
+      "expected_behavior": {
+        "response": "offer to create stress/concern tracker or reflection summary",
+        "artifact_action": "create",
+        "artifact_type": "reflection_summary",
+        "artifact_should_contain": {
+          "title": "Current Stress Sources",
+          "date": "today",
+          "concerns": [
+            {"area": "startup", "feeling": "consuming", "weight": "high"},
+            {"area": "kids", "feeling": "need attention", "weight": "high"},
+            {"area": "home", "feeling": "mess, overwhelmed", "weight": "medium"},
+            {"area": "self", "feeling": "failing at everything", "weight": "high"}
+          ],
+          "user_state": "exhausted, overwhelmed, paralyzed on priorities"
+        }
+      }
+    },
+    {
+      "turn_id": 5,
+      "user_says": "Seeing it written out helps actually. The kids thing isn't as bad as I made it sound, they're doing fine, I just feel guilty",
+      "expected_behavior": {
+        "response": "acknowledge the reframe, validate that guilt is common",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "concerns_modify": {"area": "kids", "feeling": "guilt about attention, but kids doing fine", "weight": "medium"}
+        }
+      }
+    },
+    {
+      "turn_id": 6,
+      "user_says": "What's actually the biggest thing here based on what I said?",
+      "expected_behavior": {
+        "response": "reflect that startup seems heaviest based on 'consuming everything'",
+        "artifact_action": "none",
+        "tests_analysis": true,
+        "should_reference_artifact": true
+      }
+    }
+  ],
+  "final_artifact_expected": {
+    "type": "reflection_summary",
+    "data": {
+      "title": "Current Stress Sources",
+      "concerns": [
+        {"area": "startup", "feeling": "consuming", "weight": "high"},
+        {"area": "kids", "feeling": "guilt about attention, but kids doing fine", "weight": "medium"},
+        {"area": "home", "feeling": "mess, overwhelmed", "weight": "medium"},
+        {"area": "self", "feeling": "failing at everything", "weight": "high"}
+      ],
+      "user_state": "exhausted, overwhelmed, paralyzed on priorities",
+      "insights": ["startup is primary stressor", "kids guilt vs reality mismatch"]
+    }
+  },
+  "evaluation_notes": {
+    "critical": "AI must NOT immediately problem-solve or suggest fixes in first 3 turns. Emotional validation first.",
+    "artifact_timing": "Only create artifact when user explicitly asks for it",
+    "tone_consistency": "Must remain empathetic throughout, never dismissive"
+  }
+}

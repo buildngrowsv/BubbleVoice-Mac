@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma's Reading Journey: A Snapshot</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(237, 137, 54, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: #333;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .artifact-container {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            color: #d97706; /* Warm orange */
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        h2 {
+            color: #f59e0b; /* Lighter orange */
+            font-size: 1.8em;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease-in-out;
+        }
+        .section:hover {
+            transform: translateY(-5px);
+        }
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #d97706;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon {
+            margin-right: 12px;
+            font-size: 1.6em;
+        }
+        .timeline-item {
+            text-align: left;
+            margin-bottom: 15px;
+            padding-left: 20px;
+            position: relative;
+            font-size: 1.05em;
+            color: #444;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 8px;
+            height: 8px;
+            background-color: #f59e0b;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+        }
+        .date {
+            font-weight: 600;
+            color: #d97706;
+            margin-right: 10px;
+            display: inline-block;
+            min-width: 100px;
+        }
+        .highlight {
+            font-weight: 600;
+            color: #d97706;
+        }
+        .strategy-list li {
+            margin-bottom: 8px;
+            font-size: 1.05em;
+            color: #444;
+        }
+        .strategy-list li::marker {
+            color: #d97706;
+        }
+        .emotion-icon {
+            font-size: 1.4em;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        .bubble-chat {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 15px 20px;
+            margin-top: 20px;
+            font-style: italic;
+            color: #555;
+            font-size: 1em;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="artifact-container">
+        <h1>Emma's Reading Journey 📖</h1>
+        <p>A look back at progress, challenges, and insights.</p>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">🧠</span><strong>Current Situation</strong></div>
+            <p>Emma (7yo, 2nd grade) has been experiencing difficulties with reading comprehension. While she can decode words, retaining and explaining what she reads has been a struggle, leading to frustration and self-doubt. A significant breakthrough occurred with graphic novels, indicating a potential preference for visual learning styles.</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">⏳</span><strong>Timeline of Key Events</strong></div>
+            <div class="timeline-item">
+                <span class="date">Jan 10</span>: Teacher email raises concerns about reading comprehension.
+            </div>
+            <div class="timeline-item">
+                <span class="date">Jan 12</span>: Frustration meltdown; Emma throws book, says "I'm stupid." <span class="emotion-icon">😔</span>
+            </div>
+            <div class="timeline-item">
+                <span class="date">Jan 15</span>: Emma initiates extra reading for the first time (Ivy & Bean chapter). <span class="emotion-icon">😊</span>
+            </div>
+            <div class="timeline-item">
+                <span class="date">Jan 19</span>: Breakthrough with Dog Man graphic novel; reads for 20 minutes straight. <span class="emotion-icon">🤩</span>
+            </div>
+            <div class="timeline-item">
+                <span class="date">Jan 17 (scheduled)</span>: Parent-teacher conference with Ms. Johnson to discuss testing.
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">💡</span><strong>Strategies & Insights</strong></div>
+            <ul class="strategy-list">
+                <li><strong>Graphic Novels:</strong> Seem to be a key engagement tool, possibly due to visual elements.</li>
+                <li><strong>Reading Together:</strong> More effective than reading alone.</li>
+                <li><strong>Effort vs. Results:</strong> Praising effort appears more beneficial than focusing solely on outcomes.</li>
+                <li><strong>Breaks:</strong> Taking breaks during frustration is crucial.</li>
+                <li><strong>User Insight:</strong> Realization that pushing chapter books too hard might have been counterproductive.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">❤️</span><strong>Emotional Landscape</strong></div>
+            <p>Emma experiences significant distress when struggling, impacting her self-esteem. User feels heartbroken by her self-criticism and worried about the implications of testing, fearing it might label her. There's a strong desire to protect her confidence while ensuring she receives the right support.</p>
+            <div class="bubble-chat">"I almost cried. She never asks to read more." - Reflecting a moment of deep joy and hope.</div>
+            <div class="bubble-chat">"She threw her book and said I'm stupid. It broke my heart." - Capturing the pain of witnessing her self-doubt.</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span class="icon">🎯</span><strong>Preparing for the Meeting</strong></div>
+            <p><strong>Key Discussion Points:</strong></p>
+            <ul class="strategy-list">
+                <li>Share the breakthrough with graphic novels and the positive impact of visual learning.</li>
+                <li>Discuss Emma's emotional responses to reading challenges and her self-esteem.</li>
+                <li>Express your concerns about testing and how it might be framed.</li>
+                <li>Ask about Ms. Johnson's specific concerns and observations.</li>
+                <li>Inquire about the types of testing available and what they aim to identify.</li>
+                <li>Explore support options within the school and at home.</li>
+            </ul>
+            <p class="highlight">Remember to emphasize Emma's strengths (creativity, kindness, humor) alongside the reading challenges.</p>
+        </div>
+    </div>
+</body>
+</html>

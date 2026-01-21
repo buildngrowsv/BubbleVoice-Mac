@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- 
+	BUBBLEVOICE MAC - ENTITLEMENTS
+	
+	This file defines the macOS entitlements (permissions) that BubbleVoice requires.
+	These are necessary for the app to function properly and must be included in the
+	code-signed app bundle.
+	
+	PERMISSIONS EXPLAINED:
+	- Microphone: Required for voice input functionality
+	- User Selected Files: Allows read/write to folders chosen by user
+	- Network Client/Server: For LLM API calls and local backend server
+	- Audio Input: Required for microphone access
+	
+	TECHNICAL NOTES:
+	- These entitlements are applied during the code signing process
+	- Some entitlements require matching Info.plist entries
+	- Hardened runtime is enabled for security and notarization
+	-->
+	
+	<!-- Allow microphone access for voice input -->
+	<key>com.apple.security.device.audio-input</key>
+	<true/>
+	
+	<!-- Allow access to user-selected files and folders -->
+	<!-- This enables the folder picker and saving to chosen locations -->
+	<key>com.apple.security.files.user-selected.read-write</key>
+	<true/>
+	
+	<!-- Allow network access for LLM API calls -->
+	<key>com.apple.security.network.client</key>
+	<true/>
+	
+	<!-- Allow running local backend server -->
+	<key>com.apple.security.network.server</key>
+	<true/>
+	
+	<!-- Disable library validation for development -->
+	<!-- This allows loading of native modules like canvas -->
+	<key>com.apple.security.cs.disable-library-validation</key>
+	<true/>
+	
+	<!-- Allow JIT compilation for better performance -->
+	<key>com.apple.security.cs.allow-jit</key>
+	<true/>
+	
+	<!-- Allow unsigned executable memory (required by Electron) -->
+	<key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+	<true/>
+</dict>
+</plist>

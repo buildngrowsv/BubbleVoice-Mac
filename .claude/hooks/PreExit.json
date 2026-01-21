@@ -1,0 +1,53 @@
+{
+  "name": "PreExit Verification Hook",
+  "description": "Final checks before Claude session ends - Ralph Wiggum style verification",
+  "type": "PreExit",
+  "enabled": true,
+  
+  "verification_required": true,
+  
+  "checks": [
+    {
+      "id": "build_check",
+      "description": "Verify Swift code builds",
+      "command": "xcodebuild -scheme BubbleVoice-Mac build 2>&1 | tail -5",
+      "success_pattern": "BUILD SUCCEEDED",
+      "on_failure": "warn",
+      "message": "⚠️ Build may have issues. Consider fixing before ending session."
+    },
+    {
+      "id": "uncommitted_changes",
+      "description": "Check for uncommitted changes",
+      "command": "git status --porcelain 2>/dev/null | wc -l | tr -d ' '",
+      "success_pattern": "0",
+      "on_failure": "info",
+      "message": "📝 You have uncommitted changes. Consider committing before ending."
+    },
+    {
+      "id": "todo_check",
+      "description": "Check for incomplete TODOs added this session",
+      "command": "git diff --cached --name-only 2>/dev/null | xargs grep -l 'TODO' 2>/dev/null | wc -l | tr -d ' '",
+      "success_pattern": "0",
+      "on_failure": "info", 
+      "message": "📋 New TODO comments found. Track these for follow-up."
+    }
+  ],
+  
+  "completion_announcement": {
+    "enabled": true,
+    "command_template": "timeout 30 bash -c 'say -o /tmp/soft_say.aiff \"Session complete for BubbleVoice Mac. {{summary}}\" && afplay -v 0.3 /tmp/soft_say.aiff'",
+    "summary_prompt": "Summarize what was accomplished in this session in one sentence"
+  },
+  
+  "ralph_wiggum": {
+    "enabled": false,
+    "comment": "Set to true for iterative tasks that must meet completion criteria",
+    "completion_criteria": [
+      "build_succeeds",
+      "no_lint_errors"
+    ],
+    "max_iterations": 10,
+    "on_criteria_not_met": "continue_iterating",
+    "on_max_iterations": "report_and_exit"
+  }
+}

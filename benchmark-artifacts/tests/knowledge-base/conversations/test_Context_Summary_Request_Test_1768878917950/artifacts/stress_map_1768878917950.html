@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(239, 246, 255, 0.8) 0%, rgba(219, 234, 254, 0.8) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+        }
+        .stress-map h1 {
+            color: #2c5282;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+        }
+        .stress-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .category {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        .category i {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: #4299e1;
+        }
+        .category h3 {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #1a365d;
+            margin-bottom: 10px;
+        }
+        .category p {
+            font-size: 0.95em;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.85em;
+            color: #718096;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="stress-map">
+        <h1>Your Stress Landscape</h1>
+        <div class="stress-categories">
+            <div class="category">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>Scheduling Conflicts</h3>
+                <p>Overlapping activities (e.g., Max's practice & Emma's tutoring) create logistical stress and a feeling of being pulled in multiple directions.</p>
+            </div>
+            <div class="category">
+                <i class="fas fa-book-open"></i>
+                <h3>Emma's Reading Progress</h3>
+                <p>Concerns about her comprehension, self-esteem, and the upcoming parent-teacher conference/testing add significant emotional weight.</p>
+            </div>
+            <div class="category">
+                <i class="fas fa-chart-line"></i>
+                <h3>Startup Fundraising</h3>
+                <p>The high-pressure environment of seeking investment, coupled with hiring needs, is a major source of overwhelm and anxiety.</p>
+            </div>
+            <div class="category">
+                <i class="fas fa-running"></i>
+                <h3>Personal Goals</h3>
+                <p>Struggles with consistency in running due to fatigue and time constraints, leading to frustration and guilt.</p>
+            </div>
+             <div class="category">
+                <i class="fas fa-balance-scale"></i>
+                <h3>Work-Life Balance</h3>
+                <p>Feeling overwhelmed by the constant juggling of work demands, family needs, and personal well-being.</p>
+            </div>
+        </div>
+        <div class="footer">
+            These patterns often interact, creating a complex web of pressures. Remember, acknowledging them is the first step to managing them. 
+        </div>
+    </div>
+</body>
+</html>

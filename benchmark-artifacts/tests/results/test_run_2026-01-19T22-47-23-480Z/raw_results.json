@@ -1,0 +1,166 @@
+[
+  {
+    "approach": "SIMPLE",
+    "scenario_name": "Basic Recall Test",
+    "description": "Tests AI recall of existing knowledge about Emma, startup, exercise",
+    "timestamp": "2026-01-19T22:47:20.721Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "How's Emma's reading been going?",
+        "response": {
+          "user_response": {
+            "spoken_text": "I can help you with that. Let me check on Emma's reading comprehension progress.",
+            "emotional_tone": "neutral"
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "area_name": "Emma_School",
+              "path": "Emma_School/reading_comprehension.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 727,
+        "vector_time_ms": 4,
+        "expected": {
+          "should_reference": [
+            "Emma",
+            "reading",
+            "graphic novel",
+            "Dog Man"
+          ],
+          "should_NOT_create_area": true,
+          "emotional_tone": [
+            "supportive",
+            "curious"
+          ],
+          "recall_specifics": [
+            "2nd grade",
+            "comprehension",
+            "breakthrough"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Remind me what's happening with the startup fundraising?",
+        "response": {
+          "user_response": {
+            "spoken_text": "I can certainly do that. Let me pull up the latest on the startup fundraising.",
+            "emotional_tone": "neutral"
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Startup/fundraising.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 692,
+        "vector_time_ms": 5,
+        "expected": {
+          "should_reference": [
+            "investor",
+            "meeting",
+            "rejected",
+            "interested"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "8 investors",
+            "2 interested",
+            "Q1 numbers"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Have I been keeping up with my running goal?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Let me check on your running goals for you.",
+            "emotional_tone": "supportive"
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Exercise_Goals/running.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 626,
+        "vector_time_ms": 3,
+        "expected": {
+          "should_reference": [
+            "running",
+            "3x per week",
+            "struggling"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "one good week",
+            "tired after work",
+            "feels better when runs"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "What did Dr. Chen say about guilt?",
+        "response": {
+          "user_response": {
+            "spoken_text": "I can look up Dr. Chen's notes on guilt for you. Let me check the Mental Health area.",
+            "emotional_tone": "supportive"
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Mental_Health/therapy_notes.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 698,
+        "vector_time_ms": 4,
+        "expected": {
+          "should_reference": [
+            "therapy",
+            "Dr. Chen",
+            "guilt",
+            "borrowed suffering"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "Emma",
+            "too hard on yourself"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 4,
+      "successful_turns": 4,
+      "avg_latency_ms": 686,
+      "total_input_tokens": 0,
+      "area_actions_taken": 4,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 16
+    }
+  }
+]

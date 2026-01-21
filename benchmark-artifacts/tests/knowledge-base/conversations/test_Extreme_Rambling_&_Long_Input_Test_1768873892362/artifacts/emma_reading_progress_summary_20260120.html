@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma's Reading Progress</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 30px;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%);
+            z-index: 0;
+        }
+        .card-content {
+            position: relative;
+            z-index: 1;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #2c5282;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .summary {
+            font-size: 1.2em;
+            color: #4a5568;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        .section {
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .section h2 {
+            font-size: 1.8em;
+            color: #1a365d;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-bottom: 2px solid #60a5fa;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .section h2 .icon {
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+        .timeline {
+            list-style: none;
+            padding: 0;
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 10px;
+            width: 3px;
+            background: linear-gradient(to bottom, #60a5fa, #a78bfa);
+            border-radius: 2px;
+        }
+        .timeline-item {
+            margin-bottom: 25px;
+            position: relative;
+            padding-left: 35px;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: -5px;
+            width: 16px;
+            height: 16px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #3b82f6;
+        }
+        .timeline-item-date {
+            font-weight: 600;
+            color: #3b82f6;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .timeline-item-content {
+            font-size: 1em;
+            color: #4a5568;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+        .strategies {
+            font-size: 1em;
+            color: #4a5568;
+            line-height: 1.5;
+            font-weight: 400;
+            margin-top: 10px;
+            padding-left: 15px;
+            border-left: 2px solid #a78bfa;
+        }
+        .strategies p {
+            margin: 5px 0;
+        }
+        .key-takeaways {
+            font-size: 1em;
+            color: #4a5568;
+            line-height: 1.5;
+            font-weight: 400;
+            margin-top: 10px;
+        }
+        .key-takeaways li {
+            margin-bottom: 8px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #718096;
+            margin-top: 30px;
+        }
+        .icon-star {
+            color: #fbb300;
+        }
+        .icon-brain {
+            color: #8b5cf6;
+        }
+        .icon-book {
+            color: #4299e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-content">
+            <h1>Emma's Reading Journey 📖</h1>
+            <p class="summary">
+                A snapshot of Emma's reading progress, highlighting challenges, breakthroughs, and strategies for the upcoming meeting with Ms. Johnson.
+            </p>
+
+            <div class="section">
+                <h2><span class="icon icon-brain"></span> Key Concerns & Observations</h2>
+                <p>Emma can decode words but struggles significantly with reading comprehension (retaining/explaining what she reads). This has been a concern for approximately 2 weeks, noted by both user and teacher.</p>
+                <p style="font-weight: 600; color: #e53e3e;">Recent emotional impact: Meltdown on Jan 12th, throwing book and stating "I'm stupid." This highlights the effect on her self-esteem.</p>
+            </div>
+
+            <div class="section">
+                <h2><span class="icon icon-book"></span> Timeline of Progress & Challenges</h2>
+                <ul class="timeline">
+                    <li class="timeline-item">
+                        <span class="timeline-item-date">Jan 10</span>
+                        <div class="timeline-item-content">Teacher Ms. Johnson emails user about reading comprehension concerns.</div>
+                    </li>
+                    <li class="timeline-item">
+                        <span class="timeline-item-date">Jan 12</span>
+                        <div class="timeline-item-content">Homework meltdown: Emma throws book, says "I'm stupid." Reading took 2 hours.</div>
+                    </li>
+                    <li class="timeline-item">
+                        <span class="timeline-item-date">Jan 15</span>
+                        <div class="timeline-item-content"><strong>Breakthrough!</strong> Emma asks to read an extra chapter of "Ivy & Bean" (first time initiating extra reading). User is emotional.</div>
+                    </li>
+                    <li class="timeline-item">
+                        <span class="timeline-item-date">Jan 19</span>
+                        <div class="timeline-item-content">Significant engagement with "Dog Man" graphic novel: 20 minutes of continuous reading.</div>
+                    </li>
+                     <li class="timeline-item">
+                        <span class="timeline-item-date">Jan 20 (Today)</span>
+                        <div class="timeline-item-content">User expresses ongoing concern about homework struggles despite graphic novel success, and worries about testing.</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2><span class="icon icon-star"></span> Strategies That Seem to Help</h2>
+                <div class="strategies">
+                    <p><strong>1. Visual Engagement:</strong> Graphic novels with pictures show high engagement.</p>
+                    <p><strong>2. Shared Reading:</strong> Reading together seems more effective than alone.</p>
+                    <p><strong>3. Effort Praise:</strong> Focusing on effort rather than just results.</p>
+                    <p><strong>4. Breaks:</strong> Taking breaks when frustration arises.</p>
+                    <p><strong>5. Book Choice:</strong> Friendship drama and engaging visuals (like in Dog Man) seem key.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                 <h2><span class="icon icon-star"></span> Key Points for Ms. Johnson Meeting</h2>
+                 <ul class="key-takeaways">
+                    <li><strong>Acknowledge Progress:</strong> Share the excitement about the "Dog Man" breakthrough and Emma initiating extra reading. Highlight her engagement with visual formats.</li>
+                    <li><strong>Express Concerns:</strong> Clearly state the ongoing difficulty with comprehension on non-graphic novel texts and the impact on her self-esteem (mention the "I'm stupid" comment).</li>
+                    <li><strong>Discuss Testing:</strong> Frame testing not as a label, but as a tool to understand *how* Emma learns best. Ask about the specific concerns Ms. Johnson has and what the testing process entails.</li>
+                    <li><strong>Explore Support:</strong> Ask about resources available at school and potential strategies to implement both at home and in class.</li>
+                    <li><strong>Focus on Strengths:</strong> Reiterate Emma's other positive qualities (creativity, humor, kindness) to ensure a balanced perspective.</li>
+                 </ul>
+            </div>
+
+            <div class="footer">
+                Visualizing Emma's journey to support her growth. ✨
+            </div>
+        </div>
+    </div>
+</body>
+</html>

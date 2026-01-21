@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 30px;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #2c5282; /* Deep blue */
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .stressors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .stressor {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .stressor:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        .stressor-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        .stressor-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #3182ce; /* Medium blue */
+            margin-bottom: 10px;
+        }
+        .stressor-details {
+            font-size: 0.95em;
+            color: #4a5568; /* Gray */
+            line-height: 1.6;
+        }
+        .primary {
+            border-left: 5px solid #ed8936; /* Warm orange for high stress */
+        }
+        .secondary {
+            border-left: 5px solid #3b82f6; /* Stable blue for moderate stress */
+        }
+        .tertiary {
+            border-left: 5px solid #48bb78; /* Growth green for lower stress */
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Current Stressors</h1>
+        <div class="stressors">
+            <div class="stressor primary">
+                <div class="stressor-icon">🚀</div>
+                <div class="stressor-title">Startup Pressure</div>
+                <div class="stressor-details">Investor relations and fundraising are causing significant stress and contributing to exhaustion.</div>
+            </div>
+            <div class="stressor secondary">
+                <div class="stressor-icon">🏃</div>
+                <div class="stressor-title">Exercise Goals</div>
+                <div class="stressor-details">Feeling too tired to run, despite knowing its benefits. This is a recurring struggle.</div>
+            </div>
+            <div class="stressor secondary">
+                <div class="stressor-icon">❤️</div>
+                <div class="stressor-title">Relationship Time</div>
+                <div class="stressor-details">Haven't had a date night with Jordan in a long time. Quality time is being deprioritized.</div>
+            </div>
+            <div class="stressor tertiary">
+                <div class="stressor-icon">📚</div>
+                <div class="stressor-title">Emma's Reading</div>
+                <div class="stressor-details">A positive development, but the underlying effort and potential for future struggles still require emotional energy.</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

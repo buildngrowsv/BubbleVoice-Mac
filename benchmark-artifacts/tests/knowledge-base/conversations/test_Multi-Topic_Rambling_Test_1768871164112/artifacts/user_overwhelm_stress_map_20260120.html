@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(245, 158, 11, 0.8) 100%);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .domains {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .domain {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .domain:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        .domain-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .domain-title .icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        .stressors {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .stressor-item {
+            background: rgba(0,0,0,0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            font-weight: 400;
+            border-left: 4px solid rgba(255, 255, 255, 0.5);
+            transition: background 0.2s ease;
+        }
+        .stressor-item:hover {
+            background: rgba(0,0,0,0.2);
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map-container">
+        <h1>Feeling Overwhelmed: Where the Stress is Coming From</h1>
+        <div class="domains">
+            <div class="domain">
+                <div class="domain-title"><span class="icon">🚀</span> Startup</div>
+                <ul class="stressors">
+                    <li class="stressor-item">Fundraising pressure</li>
+                    <li class="stressor-item">Investor demands (Q1 numbers)</li>
+                    <li class="stressor-item">Team/Hiring challenges</li>
+                </ul>
+            </div>
+            <div class="domain">
+                <div class="domain-title"><span class="icon">🏡</span> Family & Kids</div>
+                <ul class="stressors">
+                    <li class="stressor-item">Emma's reading progress & teacher meeting</li>
+                    <li class="stressor-item">Max's soccer game schedule</li>
+                    <li class="stressor-item">Balancing attention between kids</li>
+                </ul>
+            </div>
+            <div class="domain">
+                <div class="domain-title"><span class="icon">❤️</span> Personal Well-being</div>
+                <ul class="stressors">
+                    <li class="stressor-item">Exhaustion from work</li>
+                    <li class="stressor-item">Neglected exercise goals (running)</li>
+                    <li class="stressor-item">Lack of quality time with partner (Jordan)</li>
+                </ul>
+            </div>
+             <div class="domain">
+                <div class="domain-title"><span class="icon">🏠</span> Home</div>
+                <ul class="stressors">
+                    <li class="stressor-item">Kitchen renovation on hold</li>
+                    <li class="stressor-item">Uncertainty about financial commitment</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer">
+            Identifying these areas is the first step to regaining balance. We can tackle them one by one.
+        </div>
+    </div>
+</body>
+</html>

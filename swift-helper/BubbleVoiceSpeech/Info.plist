@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>com.bubblevoice.speech-helper</string>
+	
+	<key>CFBundleName</key>
+	<string>BubbleVoiceSpeech</string>
+	
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	
+	<!-- Microphone Permission -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>BubbleVoice Speech Helper needs microphone access to provide voice input functionality.</string>
+	
+	<!-- Speech Recognition Permission -->
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>BubbleVoice Speech Helper uses speech recognition to transcribe your voice.</string>
+</dict>
+</plist>

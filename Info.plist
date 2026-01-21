@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	BUBBLEVOICE MAC - INFO.PLIST
+	
+	This file provides metadata and permission descriptions for the macOS app.
+	The usage description strings are shown to users when requesting permissions.
+	
+	PRODUCT CONTEXT:
+	BubbleVoice is a personal AI companion that uses voice as the primary input.
+	The permission descriptions should clearly explain why each permission is needed
+	and how it benefits the user's experience.
+	
+	TECHNICAL NOTES:
+	- NSMicrophoneUsageDescription is required for microphone access
+	- These descriptions appear in system permission dialogs
+	- Clear, user-friendly language is essential for trust
+	-->
+	
+	<key>CFBundleName</key>
+	<string>BubbleVoice</string>
+	
+	<key>CFBundleDisplayName</key>
+	<string>BubbleVoice</string>
+	
+	<key>CFBundleIdentifier</key>
+	<string>com.bubblevoice.mac</string>
+	
+	<key>CFBundleVersion</key>
+	<string>0.1.0</string>
+	
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.0</string>
+	
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	
+	<key>CFBundleExecutable</key>
+	<string>BubbleVoice</string>
+	
+	<!-- Microphone Permission Description -->
+	<!-- This message is shown when requesting microphone access -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>BubbleVoice needs access to your microphone to listen to your voice input and have natural conversations with you. Your voice is processed locally and sent to AI services for responses.</string>
+	
+	<!-- Speech Recognition Permission Description -->
+	<!-- This is shown if using Apple's speech recognition -->
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>BubbleVoice uses speech recognition to transcribe your voice input in real-time, enabling natural voice conversations with your AI companion.</string>
+	
+	<!-- File Access Description -->
+	<!-- Shown when accessing user-selected folders -->
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>BubbleVoice saves your conversation history and recordings to your chosen folder so you can access them later and keep your data organized.</string>
+	
+	<!-- High Resolution Capable -->
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	
+	<!-- Support Dark Mode -->
+	<key>NSRequiresAquaSystemAppearance</key>
+	<false/>
+	
+	<!-- App Category -->
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.productivity</string>
+	
+	<!-- Minimum macOS Version -->
+	<key>LSMinimumSystemVersion</key>
+	<string>11.0</string>
+</dict>
+</plist>

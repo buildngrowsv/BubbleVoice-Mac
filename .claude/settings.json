@@ -1,0 +1,84 @@
+{
+  "project": "BubbleVoice-Mac",
+  "description": "Voice AI application for macOS with liquid glass UI",
+  "created": "2026-01-18",
+  
+  "permissions": {
+    "mode": "default",
+    "comment": "Modes: default (ask permission), acceptEdits (auto-accept file changes), plan (think only), bypassPermissions (full auto - dangerous)"
+  },
+  
+  "allowedTools": {
+    "comment": "Tools Claude is allowed to use without asking",
+    "always_allow": [
+      "read_file",
+      "list_directory", 
+      "search_files",
+      "grep"
+    ],
+    "ask_permission": [
+      "write_file",
+      "edit_file",
+      "bash",
+      "git"
+    ],
+    "never_allow": [
+      "rm -rf",
+      "sudo",
+      "chmod 777"
+    ]
+  },
+  
+  "filePatterns": {
+    "comment": "File patterns for different behaviors",
+    "auto_format": ["*.swift"],
+    "require_review": ["*.entitlements", "*.plist", "Package.swift"],
+    "read_only": ["*.resolved", "*.xcuserstate"]
+  },
+  
+  "build": {
+    "command": "xcodebuild -scheme BubbleVoice-Mac -destination 'platform=macOS' build",
+    "timeout": 120,
+    "on_failure": "report_and_continue"
+  },
+  
+  "test": {
+    "command": "swift test",
+    "timeout": 60,
+    "required_before_commit": true
+  },
+  
+  "lint": {
+    "command": "swiftlint",
+    "auto_fix": true
+  },
+  
+  "context": {
+    "max_files": 20,
+    "max_tokens_per_file": 10000,
+    "always_include": [
+      "CLAUDE.md",
+      "Package.swift",
+      "README.md"
+    ]
+  },
+  
+  "model": {
+    "default": "sonnet",
+    "for_planning": "opus",
+    "for_simple_tasks": "haiku",
+    "comment": "Use opus for architecture decisions, sonnet for implementation, haiku for simple edits"
+  },
+  
+  "loops": {
+    "max_iterations": 10,
+    "completion_check": "build_succeeds",
+    "on_max_reached": "report_progress"
+  },
+  
+  "ports": {
+    "comment": "Use random ports, never defaults",
+    "reserved": [3847, 5923, 4156, 6283, 7491],
+    "avoid": [3000, 8080, 8000, 5000, 4000]
+  }
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(200, 200, 200, 0.1));
+            backdrop-filter: blur(20px);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .artifact-container {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            color: #1a365d; /* Deep blue */
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        .stress-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+            text-align: left;
+        }
+        .category {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        .category-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #3b82f6; /* Bright blue */
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .category-title i {
+            font-size: 1.2em;
+        }
+        .stress-points {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .stress-point {
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            color: #555;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stress-point i {
+            color: #f59e0b; /* Warm orange */
+            font-size: 0.8em;
+        }
+        .summary {
+            margin-top: 50px;
+            font-size: 1.1em;
+            color: #444;
+            line-height: 1.7;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .summary-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #805ad5; /* Purple */
+            margin-bottom: 15px;
+        }
+        .highlight {
+            font-weight: 600;
+            color: #e53e3e; /* Reddish */
+        }
+        /* Font Awesome for icons */
+        @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+    </style>
+</head>
+<body>
+    <div class="artifact-container">
+        <h1>Your Current Stress Landscape</h1>
+        <div class="stress-categories">
+            <div class="category">
+                <div class="category-title"><i class="fas fa-book-open"></i>Emma's Learning</div>
+                <ul class="stress-points">
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Reading comprehension struggles persist.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Anxiety around potential testing and labels.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Guilt over not noticing sooner.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Balancing support with not making her feel 'wrong'.</li>
+                </ul>
+            </div>
+            <div class="category">
+                <div class="category-title"><i class="fas fa-chart-line"></i>Startup Pressure</div>
+                <ul class="stress-points">
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Investor pressure for Q1 numbers.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Co-founder pushing for ambitious features.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Difficulty finding the right senior engineer.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Fear of not thinking 'big enough'.</li>
+                </ul>
+            </div>
+            <div class="category">
+                <div class="category-title"><i class="fas fa-running"></i>Personal Well-being</div>
+                <ul class="stress-points">
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Exhaustion and lack of energy.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Neglecting running goal (once in 2 weeks).</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Feeling drained after daily responsibilities.</li>
+                </ul>
+            </div>
+            <div class="category">
+                <div class="category-title"><i class="fas fa-users"></i>Family & Relationships</div>
+                <ul class="stress-points">
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Conflict between Max's game and investor call.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Feeling like 'ships passing in the night' with partner.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Not enough quality time with partner.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Overwhelmed by family planning (Thanksgiving).</li>
+                </ul>
+            </div>
+            <div class="category">
+                <div class="category-title"><i class="fas fa-home"></i>Household & Other</div>
+                <ul class="stress-points">
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Kitchen renovation on hold.</li>
+                    <li class="stress-point"><i class="fas fa-exclamation-circle"></i>Feeling like tasks are piling up.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="summary">
+            <div class="summary-title">Overall Feeling</div>
+            You're feeling <span class="highlight">overwhelmed</span>, like you're dropping balls everywhere and unsure which one to pick up first. It's natural to question if this is normal, but please know that feeling this way when juggling so much is a sign that you're human and caring deeply about all these areas. It's not about being 'bad at managing life,' but about the sheer volume and intensity of demands right now.
+        </div>
+    </div>
+</body>
+</html>

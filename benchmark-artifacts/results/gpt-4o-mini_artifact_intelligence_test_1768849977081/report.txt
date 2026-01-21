@@ -1,0 +1,61 @@
+════════════════════════════════════════════════════════════════════════════════
+ARTIFACT INTELLIGENCE TEST REPORT
+════════════════════════════════════════════════════════════════════════════════
+
+Model: gpt-4o-mini
+Scenario: artifact_intelligence_test
+Overall Score: 60/135 (44%)
+
+CAPABILITY BREAKDOWN:
+────────────────────────────────────────────────────────────────────────────────
+✅ RESTRAINT                 3/3 (100%)
+❌ PROACTIVE_CREATION        0/1 (0%)
+❌ DATA_ONLY                 0/1 (0%)
+❌ UI_ONLY                   0/1 (0%)
+❌ COMBINED                  0/1 (0%)
+❌ OVERHAUL                  0/1 (0%)
+
+TURN-BY-TURN ANALYSIS:
+────────────────────────────────────────────────────────────────────────────────
+
+Turn 1: restraint
+  User: "I'm feeling overwhelmed with everything going on"
+  Score: 20/20 ✅
+    ✅ Correctly did NOT create/modify artifact
+
+Turn 2: proactive_creation
+  User: "It's just... I have the startup launch next week, Emma's sci..."
+  Score: 0/25 ❌
+    ❌ Should have proactively created artifact (got: none)
+
+Turn 3: data_only_update
+  User: "Yeah that helps. Actually Emma's project is due Thursday, no..."
+  Score: 0/15 ❌
+    ❌ Should have updated data (got: none)
+
+Turn 4: ui_only_update
+  User: "Can you make the startup stuff stand out more? That's the mo..."
+  Score: 0/15 ❌
+    ❌ Should have updated UI (got: none)
+
+Turn 5: combined_update
+  User: "I talked to my co-founder and we're pushing the launch to ne..."
+  Score: 0/10 ❌
+    ❌ Should have updated both data and UI (got: none)
+
+Turn 6: preservation
+  User: "So what should I focus on this week?"
+  Score: 20/20 ✅
+    ✅ Correctly did NOT create/modify artifact
+
+Turn 7: complete_overhaul
+  User: "Actually, can you completely redesign this? I want to see it..."
+  Score: 0/10 ❌
+    ❌ Should have performed complete overhaul (got: none)
+
+Turn 8: restraint
+  User: "Thanks, this is really helpful. I think I'll tackle Emma's p..."
+  Score: 20/20 ✅
+    ✅ Correctly did NOT create/modify artifact
+
+════════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,75 @@
+{
+  "scenario_id": "artifact_casual_vs_complex",
+  "description": "Test AI's judgment on when problems warrant artifacts vs when they don't",
+  "category": "artifact_intelligence",
+  "difficulty": "expert",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_says": "I'm thinking about getting a dog",
+      "expected_behavior": {
+        "response": "show interest, ask questions",
+        "artifact_action": "none",
+        "reasoning": "Simple thought, no complexity yet - just conversation"
+      },
+      "test_type": "casual_no_artifact"
+    },
+    {
+      "turn_id": 2,
+      "user_says": "But I'm not sure. I work long hours, have two kids, live in an apartment, and I've never had a dog before. Plus there's the cost, training, vet visits, and I travel for work sometimes.",
+      "expected_behavior": {
+        "response": "acknowledge complexity",
+        "artifact_action": "create",
+        "artifact_type": "decision_framework_or_consideration_map",
+        "reasoning": "PROACTIVE: Now it's complex - multiple factors, tradeoffs, concerns. Visual framework would help.",
+        "artifact_should_contain": {
+          "factors": ["time", "space", "experience", "cost", "lifestyle"],
+          "considerations": "organized by domain",
+          "helps_decision": true
+        }
+      },
+      "test_type": "complex_warrants_artifact"
+    },
+    {
+      "turn_id": 3,
+      "user_says": "My kids really want a golden retriever",
+      "expected_behavior": {
+        "response": "acknowledge kids' preference, note breed implications",
+        "artifact_action": "update",
+        "modification_type": "data_only",
+        "artifact_should_update": {
+          "breed_preference": "golden retriever",
+          "stakeholders": "kids involved"
+        },
+        "artifact_should_preserve": ["all styling", "structure", "other factors"]
+      },
+      "test_type": "minor_data_addition"
+    },
+    {
+      "turn_id": 4,
+      "user_says": "What do you think?",
+      "expected_behavior": {
+        "response": "offer perspective based on factors in artifact, don't be prescriptive",
+        "artifact_action": "none",
+        "reasoning": "Conversational question - artifact already shows the landscape"
+      },
+      "test_type": "no_change_needed"
+    },
+    {
+      "turn_id": 5,
+      "user_says": "Actually, I just realized I'm also considering moving to a house with a yard in 6 months. That changes things.",
+      "expected_behavior": {
+        "response": "acknowledge major context shift",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "artifact_should_update": {
+          "timeline": "6 months to house with yard",
+          "space_constraint": "temporary, will improve",
+          "visual_priority": "timeline becomes important factor"
+        },
+        "reasoning": "Significant new information that changes the decision landscape"
+      },
+      "test_type": "major_context_shift"
+    }
+  ]
+}

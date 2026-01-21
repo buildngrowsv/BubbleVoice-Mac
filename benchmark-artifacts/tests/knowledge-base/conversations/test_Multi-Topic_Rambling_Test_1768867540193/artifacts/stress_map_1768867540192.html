@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e6eaf0 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 30px 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2c5282;
+            letter-spacing: -0.5px;
+        }
+        p.subtitle {
+            font-size: 1.1em;
+            color: #718096;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        .domains {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            text-align: left;
+        }
+        .domain {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .domain:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        .domain-icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .domain-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3182ce;
+        }
+        .domain-details {
+            font-size: 0.95em;
+            color: #55606d;
+            line-height: 1.6;
+            font-weight: 400;
+        }
+        .domain-details p {
+            margin-bottom: 10px;
+        }
+        .domain-details p:last-child {
+            margin-bottom: 0;
+        }
+        .domain-details strong {
+            color: #2a4365;
+            font-weight: 600;
+        }
+        /* Color Themes */
+        .startup .domain-title { color: #d9534f; }
+        .startup .domain-icon { color: #e53e3e; }
+        .startup .domain {
+            background: linear-gradient(135deg, rgba(255, 230, 230, 0.8) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+        .exercise .domain-title { color: #38a169; }
+        .exercise .domain-icon { color: #38a169; }
+        .exercise .domain {
+            background: linear-gradient(135deg, rgba(223, 250, 233, 0.8) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+        .partner .domain-title { color: #805ad5; }
+        .partner .domain-icon { color: #805ad5; }
+        .partner .domain {
+            background: linear-gradient(135deg, rgba(237, 231, 254, 0.8) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+        .family .domain-title { color: #f6ad55; }
+        .family .domain-icon { color: #dd6b20; }
+        .family .domain {
+            background: linear-gradient(135deg, rgba(255, 240, 220, 0.8) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map">
+        <h1>Your Current Stress Landscape</h1>
+        <p class="subtitle">A visual overview of what's demanding your energy right now.</p>
+        <div class="domains">
+            
+            <div class="domain startup">
+                <span class="domain-icon">💼</span>
+                <div class="domain-title">Startup & Investors</div>
+                <div class="domain-details">
+                    <p><strong>Pressure:</strong> High</p>
+                    <p><strong>Feeling:</strong> Stressed, overwhelmed by investor demands.</p>
+                </div>
+            </div>
+
+            <div class="domain exercise">
+                <span class="domain-icon">🏃</span>
+                <div class="domain-title">Exercise Goals</div>
+                <div class="domain-details">
+                    <p><strong>Pressure:</strong> Medium</p>
+                    <p><strong>Feeling:</strong> Exhausted, struggling to prioritize self-care.</p>
+                </div>
+            </div>
+
+            <div class="domain partner">
+                <span class="domain-icon">❤️</span>
+                <div class="domain-title">Partner Relationship</div>
+                <div class="domain-details">
+                    <p><strong>Pressure:</strong> Medium</p>
+                    <p><strong>Feeling:</strong> Neglected, missing quality time with Jordan.</p>
+                </div>
+            </div>
+
+            <div class="domain family">
+                <span class="domain-icon">📚</span>
+                <div class="domain-title">Emma's Reading</div>
+                <div class="domain-details">
+                    <p><strong>Pressure:</strong> Low (Positive!)</p>
+                    <p><strong>Feeling:</strong> Hopeful, proud of Emma's progress.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

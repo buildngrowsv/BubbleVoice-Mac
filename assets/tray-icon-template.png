@@ -1,0 +1,6 @@
+<!-- This is a placeholder. In production, this would be an actual PNG icon -->
+<!-- For now, we'll create a simple SVG that can be converted -->
+<svg width="22" height="22" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="11" cy="11" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+  <circle cx="11" cy="11" r="4" fill="currentColor"/>
+</svg>

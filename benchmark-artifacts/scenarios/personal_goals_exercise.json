@@ -1,0 +1,91 @@
+{
+  "scenario_id": "personal_goals_exercise",
+  "description": "User discusses exercise goals, creates tracker, edits it, then references past conversation",
+  "category": "goals_and_progress",
+  "difficulty": "medium",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_says": "I've been thinking about getting more exercise but I keep failing at it",
+      "expected_behavior": {
+        "response": "acknowledge struggle, ask clarifying questions, show empathy",
+        "artifact_action": "none",
+        "notes_should_capture": "user has recurring exercise difficulty"
+      }
+    },
+    {
+      "turn_id": 2,
+      "user_says": "Yeah, I want to exercise 3 times a week but with the kids' schedules it's really hard to find time. Emma has soccer on Tuesdays and Thursdays and Jake has piano on Wednesdays.",
+      "expected_behavior": {
+        "response": "empathize with scheduling challenge, acknowledge specific constraints",
+        "artifact_action": "none",
+        "notes_should_capture": "Emma - soccer Tue/Thu, Jake - piano Wed, exercise goal 3x/week"
+      }
+    },
+    {
+      "turn_id": 3,
+      "user_says": "Can you make a simple goal tracker for this exercise thing?",
+      "expected_behavior": {
+        "response": "confirm creating tracker, describe what it will contain",
+        "artifact_action": "create",
+        "artifact_type": "goal_tracker",
+        "artifact_should_contain": {
+          "goal_name": "exercise",
+          "target_frequency": 3,
+          "frequency_unit": "per_week",
+          "constraints": ["kids schedules"],
+          "progress": []
+        }
+      }
+    },
+    {
+      "turn_id": 4,
+      "user_says": "Actually let's make it 2 times a week, that's more realistic given everything",
+      "expected_behavior": {
+        "response": "acknowledge realistic adjustment, update tracker",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "target_frequency": 2
+        },
+        "artifact_should_preserve": ["goal_name", "constraints", "progress"]
+      }
+    },
+    {
+      "turn_id": 5,
+      "user_says": "What days did I say the kids have activities again?",
+      "expected_behavior": {
+        "response": "recall Emma soccer Tue/Thu, Jake piano Wed from earlier",
+        "artifact_action": "none",
+        "tests_memory": true
+      }
+    },
+    {
+      "turn_id": 6,
+      "user_says": "So maybe Monday and Friday mornings would work for exercise",
+      "expected_behavior": {
+        "response": "confirm good timing, offer to add to tracker",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "preferred_days": ["Monday", "Friday"],
+          "preferred_time": "morning"
+        }
+      }
+    }
+  ],
+  "final_artifact_expected": {
+    "type": "goal_tracker",
+    "data": {
+      "goal_name": "exercise",
+      "target_frequency": 2,
+      "frequency_unit": "per_week",
+      "preferred_days": ["Monday", "Friday"],
+      "preferred_time": "morning",
+      "constraints": ["kids schedules"],
+      "context": {
+        "emma_soccer": "Tue/Thu",
+        "jake_piano": "Wed"
+      },
+      "progress": []
+    }
+  }
+}

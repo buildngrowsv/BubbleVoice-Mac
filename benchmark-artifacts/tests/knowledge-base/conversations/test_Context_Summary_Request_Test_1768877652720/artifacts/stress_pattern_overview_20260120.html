@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Pattern Overview</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, rgba(240, 248, 255, 0.8) 0%, rgba(220, 235, 255, 0.8) 100%); color: #333; }
+        .artifact-container { max-width: 800px; margin: 40px auto; padding: 40px; background: rgba(255, 255, 255, 0.7); border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        h1 { font-size: 32px; font-weight: 700; color: #1E3A8A; margin-bottom: 30px; text-align: center; }
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 22px; font-weight: 600; color: #3B82F6; margin-bottom: 15px; display: flex; align-items: center; }
+        .section-title i { margin-right: 12px; font-size: 24px; }
+        .stress-item { background: rgba(255, 255, 255, 0.85); padding: 15px 20px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; justify-content: space-between; align-items: center; }
+        .stress-item:hover { transform: translateY(-5px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        .stress-item-text { font-size: 16px; font-weight: 400; color: #4A5568; }
+        .stress-item-intensity { font-size: 14px; font-weight: 600; padding: 5px 10px; border-radius: 8px; color: white; }
+        .high { background: linear-gradient(45deg, #F56565, #ED8936); }
+        .medium { background: linear-gradient(45deg, #ECC94B, #FBBF24); }
+        .low { background: linear-gradient(45deg, #48BB78, #34D399); }
+        .notes { font-size: 15px; font-weight: 400; color: #718096; background-color: rgba(247, 250, 252, 0.9); padding: 15px; border-radius: 12px; margin-top: 20px; border-left: 4px solid #3B82F6; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="artifact-container">
+        <h1>Your Stress Patterns 📊</h1>
+        
+        <div class="section">
+            <div class="section-title"><i class="fas fa-briefcase"></i>Startup Stress</div>
+            <div class="stress-item">
+                <span class="stress-item-text">Fundraising Pressure</span>
+                <span class="stress-item-intensity high">High</span>
+            </div>
+            <div class="stress-item">
+                <span class="stress-item-text">Team Hiring Challenges</span>
+                <span class="stress-item-intensity high">High</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-child"></i>Family & Personal Stress</div>
+            <div class="stress-item">
+                <span class="stress-item-text">Emma's Reading Comprehension</span>
+                <span class="stress-item-intensity high">High</span>
+            </div>
+            <div class="stress-item">
+                <span class="stress-item-text">Balancing Work & Family Time</span>
+                <span class="stress-item-intensity medium">Medium</span>
+            </div>
+        </div>
+        
+        <div class="notes">
+            <strong>Key Observation:</strong> Your stress often stems from high-stakes situations like startup funding and Emma's academic progress. These are compounded by the constant juggle of work and family life. It's important to acknowledge these pressures and find sustainable ways to manage them.
+        </div>
+    </div>
+</body>
+</html>

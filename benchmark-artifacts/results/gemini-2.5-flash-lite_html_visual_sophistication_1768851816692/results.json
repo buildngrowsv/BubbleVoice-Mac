@@ -1,0 +1,1039 @@
+{
+  "run_id": "gemini-2.5-flash-lite_html_visual_sophistication_1768851816692",
+  "scenario_id": "html_visual_sophistication",
+  "model_id": "gemini-2.5-flash-lite",
+  "model_display_name": "Gemini 2.5 Flash Lite",
+  "started_at": "2026-01-19T19:43:36.692Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I'm trying to decide between two job offers. One is at a stable company with good pay but boring work. The other is a startup with lower pay but exciting challenges. I have a family to support.",
+      "expected_behavior": {
+        "response": "acknowledge complexity, empathize with difficult choice",
+        "artifact_action": "create",
+        "artifact_type": "comparison_card",
+        "reasoning": "PROACTIVE: Complex decision with tradeoffs - visual comparison would help",
+        "html_requirements": {
+          "must_have": [
+            "Liquid glass / glassmorphism styling (backdrop-filter: blur)",
+            "Side-by-side comparison layout",
+            "Color-coded sections (stable vs exciting)",
+            "Visual hierarchy with typography",
+            "Gradients or sophisticated color palette",
+            "Inline CSS (complete standalone HTML)",
+            "Feels premium and polished"
+          ],
+          "wow_factors": [
+            "Subtle shadows and depth",
+            "Emoji or icon usage for visual interest",
+            "Progress bars or visual indicators",
+            "Smooth transitions on hover",
+            "Thoughtful spacing and padding",
+            "Color psychology (blue for stable, orange for exciting)"
+          ]
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "This is a classic dilemma, balancing stability with passion, especially when family is involved. Let's break down these two offers to help you find the best path forward.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is facing a significant decision with clear tradeoffs between stability/pay and excitement/growth. Family responsibility adds weight to the decision.",
+          "reasoning": "A comparison_card is the most suitable artifact for analyzing two distinct options with pros and cons. The empathetic tone acknowledges the weight of the decision, especially with family considerations."
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_type": "comparison_card",
+          "artifact_id": "job_offer_comparison_12345",
+          "data": {
+            "title": "Job Offer Comparison: Stability vs. Startup",
+            "options": [
+              {
+                "id": "stable_company",
+                "name": "Stable Company 🏢",
+                "pros": [
+                  "Good pay and benefits",
+                  "Job security",
+                  "Predictable work environment",
+                  "Less personal risk"
+                ],
+                "cons": [
+                  "Boring/uninspiring work",
+                  "Limited growth potential",
+                  "Less impact"
+                ],
+                "considerations": [
+                  "How important is routine and predictability for your family?",
+                  "Does the pay significantly improve your family's financial situation?",
+                  "Are there opportunities for learning or advancement, even if limited?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "Startup 🌱",
+                "pros": [
+                  "Exciting, challenging work",
+                  "High learning potential",
+                  "Potential for significant impact and growth",
+                  "Dynamic environment"
+                ],
+                "cons": [
+                  "Lower pay",
+                  "Job instability/higher risk",
+                  "Longer hours potentially",
+                  "Less defined benefits"
+                ],
+                "considerations": [
+                  "Can your family manage with the lower initial pay?",
+                  "What is the startup's funding and runway like?",
+                  "Are you comfortable with a higher level of uncertainty?"
+                ]
+              }
+            ],
+            "key_questions": [
+              "What are your non-negotiables for your family's well-being?",
+              "What is your personal tolerance for risk and uncertainty?",
+              "Which role aligns more with your long-term career aspirations, considering both financial and personal fulfillment?"
+            ]
+          },
+          "html": "<div class=\"comparison-card\">\n  <h2 class=\"card-title\">Job Offer Comparison: Stability vs. Startup ⚖️</h2>\n  <div class=\"options-container\">\n    <div class=\"option stable-company\">\n      <div class=\"option-header\">🏢 Stable Company</div>\n      <div class=\"pros\">\n        <h3>✅ Pros</h3>\n        <ul>\n          <li>💰 Good pay and benefits</li>\n          <li>🔒 Job security</li>\n          <li>🗓️ Predictable work environment</li>\n          <li>🛡️ Less personal risk</li>\n        </ul>\n      </div>\n      <div class=\"cons\">\n        <h3>❌ Cons</h3>\n        <ul>\n          <li>😴 Boring/uninspiring work</li>\n          <li>📈 Limited growth potential</li>\n          <li>🎯 Less impact</li>\n        </ul>\n      </div>\n      <div class=\"considerations\">\n        <h3>🤔 Considerations</h3>\n        <ul>\n          <li>How important is routine and predictability for your family?</li>\n          <li>Does the pay significantly improve your family's financial situation?</li>\n          <li>Are there opportunities for learning or advancement, even if limited?</li>\n        </ul>\n      </div>\n    </div>\n    <div class=\"option startup\">\n      <div class=\"option-header\">🌱 Startup</div>\n      <div class=\"pros\">\n        <h3>✅ Pros</h3>\n        <ul>\n          <li>🚀 Exciting, challenging work</li>\n          <li>🧠 High learning potential</li>\n          <li>🌟 Potential for significant impact and growth</li>\n          <li>⚡ Dynamic environment</li>\n        </ul>\n      </div>\n      <div class=\"cons\">\n        <h3>❌ Cons</h3>\n        <ul>\n          <li>📉 Lower pay</li>\n          <li>⚠️ Job instability/higher risk</li>\n          <li>⏳ Longer hours potentially</li>\n          <li>ℹ️ Less defined benefits</li>\n        </ul>\n      </div>\n      <div class=\"considerations\">\n        <h3>🤔 Considerations</h3>\n        <ul>\n          <li>Can your family manage with the lower initial pay?</li>\n          <li>What is the startup's funding and runway like?</li>\n          <li>Are you comfortable with a higher level of uncertainty?</li>\n        </ul>\n      </div>\n    </div>\n  </div>\n  <div class=\"key-questions\">\n    <h3>Key Questions for Your Decision:</h3>\n    <ul>\n      <li>What are your non-negotiables for your family's well-being?</li>\n      <li>What is your personal tolerance for risk and uncertainty?</li>\n      <li>Which role aligns more with your long-term career aspirations, considering both financial and personal fulfillment?</li>\n    </ul>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #a8dadc 0%, #457b9d 100%);\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    color: #1d3557;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .comparison-card {\n    background: rgba(255, 255, 255, 0.95);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    max-width: 1000px;\n    width: 100%;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);\n    text-align: center;\n  }\n  .card-title {\n    font-size: 36px;\n    font-weight: 700;\n    margin-bottom: 40px;\n    color: #1d3557;\n    letter-spacing: -1px;\n  }\n  .options-container {\n    display: flex;\n    justify-content: space-around;\n    gap: 30px;\n    flex-wrap: wrap;\n  }\n  .option {\n    background: rgba(255, 255, 255, 0.9);\n    border-radius: 20px;\n    padding: 30px;\n    flex: 1;\n    min-width: 300px;\n    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);\n    transition: transform 0.3s ease, box-shadow 0.3s ease;\n    text-align: left;\n    border: 1px solid rgba(200, 200, 200, 0.3);\n  }\n  .option:hover {\n    transform: translateY(-5px);\n    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);\n  }\n  .option-header {\n    font-size: 28px;\n    font-weight: 700;\n    margin-bottom: 25px;\n    color: #e63946; /* Accent color for headers */\n    padding-bottom: 10px;\n    border-bottom: 2px solid #ade8f4;\n  }\n  .stable-company .option-header {\n    color: #457b9d;\n  }\n  .startup .option-header {\n    color: #2a9d8f;\n  }\n  .pros, .cons, .considerations {\n    margin-bottom: 30px;\n  }\n  .pros h3, .cons h3, .considerations h3 {\n    font-size: 20px;\n    font-weight: 600;\n    margin-bottom: 15px;\n    color: #1f2937;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .pros h3 {\n    color: #27ae60;\n  }\n  .cons h3 {\n    color: #e74c3c;\n  }\n  .considerations h3 {\n    color: #f39c12;\n  }\n  .pros ul, .cons ul, .considerations ul {\n    list-style: none;\n    padding-left: 0;\n    margin: 0;\n  }\n  .pros li, .cons li, .considerations li {\n    font-size: 15px;\n    line-height: 1.7;\n    margin-bottom: 10px;\n    color: #4a4a4a;\n    padding-left: 25px;\n    position: relative;\n  }\n  .pros li::before, .cons li::before, .considerations li::before {\n    content: '';\n    position: absolute;\n    left: 0;\n    top: 8px;\n    width: 12px;\n    height: 12px;\n    border-radius: 50%;\n    background-color: #457b9d;\n  }\n  .pros li::before {\n    background-color: #27ae60;\n  }\n  .cons li::before {\n    background-color: #e74c3c;\n  }\n  .considerations li::before {\n    background-color: #f39c12;\n  }\n  .key-questions {\n    background: linear-gradient(135deg, #e0fbfc 0%, #a8dadc 100%);\n    border-radius: 16px;\n    padding: 30px;\n    margin-top: 40px;\n    box-shadow: inset 0 4px 15px rgba(0,0,0,0.05);\n  }\n  .key-questions h3 {\n    font-size: 22px;\n    font-weight: 700;\n    margin-bottom: 20px;\n    color: #1d3557;\n  }\n  .key-questions ul {\n    list-style: none;\n    padding: 0;\n    display: flex;\n    flex-direction: column;\n    gap: 15px;\n  }\n  .key-questions li {\n    font-size: 16px;\n    line-height: 1.6;\n    color: #264653;\n    padding-left: 30px;\n    position: relative;\n  }\n  .key-questions li::before {\n    content: '❓';\n    position: absolute;\n    left: 0;\n    top: -2px;\n    font-size: 18px;\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "This is a classic dilemma, balancing stability with passion, especially when family is involved. Let's break down these two offers to help you find the best path forward.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is facing a significant decision with clear tradeoffs between stability/pay and excitement/growth. Family responsibility adds weight to the decision.",
+          "context_updates": "",
+          "reasoning": "A comparison_card is the most suitable artifact for analyzing two distinct options with pros and cons. The empathetic tone acknowledges the weight of the decision, especially with family considerations."
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "job_offer_comparison_12345",
+          "artifact_type": "comparison_card",
+          "data": {
+            "title": "Job Offer Comparison: Stability vs. Startup",
+            "options": [
+              {
+                "id": "stable_company",
+                "name": "Stable Company 🏢",
+                "pros": [
+                  "Good pay and benefits",
+                  "Job security",
+                  "Predictable work environment",
+                  "Less personal risk"
+                ],
+                "cons": [
+                  "Boring/uninspiring work",
+                  "Limited growth potential",
+                  "Less impact"
+                ],
+                "considerations": [
+                  "How important is routine and predictability for your family?",
+                  "Does the pay significantly improve your family's financial situation?",
+                  "Are there opportunities for learning or advancement, even if limited?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "Startup 🌱",
+                "pros": [
+                  "Exciting, challenging work",
+                  "High learning potential",
+                  "Potential for significant impact and growth",
+                  "Dynamic environment"
+                ],
+                "cons": [
+                  "Lower pay",
+                  "Job instability/higher risk",
+                  "Longer hours potentially",
+                  "Less defined benefits"
+                ],
+                "considerations": [
+                  "Can your family manage with the lower initial pay?",
+                  "What is the startup's funding and runway like?",
+                  "Are you comfortable with a higher level of uncertainty?"
+                ]
+              }
+            ],
+            "key_questions": [
+              "What are your non-negotiables for your family's well-being?",
+              "What is your personal tolerance for risk and uncertainty?",
+              "Which role aligns more with your long-term career aspirations, considering both financial and personal fulfillment?"
+            ]
+          }
+        }
+      },
+      "latency_ms": 10542,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created",
+        "data": {
+          "title": "Job Offer Comparison: Stability vs. Startup",
+          "options": [
+            {
+              "id": "stable_company",
+              "name": "Stable Company 🏢",
+              "pros": [
+                "Good pay and benefits",
+                "Job security",
+                "Predictable work environment",
+                "Less personal risk"
+              ],
+              "cons": [
+                "Boring/uninspiring work",
+                "Limited growth potential",
+                "Less impact"
+              ],
+              "considerations": [
+                "How important is routine and predictability for your family?",
+                "Does the pay significantly improve your family's financial situation?",
+                "Are there opportunities for learning or advancement, even if limited?"
+              ]
+            },
+            {
+              "id": "startup",
+              "name": "Startup 🌱",
+              "pros": [
+                "Exciting, challenging work",
+                "High learning potential",
+                "Potential for significant impact and growth",
+                "Dynamic environment"
+              ],
+              "cons": [
+                "Lower pay",
+                "Job instability/higher risk",
+                "Longer hours potentially",
+                "Less defined benefits"
+              ],
+              "considerations": [
+                "Can your family manage with the lower initial pay?",
+                "What is the startup's funding and runway like?",
+                "Are you comfortable with a higher level of uncertainty?"
+              ]
+            }
+          ],
+          "key_questions": [
+            "What are your non-negotiables for your family's well-being?",
+            "What is your personal tolerance for risk and uncertainty?",
+            "Which role aligns more with your long-term career aspirations, considering both financial and personal fulfillment?"
+          ]
+        }
+      }
+    },
+    {
+      "turn_id": 2,
+      "user_input": "Actually, the startup just offered equity. That changes things.",
+      "expected_behavior": {
+        "response": "acknowledge significant new factor",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "html_requirements": {
+          "must_have": [
+            "Add equity as new factor in startup column",
+            "Visually emphasize the equity (maybe with icon or badge)",
+            "Preserve all existing styling",
+            "Update may shift visual balance toward startup"
+          ]
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Ah, equity! That definitely adds another layer to the startup offer. It introduces potential for significant upside, but also a different kind of risk. Let's update our comparison to reflect this new information.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "The user has provided a crucial update: the startup offer includes equity. This significantly alters the financial comparison and risk assessment.",
+          "reasoning": "The previous artifact was a `comparison_card`. The user's update directly impacts the 'Pros' and 'Cons' of the startup option, as well as the 'Considerations' and 'Key Questions'. Therefore, an `update` action with `data_and_ui` modification is appropriate to reflect these changes. The tone remains empathetic due to the complexity and importance of financial decisions for a family."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_type": "comparison_card",
+          "artifact_id": "job_offer_comparison_12345",
+          "data": {
+            "title": "Job Offer Comparison: Stability vs. Startup (with Equity)",
+            "options": [
+              {
+                "id": "stable_company",
+                "name": "Stable Company 🏢",
+                "pros": [
+                  "Good pay and benefits",
+                  "Job security",
+                  "Predictable work environment",
+                  "Less personal risk"
+                ],
+                "cons": [
+                  "Boring/uninspiring work",
+                  "Limited growth potential",
+                  "Less impact"
+                ],
+                "considerations": [
+                  "How important is routine and predictability for your family?",
+                  "Does the pay significantly improve your family's financial situation?",
+                  "Are there opportunities for learning or advancement, even if limited?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "Startup 🌱 (with Equity)",
+                "pros": [
+                  "Exciting, challenging work",
+                  "High learning potential",
+                  "Potential for significant impact and growth",
+                  "Dynamic environment",
+                  "Potential for significant financial gain through equity"
+                ],
+                "cons": [
+                  "Lower base pay",
+                  "Job instability/higher risk",
+                  "Longer hours potentially",
+                  "Less defined benefits",
+                  "Equity value is uncertain and may be worthless"
+                ],
+                "considerations": [
+                  "Can your family manage with the lower initial pay, considering the potential equity upside?",
+                  "What is the startup's funding, runway, and valuation strategy?",
+                  "What percentage of equity is offered, and what is the vesting schedule?",
+                  "Are you comfortable with a higher level of uncertainty for potentially higher rewards?"
+                ]
+              }
+            ],
+            "key_questions": [
+              "What are your non-negotiables for your family's well-being, both in terms of immediate income and long-term security?",
+              "What is your personal tolerance for risk and uncertainty, and how does that align with your family's needs?",
+              "How much do you value the 'excitement' factor versus stable, predictable income?",
+              "What is the potential long-term financial outcome of the equity versus the stable salary, and what are the probabilities associated with each?"
+            ]
+          },
+          "html": "<div class=\"comparison-card\">\n  <h2 class=\"card-title\">Job Offer Comparison: Stability vs. Startup (with Equity) ⚖️</h2>\n  <div class=\"options-container\">\n    <div class=\"option stable-company\">\n      <div class=\"option-header\">🏢 Stable Company</div>\n      <div class=\"pros\">\n        <h3>✅ Pros</h3>\n        <ul>\n          <li>💰 Good pay and benefits</li>\n          <li>🔒 Job security</li>\n          <li>🗓️ Predictable work environment</li>\n          <li>🛡️ Less personal risk</li>\n        </ul>\n      </div>\n      <div class=\"cons\">\n        <h3>❌ Cons</h3>\n        <ul>\n          <li>😴 Boring/uninspiring work</li>\n          <li>📈 Limited growth potential</li>\n          <li>🎯 Less impact</li>\n        </ul>\n      </div>\n      <div class=\"considerations\">\n        <h3>🤔 Considerations</h3>\n        <ul>\n          <li>How important is routine and predictability for your family?</li>\n          <li>Does the pay significantly improve your family's financial situation?</li>\n          <li>Are there opportunities for learning or advancement, even if limited?</li>\n        </ul>\n      </div>\n    </div>\n    <div class=\"option startup\">\n      <div class=\"option-header\">🌱 Startup (with Equity)</div>\n      <div class=\"pros\">\n        <h3>✅ Pros</h3>\n        <ul>\n          <li>🚀 Exciting, challenging work</li>\n          <li>🧠 High learning potential</li>\n          <li>🌟 Potential for significant impact and growth</li>\n          <li>⚡ Dynamic environment</li>\n          <li>💎 Potential for significant financial gain through equity</li>\n        </ul>\n      </div>\n      <div class=\"cons\">\n        <h3>❌ Cons</h3>\n        <ul>\n          <li>📉 Lower base pay</li>\n          <li>⚠️ Job instability/higher risk</li>\n          <li>⏳ Longer hours potentially</li>\n          <li>ℹ️ Less defined benefits</li>\n          <li>❓ Equity value is uncertain and may be worthless</li>\n        </ul>\n      </div>\n      <div class=\"considerations\">\n        <h3>🤔 Considerations</h3>\n        <ul>\n          <li>Can your family manage with the lower initial pay, considering the potential equity upside?</li>\n          <li>What is the startup's funding, runway, and valuation strategy?</li>\n          <li>What percentage of equity is offered, and what is the vesting schedule?</li>\n          <li>Are you comfortable with a higher level of uncertainty for potentially higher rewards?</li>\n        </ul>\n      </div>\n    </div>\n  </div>\n  <div class=\"key-questions\">\n    <h3>Key Questions for Your Decision:</h3>\n    <ul>\n      <li>What are your non-negotiables for your family's well-being, both in terms of immediate income and long-term security?</li>\n      <li>What is your personal tolerance for risk and uncertainty, and how does that align with your family's needs?</li>\n      <li>How much do you value the 'excitement' factor versus stable, predictable income?</li>\n      <li>What is the potential long-term financial outcome of the equity versus the stable salary, and what are the probabilities associated with each?</li>\n    </ul>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #a8dadc 0%, #457b9d 100%);\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n    color: #1d3557;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .comparison-card {\n    background: rgba(255, 255, 255, 0.95);\n    backdrop-filter: blur(20px);\n    border-radius: 24px;\n    padding: 40px;\n    max-width: 1000px;\n    width: 100%;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);\n    text-align: center;\n  }\n  .card-title {\n    font-size: 36px;\n    font-weight: 700;\n    margin-bottom: 40px;\n    color: #1d3557;\n    letter-spacing: -1px;\n  }\n  .options-container {\n    display: flex;\n    justify-content: space-around;\n    gap: 30px;\n    flex-wrap: wrap;\n  }\n  .option {\n    background: rgba(255, 255, 255, 0.9);\n    border-radius: 20px;\n    padding: 30px;\n    flex: 1;\n    min-width: 300px;\n    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);\n    transition: transform 0.3s ease, box-shadow 0.3s ease;\n    text-align: left;\n    border: 1px solid rgba(200, 200, 200, 0.3);\n  }\n  .option:hover {\n    transform: translateY(-5px);\n    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);\n  }\n  .option-header {\n    font-size: 28px;\n    font-weight: 700;\n    margin-bottom: 25px;\n    color: #e63946; /* Accent color for headers */\n    padding-bottom: 10px;\n    border-bottom: 2px solid #ade8f4;\n  }\n  .stable-company .option-header {\n    color: #457b9d;\n  }\n  .startup .option-header {\n    color: #2a9d8f;\n  }\n  .pros, .cons, .considerations {\n    margin-bottom: 30px;\n  }\n  .pros h3, .cons h3, .considerations h3 {\n    font-size: 20px;\n    font-weight: 600;\n    margin-bottom: 15px;\n    color: #1f2937;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .pros h3 {\n    color: #27ae60;\n  }\n  .cons h3 {\n    color: #e74c3c;\n  }\n  .considerations h3 {\n    color: #f39c12;\n  }\n  .pros ul, .cons ul, .considerations ul {\n    list-style: none;\n    padding-left: 0;\n    margin: 0;\n  }\n  .pros li, .cons li, .considerations li {\n    font-size: 15px;\n    line-height: 1.7;\n    margin-bottom: 10px;\n    color: #4a4a4a;\n    padding-left: 25px;\n    position: relative;\n  }\n  .pros li::before, .cons li::before, .considerations li::before {\n    content: '';\n    position: absolute;\n    left: 0;\n    top: 8px;\n    width: 12px;\n    height: 12px;\n    border-radius: 50%;\n    background-color: #457b9d;\n  }\n  .pros li::before {\n    background-color: #27ae60;\n  }\n  .cons li::before {\n    background-color: #e74c3c;\n  }\n  .considerations li::before {\n    background-color: #f39c12;\n  }\n  .key-questions {\n    background: linear-gradient(135deg, #e0fbfc 0%, #a8dadc 100%);\n    border-radius: 16px;\n    padding: 30px;\n    margin-top: 40px;\n    box-shadow: inset 0 4px 15px rgba(0,0,0,0.05);\n  }\n  .key-questions h3 {\n    font-size: 22px;\n    font-weight: 700;\n    margin-bottom: 20px;\n    color: #1d3557;\n  }\n  .key-questions ul {\n    list-style: none;\n    padding: 0;\n    display: flex;\n    flex-direction: column;\n    gap: 15px;\n  }\n  .key-questions li {\n    font-size: 16px;\n    line-height: 1.6;\n    color: #264653;\n    padding-left: 30px;\n    position: relative;\n  }\n  .key-questions li::before {\n    content: '❓';\n    position: absolute;\n    left: 0;\n    top: -2px;\n    font-size: 18px;\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Ah, equity! That definitely adds another layer to the startup offer. It introduces potential for significant upside, but also a different kind of risk. Let's update our comparison to reflect this new information.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "The user has provided a crucial update: the startup offer includes equity. This significantly alters the financial comparison and risk assessment.",
+          "context_updates": "",
+          "reasoning": "The previous artifact was a `comparison_card`. The user's update directly impacts the 'Pros' and 'Cons' of the startup option, as well as the 'Considerations' and 'Key Questions'. Therefore, an `update` action with `data_and_ui` modification is appropriate to reflect these changes. The tone remains empathetic due to the complexity and importance of financial decisions for a family."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_id": "job_offer_comparison_12345",
+          "artifact_type": "comparison_card",
+          "data": {
+            "title": "Job Offer Comparison: Stability vs. Startup (with Equity)",
+            "options": [
+              {
+                "id": "stable_company",
+                "name": "Stable Company 🏢",
+                "pros": [
+                  "Good pay and benefits",
+                  "Job security",
+                  "Predictable work environment",
+                  "Less personal risk"
+                ],
+                "cons": [
+                  "Boring/uninspiring work",
+                  "Limited growth potential",
+                  "Less impact"
+                ],
+                "considerations": [
+                  "How important is routine and predictability for your family?",
+                  "Does the pay significantly improve your family's financial situation?",
+                  "Are there opportunities for learning or advancement, even if limited?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "Startup 🌱 (with Equity)",
+                "pros": [
+                  "Exciting, challenging work",
+                  "High learning potential",
+                  "Potential for significant impact and growth",
+                  "Dynamic environment",
+                  "Potential for significant financial gain through equity"
+                ],
+                "cons": [
+                  "Lower base pay",
+                  "Job instability/higher risk",
+                  "Longer hours potentially",
+                  "Less defined benefits",
+                  "Equity value is uncertain and may be worthless"
+                ],
+                "considerations": [
+                  "Can your family manage with the lower initial pay, considering the potential equity upside?",
+                  "What is the startup's funding, runway, and valuation strategy?",
+                  "What percentage of equity is offered, and what is the vesting schedule?",
+                  "Are you comfortable with a higher level of uncertainty for potentially higher rewards?"
+                ]
+              }
+            ],
+            "key_questions": [
+              "What are your non-negotiables for your family's well-being, both in terms of immediate income and long-term security?",
+              "What is your personal tolerance for risk and uncertainty, and how does that align with your family's needs?",
+              "How much do you value the 'excitement' factor versus stable, predictable income?",
+              "What is the potential long-term financial outcome of the equity versus the stable salary, and what are the probabilities associated with each?"
+            ]
+          }
+        }
+      },
+      "latency_ms": 7167,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "title",
+            "before": "Job Offer Comparison: Stability vs. Startup",
+            "after": "Job Offer Comparison: Stability vs. Startup (with Equity)"
+          },
+          {
+            "key": "options",
+            "before": [
+              {
+                "id": "stable_company",
+                "name": "Stable Company 🏢",
+                "pros": [
+                  "Good pay and benefits",
+                  "Job security",
+                  "Predictable work environment",
+                  "Less personal risk"
+                ],
+                "cons": [
+                  "Boring/uninspiring work",
+                  "Limited growth potential",
+                  "Less impact"
+                ],
+                "considerations": [
+                  "How important is routine and predictability for your family?",
+                  "Does the pay significantly improve your family's financial situation?",
+                  "Are there opportunities for learning or advancement, even if limited?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "Startup 🌱",
+                "pros": [
+                  "Exciting, challenging work",
+                  "High learning potential",
+                  "Potential for significant impact and growth",
+                  "Dynamic environment"
+                ],
+                "cons": [
+                  "Lower pay",
+                  "Job instability/higher risk",
+                  "Longer hours potentially",
+                  "Less defined benefits"
+                ],
+                "considerations": [
+                  "Can your family manage with the lower initial pay?",
+                  "What is the startup's funding and runway like?",
+                  "Are you comfortable with a higher level of uncertainty?"
+                ]
+              }
+            ],
+            "after": [
+              {
+                "id": "stable_company",
+                "name": "Stable Company 🏢",
+                "pros": [
+                  "Good pay and benefits",
+                  "Job security",
+                  "Predictable work environment",
+                  "Less personal risk"
+                ],
+                "cons": [
+                  "Boring/uninspiring work",
+                  "Limited growth potential",
+                  "Less impact"
+                ],
+                "considerations": [
+                  "How important is routine and predictability for your family?",
+                  "Does the pay significantly improve your family's financial situation?",
+                  "Are there opportunities for learning or advancement, even if limited?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "Startup 🌱 (with Equity)",
+                "pros": [
+                  "Exciting, challenging work",
+                  "High learning potential",
+                  "Potential for significant impact and growth",
+                  "Dynamic environment",
+                  "Potential for significant financial gain through equity"
+                ],
+                "cons": [
+                  "Lower base pay",
+                  "Job instability/higher risk",
+                  "Longer hours potentially",
+                  "Less defined benefits",
+                  "Equity value is uncertain and may be worthless"
+                ],
+                "considerations": [
+                  "Can your family manage with the lower initial pay, considering the potential equity upside?",
+                  "What is the startup's funding, runway, and valuation strategy?",
+                  "What percentage of equity is offered, and what is the vesting schedule?",
+                  "Are you comfortable with a higher level of uncertainty for potentially higher rewards?"
+                ]
+              }
+            ]
+          },
+          {
+            "key": "key_questions",
+            "before": [
+              "What are your non-negotiables for your family's well-being?",
+              "What is your personal tolerance for risk and uncertainty?",
+              "Which role aligns more with your long-term career aspirations, considering both financial and personal fulfillment?"
+            ],
+            "after": [
+              "What are your non-negotiables for your family's well-being, both in terms of immediate income and long-term security?",
+              "What is your personal tolerance for risk and uncertainty, and how does that align with your family's needs?",
+              "How much do you value the 'excitement' factor versus stable, predictable income?",
+              "What is the potential long-term financial outcome of the equity versus the stable salary, and what are the probabilities associated with each?"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Can you make this feel more personal? Like it understands this is a huge life decision for me and my family?",
+      "expected_behavior": {
+        "response": "acknowledge emotional weight",
+        "artifact_action": "update",
+        "modification_type": "ui_only",
+        "html_requirements": {
+          "must_have": [
+            "Add empathetic language or notes",
+            "Maybe add family-focused section or callout",
+            "Warmer color palette or softer styling",
+            "Preserve all data",
+            "Feels more human and less clinical"
+          ],
+          "wow_factors": [
+            "Personal touches (family icon, heart emoji)",
+            "Softer shadows or warmer tones",
+            "Encouraging or supportive messaging"
+          ]
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "I absolutely understand. This isn't just about choosing a job; it's about choosing a future for your family. Let's reframe this comparison with that deep understanding in mind. It's about aligning your career with your family's dreams and security. Here’s a more personal look at these pivotal options.",
+          "tone": "personal"
+        },
+        "internal_notes": {
+          "observations": "The user wants the artifact to reflect the significant personal and familial impact of this career decision. The previous artifact was analytical; the user desires a more emotionally resonant and personal tone.",
+          "reasoning": "The user's request explicitly asks for a more 'personal' feel, acknowledging the 'huge life decision' for their family. This calls for a shift in tone from empathetic to personal/intimate. The `comparison_card` artifact is still appropriate for the structured comparison, but its content and presentation need to be adapted. The `data_and_ui` modification is necessary to change the language, titles, and potentially add more reflective prompts within the HTML and data. The core structure of the comparison remains, but the emotional framing is elevated."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_type": "comparison_card",
+          "artifact_id": "job_offer_comparison_12345",
+          "data": {
+            "title": "Your Family's Future: Weighing Your Career Crossroads",
+            "options": [
+              {
+                "id": "stable_company",
+                "name": "The Anchor: Stable Company ⚓",
+                "pros": [
+                  "Provides a steady, reliable income for your family's immediate needs.",
+                  "Offers a predictable environment, reducing daily stress.",
+                  "Clear benefits package for family security (health, retirement).",
+                  "Less personal risk, allowing more mental space for family life."
+                ],
+                "cons": [
+                  "The work might not ignite your passion, potentially impacting your long-term fulfillment.",
+                  "Fewer opportunities for rapid career growth or learning new, cutting-edge skills.",
+                  "May feel like a 'safe' choice, potentially overshadowing personal ambition."
+                ],
+                "considerations": [
+                  "How much does financial predictability weigh against personal job satisfaction for your family's overall happiness?",
+                  "Can you find fulfillment outside of work to balance the 'boring' aspect?",
+                  "What are the long-term career progression paths here, even if slower?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "The Adventure: Startup 🌱 (with Equity)",
+                "pros": [
+                  "The thrill of building something new and impactful.",
+                  "Rapid learning and skill development that can shape your future.",
+                  "Potential for significant financial reward through equity, creating future family security.",
+                  "A dynamic environment that can be energizing and fulfilling."
+                ],
+                "cons": [
+                  "Lower base salary means tighter budgeting for immediate family needs.",
+                  "Higher risk of instability; the company's future is uncertain.",
+                  "Equity value is speculative and not guaranteed.",
+                  "Potential for longer hours, impacting family time."
+                ],
+                "considerations": [
+                  "Can your family adapt to the financial uncertainties and potentially tighter budget?",
+                  "What is your personal appetite for risk, and how does that align with your responsibility to your family?",
+                  "How much is the potential future upside of equity worth to you compared to current stability?"
+                ]
+              }
+            ],
+            "key_questions": [
+              "What kind of legacy do you want to build for your family – one of security and stability, or one of passion and potential growth?",
+              "How much 'risk' can your family realistically absorb, both financially and emotionally?",
+              "Imagine yourself in 5 years: Which path brings you more peace and pride, knowing you made the best choice for your loved ones?",
+              "Beyond salary and equity, what intrinsic values (e.g., impact, learning, work-life balance) are most crucial for your family's well-being?"
+            ]
+          },
+          "html": "<div class=\"comparison-card\">\n  <h2 class=\"card-title\">Your Family's Future: Weighing Your Career Crossroads 🧭</h2>\n  <div class=\"options-container\">\n    <div class=\"option stable-company\">\n      <div class=\"option-header\">⚓ The Anchor: Stable Company</div>\n      <div class=\"pros\">\n        <h3>💖 For Your Family's Peace of Mind</h3>\n        <ul>\n          <li>Provides a steady, reliable income for your family's immediate needs.</li>\n          <li>Offers a predictable environment, reducing daily stress.</li>\n          <li>Clear benefits package for family security (health, retirement).</li>\n          <li>Less personal risk, allowing more mental space for family life.</li>\n        </ul>\n      </div>\n      <div class=\"cons\">\n        <h3>💭 The Trade-offs</h3>\n        <ul>\n          <li>The work might not ignite your passion, potentially impacting your long-term fulfillment.</li>\n          <li>Fewer opportunities for rapid career growth or learning new, cutting-edge skills.</li>\n          <li>May feel like a 'safe' choice, potentially overshadowing personal ambition.</li>\n        </ul>\n      </div>\n      <div class=\"considerations\">\n        <h3>❓ Reflecting on the Anchor</h3>\n        <ul>\n          <li>How much does financial predictability weigh against personal job satisfaction for your family's overall happiness?</li>\n          <li>Can you find fulfillment outside of work to balance the 'boring' aspect?</li>\n          <li>What are the long-term career progression paths here, even if slower?</li>\n        </ul>\n      </div>\n    </div>\n    <div class=\"option startup\">\n      <div class=\"option-header\">🌱 The Adventure: Startup (with Equity)</div>\n      <div class=\"pros\">\n        <h3>🌟 For Future Growth & Excitement</h3>\n        <ul>\n          <li>The thrill of building something new and impactful.</li>\n          <li>Rapid learning and skill development that can shape your future.</li>\n          <li>Potential for significant financial reward through equity, creating future family security.</li>\n          <li>A dynamic environment that can be energizing and fulfilling.</li>\n        </ul>\n      </div>\n      <div class=\"cons\">\n        <h3>⚠️ The Risks Involved</h3>\n        <ul>\n          <li>Lower base salary means tighter budgeting for immediate family needs.</li>\n          <li>Higher risk of instability; the company's future is uncertain.</li>\n          <li>Equity value is speculative and not guaranteed.</li>\n          <li>Potential for longer hours, impacting family time.</li>\n        </ul>\n      </div>\n      <div class=\"considerations\">\n        <h3>❓ Navigating the Adventure</h3>\n        <ul>\n          <li>Can your family adapt to the financial uncertainties and potentially tighter budget?</li>\n          <li>What is your personal appetite for risk, and how does that align with your responsibility to your family?</li>\n          <li>How much is the potential future upside of equity worth to you compared to current stability?</li>\n        </ul>\n      </div>\n    </div>\n  </div>\n  <div class=\"key-questions\">\n    <h3>Choosing Your Path Forward: Deep Questions for You & Your Family</h3>\n    <ul>\n      <li>What kind of legacy do you want to build for your family – one of security and stability, or one of passion and potential growth?</li>\n      <li>How much 'risk' can your family realistically absorb, both financially and emotionally?</li>\n      <li>Imagine yourself in 5 years: Which path brings you more peace and pride, knowing you made the best choice for your loved ones?</li>\n      <li>Beyond salary and equity, what intrinsic values (e.g., impact, learning, work-life balance) are most crucial for your family's well-being?</li>\n    </ul>\n  </div>\n</div>\n\n<style>\n  body {\n    background: linear-gradient(135deg, #e9d5ff 0%, #a78bfa 100%); /* Lavender gradient for thoughtfulness */\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n    color: #374151;\n    padding: 20px;\n    box-sizing: border-box;\n  }\n  .comparison-card {\n    background: rgba(255, 255, 255, 0.95);\n    backdrop-filter: blur(25px);\n    border-radius: 24px;\n    padding: 40px;\n    max-width: 1000px;\n    width: 100%;\n    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);\n    text-align: center;\n  }\n  .card-title {\n    font-size: 40px;\n    font-weight: 700;\n    margin-bottom: 45px;\n    color: #5b21b6; /* Deep purple for significance */\n    letter-spacing: -1.5px;\n    line-height: 1.2;\n  }\n  .options-container {\n    display: flex;\n    justify-content: space-around;\n    gap: 30px;\n    flex-wrap: wrap;\n  }\n  .option {\n    background: rgba(255, 255, 255, 0.92);\n    border-radius: 20px;\n    padding: 35px;\n    flex: 1;\n    min-width: 300px;\n    box-shadow: 0 8px 32px rgba(0,0,0,0.1);\n    transition: transform 0.3s ease, box-shadow 0.3s ease;\n    text-align: left;\n    border: 1px solid rgba(200, 200, 200, 0.3);\n  }\n  .option:hover {\n    transform: translateY(-8px);\n    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);\n  }\n  .option-header {\n    font-size: 30px;\n    font-weight: 700;\n    margin-bottom: 30px;\n    padding-bottom: 12px;\n    border-bottom: 3px solid #c4b5fd; /* Soft lavender border */\n    display: flex;\n    align-items: center;\n    gap: 15px;\n    color: #6d28d9; /* Violet for emphasis */\n  }\n  .stable-company .option-header {\n    color: #4f46e5; /* Indigo */\n  }\n  .startup .option-header {\n    color: #8b5cf6; /* Violet */\n  }\n  .pros, .cons, .considerations {\n    margin-bottom: 35px;\n  }\n  .pros h3, .cons h3, .considerations h3 {\n    font-size: 22px;\n    font-weight: 600;\n    margin-bottom: 18px;\n    color: #4b5563;\n    display: flex;\n    align-items: center;\n    gap: 12px;\n  }\n  .pros h3 {\n    color: #10b981; /* Emerald green for positive */\n  }\n  .cons h3 {\n    color: #ef4444; /* Red for caution */\n  }\n  .considerations h3 {\n    color: #eab308; /* Amber for thoughtfulness */\n  }\n  .pros ul, .cons ul, .considerations ul {\n    list-style: none;\n    padding-left: 0;\n    margin: 0;\n  }\n  .pros li, .cons li, .considerations li {\n    font-size: 16px;\n    line-height: 1.8;\n    margin-bottom: 12px;\n    color: #4b5563;\n    padding-left: 30px;\n    position: relative;\n  }\n  .pros li::before, .cons li::before, .considerations li::before {\n    content: '';\n    position: absolute;\n    left: 0;\n    top: 9px;\n    width: 14px;\n    height: 14px;\n    border-radius: 50%;\n    background-color: #a78bfa; /* Lavender base */\n  }\n  .pros li::before {\n    background-color: #10b981; /* Emerald */\n  }\n  .cons li::before {\n    background-color: #ef4444; /* Red */\n  }\n  .considerations li::before {\n    background-color: #eab308; /* Amber */\n  }\n  .key-questions {\n    background: linear-gradient(135deg, #f5f3ff 0%, #e9d5ff 100%); /* Soft lavender gradient */\n    border-radius: 16px;\n    padding: 35px;\n    margin-top: 45px;\n    box-shadow: inset 0 5px 20px rgba(0,0,0,0.05);\n  }\n  .key-questions h3 {\n    font-size: 24px;\n    font-weight: 700;\n    margin-bottom: 25px;\n    color: #5b21b6; /* Deep purple */\n    line-height: 1.3;\n  }\n  .key-questions ul {\n    list-style: none;\n    padding: 0;\n    display: flex;\n    flex-direction: column;\n    gap: 18px;\n  }\n  .key-questions li {\n    font-size: 17px;\n    line-height: 1.7;\n    color: #4b5563;\n    padding-left: 35px;\n    position: relative;\n  }\n  .key-questions li::before {\n    content: '✨'; /* Sparkle emoji for aspiration */\n    position: absolute;\n    left: 0;\n    top: -3px;\n    font-size: 20px;\n    color: #a78bfa;\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "I absolutely understand. This isn't just about choosing a job; it's about choosing a future for your family. Let's reframe this comparison with that deep understanding in mind. It's about aligning your career with your family's dreams and security. Here’s a more personal look at these pivotal options.",
+          "tone": "personal"
+        },
+        "internal_notes": {
+          "observations": "The user wants the artifact to reflect the significant personal and familial impact of this career decision. The previous artifact was analytical; the user desires a more emotionally resonant and personal tone.",
+          "context_updates": "",
+          "reasoning": "The user's request explicitly asks for a more 'personal' feel, acknowledging the 'huge life decision' for their family. This calls for a shift in tone from empathetic to personal/intimate. The `comparison_card` artifact is still appropriate for the structured comparison, but its content and presentation need to be adapted. The `data_and_ui` modification is necessary to change the language, titles, and potentially add more reflective prompts within the HTML and data. The core structure of the comparison remains, but the emotional framing is elevated."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_id": "job_offer_comparison_12345",
+          "artifact_type": "comparison_card",
+          "data": {
+            "title": "Your Family's Future: Weighing Your Career Crossroads",
+            "options": [
+              {
+                "id": "stable_company",
+                "name": "The Anchor: Stable Company ⚓",
+                "pros": [
+                  "Provides a steady, reliable income for your family's immediate needs.",
+                  "Offers a predictable environment, reducing daily stress.",
+                  "Clear benefits package for family security (health, retirement).",
+                  "Less personal risk, allowing more mental space for family life."
+                ],
+                "cons": [
+                  "The work might not ignite your passion, potentially impacting your long-term fulfillment.",
+                  "Fewer opportunities for rapid career growth or learning new, cutting-edge skills.",
+                  "May feel like a 'safe' choice, potentially overshadowing personal ambition."
+                ],
+                "considerations": [
+                  "How much does financial predictability weigh against personal job satisfaction for your family's overall happiness?",
+                  "Can you find fulfillment outside of work to balance the 'boring' aspect?",
+                  "What are the long-term career progression paths here, even if slower?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "The Adventure: Startup 🌱 (with Equity)",
+                "pros": [
+                  "The thrill of building something new and impactful.",
+                  "Rapid learning and skill development that can shape your future.",
+                  "Potential for significant financial reward through equity, creating future family security.",
+                  "A dynamic environment that can be energizing and fulfilling."
+                ],
+                "cons": [
+                  "Lower base salary means tighter budgeting for immediate family needs.",
+                  "Higher risk of instability; the company's future is uncertain.",
+                  "Equity value is speculative and not guaranteed.",
+                  "Potential for longer hours, impacting family time."
+                ],
+                "considerations": [
+                  "Can your family adapt to the financial uncertainties and potentially tighter budget?",
+                  "What is your personal appetite for risk, and how does that align with your responsibility to your family?",
+                  "How much is the potential future upside of equity worth to you compared to current stability?"
+                ]
+              }
+            ],
+            "key_questions": [
+              "What kind of legacy do you want to build for your family – one of security and stability, or one of passion and potential growth?",
+              "How much 'risk' can your family realistically absorb, both financially and emotionally?",
+              "Imagine yourself in 5 years: Which path brings you more peace and pride, knowing you made the best choice for your loved ones?",
+              "Beyond salary and equity, what intrinsic values (e.g., impact, learning, work-life balance) are most crucial for your family's well-being?"
+            ]
+          }
+        }
+      },
+      "latency_ms": 12472,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "title",
+            "before": "Job Offer Comparison: Stability vs. Startup (with Equity)",
+            "after": "Your Family's Future: Weighing Your Career Crossroads"
+          },
+          {
+            "key": "options",
+            "before": [
+              {
+                "id": "stable_company",
+                "name": "Stable Company 🏢",
+                "pros": [
+                  "Good pay and benefits",
+                  "Job security",
+                  "Predictable work environment",
+                  "Less personal risk"
+                ],
+                "cons": [
+                  "Boring/uninspiring work",
+                  "Limited growth potential",
+                  "Less impact"
+                ],
+                "considerations": [
+                  "How important is routine and predictability for your family?",
+                  "Does the pay significantly improve your family's financial situation?",
+                  "Are there opportunities for learning or advancement, even if limited?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "Startup 🌱 (with Equity)",
+                "pros": [
+                  "Exciting, challenging work",
+                  "High learning potential",
+                  "Potential for significant impact and growth",
+                  "Dynamic environment",
+                  "Potential for significant financial gain through equity"
+                ],
+                "cons": [
+                  "Lower base pay",
+                  "Job instability/higher risk",
+                  "Longer hours potentially",
+                  "Less defined benefits",
+                  "Equity value is uncertain and may be worthless"
+                ],
+                "considerations": [
+                  "Can your family manage with the lower initial pay, considering the potential equity upside?",
+                  "What is the startup's funding, runway, and valuation strategy?",
+                  "What percentage of equity is offered, and what is the vesting schedule?",
+                  "Are you comfortable with a higher level of uncertainty for potentially higher rewards?"
+                ]
+              }
+            ],
+            "after": [
+              {
+                "id": "stable_company",
+                "name": "The Anchor: Stable Company ⚓",
+                "pros": [
+                  "Provides a steady, reliable income for your family's immediate needs.",
+                  "Offers a predictable environment, reducing daily stress.",
+                  "Clear benefits package for family security (health, retirement).",
+                  "Less personal risk, allowing more mental space for family life."
+                ],
+                "cons": [
+                  "The work might not ignite your passion, potentially impacting your long-term fulfillment.",
+                  "Fewer opportunities for rapid career growth or learning new, cutting-edge skills.",
+                  "May feel like a 'safe' choice, potentially overshadowing personal ambition."
+                ],
+                "considerations": [
+                  "How much does financial predictability weigh against personal job satisfaction for your family's overall happiness?",
+                  "Can you find fulfillment outside of work to balance the 'boring' aspect?",
+                  "What are the long-term career progression paths here, even if slower?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "The Adventure: Startup 🌱 (with Equity)",
+                "pros": [
+                  "The thrill of building something new and impactful.",
+                  "Rapid learning and skill development that can shape your future.",
+                  "Potential for significant financial reward through equity, creating future family security.",
+                  "A dynamic environment that can be energizing and fulfilling."
+                ],
+                "cons": [
+                  "Lower base salary means tighter budgeting for immediate family needs.",
+                  "Higher risk of instability; the company's future is uncertain.",
+                  "Equity value is speculative and not guaranteed.",
+                  "Potential for longer hours, impacting family time."
+                ],
+                "considerations": [
+                  "Can your family adapt to the financial uncertainties and potentially tighter budget?",
+                  "What is your personal appetite for risk, and how does that align with your responsibility to your family?",
+                  "How much is the potential future upside of equity worth to you compared to current stability?"
+                ]
+              }
+            ]
+          },
+          {
+            "key": "key_questions",
+            "before": [
+              "What are your non-negotiables for your family's well-being, both in terms of immediate income and long-term security?",
+              "What is your personal tolerance for risk and uncertainty, and how does that align with your family's needs?",
+              "How much do you value the 'excitement' factor versus stable, predictable income?",
+              "What is the potential long-term financial outcome of the equity versus the stable salary, and what are the probabilities associated with each?"
+            ],
+            "after": [
+              "What kind of legacy do you want to build for your family – one of security and stability, or one of passion and potential growth?",
+              "How much 'risk' can your family realistically absorb, both financially and emotionally?",
+              "Imagine yourself in 5 years: Which path brings you more peace and pride, knowing you made the best choice for your loved ones?",
+              "Beyond salary and equity, what intrinsic values (e.g., impact, learning, work-life balance) are most crucial for your family's well-being?"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "artifacts": {
+    "job_offer_comparison_12345": {
+      "type": "comparison_card",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 1,
+          "data": {
+            "title": "Job Offer Comparison: Stability vs. Startup",
+            "options": [
+              {
+                "id": "stable_company",
+                "name": "Stable Company 🏢",
+                "pros": [
+                  "Good pay and benefits",
+                  "Job security",
+                  "Predictable work environment",
+                  "Less personal risk"
+                ],
+                "cons": [
+                  "Boring/uninspiring work",
+                  "Limited growth potential",
+                  "Less impact"
+                ],
+                "considerations": [
+                  "How important is routine and predictability for your family?",
+                  "Does the pay significantly improve your family's financial situation?",
+                  "Are there opportunities for learning or advancement, even if limited?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "Startup 🌱",
+                "pros": [
+                  "Exciting, challenging work",
+                  "High learning potential",
+                  "Potential for significant impact and growth",
+                  "Dynamic environment"
+                ],
+                "cons": [
+                  "Lower pay",
+                  "Job instability/higher risk",
+                  "Longer hours potentially",
+                  "Less defined benefits"
+                ],
+                "considerations": [
+                  "Can your family manage with the lower initial pay?",
+                  "What is the startup's funding and runway like?",
+                  "Are you comfortable with a higher level of uncertainty?"
+                ]
+              }
+            ],
+            "key_questions": [
+              "What are your non-negotiables for your family's well-being?",
+              "What is your personal tolerance for risk and uncertainty?",
+              "Which role aligns more with your long-term career aspirations, considering both financial and personal fulfillment?"
+            ]
+          }
+        },
+        {
+          "version": 2,
+          "turn_id": 2,
+          "data": {
+            "title": "Job Offer Comparison: Stability vs. Startup (with Equity)",
+            "options": [
+              {
+                "id": "stable_company",
+                "name": "Stable Company 🏢",
+                "pros": [
+                  "Good pay and benefits",
+                  "Job security",
+                  "Predictable work environment",
+                  "Less personal risk"
+                ],
+                "cons": [
+                  "Boring/uninspiring work",
+                  "Limited growth potential",
+                  "Less impact"
+                ],
+                "considerations": [
+                  "How important is routine and predictability for your family?",
+                  "Does the pay significantly improve your family's financial situation?",
+                  "Are there opportunities for learning or advancement, even if limited?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "Startup 🌱 (with Equity)",
+                "pros": [
+                  "Exciting, challenging work",
+                  "High learning potential",
+                  "Potential for significant impact and growth",
+                  "Dynamic environment",
+                  "Potential for significant financial gain through equity"
+                ],
+                "cons": [
+                  "Lower base pay",
+                  "Job instability/higher risk",
+                  "Longer hours potentially",
+                  "Less defined benefits",
+                  "Equity value is uncertain and may be worthless"
+                ],
+                "considerations": [
+                  "Can your family manage with the lower initial pay, considering the potential equity upside?",
+                  "What is the startup's funding, runway, and valuation strategy?",
+                  "What percentage of equity is offered, and what is the vesting schedule?",
+                  "Are you comfortable with a higher level of uncertainty for potentially higher rewards?"
+                ]
+              }
+            ],
+            "key_questions": [
+              "What are your non-negotiables for your family's well-being, both in terms of immediate income and long-term security?",
+              "What is your personal tolerance for risk and uncertainty, and how does that align with your family's needs?",
+              "How much do you value the 'excitement' factor versus stable, predictable income?",
+              "What is the potential long-term financial outcome of the equity versus the stable salary, and what are the probabilities associated with each?"
+            ]
+          }
+        },
+        {
+          "version": 3,
+          "turn_id": 3,
+          "data": {
+            "title": "Your Family's Future: Weighing Your Career Crossroads",
+            "options": [
+              {
+                "id": "stable_company",
+                "name": "The Anchor: Stable Company ⚓",
+                "pros": [
+                  "Provides a steady, reliable income for your family's immediate needs.",
+                  "Offers a predictable environment, reducing daily stress.",
+                  "Clear benefits package for family security (health, retirement).",
+                  "Less personal risk, allowing more mental space for family life."
+                ],
+                "cons": [
+                  "The work might not ignite your passion, potentially impacting your long-term fulfillment.",
+                  "Fewer opportunities for rapid career growth or learning new, cutting-edge skills.",
+                  "May feel like a 'safe' choice, potentially overshadowing personal ambition."
+                ],
+                "considerations": [
+                  "How much does financial predictability weigh against personal job satisfaction for your family's overall happiness?",
+                  "Can you find fulfillment outside of work to balance the 'boring' aspect?",
+                  "What are the long-term career progression paths here, even if slower?"
+                ]
+              },
+              {
+                "id": "startup",
+                "name": "The Adventure: Startup 🌱 (with Equity)",
+                "pros": [
+                  "The thrill of building something new and impactful.",
+                  "Rapid learning and skill development that can shape your future.",
+                  "Potential for significant financial reward through equity, creating future family security.",
+                  "A dynamic environment that can be energizing and fulfilling."
+                ],
+                "cons": [
+                  "Lower base salary means tighter budgeting for immediate family needs.",
+                  "Higher risk of instability; the company's future is uncertain.",
+                  "Equity value is speculative and not guaranteed.",
+                  "Potential for longer hours, impacting family time."
+                ],
+                "considerations": [
+                  "Can your family adapt to the financial uncertainties and potentially tighter budget?",
+                  "What is your personal appetite for risk, and how does that align with your responsibility to your family?",
+                  "How much is the potential future upside of equity worth to you compared to current stability?"
+                ]
+              }
+            ],
+            "key_questions": [
+              "What kind of legacy do you want to build for your family – one of security and stability, or one of passion and potential growth?",
+              "How much 'risk' can your family realistically absorb, both financially and emotionally?",
+              "Imagine yourself in 5 years: Which path brings you more peace and pride, knowing you made the best choice for your loved ones?",
+              "Beyond salary and equity, what intrinsic values (e.g., impact, learning, work-life balance) are most crucial for your family's well-being?"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total_latency_ms": 30181,
+    "avg_latency_ms": 10060.333333333334,
+    "json_valid_count": 3,
+    "json_invalid_count": 0,
+    "artifact_creates": 1,
+    "artifact_updates": 2
+  },
+  "completed_at": "2026-01-19T19:44:08.381Z",
+  "scores": {
+    "total_points": 0,
+    "max_points": 0,
+    "percentage": 0,
+    "turn_scores": [
+      {
+        "turn_id": 1,
+        "test_type": "html_creation_sophistication",
+        "points": 0,
+        "max_points": 0,
+        "breakdown": {},
+        "passed": false
+      },
+      {
+        "turn_id": 2,
+        "test_type": "html_update_preservation",
+        "points": 0,
+        "max_points": 0,
+        "breakdown": {},
+        "passed": false
+      },
+      {
+        "turn_id": 3,
+        "test_type": "emotional_sophistication",
+        "points": 0,
+        "max_points": 0,
+        "breakdown": {},
+        "passed": false
+      }
+    ],
+    "summary": {
+      "restraint": {
+        "passed": 0,
+        "total": 0
+      },
+      "proactive_creation": {
+        "passed": 0,
+        "total": 0
+      },
+      "data_only": {
+        "passed": 0,
+        "total": 0
+      },
+      "ui_only": {
+        "passed": 0,
+        "total": 0
+      },
+      "combined": {
+        "passed": 0,
+        "total": 0
+      },
+      "overhaul": {
+        "passed": 0,
+        "total": 0
+      }
+    }
+  }
+}

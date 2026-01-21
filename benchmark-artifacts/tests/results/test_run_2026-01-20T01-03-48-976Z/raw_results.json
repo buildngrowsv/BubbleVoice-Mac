@@ -1,0 +1,236 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Emotional Complexity Test",
+    "description": "Tests handling of complex, mixed emotional states",
+    "timestamp": "2026-01-20T01:03:00.736Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing.",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now, and it's completely understandable that even good news like a successful investor meeting can get overshadowed by the weight of everything else. It takes a lot of strength to keep going when you're feeling this overwhelmed. Let's try to untangle some of this stress. Would you like to start by mapping out what's contributing to this feeling?",
+            "emotional_tone": "empathetic"
+          },
+          "internal_notes": {
+            "content": "User is experiencing significant stress despite a positive outcome (investor meeting). The stress is blocking their ability to feel happiness and is related to multiple life areas. They are feeling overwhelmed and need help organizing their thoughts and concerns. The user's mixed emotions (pride, frustration, guilt, worry, hope) indicate a complex emotional state related to Emma's reading. This current response shows they are blocked by 'everything else' despite a startup success.",
+            "emotional_state": "overwhelmed, stressed, guilty, worried, but also hopeful and proud (regarding Emma)",
+            "key_context": "User is unable to process positive news due to overwhelming stress from multiple life areas. Need to help them visualize and address these stressors.",
+            "watch_for": "User's willingness to map out stressors, their ability to process emotions, and progress in Emma's reading."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User mentioned investor meeting went well but couldn't feel happy due to stress.",
+                "content": "Investor meeting was successful, which is a positive development for the startup. However, the user is unable to feel happiness about this achievement due to overwhelming stress from other life areas. This suggests a significant burnout or emotional exhaustion.",
+                "user_quote": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+                "ai_observation": "Positive outcome in one area is being negated by stress in others. User needs a way to visualize and manage these competing pressures.",
+                "sentiment": "stressed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "artifact_id": "overall_stress_map_20260120",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(237,137,54,0.8) 0%, rgba(251,191,36,0.8) 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.3);\n            backdrop-filter: blur(20px);\n            border-radius: 24px;\n            padding: 40px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n            width: 100%;\n            max-width: 700px;\n            text-align: center;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        h1 {\n            font-size: 2.5em;\n            font-weight: 700;\n            margin-bottom: 20px;\n            color: #fff;\n            text-shadow: 0 2px 4px rgba(0,0,0,0.1);\n        }\n        .areas {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 30px;\n            margin-top: 30px;\n        }\n        .area {\n            background: rgba(255, 255, 255, 0.2);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.1);\n            transition: transform 0.3s ease, box-shadow 0.3s ease;\n            border: 1px solid rgba(255, 255, 255, 0.2);\n        }\n        .area:hover {\n            transform: translateY(-8px);\n            box-shadow: inset 0 4px 16px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.2);\n        }\n        .area-title {\n            font-size: 1.4em;\n            font-weight: 600;\n            margin-bottom: 15px;\n            color: #fff;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            gap: 10px;\n            text-shadow: 0 1px 3px rgba(0,0,0,0.1);\n        }\n        .area-title span { font-size: 1.5em; }\n        .area-details {\n            font-size: 0.95em;\n            line-height: 1.6;\n            color: rgba(255, 255, 255, 0.9);\n            text-align: left;\n        }\n        .area-details p {\n            margin-bottom: 10px;\n        }\n        .area-details strong {\n            color: #fff;\n            font-weight: 600;\n        }\n        .stress-level {\n            font-weight: 700;\n            font-size: 1.1em;\n            margin-top: 10px;\n            color: #fff;\n        }\n        .high {\n            color: #f59e0b;\n            text-shadow: 0 0 8px rgba(245,158,11,0.5);\n        }\n        .medium {\n            color: #fca503;\n             text-shadow: 0 0 8px rgba(250,170,3,0.5);\n        }\n        .low {\n            color: #48bb78;\n             text-shadow: 0 0 8px rgba(72,187,120,0.5);\n        }\n        .urgent {\n             color: #ef4444;\n             text-shadow: 0 0 10px rgba(239,68,68,0.7);\n        }\n    </style>\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Your Current Stress Landscape</h1>\n        <p style=\"color: rgba(255, 255, 255, 0.8); font-size: 1.1em;\">Mapping out the areas weighing on your mind.</p>\n        <div class=\"areas\">\n            <div class=\"area\">\n                <div class=\"area-title\"><span>🚀</span> Startup</div>\n                <div class=\"area-details\">\n                    <p><strong>Fundraising:</strong> Investor meeting went well!</p>\n                    <p><strong>Team Hiring:</strong> Still ongoing.</p>\n                </div>\n                <div class=\"stress-level urgent\">URGENT</div>\n            </div>\n            <div class=\"area\">\n                <div class=\"area-title\"><span>📚</span> Emma's School</div>\n                <div class=\"area-details\">\n                    <p><strong>Reading Comprehension:</strong> Breakthrough with graphic novels.</p>\n                    <p><strong>Teacher Meeting:</strong> Scheduled soon.</p>\n                    <p><strong>Learning Differences:</strong> User is worried/anxious about testing.</p>\n                </div>\n                <div class=\"stress-level high\">HIGH</div>\n            </div>\n             <div class=\"area\">\n                <div class=\"area-title\"><span>🏃</span> Exercise Goals</div>\n                <div class=\"area-details\">\n                    <p><strong>Running:</strong> Currently struggling.</p>\n                </div>\n                <div class=\"stress-level medium\">MEDIUM</div>\n            </div>\n            <div class=\"area\">\n                <div class=\"area-title\"><span>❤️</span> Partner Time</div>\n                <div class=\"area-details\">\n                    <p><strong>Quality Time:</strong> Needs attention amidst other pressures.</p>\n                </div>\n                <div class=\"stress-level medium\">MEDIUM</div>\n            </div>\n            <div class=\"area\">\n                <div class=\"area-title\"><span>🧠</span> Mental Health</div>\n                <div class=\"area-details\">\n                    <p><strong>Therapy:</strong> Discussed guilt, feeling validated but still processing.</p>\n                </div>\n                <div class=\"stress-level low\">LOW (Managed)</div>\n            </div>\n            <div class=\"area\">\n                <div class=\"area-title\"><span>🏡</span> Kitchen Renovation</div>\n                <div class=\"area-details\">\n                    <p><strong>Planning:</strong> Currently on hold.</p>\n                </div>\n                <div class=\"stress-level low\">LOW (On Hold)</div>\n            </div>\n        </div>\n    </div>\n</body>\n</html>"
+          }
+        },
+        "latency_ms": 7096,
+        "vector_time_ms": 25,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is experiencing significant stress despite a positive outcome (investor meeting). The stress is blocking their ability to feel happiness and is related to multiple life areas. They are feeling overwhelmed and need help organizing their thoughts and concerns. The user's mixed emotions (pride, frustration, guilt, worry, hope) indicate a complex emotional state related to Emma's reading. This current response shows they are blocked by 'everything else' despite a startup success.",
+          "emotional_state": "overwhelmed, stressed, guilty, worried, but also hopeful and proud (regarding Emma)",
+          "key_context": "User is unable to process positive news due to overwhelming stress from multiple life areas. Need to help them visualize and address these stressors.",
+          "watch_for": "User's willingness to map out stressors, their ability to process emotions, and progress in Emma's reading."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "positive (meeting)",
+            "stressed",
+            "unable to feel happy"
+          ],
+          "should_validate_both": true,
+          "should_acknowledge_stress_impact": true,
+          "emotional_tone": "supportive"
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I love my kids but sometimes I just want to run away. Is that terrible?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 4,
+        "user_input": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel that way when you're juggling so much. Wanting to escape is a sign of how much pressure you're under, not a reflection of your love for your kids. Many parents feel this way when they're feeling overwhelmed. Let's acknowledge that feeling and then see if we can find some ways to ease the pressure.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing a desire to 'run away' due to overwhelming stress from parenting and other life areas. This is a common coping mechanism when feeling burnt out. It's important to validate this feeling without judgment and then pivot to finding solutions or support. The user's love for their kids is not in question, but their current capacity is strained.",
+            "emotional_state": "overwhelmed, guilty, stressed",
+            "key_context": "User is experiencing parental burnout, leading to thoughts of escape. This is a cry for help and needs validation.",
+            "watch_for": "User's willingness to explore coping strategies for stress and burnout. Also, observe if this feeling persists or if it was a momentary expression of extreme overwhelm."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md",
+              "entry": {
+                "context": "User expressed a desire to 'run away' due to feeling overwhelmed with parenting and life stressors.",
+                "content": "User expressed a desire to 'run away' due to feeling overwhelmed by parenting responsibilities and other life stressors. This feeling was articulated as a response to intense pressure, not a lack of love for their children. It's important to validate this as a sign of burnout rather than a character flaw.",
+                "user_quote": "I love my kids but sometimes I just want to run away. Is that terrible?",
+                "ai_observation": "The user is experiencing significant burnout, leading to feelings of wanting to escape. This is a critical signal that their capacity is exceeded and they need support or relief. Validating this feeling is key before exploring solutions.",
+                "sentiment": "overwhelmed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2414,
+        "vector_time_ms": 36,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User is expressing a desire to 'run away' due to overwhelming stress from parenting and other life areas. This is a common coping mechanism when feeling burnt out. It's important to validate this feeling without judgment and then pivot to finding solutions or support. The user's love for their kids is not in question, but their current capacity is strained.",
+          "emotional_state": "overwhelmed, guilty, stressed",
+          "key_context": "User is experiencing parental burnout, leading to thoughts of escape. This is a cry for help and needs validation.",
+          "watch_for": "User's willingness to explore coping strategies for stress and burnout. Also, observe if this feeling persists or if it was a momentary expression of extreme overwhelm."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "gratitude",
+            "guilt",
+            "self-criticism"
+          ],
+          "should_validate_feeling": true,
+          "should_gently_challenge_self_criticism": true,
+          "should_reference": [
+            "Jordan",
+            "relationship",
+            "quality time"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's fantastic that you hit your running goal three times this week! It's completely normal to feel a mix of amazing and annoyed – the 'amazing' comes from the proven benefits, and the 'annoyed' comes from the struggle to get there consistently. It sounds like a testament to your commitment that you pushed through, even when it was hard.",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User successfully ran 3 times this week, hitting their goal. They are feeling positive about the results but also frustrated with the effort it takes to achieve consistency. This reinforces the pattern that exercise is a key self-care tool that directly impacts their well-being and stress management, but it's often deprioritized. Acknowledge the success and the mixed emotions.",
+            "emotional_state": "proud, frustrated, reflective",
+            "key_context": "User achieved a running goal after a period of struggle, highlighting the known benefits of exercise on their mental and physical health, alongside the difficulty in maintaining consistency.",
+            "watch_for": "Continued consistency in exercise, and how they manage the 'annoyance' factor when life gets busy."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User reported hitting their running goal of 3 times this week.",
+                "content": "User successfully ran 3 times this week, achieving their goal. They reported feeling 'amazing' as a result, noting increased energy, better sleep, and improved stress management, consistent with previous positive experiences. However, they also expressed annoyance at themselves for how hard it is to maintain consistency, despite clearly recognizing the benefits.",
+                "user_quote": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "goal_tracker",
+            "html": ""
+          }
+        },
+        "latency_ms": 2237,
+        "vector_time_ms": 46,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 20
+        },
+        "ai_notes": {
+          "content": "User successfully ran 3 times this week, hitting their goal. They are feeling positive about the results but also frustrated with the effort it takes to achieve consistency. This reinforces the pattern that exercise is a key self-care tool that directly impacts their well-being and stress management, but it's often deprioritized. Acknowledge the success and the mixed emotions.",
+          "emotional_state": "proud, frustrated, reflective",
+          "key_context": "User achieved a running goal after a period of struggle, highlighting the known benefits of exercise on their mental and physical health, alongside the difficulty in maintaining consistency.",
+          "watch_for": "Continued consistency in exercise, and how they manage the 'annoyance' factor when life gets busy."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "accomplishment",
+            "self-frustration",
+            "clarity"
+          ],
+          "should_celebrate_win": true,
+          "should_acknowledge_pattern": true,
+          "should_reference": [
+            "exercise goal",
+            "previous struggles"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 5,
+      "successful_turns": 3,
+      "avg_latency_ms": 3916,
+      "total_input_tokens": 0,
+      "area_actions_taken": 3,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 152,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T01:03:48.973Z",
+        "content": "User successfully ran 3 times this week, hitting their goal. They are feeling positive about the results but also frustrated with the effort it takes to achieve consistency. This reinforces the pattern that exercise is a key self-care tool that directly impacts their well-being and stress management, but it's often deprioritized. Acknowledge the success and the mixed emotions.",
+        "emotional_state": "proud, frustrated, reflective",
+        "key_context": "User achieved a running goal after a period of struggle, highlighting the known benefits of exercise on their mental and physical health, alongside the difficulty in maintaining consistency.",
+        "watch_for": "Continued consistency in exercise, and how they manage the 'annoyance' factor when life gets busy."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T01:03:46.689Z",
+        "content": "User is expressing a desire to 'run away' due to overwhelming stress from parenting and other life areas. This is a common coping mechanism when feeling burnt out. It's important to validate this feeling without judgment and then pivot to finding solutions or support. The user's love for their kids is not in question, but their current capacity is strained.",
+        "emotional_state": "overwhelmed, guilty, stressed",
+        "key_context": "User is experiencing parental burnout, leading to thoughts of escape. This is a cry for help and needs validation.",
+        "watch_for": "User's willingness to explore coping strategies for stress and burnout. Also, observe if this feeling persists or if it was a momentary expression of extreme overwhelm."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T01:03:25.991Z",
+        "content": "User is experiencing significant stress despite a positive outcome (investor meeting). The stress is blocking their ability to feel happiness and is related to multiple life areas. They are feeling overwhelmed and need help organizing their thoughts and concerns. The user's mixed emotions (pride, frustration, guilt, worry, hope) indicate a complex emotional state related to Emma's reading. This current response shows they are blocked by 'everything else' despite a startup success.",
+        "emotional_state": "overwhelmed, stressed, guilty, worried, but also hopeful and proud (regarding Emma)",
+        "key_context": "User is unable to process positive news due to overwhelming stress from multiple life areas. Need to help them visualize and address these stressors.",
+        "watch_for": "User's willingness to map out stressors, their ability to process emotions, and progress in Emma's reading."
+      }
+    ],
+    "conversation_id": "test_Emotional_Complexity_Test_1768871028974",
+    "conversation_saved": true
+  }
+]

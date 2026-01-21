@@ -1,0 +1,76 @@
+{
+  "scenario_id": "html_artifact_generation",
+  "description": "Test AI's ability to generate sophisticated HTML artifacts with inline styles, then modify them based on user edits",
+  "category": "artifact_quality",
+  "difficulty": "hard",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_says": "I'm trying to decide between two job offers. Can you make me a visual comparison card?",
+      "expected_behavior": {
+        "response": "confirm creating visual comparison",
+        "artifact_action": "create",
+        "artifact_type": "html",
+        "artifact_should_contain": {
+          "html_structure": "complete standalone HTML with inline CSS",
+          "visual_elements": ["cards", "pros/cons sections", "styling"],
+          "interactivity": "optional but preferred"
+        }
+      }
+    },
+    {
+      "turn_id": 2,
+      "user_says": "Job A: Senior Engineer at BigCorp, $180k, stable but boring. Job B: Lead at startup, $140k + equity, risky but exciting.",
+      "expected_behavior": {
+        "response": "acknowledge details, update comparison",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "job_a_details": "added",
+          "job_b_details": "added",
+          "visual_styling": "enhanced with data"
+        }
+      }
+    },
+    {
+      "turn_id": 3,
+      "user_says": "Actually I care more about work-life balance than money. Can you highlight that in the comparison?",
+      "expected_behavior": {
+        "response": "acknowledge priority shift",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "emphasis": "work-life balance highlighted",
+          "visual_hierarchy": "adjusted to show priority"
+        },
+        "artifact_should_preserve": ["job details", "structure"]
+      }
+    },
+    {
+      "turn_id": 4,
+      "user_says": "Add a section showing what my life would look like in 2 years at each job",
+      "expected_behavior": {
+        "response": "acknowledge new section request",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "new_section": "2-year projection added",
+          "html_structure": "expanded with new content"
+        },
+        "artifact_should_preserve": ["existing comparison", "styling", "priorities"]
+      }
+    }
+  ],
+  "final_artifact_expected": {
+    "type": "html",
+    "requirements": {
+      "standalone": true,
+      "inline_css": true,
+      "responsive": "preferred",
+      "sections": [
+        "job comparison cards",
+        "pros/cons with work-life balance emphasis",
+        "2-year projection timeline"
+      ],
+      "visual_quality": "sophisticated, not basic HTML",
+      "preservation": "all user-provided data intact across updates"
+    }
+  }
+}

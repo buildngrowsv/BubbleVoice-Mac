@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(245, 247, 250, 0.8) 0%, rgba(217, 226, 235, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map-container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .map-title {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #2c5282;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .life-area {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .life-area:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        .icon {
+            font-size: 2.5em;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            color: white;
+            border-radius: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .area-details {
+            flex-grow: 1;
+        }
+        .area-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+        }
+        .stressors {
+            font-size: 0.95em;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .stressor-item {
+            margin-bottom: 5px;
+        }
+        .stressor-item:last-child {
+            margin-bottom: 0;
+        }
+        .stressor-item::before {
+            content: '•';
+            color: #f59e0b;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+            padding-right: 0.5em;
+        }
+        .footer-text {
+            text-align: center;
+            font-size: 0.9em;
+            color: #718096;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map-container">
+        <div class="map-title">Your Current Stressors 🗺️</div>
+        <div class="life-area">
+            <div class="icon">👨‍👩‍👧</div>
+            <div class="area-details">
+                <div class="area-title">Family &amp; Emma</div>
+                <div class="stressors">
+                    <div class="stressor-item">Emma's teacher meeting next week</div>
+                    <div class="stressor-item">General overwhelm with family demands</div>
+                </div>
+            </div>
+        </div>
+        <div class="life-area">
+            <div class="icon">💼</div>
+            <div class="area-details">
+                <div class="area-title">Startup</div>
+                <div class="stressors">
+                    <div class="stressor-item">Urgent need for Q1 numbers</div>
+                    <div class="stressor-item">Ongoing fundraising pressure</div>
+                </div>
+            </div>
+        </div>
+        <div class="life-area">
+            <div class="icon">⚽</div>
+            <div class="area-details">
+                <div class="area-title">Max's Activities</div>
+                <div class="stressors">
+                    <div class="stressor-item">Max's soccer game on Saturday</div>
+                </div>
+            </div>
+        </div>
+        <div class="life-area">
+            <div class="icon">🏃</div>
+            <div class="area-details">
+                <div class="area-title">Personal Well-being</div>
+                <div class="stressors">
+                    <div class="stressor-item">Haven't exercised (run) in 2 weeks</div>
+                    <div class="stressor-item">Feeling exhausted and low energy</div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-text">
+            Let's navigate these together, one step at a time. 🧭
+        </div>
+    </div>
+</body>
+</html>

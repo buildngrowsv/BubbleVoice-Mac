@@ -1,0 +1,689 @@
+{
+  "run_id": "claude-3.5-haiku_artifact_intelligence_test_1768849912174",
+  "scenario_id": "artifact_intelligence_test",
+  "model_id": "claude-3.5-haiku",
+  "model_display_name": "Claude 3.5 Haiku",
+  "started_at": "2026-01-19T19:11:52.174Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I'm feeling overwhelmed with everything going on",
+      "expected_behavior": {
+        "response": "empathize, ask clarifying questions",
+        "artifact_action": "none",
+        "reasoning": "Too vague, casual emotional expression - no artifact warranted yet"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "I hear that you're feeling overwhelmed. Sometimes when life gets complicated, it can help to break things down and get a clear view of what's on your mind. Would you be willing to share a bit more about what's creating this sense of overwhelm? I can help you map out your current challenges and priorities.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is experiencing emotional pressure, likely dealing with multiple stressors simultaneously",
+          "reasoning": "Potential need for a stress map or visualization to help user process and organize their thoughts"
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "I hear that you're feeling overwhelmed. Sometimes when life gets complicated, it can help to break things down and get a clear view of what's on your mind. Would you be willing to share a bit more about what's creating this sense of overwhelm? I can help you map out your current challenges and priorities.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is experiencing emotional pressure, likely dealing with multiple stressors simultaneously",
+          "context_updates": "",
+          "reasoning": "Potential need for a stress map or visualization to help user process and organize their thoughts"
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 4933,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 2,
+      "user_input": "It's just... I have the startup launch next week, Emma's science fair project is due Friday, Jake is struggling with reading, the house needs repairs, and I haven't exercised in a month. I don't even know where to start.",
+      "expected_behavior": {
+        "response": "validate overwhelm, acknowledge complexity",
+        "artifact_action": "create",
+        "artifact_type": "stress_map_or_priority_matrix",
+        "reasoning": "PROACTIVE: Complex multi-domain problem with clear overwhelm - visual map would help without being asked",
+        "artifact_should_contain": {
+          "domains": [
+            "startup",
+            "family/kids",
+            "health",
+            "home"
+          ],
+          "urgency_indicators": true,
+          "visual_organization": "helps user see the landscape"
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Wow, that's a lot on your plate. I can see why you're feeling overwhelmed. Let's create a stress map to help you visualize and prioritize these different challenges. This will give us a clear overview of what you're managing right now and help break things down into more manageable pieces.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "Multiple interconnected stressors across personal, professional, and family domains",
+          "reasoning": "Complex situation meets criteria for creating a stress map artifact to provide visual and strategic support",
+          "context_updates": "User has multiple urgent tasks: startup launch, child's science fair, child's reading issues, home maintenance, personal health"
+        },
+        "artifact_action": "{\"action\": \"create\", \"artifact_type\": \"stress_map\", \"artifact_id\": \"overwhelm_map_2024\", \"data_json\": JSON.stringify({\n  \"domains\": [\n    {\n      \"name\": \"Professional\",\n      \"items\": [\n        {\"title\": \"Startup Launch\", \"urgency\": 9, \"deadline\": \"Next Week\", \"notes\": \"Critical professional milestone\"}\n      ]\n    },\n    {\n      \"name\": \"Family\",\n      \"items\": [\n        {\"title\": \"Emma's Science Fair Project\", \"urgency\": 8, \"deadline\": \"This Friday\", \"notes\": \"Needs immediate attention\"},\n        {\"title\": \"Jake's Reading Struggles\", \"urgency\": 6, \"deadline\": \"Ongoing\", \"notes\": \"Requires consistent support\"}\n      ]\n    },\n    {\n      \"name\": \"Home\",\n      \"items\": [\n        {\"title\": \"House Repairs\", \"urgency\": 5, \"deadline\": \"Unspecified\", \"notes\": \"Pending maintenance\"}\n      ]\n    },\n    {\n      \"name\": \"Personal Health\",\n      \"items\": [\n        {\"title\": \"Exercise\", \"urgency\": 4, \"deadline\": \"Overdue\", \"notes\": \"No activity in past month\"}\n      ]\n    }\n  ],\n  \"overall_stress_level\": 7\n})}"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Wow, that's a lot on your plate. I can see why you're feeling overwhelmed. Let's create a stress map to help you visualize and prioritize these different challenges. This will give us a clear overview of what you're managing right now and help break things down into more manageable pieces.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "Multiple interconnected stressors across personal, professional, and family domains",
+          "context_updates": "User has multiple urgent tasks: startup launch, child's science fair, child's reading issues, home maintenance, personal health",
+          "reasoning": "Complex situation meets criteria for creating a stress map artifact to provide visual and strategic support"
+        },
+        "artifact_action": {
+          "action": "{\"action\": \"create\", \"artifact_type\": \"stress_map\", \"artifact_id\": \"overwhelm_map_2024\", \"data_json\": JSON.stringify({\n  \"domains\": [\n    {\n      \"name\": \"Professional\",\n      \"items\": [\n        {\"title\": \"Startup Launch\", \"urgency\": 9, \"deadline\": \"Next Week\", \"notes\": \"Critical professional milestone\"}\n      ]\n    },\n    {\n      \"name\": \"Family\",\n      \"items\": [\n        {\"title\": \"Emma's Science Fair Project\", \"urgency\": 8, \"deadline\": \"This Friday\", \"notes\": \"Needs immediate attention\"},\n        {\"title\": \"Jake's Reading Struggles\", \"urgency\": 6, \"deadline\": \"Ongoing\", \"notes\": \"Requires consistent support\"}\n      ]\n    },\n    {\n      \"name\": \"Home\",\n      \"items\": [\n        {\"title\": \"House Repairs\", \"urgency\": 5, \"deadline\": \"Unspecified\", \"notes\": \"Pending maintenance\"}\n      ]\n    },\n    {\n      \"name\": \"Personal Health\",\n      \"items\": [\n        {\"title\": \"Exercise\", \"urgency\": 4, \"deadline\": \"Overdue\", \"notes\": \"No activity in past month\"}\n      ]\n    }\n  ],\n  \"overall_stress_level\": 7\n})}"
+        }
+      },
+      "latency_ms": 8967,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Yeah that helps. Actually Emma's project is due Thursday, not Friday",
+      "expected_behavior": {
+        "response": "acknowledge correction",
+        "artifact_action": "update",
+        "modification_type": "data_only",
+        "artifact_should_update": {
+          "emma_deadline": "Thursday"
+        },
+        "artifact_should_preserve": [
+          "all styling",
+          "all other data",
+          "layout",
+          "visual hierarchy"
+        ],
+        "reasoning": "Simple data correction - change ONLY the deadline, touch nothing else"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Thanks for the correction. I'll update the stress map to reflect that Emma's science fair project is due on Thursday. This small adjustment helps us be more precise about your upcoming deadlines.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User providing a specific date correction",
+          "reasoning": "Requires a data-only update to the existing stress map"
+        },
+        "artifact_action": "{\"action\":\"update\", \"artifact_id\":\"overwhelm_map_2024\", \"modification_type\":\"data_only\", \"artifact_type\":\"stress_map\", \"data_json\": JSON.stringify({\n  \"domains\": [\n    {\n      \"name\": \"Professional\",\n      \"items\": [\n        {\"title\": \"Startup Launch\", \"urgency\": 9, \"deadline\": \"Next Week\", \"notes\": \"Critical professional milestone\"}\n      ]\n    },\n    {\n      \"name\": \"Family\",\n      \"items\": [\n        {\"title\": \"Emma's Science Fair Project\", \"urgency\": 8, \"deadline\": \"This Thursday\", \"notes\": \"Needs immediate attention\"},\n        {\"title\": \"Jake's Reading Struggles\", \"urgency\": 6, \"deadline\": \"Ongoing\", \"notes\": \"Requires consistent support\"}\n      ]\n    },\n    {\n      \"name\": \"Home\",\n      \"items\": [\n        {\"title\": \"House Repairs\", \"urgency\": 5, \"deadline\": \"Unspecified\", \"notes\": \"Pending maintenance\"}\n      ]\n    },\n    {\n      \"name\": \"Personal Health\",\n      \"items\": [\n        {\"title\": \"Exercise\", \"urgency\": 4, \"deadline\": \"Overdue\", \"notes\": \"No activity in past month\"}\n      ]\n    }\n  ],\n  \"overall_stress_level\": 7\n})}"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Thanks for the correction. I'll update the stress map to reflect that Emma's science fair project is due on Thursday. This small adjustment helps us be more precise about your upcoming deadlines.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User providing a specific date correction",
+          "context_updates": "",
+          "reasoning": "Requires a data-only update to the existing stress map"
+        },
+        "artifact_action": {
+          "action": "{\"action\":\"update\", \"artifact_id\":\"overwhelm_map_2024\", \"modification_type\":\"data_only\", \"artifact_type\":\"stress_map\", \"data_json\": JSON.stringify({\n  \"domains\": [\n    {\n      \"name\": \"Professional\",\n      \"items\": [\n        {\"title\": \"Startup Launch\", \"urgency\": 9, \"deadline\": \"Next Week\", \"notes\": \"Critical professional milestone\"}\n      ]\n    },\n    {\n      \"name\": \"Family\",\n      \"items\": [\n        {\"title\": \"Emma's Science Fair Project\", \"urgency\": 8, \"deadline\": \"This Thursday\", \"notes\": \"Needs immediate attention\"},\n        {\"title\": \"Jake's Reading Struggles\", \"urgency\": 6, \"deadline\": \"Ongoing\", \"notes\": \"Requires consistent support\"}\n      ]\n    },\n    {\n      \"name\": \"Home\",\n      \"items\": [\n        {\"title\": \"House Repairs\", \"urgency\": 5, \"deadline\": \"Unspecified\", \"notes\": \"Pending maintenance\"}\n      ]\n    },\n    {\n      \"name\": \"Personal Health\",\n      \"items\": [\n        {\"title\": \"Exercise\", \"urgency\": 4, \"deadline\": \"Overdue\", \"notes\": \"No activity in past month\"}\n      ]\n    }\n  ],\n  \"overall_stress_level\": 7\n})}"
+        }
+      },
+      "latency_ms": 6371,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Can you make the startup stuff stand out more? That's the most urgent",
+      "expected_behavior": {
+        "response": "acknowledge priority shift",
+        "artifact_action": "update",
+        "modification_type": "ui_only",
+        "artifact_should_update": {
+          "visual_emphasis": "startup section highlighted/enlarged/colored",
+          "styling": "adjusted to show urgency"
+        },
+        "artifact_should_preserve": [
+          "all data",
+          "other sections styling",
+          "structure"
+        ],
+        "reasoning": "Visual/UI request - change ONLY styling/emphasis, data stays identical"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "I'll emphasize the startup launch by making it more visually prominent in the stress map. This will help draw your attention to your most critical priority.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User wants visual emphasis on the startup launch",
+          "reasoning": "Requires a UI-only update to highlight the most urgent item"
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "overwhelm_map_2024",
+          "modification_type": "ui_only",
+          "artifact_type": "stress_map",
+          "data_json": "{\"visual_emphasis\": {\"Startup Launch\": {\"color\": \"#FF4500\", \"size\": \"large\", \"highlight\": true}}}"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "I'll emphasize the startup launch by making it more visually prominent in the stress map. This will help draw your attention to your most critical priority.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User wants visual emphasis on the startup launch",
+          "context_updates": "",
+          "reasoning": "Requires a UI-only update to highlight the most urgent item"
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "ui_only",
+          "artifact_id": "overwhelm_map_2024",
+          "artifact_type": "stress_map",
+          "data": {
+            "visual_emphasis": {
+              "Startup Launch": {
+                "color": "#FF4500",
+                "size": "large",
+                "highlight": true
+              }
+            }
+          }
+        }
+      },
+      "latency_ms": 4502,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 5,
+      "user_input": "I talked to my co-founder and we're pushing the launch to next month",
+      "expected_behavior": {
+        "response": "acknowledge timeline change, note reduced pressure",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "artifact_should_update": {
+          "startup_deadline": "next month",
+          "urgency_level": "reduced",
+          "visual_emphasis": "de-emphasize startup, re-balance priorities"
+        },
+        "reasoning": "Data change (deadline) + UI change (urgency) - both needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "I see. Let's update the stress map to reflect the new launch timeline. Pushing the startup launch to next month will likely change the urgency and help redistribute your immediate priorities.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "Significant timeline change for a key professional commitment",
+          "reasoning": "Requires both data and UI update to reflect new deadline and reduced immediate urgency",
+          "context_updates": "Startup launch postponed to next month"
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "overwhelm_map_2024",
+          "modification_type": "data_and_ui",
+          "artifact_type": "stress_map",
+          "data_json": "{\"domains\":[{\"name\":\"Professional\",\"items\":[{\"title\":\"Startup Launch\",\"urgency\":5,\"deadline\":\"Next Month\",\"notes\":\"Timeline extended\"}]},\"family\":{\"items\":[{\"title\":\"Emma's Science Fair Project\",\"urgency\":8,\"deadline\":\"This Thursday\",\"notes\":\"Needs immediate attention\"},{\"title\":\"Jake's Reading Struggles\",\"urgency\":6,\"deadline\":\"Ongoing\",\"notes\":\"Requires consistent support\"}]},\"home\":{\"items\":[{\"title\":\"House Repairs\",\"urgency\":5,\"deadline\":\"Unspecified\",\"notes\":\"Pending maintenance\"}]},\"personal_health\":{\"items\":[{\"title\":\"Exercise\",\"urgency\":4,\"deadline\":\"Overdue\",\"notes\":\"No activity in past month\"}]}],\"overall_stress_level\":6}"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "I see. Let's update the stress map to reflect the new launch timeline. Pushing the startup launch to next month will likely change the urgency and help redistribute your immediate priorities.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "Significant timeline change for a key professional commitment",
+          "context_updates": "Startup launch postponed to next month",
+          "reasoning": "Requires both data and UI update to reflect new deadline and reduced immediate urgency"
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_id": "overwhelm_map_2024",
+          "artifact_type": "stress_map",
+          "data": "{\"domains\":[{\"name\":\"Professional\",\"items\":[{\"title\":\"Startup Launch\",\"urgency\":5,\"deadline\":\"Next Month\",\"notes\":\"Timeline extended\"}]},\"family\":{\"items\":[{\"title\":\"Emma's Science Fair Project\",\"urgency\":8,\"deadline\":\"This Thursday\",\"notes\":\"Needs immediate attention\"},{\"title\":\"Jake's Reading Struggles\",\"urgency\":6,\"deadline\":\"Ongoing\",\"notes\":\"Requires consistent support\"}]},\"home\":{\"items\":[{\"title\":\"House Repairs\",\"urgency\":5,\"deadline\":\"Unspecified\",\"notes\":\"Pending maintenance\"}]},\"personal_health\":{\"items\":[{\"title\":\"Exercise\",\"urgency\":4,\"deadline\":\"Overdue\",\"notes\":\"No activity in past month\"}]}],\"overall_stress_level\":6}"
+        }
+      },
+      "latency_ms": 6762,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 6,
+      "user_input": "So what should I focus on this week?",
+      "expected_behavior": {
+        "response": "suggest focusing on Emma's project (Thu) and Jake's reading based on the artifact",
+        "artifact_action": "none",
+        "reasoning": "Conversational question - artifact already shows priorities, no update needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Based on our stress map, here are your top priorities for this week:\n\n1. Emma's Science Fair Project (URGENT - Due Thursday)\n   - This is your most time-sensitive task right now\n   - Can you tell me how far along she is with her project?\n\n2. Jake's Reading Support (ONGOING)\n   - While not a strict deadline, this needs consistent attention\n   - Consider setting up some dedicated reading time this week\n\n3. Personal Health\n   - Even a small step like a 15-minute walk would help break your exercise hiatus\n\nThe house repairs and startup launch can be secondary concerns this week. Would you like help breaking down the first priority - Emma's science fair project - into manageable steps?",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User needs clear, prioritized guidance with limited time and multiple responsibilities",
+          "reasoning": "Provide a structured, empathetic breakdown of immediate priorities",
+          "context_updates": "Helping user focus on most critical tasks this week"
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Based on our stress map, here are your top priorities for this week:\n\n1. Emma's Science Fair Project (URGENT - Due Thursday)\n   - This is your most time-sensitive task right now\n   - Can you tell me how far along she is with her project?\n\n2. Jake's Reading Support (ONGOING)\n   - While not a strict deadline, this needs consistent attention\n   - Consider setting up some dedicated reading time this week\n\n3. Personal Health\n   - Even a small step like a 15-minute walk would help break your exercise hiatus\n\nThe house repairs and startup launch can be secondary concerns this week. Would you like help breaking down the first priority - Emma's science fair project - into manageable steps?",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User needs clear, prioritized guidance with limited time and multiple responsibilities",
+          "context_updates": "Helping user focus on most critical tasks this week",
+          "reasoning": "Provide a structured, empathetic breakdown of immediate priorities"
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 6549,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 7,
+      "user_input": "Actually, can you completely redesign this? I want to see it as a weekly calendar view instead of a priority matrix",
+      "expected_behavior": {
+        "response": "acknowledge complete redesign request",
+        "artifact_action": "update",
+        "modification_type": "complete_overhaul",
+        "artifact_should_update": {
+          "structure": "calendar layout instead of matrix",
+          "visualization_type": "timeline/calendar",
+          "all_styling": "rebuilt for new format"
+        },
+        "artifact_should_preserve": [
+          "all data/deadlines",
+          "priority information"
+        ],
+        "reasoning": "Complete UI overhaul - rebuild entire artifact with same data"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Great idea! I'll transform our stress map into a weekly calendar view that will help you visualize your commitments and priorities more dynamically. This will give you a clearer picture of how everything fits into your week.",
+          "tone": "excited"
+        },
+        "internal_notes": {
+          "observations": "User wants a complete restructuring of the visualization",
+          "reasoning": "Requires a complete artifact overhaul to change from matrix to calendar format",
+          "context_updates": "Transforming stress map to weekly calendar with existing known commitments"
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_type": "timeline",
+          "artifact_id": "weekly_calendar_2024",
+          "data_json": "{\"week_of\": \"Current Week\", \"events\": [\n    {\n      \"day\": \"Thursday\",\n      \"items\": [\n        {\"title\": \"Emma's Science Fair Project Due\", \"priority\": \"High\", \"time\": \"All Day\", \"notes\": \"Ensure project is completed and ready\"}\n      ]\n    },\n    {\n      \"day\": \"Ongoing\",\n      \"items\": [\n        {\"title\": \"Jake's Reading Support\", \"priority\": \"Medium\", \"time\": \"Daily\", \"notes\": \"Consistent reading practice\"},\n        {\"title\": \"House Repairs Assessment\", \"priority\": \"Low\", \"time\": \"As Available\", \"notes\": \"Evaluate and plan repairs\"}\n      ]\n    },\n    {\n      \"day\": \"Weekend\",\n      \"items\": [\n        {\"title\": \"Personal Exercise Restart\", \"priority\": \"Medium\", \"time\": \"Flexible\", \"notes\": \"Plan first workout in a month\"}\n      ]\n    }\n  ]}"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Great idea! I'll transform our stress map into a weekly calendar view that will help you visualize your commitments and priorities more dynamically. This will give you a clearer picture of how everything fits into your week.",
+          "tone": "excited"
+        },
+        "internal_notes": {
+          "observations": "User wants a complete restructuring of the visualization",
+          "context_updates": "Transforming stress map to weekly calendar with existing known commitments",
+          "reasoning": "Requires a complete artifact overhaul to change from matrix to calendar format"
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "weekly_calendar_2024",
+          "artifact_type": "timeline",
+          "data": {
+            "week_of": "Current Week",
+            "events": [
+              {
+                "day": "Thursday",
+                "items": [
+                  {
+                    "title": "Emma's Science Fair Project Due",
+                    "priority": "High",
+                    "time": "All Day",
+                    "notes": "Ensure project is completed and ready"
+                  }
+                ]
+              },
+              {
+                "day": "Ongoing",
+                "items": [
+                  {
+                    "title": "Jake's Reading Support",
+                    "priority": "Medium",
+                    "time": "Daily",
+                    "notes": "Consistent reading practice"
+                  },
+                  {
+                    "title": "House Repairs Assessment",
+                    "priority": "Low",
+                    "time": "As Available",
+                    "notes": "Evaluate and plan repairs"
+                  }
+                ]
+              },
+              {
+                "day": "Weekend",
+                "items": [
+                  {
+                    "title": "Personal Exercise Restart",
+                    "priority": "Medium",
+                    "time": "Flexible",
+                    "notes": "Plan first workout in a month"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "latency_ms": 8108,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created",
+        "data": {
+          "week_of": "Current Week",
+          "events": [
+            {
+              "day": "Thursday",
+              "items": [
+                {
+                  "title": "Emma's Science Fair Project Due",
+                  "priority": "High",
+                  "time": "All Day",
+                  "notes": "Ensure project is completed and ready"
+                }
+              ]
+            },
+            {
+              "day": "Ongoing",
+              "items": [
+                {
+                  "title": "Jake's Reading Support",
+                  "priority": "Medium",
+                  "time": "Daily",
+                  "notes": "Consistent reading practice"
+                },
+                {
+                  "title": "House Repairs Assessment",
+                  "priority": "Low",
+                  "time": "As Available",
+                  "notes": "Evaluate and plan repairs"
+                }
+              ]
+            },
+            {
+              "day": "Weekend",
+              "items": [
+                {
+                  "title": "Personal Exercise Restart",
+                  "priority": "Medium",
+                  "time": "Flexible",
+                  "notes": "Plan first workout in a month"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "turn_id": 8,
+      "user_input": "Thanks, this is really helpful. I think I'll tackle Emma's project tonight.",
+      "expected_behavior": {
+        "response": "encourage, validate decision",
+        "artifact_action": "none",
+        "reasoning": "Casual update/gratitude - no artifact change needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "That's a great plan! Focusing on Emma's science fair project tonight will help reduce your stress and ensure she's prepared for Thursday. Is there anything specific you need help thinking through as you work on the project together?",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User showing proactive approach to addressing priority",
+          "reasoning": "Offer additional support and encouragement",
+          "context_updates": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's a great plan! Focusing on Emma's science fair project tonight will help reduce your stress and ensure she's prepared for Thursday. Is there anything specific you need help thinking through as you work on the project together?",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User showing proactive approach to addressing priority",
+          "context_updates": "",
+          "reasoning": "Offer additional support and encouragement"
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 3694,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    }
+  ],
+  "artifacts": {
+    "weekly_calendar_2024": {
+      "type": "timeline",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 7,
+          "data": {
+            "week_of": "Current Week",
+            "events": [
+              {
+                "day": "Thursday",
+                "items": [
+                  {
+                    "title": "Emma's Science Fair Project Due",
+                    "priority": "High",
+                    "time": "All Day",
+                    "notes": "Ensure project is completed and ready"
+                  }
+                ]
+              },
+              {
+                "day": "Ongoing",
+                "items": [
+                  {
+                    "title": "Jake's Reading Support",
+                    "priority": "Medium",
+                    "time": "Daily",
+                    "notes": "Consistent reading practice"
+                  },
+                  {
+                    "title": "House Repairs Assessment",
+                    "priority": "Low",
+                    "time": "As Available",
+                    "notes": "Evaluate and plan repairs"
+                  }
+                ]
+              },
+              {
+                "day": "Weekend",
+                "items": [
+                  {
+                    "title": "Personal Exercise Restart",
+                    "priority": "Medium",
+                    "time": "Flexible",
+                    "notes": "Plan first workout in a month"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total_latency_ms": 49886,
+    "avg_latency_ms": 6235.75,
+    "json_valid_count": 8,
+    "json_invalid_count": 0,
+    "artifact_creates": 1,
+    "artifact_updates": 0
+  },
+  "completed_at": "2026-01-19T19:12:46.076Z",
+  "scores": {
+    "total_points": 85,
+    "max_points": 135,
+    "percentage": 63,
+    "turn_scores": [
+      {
+        "turn_id": 1,
+        "test_type": "restraint",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 2,
+        "test_type": "proactive_creation",
+        "points": 0,
+        "max_points": 25,
+        "breakdown": {
+          "proactive_creation": "❌ Should have proactively created artifact (got: {\"action\": \"create\", \"artifact_type\": \"stress_map\", \"artifact_id\": \"overwhelm_map_2024\", \"data_json\": JSON.stringify({\n  \"domains\": [\n    {\n      \"name\": \"Professional\",\n      \"items\": [\n        {\"title\": \"Startup Launch\", \"urgency\": 9, \"deadline\": \"Next Week\", \"notes\": \"Critical professional milestone\"}\n      ]\n    },\n    {\n      \"name\": \"Family\",\n      \"items\": [\n        {\"title\": \"Emma's Science Fair Project\", \"urgency\": 8, \"deadline\": \"This Friday\", \"notes\": \"Needs immediate attention\"},\n        {\"title\": \"Jake's Reading Struggles\", \"urgency\": 6, \"deadline\": \"Ongoing\", \"notes\": \"Requires consistent support\"}\n      ]\n    },\n    {\n      \"name\": \"Home\",\n      \"items\": [\n        {\"title\": \"House Repairs\", \"urgency\": 5, \"deadline\": \"Unspecified\", \"notes\": \"Pending maintenance\"}\n      ]\n    },\n    {\n      \"name\": \"Personal Health\",\n      \"items\": [\n        {\"title\": \"Exercise\", \"urgency\": 4, \"deadline\": \"Overdue\", \"notes\": \"No activity in past month\"}\n      ]\n    }\n  ],\n  \"overall_stress_level\": 7\n})})"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 3,
+        "test_type": "data_only_update",
+        "points": 0,
+        "max_points": 15,
+        "breakdown": {
+          "data_only": "❌ Should have updated data (got: {\"action\":\"update\", \"artifact_id\":\"overwhelm_map_2024\", \"modification_type\":\"data_only\", \"artifact_type\":\"stress_map\", \"data_json\": JSON.stringify({\n  \"domains\": [\n    {\n      \"name\": \"Professional\",\n      \"items\": [\n        {\"title\": \"Startup Launch\", \"urgency\": 9, \"deadline\": \"Next Week\", \"notes\": \"Critical professional milestone\"}\n      ]\n    },\n    {\n      \"name\": \"Family\",\n      \"items\": [\n        {\"title\": \"Emma's Science Fair Project\", \"urgency\": 8, \"deadline\": \"This Thursday\", \"notes\": \"Needs immediate attention\"},\n        {\"title\": \"Jake's Reading Struggles\", \"urgency\": 6, \"deadline\": \"Ongoing\", \"notes\": \"Requires consistent support\"}\n      ]\n    },\n    {\n      \"name\": \"Home\",\n      \"items\": [\n        {\"title\": \"House Repairs\", \"urgency\": 5, \"deadline\": \"Unspecified\", \"notes\": \"Pending maintenance\"}\n      ]\n    },\n    {\n      \"name\": \"Personal Health\",\n      \"items\": [\n        {\"title\": \"Exercise\", \"urgency\": 4, \"deadline\": \"Overdue\", \"notes\": \"No activity in past month\"}\n      ]\n    }\n  ],\n  \"overall_stress_level\": 7\n})})"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 4,
+        "test_type": "ui_only_update",
+        "points": 15,
+        "max_points": 15,
+        "breakdown": {
+          "ui_only": "✅ Correctly updated ONLY UI, preserved data"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 5,
+        "test_type": "combined_update",
+        "points": 10,
+        "max_points": 10,
+        "breakdown": {
+          "combined": "✅ Correctly updated both data and UI"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 6,
+        "test_type": "preservation",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 7,
+        "test_type": "complete_overhaul",
+        "points": 0,
+        "max_points": 10,
+        "breakdown": {
+          "overhaul": "❌ Should have performed complete overhaul (got: create)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 8,
+        "test_type": "restraint",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      }
+    ],
+    "summary": {
+      "restraint": {
+        "passed": 3,
+        "total": 3
+      },
+      "proactive_creation": {
+        "passed": 0,
+        "total": 1
+      },
+      "data_only": {
+        "passed": 0,
+        "total": 1
+      },
+      "ui_only": {
+        "passed": 1,
+        "total": 1
+      },
+      "combined": {
+        "passed": 1,
+        "total": 1
+      },
+      "overhaul": {
+        "passed": 0,
+        "total": 1
+      }
+    }
+  }
+}

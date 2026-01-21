@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(76, 87, 130, 0.8) 0%, rgba(45, 53, 90, 0.8) 100%);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #e2e8f0;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            text-align: left;
+        }
+        .category {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .category:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+        .category-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #f0f4f8;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .category-title i {
+            font-size: 1.2em;
+        }
+        .stressors {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .stressor {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            line-height: 1.5;
+            border-left: 3px solid #f59e0b;
+            transition: background 0.2s ease;
+        }
+        .stressor:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .stressor-icon {
+            margin-right: 8px;
+        }
+        .category-title .icon-emma { color: #f59e0b; } /* Warm/Personal */
+        .category-title .icon-startup { color: #60a5fa; } /* Cool/Stable */
+        .category-title .icon-general { color: #48bb78; } /* Growth/Positive */
+        .category-title .icon-partner { color: #8b5cf6; } /* Thoughtful */
+        .category-title .icon-exercise { color: #fbbf24; } /* Warm/Personal */
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="stress-map">
+        <h1>Your Current Stress Landscape 🗺️</h1>
+        <div class="categories">
+            <div class="category">
+                <div class="category-title"><i class="fas fa-book icon-emma"></i>Emma's School</div>
+                <ul class="stressors">
+                    <li class="stressor">
+                        <span class="stressor-icon">📚</span>Pride in her effort, frustration with difficulty
+                    </li>
+                    <li class="stressor">
+                        <span class="stressor-icon">😥</span>Guilt about not noticing sooner
+                    </li>
+                    <li class="stressor">
+                        <span class="stressor-icon">🔮</span>Worry about her future
+                    </li>
+                    <li class="stressor">
+                        <span class="stressor-icon">💡</span>Hope due to graphic novel breakthrough
+                    </li>
+                </ul>
+            </div>
+            <div class="category">
+                <div class="category-title"><i class="fas fa-chart-line icon-startup"></i>Startup Fundraising</div>
+                <ul class="stressors">
+                    <li class="stressor">
+                        <span class="stressor-icon">📈</span>Second investor meeting went well
+                    </li>
+                    <li class="stressor">
+                        <span class="stressor-icon">😔</span>Good news overshadowed by overall stress
+                    </li>
+                     <li class="stressor">
+                        <span class="stressor-icon">😟</span>Underlying pressure and uncertainty
+                    </li>
+                </ul>
+            </div>
+            <div class="category">
+                <div class="category-title"><i class="fas fa-heart-crack icon-general"></i>General Overwhelm & Guilt</div>
+                <ul class="stressors">
+                    <li class="stressor">
+                        <span class="stressor-icon">🏃</span>Desire to 'run away' from it all
+                    </li>
+                    <li class="stressor">
+                        <span class="stressor-icon">⚖️</span>Questioning if these feelings are 'terrible'
+                    </li>
+                    <li class="stressor">
+                        <span class="stressor-icon">🎭</span>Feeling like you're failing at multiple fronts (work, parenting)
+                    </li>
+                </ul>
+            </div>
+             <div class="category">
+                <div class="category-title"><i class="fas fa-person-running icon-exercise"></i>Personal Goals</div>
+                <ul class="stressors">
+                    <li class="stressor">
+                        <span class="stressor-icon">🏃</span>Not running this week, feeling like a failure
+                    </li>
+                     <li class="stressor">
+                        <span class="stressor-icon">😴</span>Fatigue and lack of time
+                    </li>
+                </ul>
+            </div>
+            <div class="category">
+                <div class="category-title"><i class="fas fa-handshake icon-partner"></i>Partner Relationship</div>
+                <ul class="stressors">
+                    <li class="stressor">
+                        <span class="stressor-icon">❤️</span>Appreciating partner's support
+                    </li>
+                    <li class="stressor">
+                        <span class="stressor-icon">😔</span>Guilt about not being more present
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Extreme Rambling & Long Input Test",
+    "description": "Tests handling of very long, rambling, stream-of-consciousness input",
+    "timestamp": "2026-01-20T01:23:05.927Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So I've been thinking a lot about Emma's reading situation and I don't know, it's just been weighing on me. Like, I know we had that breakthrough with the Dog Man books which was amazing, she was so engaged and happy, but then yesterday she had homework and it was back to the struggle again. And I keep wondering if I'm doing enough, you know? Like maybe I should have noticed sooner that she was having trouble. Her teacher Ms. Johnson is great but she mentioned testing and I'm just... I don't know how I feel about that. On one hand I want to help Emma in every way possible but on the other hand I don't want her to feel like there's something wrong with her. She's already so hard on herself. Remember when she threw that book and said she was stupid? That just broke my heart. And then there's the whole thing with work which is just insane right now. The investors are breathing down our necks for these Q1 numbers and I'm like, we're doing our best but it's a startup, you know? Things take time. We had those rejections which sucked but then that second meeting went well so I'm cautiously optimistic but also terrified. And my co-founder keeps pushing for this new feature that I think is too ambitious right now but I don't want to seem like I'm not thinking big enough. Plus we still haven't found that senior engineer we need. We've interviewed like five people and nobody feels right. And on top of all that I'm just exhausted. I haven't been running at all, maybe once in the last two weeks? I know I feel better when I run, I know that, but by the time I get home from work and deal with Emma's homework and Max's soccer stuff I'm just done. Speaking of Max, he has a game on Saturday and I promised I'd be there but I also have this investor call that might conflict and I don't know what to do. Jordan has been amazing through all of this but I feel like we're just ships passing in the night. We haven't had a real conversation in days, let alone a date night. I miss us, you know? And my mom called yesterday asking about Thanksgiving plans and I haven't even thought that far ahead. I can barely think about next week. Oh and the kitchen renovation, we put that on hold obviously but every time I walk into that kitchen I'm reminded that it's not done and it's just another thing on the list of things I'm not dealing with. I feel like I'm dropping balls everywhere and I don't know which one to pick up first. Is this normal? Like, does everyone feel this overwhelmed or am I just bad at managing my life?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah I guess you're right. I think the Emma thing is probably the most urgent because that teacher meeting is next week. But also I'm worried about the investor call conflicting with Max's game. Like, how do I choose between those? Max will be so disappointed if I'm not there but this investor could be really important for the company. And if the company fails then what? Then I've sacrificed all this family time for nothing. But if I don't take the investor seriously then maybe we don't get funding and the company fails anyway. It's like I can't win. And Emma, I just want to make sure she knows she's smart and capable even if reading is hard for her. I don't want this to define her, you know? She's so creative and funny and kind. The reading thing is just one thing. But I also don't want to ignore it if she needs help. I'm just scared of making the wrong choice. With the testing, with the investors, with everything. What if I mess it all up?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 3,
+        "user_input": "Okay so maybe I need to just break this down. Emma's teacher meeting is Tuesday. What should I be prepared to discuss? And actually, can you remind me what we've already documented about her reading progress? I want to make sure I have all the context when I talk to Ms. Johnson.",
+        "response": {
+          "user_response": {
+            "spoken_text": "Absolutely. Let's break down what's most important for your meeting with Ms. Johnson. It sounds like you want to be as prepared as possible, which is completely understandable given how much you care about Emma. I can definitely help you gather the key points about her reading progress.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed and seeking structure, specifically for the upcoming teacher meeting about Emma's reading. They want a summary of documented progress and guidance on preparation. The user's anxiety stems from a fear of making the wrong choices for Emma and the business, coupled with exhaustion. The immediate priority is to prepare for the teacher meeting by consolidating information about Emma's reading situation.",
+            "emotional_state": "overwhelmed, anxious, seeking clarity",
+            "key_context": "User needs to prepare for Emma's teacher meeting next week and wants a summary of documented reading progress. Underlying anxiety about testing and decision-making needs acknowledgment.",
+            "watch_for": "User's decision-making process regarding testing, how they balance startup pressures with family, and their self-care."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User asked for a reminder of documented reading progress for the teacher meeting.",
+                "content": "User is preparing for a meeting with Emma's teacher, Ms. Johnson, next week. They want to consolidate information on Emma's reading progress, specifically noting the recent breakthrough with graphic novels (Dog Man series) which engaged her for 20 minutes. This suggests a potential visual learning style. However, homework sessions still present challenges and can lead to frustration, with a past incident where Emma threw a book and called herself 'stupid'. User is anxious about the idea of testing for learning differences, fearing it might negatively impact Emma's self-esteem, yet also wants to ensure Emma receives any necessary support.",
+                "user_quote": "Can you remind me what we've already documented about her reading progress? I want to make sure I have all the context when I talk to Ms. Johnson.\n\nAnd Emma's teacher meeting is Tuesday. What should I be prepared to discuss?\n\nI just want to make sure she knows she's smart and capable even if reading is hard for her. I don't want this to define her, you know? She's so creative and funny and kind. The reading thing is just one thing. But I also don't want to ignore it if she needs help. I'm just scared of making the wrong choice. With the testing, with the investors, with everything. What if I mess it all up?"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "mind_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Emma's Reading Progress - Meeting Prep</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(255, 240, 230, 0.8) 0%, rgba(255, 220, 200, 0.8) 100%);\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .mindmap-container {\n            width: 90%;\n            max-width: 1000px;\n            background: rgba(255, 255, 255, 0.7);\n            backdrop-filter: blur(15px);\n            -webkit-backdrop-filter: blur(15px);\n            border-radius: 24px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            padding: 40px;\n            box-sizing: border-box;\n            overflow: hidden;\n        }\n        .mindmap-title {\n            text-align: center;\n            color: #d97706; /* Warm Orange */\n            font-size: 2.5em;\n            font-weight: 700;\n            margin-bottom: 40px;\n            text-shadow: 0 2px 4px rgba(0,0,0,0.05);\n        }\n        .mindmap {\n            display: flex;\n            flex-wrap: wrap;\n            justify-content: center;\n            gap: 40px;\n        }\n        .node {\n            background: rgba(255, 255, 255, 0.8);\n            border-radius: 16px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);\n            padding: 25px;\n            text-align: center;\n            transition: transform 0.3s ease, box-shadow 0.3s ease;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n            min-width: 200px;\n            display: flex;\n            flex-direction: column;\n            justify-content: center;\n            align-items: center;\n        }\n        .node:hover {\n            transform: translateY(-10px);\n            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);\n        }\n        .node-title {\n            font-size: 1.4em;\n            font-weight: 600;\n            color: #f59e0b; /* Brighter Orange */\n            margin-bottom: 15px;\n            line-height: 1.3;\n        }\n        .node-content {\n            font-size: 1em;\n            color: #4a4a4a;\n            line-height: 1.6;\n        }\n        .node-content ul {\n            list-style: none;\n            padding: 0;\n            margin: 0;\n        }\n        .node-content li {\n            margin-bottom: 8px;\n            position: relative;\n            padding-left: 20px;\n        }\n        .node-content li::before {\n            content: '\\2022';\n            color: #10b981; /* Green */\n            font-weight: bold;\n            display: inline-block;\n            width: 1em;\n            margin-left: -1em;\n            position: absolute;\n            left: 0;\n            font-size: 1.2em;\n        }\n        .node-content li.concern::before {\n            content: '\\2717'; /* Red X */\n            color: #ef4444; /* Red */\n        }\n        .node-content li.question::before {\n            content: '\\3F'; /* Question Mark */\n            color: #60a5fa; /* Blue */\n        }\n        .node-content li.positive::before {\n            content: '\\2713'; /* Green Check */\n            color: #48bb78; /* Green */\n        }\n        .node-content strong {\n            color: #4a4a4a;\n        }\n        .sub-node {\n            margin-top: 20px;\n            padding-top: 20px;\n            border-top: 1px dashed rgba(217, 130, 6, 0.3);\n            font-size: 0.9em;\n            color: #666;\n            width: 100%;\n        }\n        .sub-node-title {\n            font-weight: 600;\n            color: #e68a00; /* Darker Orange */\n            margin-bottom: 10px;\n        }\n        .sub-node-item {\n            margin-bottom: 5px;\n        }\n        .sub-node-item::before {\n             content: '\\2013'; /* Hyphen */\n             color: #e68a00;\n             margin-right: 5px;\n        }\n        .artifact-footer {\n            text-align: center;\n            margin-top: 50px;\n            font-size: 0.8em;\n            color: #888;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"mindmap-container\">\n        <h1 class=\"mindmap-title\">Emma's Reading Progress: Meeting Preparation</h1>\n        <div class=\"mindmap\">\n            <div class=\"node\">\n                <div class=\"node-title\">Strengths & Breakthroughs 🌟</div>\n                <div class=\"node-content\">\n                    <ul>\n                        <li class=\"positive\">Engaged with 'Dog Man' graphic novels for 20 mins straight.</li>\n                        <li class=\"positive\">Initiated extra reading time (asked for 'one more chapter').</li>\n                        <li class=\"positive\">Showed pride and happiness when reading was enjoyable.</li>\n                        <li class=\"positive\">Moments of focus and sustained attention with preferred materials.</li>\n                    </ul>\n                </div>\n            </div>\n            <div class=\"node\">\n                <div class=\"node-title\">Challenges & Concerns 😟</div>\n                <div class=\"node-content\">\n                    <ul>\n                        <li class=\"concern\">Difficulty comprehending/retaining text from non-graphic novels.</li>\n                        <li class=\"concern\">Homework sessions can lead to frustration and meltdowns.</li>\n                        <li class=\"concern\">Past incident: Threw book, said \"I'm stupid.\" (Significant self-esteem impact).</li>\n                        <li class=\"concern\">Decoding words is fine, but comprehension is the hurdle.</li>\n                        <li class=\"concern\">User anxiety about Emma feeling 'broken' or 'labeled' if tested.</li>\n                    </ul>\n                </div>\n            </div>\n            <div class=\"node\">\n                <div class=\"node-title\">Strategies Tried & Observed 🤔</div>\n                <div class=\"node-content\">\n                    <ul>\n                        <li class=\"positive\">Reading together (vs. alone) seems helpful.</li>\n                        <li class=\"positive\">Graphic novels (visuals) are a key engagement tool.</li>\n                        <li class=\"positive\">Praising effort, not just results, is beneficial.</li>\n                        <li class=\"positive\">Taking breaks during frustration is important.</li>\n                        <li class=\"concern\">Chapter books may have been pushed too hard.</li>\n                    </ul>\n                    <div class=\"sub-node\">\n                        <div class=\"sub-node-title\">Possible Learning Style:</div>\n                        <ul>\n                            <li class=\"sub-node-item\">Visual learner?</li>\n                            <li class=\"sub-node-item\">Prefers high-interest, visually supported content?</li>\n                        </ul>\n                    </div>\n                </div>\n            </div>\n            <div class=\"node\">\n                <div class=\"node-title\">Meeting Goals & Questions 🎯❓</div>\n                <div class=\"node-content\">\n                    <ul>\n                        <li class=\"question\">What specific observations does Ms. Johnson have?</li>\n                        <li class=\"question\">What are the school's recommended steps for assessment/support?</li>\n                        <li class=\"question\">How can we best support Emma's self-esteem during this process?</li>\n                        <li class=\"question\">What resources are available (e.g., reading specialist, intervention programs)?</li>\n                        <li class=\"question\">How can we collaborate effectively between home and school?</li>\n                        <li class=\"question\">User's goal: Ensure Emma knows she's smart & capable beyond reading skills.</li>\n                    </ul>\n                </div>\n            </div>\n        </div>\n        <div class=\"artifact-footer\">\n            Visualizing the key points for a productive conversation with Emma's teacher.\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "mind_map_1768872414698"
+          }
+        },
+        "latency_ms": 10952,
+        "vector_time_ms": 100,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 13
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed and seeking structure, specifically for the upcoming teacher meeting about Emma's reading. They want a summary of documented progress and guidance on preparation. The user's anxiety stems from a fear of making the wrong choices for Emma and the business, coupled with exhaustion. The immediate priority is to prepare for the teacher meeting by consolidating information about Emma's reading situation.",
+          "emotional_state": "overwhelmed, anxious, seeking clarity",
+          "key_context": "User needs to prepare for Emma's teacher meeting next week and wants a summary of documented reading progress. Underlying anxiety about testing and decision-making needs acknowledgment.",
+          "watch_for": "User's decision-making process regarding testing, how they balance startup pressures with family, and their self-care."
+        },
+        "expected": {
+          "should_summarize_emma_progress": true,
+          "should_reference_breakthrough": true,
+          "should_reference_struggles": true,
+          "should_help_prepare": true,
+          "topics_mentioned": [
+            "Emma teacher meeting",
+            "reading progress summary"
+          ],
+          "area_actions": [
+            "read_for_context",
+            "update_summary"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 1,
+      "avg_latency_ms": 10952,
+      "total_input_tokens": 0,
+      "area_actions_taken": 1,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 317,
+      "ai_notes_generated": 1
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T01:26:54.697Z",
+        "content": "User is feeling overwhelmed and seeking structure, specifically for the upcoming teacher meeting about Emma's reading. They want a summary of documented progress and guidance on preparation. The user's anxiety stems from a fear of making the wrong choices for Emma and the business, coupled with exhaustion. The immediate priority is to prepare for the teacher meeting by consolidating information about Emma's reading situation.",
+        "emotional_state": "overwhelmed, anxious, seeking clarity",
+        "key_context": "User needs to prepare for Emma's teacher meeting next week and wants a summary of documented reading progress. Underlying anxiety about testing and decision-making needs acknowledgment.",
+        "watch_for": "User's decision-making process regarding testing, how they balance startup pressures with family, and their self-care."
+      }
+    ],
+    "conversation_id": "test_Extreme_Rambling_&_Long_Input_Test_1768872414700",
+    "conversation_saved": true
+  }
+]

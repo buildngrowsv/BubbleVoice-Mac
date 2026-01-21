@@ -1,0 +1,42 @@
+{
+  "name": "bubblevoice-benchmarks",
+  "version": "1.0.0",
+  "description": "Benchmark suite for BubbleVoice AI artifact generation",
+  "main": "lib/runner.js",
+  "scripts": {
+    "benchmark": "node lib/runner.js",
+    "benchmark:baseline": "node lib/runner.js --model gemini-2.0-flash-lite --all-scenarios",
+    "benchmark:all": "node lib/runner.js --all",
+    "visualize": "node lib/visualizer.js --all",
+    "visualize:run": "node lib/visualizer.js --run",
+    "list:models": "node lib/runner.js --list-models",
+    "list:scenarios": "node lib/runner.js --list-scenarios"
+  },
+  "keywords": [
+    "ai",
+    "benchmark",
+    "voice",
+    "artifacts",
+    "llm"
+  ],
+  "author": "BubbleVoice Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@xenova/transformers": "^2.17.0"
+  },
+  "notes": {
+    "required_env_vars": [
+      "GOOGLE_API_KEY - For Gemini models",
+      "OPENAI_API_KEY - For GPT models",  
+      "ANTHROPIC_API_KEY - For Claude models"
+    ],
+    "usage": [
+      "npm run benchmark -- --scenario personal_goals_exercise --model gemini-2.0-flash-lite",
+      "npm run benchmark:baseline",
+      "npm run visualize"
+    ]
+  }
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f0f4f8, #d9e2ec); color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+        .stress-map-container { background: rgba(255, 255, 255, 0.7); border-radius: 24px; padding: 30px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); width: 90%; max-width: 800px; }
+        .map-title { font-size: 2.2em; font-weight: 700; color: #2c5282; margin-bottom: 25px; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .area-section { margin-bottom: 30px; padding: 20px; background: rgba(255, 255, 255, 0.9); border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .area-title { font-size: 1.6em; font-weight: 600; color: #3b82f6; margin-bottom: 15px; display: flex; align-items: center; }
+        .area-title i { margin-right: 12px; font-size: 1.3em; }
+        .stress-item { background: rgba(59, 130, 246, 0.08); border-left: 4px solid #3b82f6; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; font-size: 1.1em; transition: all 0.3s ease; }
+        .stress-item:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); background: rgba(59, 130, 246, 0.15); }
+        .stress-item strong { color: #1e40af; }
+        .overall-stress { margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #f9f7fe, #e0e7ff); border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); text-align: center; }
+        .overall-stress-title { font-size: 1.8em; font-weight: 700; color: #7c3aed; margin-bottom: 15px; }
+        .overall-stress-desc { font-size: 1.2em; color: #5b21b6; line-height: 1.6; }
+        .overall-stress-desc span { color: #9d174d; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="stress-map-container">
+        <h1 class="map-title">Your Current Stress Landscape 🗺️</h1>
+
+        <div class="area-section">
+            <div class="area-title"> <i class="fas fa-school"></i> Emma's School & Reading 📚</div>
+            <div class="stress-item"><strong>Frustration:</strong> It's hard for her, and you feel guilty for not noticing sooner.</div>
+            <div class="stress-item"><strong>Worry:</strong> Concern about what this means for her future.</div>
+            <div class="stress-item"><strong>Hope:</strong> Excitement about the graphic novel breakthrough.</div>
+        </div>
+
+        <div class="area-section">
+            <div class="area-title"> <i class="fas fa-building"></i> Startup / Fundraising 🚀</div>
+            <div class="stress-item"><strong>Setbacks:</strong> Recent investor rejections are weighing on you.</div>
+            <div class="stress-item"><strong>Doubt:</strong> Questioning your capabilities ("not cut out for this").</div>
+            <div class="stress-item"><strong>Momentum:</strong> Positive second investor meeting offers a glimmer of hope.</div>
+        </div>
+        
+        <div class="area-section">
+            <div class="area-title"> <i class="fas fa-running"></i> Exercise Goals 🏃‍♀️</div>
+            <div class="stress-item"><strong>Struggle:</strong> Haven't run at all this week due to fatigue and time constraints.</div>
+            <div class="stress-item"><strong>Self-Criticism:</strong> Feeling like you're "failing" at this goal.</div>
+        </div>
+
+        <div class="area-section">
+            <div class="area-title"> <i class="fas fa-home"></i> Home / Kitchen Renovation 🏡</div>
+            <div class="stress-item"><strong>Postponement:</strong> Had to delay the renovation due to financial uncertainty.</div>
+            <div class="stress-item"><strong>Disappointment:</strong> Hate delaying projects, even when it's the right call.</div>
+        </div>
+
+        <div class="area-section">
+            <div class="area-title"> <i class="fas fa-user-friends"></i> Partner & Quality Time ❤️</div>
+            <div class="stress-item"><strong>Guilt:</strong> Feeling you're not present enough due to other demands.</div>
+            <div class="stress-item"><strong>Awareness:</strong> Recognizing the relationship needs nurturing.</div>
+        </div>
+
+        <div class="overall-stress">
+            <h2 class="overall-stress-title">Your Overall State 🤯</h2>
+            <p class="overall-stress-desc">
+You're experiencing a profound sense of overwhelm, a common response when multiple high-stakes areas demand your attention simultaneously. The desire to "run away" is a signal from your mind and body that you need a break and some relief. It's a testament to how much you're juggling. Remember, even small moments of self-compassion can make a difference. You are doing your best in a very demanding season.</p>
+        </div>
+    </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</body>
+</html>

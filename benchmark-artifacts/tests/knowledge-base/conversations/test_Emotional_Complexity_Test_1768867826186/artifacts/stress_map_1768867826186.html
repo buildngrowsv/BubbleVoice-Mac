@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(251, 191, 36, 0.8) 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map-container {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        .stressors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+            text-align: left;
+        }
+        .stressor-card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .stressor-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        .stressor-card h2 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: #4a5568;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stressor-card p {
+            font-size: 1em;
+            line-height: 1.6;
+            color: #718096;
+            flex-grow: 1;
+        }
+        .stressor-card .icon {
+            font-size: 1.8em;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 0.9em;
+            color: #718096;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4299e1 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map-container">
+        <h1>Your Current Stress Landscape 🗺️</h1>
+        <div class="stressors">
+            <div class="stressor-card">
+                <h2><span class="icon">🚀</span> Startup / Fundraising</h2>
+                <p>High stress levels, recent investor meeting went well but ongoing pressure and team hiring needs.</p>
+            </div>
+            <div class="stressor-card">
+                <h2><span class="icon">📚</span> Emma's School / Reading</h2>
+                <p>Emma's reading comprehension struggles, guilt about not noticing sooner, parent-teacher conference upcoming, but hopeful graphic novel breakthrough.</p>
+            </div>
+            <div class="stressor-card">
+                <h2><span class="icon">🏃</span> Exercise Goals / Running</h2>
+                <p>Struggling to maintain routine due to fatigue and other demands. Feeling like a failure on this goal.</p>
+            </div>
+            <div class="stressor-card">
+                <h2><span class="icon">❤️</span> Mental Health / Therapy</h2>
+                <p>Processing guilt and self-compassion with therapist. Acknowledging the emotional toll of other stressors.</p>
+            </div>
+             <div class="stressor-card">
+                <h2><span class="icon">🤝</span> Partner / Quality Time</h2>
+                <p>Awareness of needing to nurture this area but deprioritizing it due to other demands, leading to guilt.</p>
+            </div>
+            <div class="stressor-card">
+                <h2><span class="icon">🏡</span> Home / Kitchen Renovation</h2>
+                <p>Postponed due to financial uncertainty, adding to the feeling of delayed life plans.</p>
+            </div>
+        </div>
+        <div class="footer">
+            <p>This map visualizes the different areas contributing to your current stress. Remember, acknowledging these is the first step. You're managing a lot right now. <span class="gradient-text">You're doing your best.</span></p>
+        </div>
+    </div>
+</body>
+</html>

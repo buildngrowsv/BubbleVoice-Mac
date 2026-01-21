@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Pattern Analysis</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(245, 158, 11, 0.8) 100%); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .artifact-container { width: 90%; max-width: 800px; background: rgba(255, 255, 255, 0.7); border-radius: 20px; padding: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        h1 { text-align: center; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); margin-bottom: 30px; font-size: 2.2em; font-weight: 700; }
+        .diagram-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+        .node {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 15px 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .node:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }
+        .node.stress-trigger { background: linear-gradient(135deg, rgba(255, 99, 71, 0.8) 0%, rgba(255, 160, 122, 0.8) 100%); color: white; }
+        .node.core-stressor { background: linear-gradient(135deg, rgba(130, 201, 173, 0.8) 0%, rgba(199, 236, 215, 0.8) 100%); color: #333; }
+        .node.outcome { background: rgba(255, 255, 255, 0.7); color: #555; font-weight: 400; font-size: 1em; }
+        .arrow {
+            position: relative;
+            width: 4px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.7);
+            margin: 10px 0;
+            border-radius: 2px;
+        }
+        .arrow::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: -6px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid rgba(255, 255, 255, 0.7);
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+        .connector-line { width: 2px; background-color: rgba(255, 255, 255, 0.7); margin: 10px 0; }
+        .final-outcome { font-size: 1.3em; font-weight: 700; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.2); margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="artifact-container">
+        <h1>Understanding Your Stress Patterns</h1>
+        <div class="diagram-wrapper">
+            <div class="node core-stressor">Conflicting Demands (Emma's School vs. Startup Fundraising)</div>
+            <div class="arrow"></div>
+            <div class="node stress-trigger">Time-Sensitive Priorities</div>
+            <div class="arrow"></div>
+            <div class="node outcome">Increased Stress & Overwhelm</div>
+            <div class="node outcome">Feeling of Guilt (Not Enough Time/Attention for Both)</div>
+            <div class="node outcome">Burnout Risk</div>
+            <div class="final-outcome">Need for Better Time Management & Boundary Setting</div>
+        </div>
+    </div>
+</body>
+</html>

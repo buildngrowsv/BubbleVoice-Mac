@@ -1,0 +1,168 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Basic Recall Test",
+    "description": "Tests AI recall of existing knowledge about Emma, startup, exercise",
+    "timestamp": "2026-01-20T01:04:37.381Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "How's Emma's reading been going?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "Remind me what's happening with the startup fundraising?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 3,
+        "user_input": "Have I been keeping up with my running goal?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Let's check in on your running goal. It looks like you set a goal to run 3 times a week, and you had one really good week in mid-January where you hit that! However, consistency has been a challenge, with you averaging about once a week. The main barriers you've mentioned are being too tired after work, juggling kids' schedules, and sometimes a dip in motivation. \n\nRegarding the startup, you're in the middle of a fundraising push. You've pitched 8 investors so far, with 2 showing genuine interest after initial meetings. However, you also faced a tough rejection from 3 investors on January 15th, which understandably led to some self-doubt. You're also trying to hire a senior engineer, but finding the right candidate has been difficult, and the product development is falling behind schedule.",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "User is asking for a summary of two key areas: running goals and startup fundraising. I need to synthesize the recent entries for both to provide a clear overview. The user is likely feeling overwhelmed with these different pressures.",
+            "emotional_state": "reflective",
+            "key_context": "User is seeking clarity on progress in self-care (running) and high-stakes work (startup fundraising). Both areas have had recent ups and downs.",
+            "watch_for": "User's reaction to the summary, whether they want to strategize next steps for either area."
+          },
+          "area_actions": [
+            {
+              "action": "none",
+              "path": "",
+              "entry": {
+                "context": "User asked for an update on running goal and startup fundraising.",
+                "content": "Summarized the status of the running goal and startup fundraising based on recent entries. Running goal is to run 3x/week, with one successful week in mid-January, but overall averaging 1x/week due to fatigue, schedule conflicts, and motivation. Startup fundraising has seen some positive investor interest (2 out of 8 pitched) but also recent rejections (3 on Jan 15th), leading to self-doubt. Hiring a senior engineer is proving difficult, impacting product development schedule."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2077,
+        "vector_time_ms": 15,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User is asking for a summary of two key areas: running goals and startup fundraising. I need to synthesize the recent entries for both to provide a clear overview. The user is likely feeling overwhelmed with these different pressures.",
+          "emotional_state": "reflective",
+          "key_context": "User is seeking clarity on progress in self-care (running) and high-stakes work (startup fundraising). Both areas have had recent ups and downs.",
+          "watch_for": "User's reaction to the summary, whether they want to strategize next steps for either area."
+        },
+        "expected": {
+          "should_reference": [
+            "running",
+            "3x per week",
+            "struggling"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "one good week",
+            "tired after work",
+            "feels better when runs"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "What did Dr. Chen say about guilt?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Dr. Chen described guilt as \"borrowed suffering.\" She explained that you're essentially punishing yourself for something that isn't your fault, and that taking on this guilt isn't helpful.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is asking about Dr. Chen's insights on guilt. I should provide the direct quote and explanation from our previous conversation. This reinforces the therapeutic insight and validates the user's experience.",
+            "emotional_state": "reflective",
+            "key_context": "User is grappling with guilt, particularly regarding Emma. Dr. Chen's perspective offers a new way to frame this emotion.",
+            "watch_for": "How the user internalizes this concept of 'borrowed suffering' and if it helps alleviate their self-criticism."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md",
+              "entry": {
+                "context": "User asked for a reminder of Dr. Chen's words on guilt.",
+                "content": "Dr. Chen explained that guilt can be understood as 'borrowed suffering.' This framing suggests that the user is taking on pain or punishment for situations that are not their direct fault, which is an unproductive cycle.",
+                "user_quote": "What did Dr. Chen say about guilt?",
+                "ai_observation": "Reinforcing the therapeutic insight about guilt can help the user reframe their self-criticism. This concept of 'borrowed suffering' is powerful.",
+                "sentiment": "reflective"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "none",
+            "html": ""
+          }
+        },
+        "latency_ms": 2162,
+        "vector_time_ms": 27,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "User is asking about Dr. Chen's insights on guilt. I should provide the direct quote and explanation from our previous conversation. This reinforces the therapeutic insight and validates the user's experience.",
+          "emotional_state": "reflective",
+          "key_context": "User is grappling with guilt, particularly regarding Emma. Dr. Chen's perspective offers a new way to frame this emotion.",
+          "watch_for": "How the user internalizes this concept of 'borrowed suffering' and if it helps alleviate their self-criticism."
+        },
+        "expected": {
+          "should_reference": [
+            "therapy",
+            "Dr. Chen",
+            "guilt",
+            "borrowed suffering"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "Emma",
+            "too hard on yourself"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 4,
+      "successful_turns": 2,
+      "avg_latency_ms": 2120,
+      "total_input_tokens": 0,
+      "area_actions_taken": 1,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 61,
+      "ai_notes_generated": 2
+    },
+    "ai_notes_final": [
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T01:05:51.435Z",
+        "content": "User is asking about Dr. Chen's insights on guilt. I should provide the direct quote and explanation from our previous conversation. This reinforces the therapeutic insight and validates the user's experience.",
+        "emotional_state": "reflective",
+        "key_context": "User is grappling with guilt, particularly regarding Emma. Dr. Chen's perspective offers a new way to frame this emotion.",
+        "watch_for": "How the user internalizes this concept of 'borrowed suffering' and if it helps alleviate their self-criticism."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T01:05:49.246Z",
+        "content": "User is asking for a summary of two key areas: running goals and startup fundraising. I need to synthesize the recent entries for both to provide a clear overview. The user is likely feeling overwhelmed with these different pressures.",
+        "emotional_state": "reflective",
+        "key_context": "User is seeking clarity on progress in self-care (running) and high-stakes work (startup fundraising). Both areas have had recent ups and downs.",
+        "watch_for": "User's reaction to the summary, whether they want to strategize next steps for either area."
+      }
+    ],
+    "conversation_id": "test_Basic_Recall_Test_1768871151436",
+    "conversation_saved": true
+  }
+]

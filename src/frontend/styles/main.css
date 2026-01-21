@@ -1,0 +1,858 @@
+/**
+ * BUBBLEVOICE MAC - MAIN STYLES
+ * 
+ * Core layout and component styles for the application.
+ * This file handles the structural layout while liquid-glass.css
+ * provides the visual aesthetic.
+ * 
+ * LAYOUT STRUCTURE:
+ * - Frameless window with custom title bar
+ * - Main conversation area (flex-grow)
+ * - Bubble suggestions area (floating above input)
+ * - Input area (fixed at bottom)
+ * - Settings panel (slide-in from right)
+ * 
+ * DESIGN SYSTEM:
+ * - Uses CSS custom properties from liquid-glass.css
+ * - Responsive to window resizing
+ * - Supports light/dark mode
+ * - GPU-accelerated animations
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  color: white;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  /* Draggable window area (except for interactive elements) */
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+/* Make interactive elements non-draggable */
+button, input, select, textarea, [contenteditable] {
+  -webkit-app-region: no-drag;
+  user-select: text;
+}
+
+/**
+ * TITLE BAR
+ * 
+ * Custom title bar for frameless window.
+ * Includes app title and window controls.
+ */
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 44px;
+  padding: 0 var(--spacing-md);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-border);
+  -webkit-app-region: drag;
+}
+
+.title-bar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.traffic-lights {
+  width: 70px; /* Space for macOS traffic lights */
+  height: 100%;
+}
+
+.app-title {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.title-bar-right {
+  display: flex;
+  gap: var(--spacing-xs);
+  -webkit-app-region: no-drag;
+}
+
+.title-bar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.title-bar-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.title-bar-button:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#close-button:hover {
+  background: var(--color-error);
+  color: white;
+}
+
+/**
+ * MAIN CONTAINER
+ * 
+ * Primary layout container for conversation and input areas.
+ */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 44px); /* Subtract title bar height */
+  position: relative;
+}
+
+/**
+ * CONVERSATION CONTAINER
+ * 
+ * Scrollable area for conversation messages.
+ */
+.conversation-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom scrollbar */
+.conversation-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.conversation-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.conversation-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+}
+
+.conversation-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/**
+ * WELCOME STATE
+ * 
+ * Shown when there's no active conversation.
+ */
+.welcome-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: var(--spacing-xl);
+  animation: fade-in 0.5s ease-in;
+}
+
+.welcome-icon {
+  margin-bottom: var(--spacing-lg);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.welcome-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-subtitle {
+  font-size: 16px;
+  opacity: 0.7;
+  margin-bottom: var(--spacing-xl);
+}
+
+.welcome-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.suggestion-chip {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.suggestion-chip:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.welcome-hint {
+  font-size: 13px;
+  opacity: 0.5;
+}
+
+.welcome-hint kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin: 0 2px;
+}
+
+/**
+ * MESSAGES
+ * 
+ * Container for conversation messages.
+ */
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding-bottom: var(--spacing-lg);
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.message.user {
+  align-items: flex-end;
+}
+
+.message.ai {
+  align-items: flex-start;
+}
+
+.message-timestamp {
+  font-size: 11px;
+  opacity: 0.5;
+  padding: 0 var(--spacing-sm);
+}
+
+/**
+ * BUBBLES CONTAINER
+ * 
+ * Floating area for proactive bubble suggestions.
+ */
+.bubbles-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  min-height: 40px;
+  max-height: 120px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.bubbles-container:empty {
+  display: none;
+}
+
+/* Hide scrollbar but keep functionality */
+.bubbles-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.bubbles-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.bubbles-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+}
+
+/**
+ * INPUT CONTAINER
+ * 
+ * Fixed input area at the bottom of the window.
+ */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--glass-border);
+}
+
+/**
+ * VOICE VISUALIZATION
+ * 
+ * Animated wave visualization shown when listening.
+ */
+.voice-visualization {
+  display: none; /* Hidden by default, shown when listening */
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-xs);
+  height: 40px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.voice-visualization.active {
+  display: flex;
+}
+
+/**
+ * INPUT WRAPPER
+ * 
+ * Contains the input field and action buttons.
+ */
+.input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm);
+  transition: all var(--transition-base);
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+/**
+ * INPUT FIELD
+ * 
+ * Contenteditable div for text input with real-time transcription.
+ */
+.input-field {
+  flex: 1;
+  min-height: 40px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: white;
+  font-size: 15px;
+  line-height: 1.5;
+  outline: none;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.input-field:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+/* Custom scrollbar for input field */
+.input-field::-webkit-scrollbar {
+  width: 4px;
+}
+
+.input-field::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.input-field::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+}
+
+/**
+ * INPUT ACTIONS
+ * 
+ * Voice and send buttons.
+ */
+.input-actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.action-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.action-button:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(0.95);
+}
+
+.action-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/**
+ * VOICE BUTTON
+ * 
+ * Primary voice input button with active state.
+ */
+.voice-button {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+}
+
+.voice-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7c92f5 0%, #8a5db8 100%);
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+}
+
+.voice-button.active {
+  background: var(--color-error);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.voice-button.active .voice-icon {
+  display: none;
+}
+
+.voice-button.active .stop-icon {
+  display: block !important;
+}
+
+/**
+ * SEND BUTTON
+ * 
+ * Send message button (enabled when there's text).
+ */
+.send-button {
+  background: transparent;
+}
+
+.send-button:not(:disabled):hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+/**
+ * STATUS INDICATOR
+ * 
+ * Shows connection status and current activity.
+ */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-success);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status-indicator.disconnected .status-dot {
+  background: var(--color-error);
+}
+
+.status-indicator.processing .status-dot {
+  background: var(--color-warning);
+}
+
+/**
+ * SETTINGS PANEL
+ * 
+ * Slide-in panel from the right side.
+ */
+.settings-panel {
+  position: fixed;
+  top: 44px; /* Below title bar */
+  right: 0;
+  width: 360px;
+  height: calc(100% - 44px);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-left: 1px solid var(--glass-border);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.3);
+  transform: translateX(100%);
+  transition: transform var(--transition-slow);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.settings-panel.open {
+  transform: translateX(0);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  z-index: 10;
+}
+
+.settings-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-settings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.close-settings:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.settings-content {
+  padding: var(--spacing-lg);
+}
+
+.settings-section {
+  margin-bottom: var(--spacing-xl);
+}
+
+.settings-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  font-size: 14px;
+  gap: var(--spacing-sm);
+}
+
+.range-value {
+  min-width: 40px;
+  text-align: right;
+  font-size: 13px;
+  opacity: 0.7;
+  font-family: var(--font-mono);
+}
+
+.settings-select,
+.settings-input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: white;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  transition: all var(--transition-base);
+}
+
+.settings-select:focus,
+.settings-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+input[type="checkbox"] {
+  width: 40px;
+  height: 22px;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  position: relative;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: white;
+  top: 2px;
+  left: 2px;
+  transition: all var(--transition-base);
+}
+
+input[type="checkbox"]:checked {
+  background: var(--color-primary);
+}
+
+input[type="checkbox"]:checked::before {
+  left: 20px;
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 4px;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 12px rgba(102, 126, 234, 0.6);
+}
+
+/**
+ * FOLDER SELECTOR
+ * 
+ * Custom folder selection UI with input field and button.
+ * Used in settings for choosing where to save data.
+ */
+.folder-selector {
+  display: flex;
+  gap: var(--spacing-sm);
+  width: 100%;
+  margin-top: var(--spacing-xs);
+}
+
+.folder-selector .settings-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.03);
+  cursor: default;
+}
+
+.folder-selector .settings-button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/**
+ * SETTINGS BUTTON
+ * 
+ * Button style used in settings panel for actions.
+ */
+.settings-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.settings-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.settings-button:active {
+  transform: translateY(0);
+}
+
+/**
+ * SETTINGS HINT
+ * 
+ * Small helper text below settings inputs.
+ */
+.settings-hint {
+  display: block;
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: var(--spacing-xs);
+  line-height: 1.4;
+}
+
+/**
+ * PERMISSIONS UI
+ * 
+ * Visual components for displaying and managing system permissions.
+ * Shows permission status with badges and action buttons.
+ */
+.permission-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  gap: var(--spacing-md);
+}
+
+.permission-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.permission-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+}
+
+.permission-icon {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.permission-description {
+  font-size: 13px;
+  opacity: 0.7;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.permission-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+/**
+ * PERMISSION BADGE
+ * 
+ * Visual indicator for permission status.
+ * Shows granted, denied, or error states with color coding.
+ */
+.permission-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.permission-badge.granted {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.permission-badge.denied {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.permission-badge.error {
+  background: rgba(251, 146, 60, 0.2);
+  color: #fb923c;
+  border: 1px solid rgba(251, 146, 60, 0.3);
+}
+
+/**
+ * UTILITY CLASSES
+ */
+.hidden {
+  display: none !important;
+}
+
+.invisible {
+  visibility: hidden !important;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}

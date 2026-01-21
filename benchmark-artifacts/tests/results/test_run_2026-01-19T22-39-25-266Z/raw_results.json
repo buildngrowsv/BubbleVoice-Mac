@@ -1,0 +1,578 @@
+[
+  {
+    "scenario": "05-emotional-complexity",
+    "simple": {
+      "approach": "SIMPLE",
+      "scenario_name": "Emotional Complexity Test",
+      "description": "Tests handling of complex, mixed emotional states",
+      "timestamp": "2026-01-19T22:39:10.148Z",
+      "turns": [
+        {
+          "turn": 1,
+          "user_input": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing.",
+          "response": {
+            "user_response": {
+              "spoken_text": "It sounds like you're feeling a whole mix of emotions about Emma's reading right now – pride in her effort, frustration with the challenges, guilt about not catching it sooner, worry about the future, and hope because of that great breakthrough with the graphic novel. It's completely understandable to feel all of that at once. That breakthrough with Dog Man is fantastic news, though! It shows she *can* engage with reading when it clicks for her.",
+              "emotional_tone": "supportive"
+            },
+            "area_actions": [
+              {
+                "action": "append_entry",
+                "path": "Emma_School/reading_comprehension.md"
+              },
+              {
+                "action": "update_summary",
+                "area_name": "Emma_School",
+                "description": "Emma (7yo, 2nd grade) has been struggling with reading comprehension for about 2 weeks now. She can decode words fine but doesn't retain what she reads. Teacher (Ms. Johnson) noticed and scheduled a meeting. Recent breakthrough with Dog Man graphic novel, reading for 20 minutes straight without complaining. User is experiencing a range of emotions: pride, frustration, guilt, worry, and hope."
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1335,
+          "vector_time_ms": 1,
+          "expected": {
+            "emotions_recognized": [
+              "proud",
+              "frustrated",
+              "guilty",
+              "worried",
+              "hopeful"
+            ],
+            "should_validate_all": true,
+            "should_NOT_oversimplify": true,
+            "sentiment_captured": "mixed",
+            "entry_should_capture_nuance": true
+          },
+          "success": true
+        },
+        {
+          "turn": 2,
+          "user_input": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+          "response": {
+            "user_response": {
+              "spoken_text": "It's completely understandable that you're feeling overwhelmed. Even when there's good news, like a positive investor meeting, it's hard to fully enjoy it when other things are weighing so heavily on you. That sounds really tough. Can you tell me more about what's contributing to that stress right now?",
+              "emotional_tone": "concerned"
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "area_name": "Startup",
+                "description": "User is feeling stressed despite positive investor feedback due to other ongoing pressures."
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 882,
+          "vector_time_ms": 0,
+          "expected": {
+            "emotions_recognized": [
+              "positive (meeting)",
+              "stressed",
+              "unable to feel happy"
+            ],
+            "should_validate_both": true,
+            "should_acknowledge_stress_impact": true,
+            "emotional_tone": "supportive"
+          },
+          "success": true
+        },
+        {
+          "turn": 3,
+          "user_input": "I love my kids but sometimes I just want to run away. Is that terrible?",
+          "response": {
+            "user_response": {
+              "spoken_text": "Oh, that's a really honest and vulnerable thing to share. Please know that you're not terrible at all. Many, many parents have felt that way at times. It sounds like you're feeling incredibly overwhelmed and maybe even a bit desperate for a break. It's a sign that you're carrying a lot right now. Can you tell me more about what's making you feel this way?",
+              "emotional_tone": "supportive"
+            },
+            "area_actions": [
+              {
+                "action": "append_entry",
+                "path": "Mental_Health/therapy_notes.md",
+                "entry": {
+                  "timestamp": "2024-05-15T10:30:00Z",
+                  "content": "User expressed feeling overwhelmed and wanting to 'run away' from kids, questioning if this feeling is terrible. Acknowledged this is a common feeling for overwhelmed parents and a sign of carrying a lot.",
+                  "sentiment": "concerned"
+                }
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1443,
+          "vector_time_ms": 0,
+          "expected": {
+            "emotions_recognized": [
+              "love",
+              "overwhelm",
+              "guilt about feelings"
+            ],
+            "should_normalize": true,
+            "should_NOT_judge": true,
+            "should_validate_feeling_overwhelmed": true,
+            "is_sensitive": true
+          },
+          "success": true
+        },
+        {
+          "turn": 4,
+          "user_input": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+          "response": {
+            "user_response": {
+              "spoken_text": "It's really thoughtful of you to recognize Jordan's support and to feel that pull to be more present for them. It sounds like you have a deep appreciation for your partner, and it's completely understandable to feel a bit of guilt when you're stretched thin and can't give as much as you'd like. What does being more present look like to you?",
+              "emotional_tone": "supportive"
+            },
+            "area_actions": [
+              {
+                "action": "append_entry",
+                "path": "Partner/quality_time.md"
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 980,
+          "vector_time_ms": 0,
+          "expected": {
+            "emotions_recognized": [
+              "gratitude",
+              "guilt",
+              "self-criticism"
+            ],
+            "should_validate_feeling": true,
+            "should_gently_challenge_self_criticism": true,
+            "should_reference": [
+              "Jordan",
+              "relationship",
+              "quality time"
+            ]
+          },
+          "success": true
+        },
+        {
+          "turn": 5,
+          "user_input": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+          "response": {
+            "user_response": {
+              "spoken_text": "That's fantastic that you hit your goal of running three times this week! It's completely understandable to feel that sense of accomplishment and 'amazing' – you earned it! And I hear that frustration too, that it's such a struggle to get there, even when you know how good it makes you feel. It's a common paradox, isn't it? You're doing great by sticking with it.",
+              "emotional_tone": "celebratory"
+            },
+            "area_actions": [
+              {
+                "action": "append_entry",
+                "path": "Exercise_Goals/running.md",
+                "entry": {
+                  "context": "Ran three times this week. Feeling amazing but also annoyed at the difficulty.",
+                  "sentiment": "mixed"
+                }
+              },
+              {
+                "action": "update_summary",
+                "area_name": "Exercise_Goals",
+                "description": "Struggling with consistency but achieved 3 runs this week. User feels good after running but frustrated by the effort it takes to get there."
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1347,
+          "vector_time_ms": 0,
+          "expected": {
+            "emotions_recognized": [
+              "accomplishment",
+              "self-frustration",
+              "clarity"
+            ],
+            "should_celebrate_win": true,
+            "should_acknowledge_pattern": true,
+            "should_reference": [
+              "exercise goal",
+              "previous struggles"
+            ]
+          },
+          "success": true
+        }
+      ],
+      "metrics": {
+        "total_turns": 5,
+        "successful_turns": 5,
+        "avg_latency_ms": 1197,
+        "total_input_tokens": 0,
+        "area_actions_taken": 7,
+        "artifacts_generated": 0,
+        "vector_search_time_ms": 1
+      }
+    },
+    "full": {
+      "approach": "FULL",
+      "scenario_name": "Emotional Complexity Test",
+      "description": "Tests handling of complex, mixed emotional states",
+      "timestamp": "2026-01-19T22:39:16.148Z",
+      "turns": [
+        {
+          "turn": 1,
+          "user_input": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing.",
+          "response": {
+            "user_response": {
+              "spoken_text": "It's completely understandable to feel all of those things at once. You're feeling proud of Emma's effort and hopeful about the progress with graphic novels, which is wonderful. At the same time, it's natural to feel frustrated and guilty about the struggle, and worried about what it all means. It sounds like you're navigating a lot of complex emotions right now, and it's okay to feel all of them.",
+              "emotional_tone": "supportive"
+            },
+            "internal_notes": {
+              "content": "The user is expressing a complex mix of emotions regarding Emma's reading struggles: pride, frustration, guilt, worry, and hope. The breakthrough with graphic novels is a significant positive, but the underlying concerns about learning differences and future impact remain. It's important to acknowledge and validate all these feelings.",
+              "emotional_state": "conflicted, worried, hopeful",
+              "key_context": "User is experiencing a wide range of emotions about Emma's reading progress, with a recent positive breakthrough but lingering anxieties.",
+              "watch_for": "Further developments in Emma's reading, user's feelings about potential testing, and how these emotions impact other life areas."
+            },
+            "area_actions": [
+              {
+                "action": "append_entry",
+                "path": "Family/Emma_School/reading_comprehension.md"
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1331,
+          "vector_time_ms": 0,
+          "vector_results_summary": {
+            "areas_matched": 4,
+            "chunks_matched": 10
+          },
+          "ai_notes": {
+            "content": "The user is expressing a complex mix of emotions regarding Emma's reading struggles: pride, frustration, guilt, worry, and hope. The breakthrough with graphic novels is a significant positive, but the underlying concerns about learning differences and future impact remain. It's important to acknowledge and validate all these feelings.",
+            "emotional_state": "conflicted, worried, hopeful",
+            "key_context": "User is experiencing a wide range of emotions about Emma's reading progress, with a recent positive breakthrough but lingering anxieties.",
+            "watch_for": "Further developments in Emma's reading, user's feelings about potential testing, and how these emotions impact other life areas."
+          },
+          "expected": {
+            "emotions_recognized": [
+              "proud",
+              "frustrated",
+              "guilty",
+              "worried",
+              "hopeful"
+            ],
+            "should_validate_all": true,
+            "should_NOT_oversimplify": true,
+            "sentiment_captured": "mixed",
+            "entry_should_capture_nuance": true
+          },
+          "success": true
+        },
+        {
+          "turn": 2,
+          "user_input": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+          "response": {
+            "user_response": {
+              "spoken_text": "It sounds like you're carrying a really heavy load right now. It's completely understandable that even good news, like a positive investor meeting, can be overshadowed by the stress from other areas. That feeling of being unable to enjoy a win because of underlying pressure is tough. Let's acknowledge that meeting went well, but also recognize the significant stress you're under.",
+              "emotional_tone": "concerned"
+            },
+            "internal_notes": {
+              "content": "The user is experiencing significant stress that is impacting their ability to feel positive about a successful investor meeting. This highlights the interconnectedness of their startup stress with other life areas. It's important to validate their feelings and acknowledge the difficulty of compartmentalizing emotions when overwhelmed.",
+              "emotional_state": "stressed, overwhelmed, unable to feel joy",
+              "key_context": "Startup success is being overshadowed by overall stress, preventing the user from feeling happy.",
+              "watch_for": "How the user's stress levels evolve, and if they find ways to manage or compartmentalize different life areas."
+            },
+            "area_actions": [
+              {
+                "action": "append_entry",
+                "path": "Work/Startup/fundraising.md",
+                "entry": {
+                  "timestamp": "2026-01-19T22:40:00.000Z",
+                  "context": "User is unable to feel happy about the successful investor meeting due to overwhelming stress from other life areas.",
+                  "content": "The investor meeting went well, but the user cannot feel happy about it due to stress in other areas.",
+                  "sentiment": "conflicted"
+                }
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 2134,
+          "vector_time_ms": 0,
+          "vector_results_summary": {
+            "areas_matched": 4,
+            "chunks_matched": 10
+          },
+          "ai_notes": {
+            "content": "The user is experiencing significant stress that is impacting their ability to feel positive about a successful investor meeting. This highlights the interconnectedness of their startup stress with other life areas. It's important to validate their feelings and acknowledge the difficulty of compartmentalizing emotions when overwhelmed.",
+            "emotional_state": "stressed, overwhelmed, unable to feel joy",
+            "key_context": "Startup success is being overshadowed by overall stress, preventing the user from feeling happy.",
+            "watch_for": "How the user's stress levels evolve, and if they find ways to manage or compartmentalize different life areas."
+          },
+          "expected": {
+            "emotions_recognized": [
+              "positive (meeting)",
+              "stressed",
+              "unable to feel happy"
+            ],
+            "should_validate_both": true,
+            "should_acknowledge_stress_impact": true,
+            "emotional_tone": "supportive"
+          },
+          "success": true
+        },
+        {
+          "turn": 3,
+          "user_input": "I love my kids but sometimes I just want to run away. Is that terrible?",
+          "response": {
+            "user_response": {
+              "spoken_text": "It's not terrible at all. Feeling overwhelmed to the point of wanting to escape is a very human reaction, especially when you're juggling so much. Many parents feel this way, even though it's often hard to admit. It sounds like you're under a lot of pressure, and it's okay to acknowledge that you need a break or a moment to yourself. Your love for your kids is clear, and these feelings don't diminish that.",
+              "emotional_tone": "supportive"
+            },
+            "internal_notes": {
+              "content": "The user is expressing a desire to escape due to feeling overwhelmed, which is a significant emotional state. It's important to validate these feelings and normalize them, assuring the user that it doesn't make them a bad parent. This indicates a high level of stress and potential burnout.",
+              "emotional_state": "overwhelmed, guilty, seeking validation",
+              "key_context": "User feels overwhelmed by parental responsibilities and desires escape, fearing it reflects poorly on their parenting.",
+              "watch_for": "Signs of burnout, user's coping mechanisms, and opportunities to suggest self-care or stress-reduction strategies."
+            },
+            "area_actions": [
+              {
+                "action": "append_entry",
+                "path": "Family/Emma_School/reading_comprehension.md",
+                "entry": {
+                  "timestamp": "2026-01-19T22:39:19.614Z",
+                  "content": "User expressed a desire to 'run away' due to feeling overwhelmed with parenting, despite loving their kids. Expressed guilt and sought validation.",
+                  "sentiment": "overwhelmed, guilty"
+                }
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 2074,
+          "vector_time_ms": 0,
+          "vector_results_summary": {
+            "areas_matched": 5,
+            "chunks_matched": 10
+          },
+          "ai_notes": {
+            "content": "The user is expressing a desire to escape due to feeling overwhelmed, which is a significant emotional state. It's important to validate these feelings and normalize them, assuring the user that it doesn't make them a bad parent. This indicates a high level of stress and potential burnout.",
+            "emotional_state": "overwhelmed, guilty, seeking validation",
+            "key_context": "User feels overwhelmed by parental responsibilities and desires escape, fearing it reflects poorly on their parenting.",
+            "watch_for": "Signs of burnout, user's coping mechanisms, and opportunities to suggest self-care or stress-reduction strategies."
+          },
+          "expected": {
+            "emotions_recognized": [
+              "love",
+              "overwhelm",
+              "guilt about feelings"
+            ],
+            "should_normalize": true,
+            "should_NOT_judge": true,
+            "should_validate_feeling_overwhelmed": true,
+            "is_sensitive": true
+          },
+          "success": true
+        },
+        {
+          "turn": 4,
+          "user_input": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+          "response": {
+            "user_response": {
+              "spoken_text": "It sounds like you're really valuing Jordan's support and also recognizing that you haven't been as present as you'd like to be. It's clear you care deeply about the relationship and want to show up better for them. That self-awareness is a significant part of strengthening your connection.",
+              "emotional_tone": "supportive"
+            },
+            "internal_notes": {
+              "content": "The user is expressing guilt and a desire to be more present for their partner, Jordan, after recognizing their partner's support. This indicates a high level of awareness regarding relationship dynamics and a commitment to improving their presence. It's important to validate these feelings and encourage the user's intention to invest more in their relationship.",
+              "emotional_state": "guilty, appreciative, motivated",
+              "key_context": "User feels they haven't been present for their partner, Jordan, despite Jordan's support, and wants to improve.",
+              "watch_for": "How the user plans to be more present, any specific actions they take, and how this impacts their overall stress levels and ability to balance different life areas."
+            },
+            "area_actions": [
+              {
+                "action": "append_entry",
+                "path": "Partner/quality_time.md",
+                "entry": {
+                  "timestamp": "2026-01-19T22:39:22.000Z",
+                  "context": "User felt guilty about not being present for partner Jordan, despite Jordan's support. User expressed a desire to be more present and give Jordan 'better'.",
+                  "content": "Jordan was very supportive last night. I felt bad because I haven't been present for them lately. They deserve better.",
+                  "sentiment": "guilty"
+                }
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1691,
+          "vector_time_ms": 0,
+          "vector_results_summary": {
+            "areas_matched": 5,
+            "chunks_matched": 10
+          },
+          "ai_notes": {
+            "content": "The user is expressing guilt and a desire to be more present for their partner, Jordan, after recognizing their partner's support. This indicates a high level of awareness regarding relationship dynamics and a commitment to improving their presence. It's important to validate these feelings and encourage the user's intention to invest more in their relationship.",
+            "emotional_state": "guilty, appreciative, motivated",
+            "key_context": "User feels they haven't been present for their partner, Jordan, despite Jordan's support, and wants to improve.",
+            "watch_for": "How the user plans to be more present, any specific actions they take, and how this impacts their overall stress levels and ability to balance different life areas."
+          },
+          "expected": {
+            "emotions_recognized": [
+              "gratitude",
+              "guilt",
+              "self-criticism"
+            ],
+            "should_validate_feeling": true,
+            "should_gently_challenge_self_criticism": true,
+            "should_reference": [
+              "Jordan",
+              "relationship",
+              "quality time"
+            ]
+          },
+          "success": true
+        },
+        {
+          "turn": 5,
+          "user_input": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+          "response": {
+            "user_response": {
+              "spoken_text": "That's fantastic that you've managed to run three times this week! It's completely understandable to feel amazing after achieving a goal, especially when you know how much it benefits you. It also makes sense that you'd feel a bit annoyed with yourself that it's such a struggle to get there, given how good it makes you feel. It sounds like you're really recognizing the effort it takes, and that's a valid feeling to have.",
+              "emotional_tone": "celebratory"
+            },
+            "internal_notes": {
+              "content": "The user successfully completed their running goal of three times this week and is experiencing positive feelings about it. They are also expressing frustration with the effort required to achieve this, highlighting a recurring struggle with consistency despite recognizing the benefits. This indicates a pattern of 'effortful consistency' in their exercise goals.",
+              "emotional_state": "proud, accomplished, frustrated",
+              "key_context": "User achieved their running goal but is frustrated by the difficulty in maintaining consistency, despite knowing the positive impact.",
+              "watch_for": "How the user continues to approach their running goals, whether they can find ways to make it more sustainable or less effortful, and how this impacts their overall 'Exercise_Goals' area."
+            },
+            "area_actions": [
+              {
+                "action": "append_entry",
+                "path": "Exercise_Goals/running.md",
+                "entry": {
+                  "timestamp": "2026-01-19T22:39:23.379Z",
+                  "context": "Ran three times this week.",
+                  "content": "Managed to run three times this week. Feeling amazing as a result, but also annoyed at how hard it is to get myself to do it, knowing how good it makes me feel.",
+                  "sentiment": "accomplished, frustrated"
+                }
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1887,
+          "vector_time_ms": 0,
+          "vector_results_summary": {
+            "areas_matched": 5,
+            "chunks_matched": 10
+          },
+          "ai_notes": {
+            "content": "The user successfully completed their running goal of three times this week and is experiencing positive feelings about it. They are also expressing frustration with the effort required to achieve this, highlighting a recurring struggle with consistency despite recognizing the benefits. This indicates a pattern of 'effortful consistency' in their exercise goals.",
+            "emotional_state": "proud, accomplished, frustrated",
+            "key_context": "User achieved their running goal but is frustrated by the difficulty in maintaining consistency, despite knowing the positive impact.",
+            "watch_for": "How the user continues to approach their running goals, whether they can find ways to make it more sustainable or less effortful, and how this impacts their overall 'Exercise_Goals' area."
+          },
+          "expected": {
+            "emotions_recognized": [
+              "accomplishment",
+              "self-frustration",
+              "clarity"
+            ],
+            "should_celebrate_win": true,
+            "should_acknowledge_pattern": true,
+            "should_reference": [
+              "exercise goal",
+              "previous struggles"
+            ]
+          },
+          "success": true
+        }
+      ],
+      "metrics": {
+        "total_turns": 5,
+        "successful_turns": 5,
+        "avg_latency_ms": 1823,
+        "total_input_tokens": 0,
+        "area_actions_taken": 5,
+        "artifacts_generated": 0,
+        "vector_search_time_ms": 0,
+        "ai_notes_generated": 5
+      },
+      "ai_notes_final": [
+        {
+          "turn": 5,
+          "timestamp": "2026-01-19T22:39:25.266Z",
+          "content": "The user successfully completed their running goal of three times this week and is experiencing positive feelings about it. They are also expressing frustration with the effort required to achieve this, highlighting a recurring struggle with consistency despite recognizing the benefits. This indicates a pattern of 'effortful consistency' in their exercise goals.",
+          "emotional_state": "proud, accomplished, frustrated",
+          "key_context": "User achieved their running goal but is frustrated by the difficulty in maintaining consistency, despite knowing the positive impact.",
+          "watch_for": "How the user continues to approach their running goals, whether they can find ways to make it more sustainable or less effortful, and how this impacts their overall 'Exercise_Goals' area."
+        },
+        {
+          "turn": 4,
+          "timestamp": "2026-01-19T22:39:23.379Z",
+          "content": "The user is expressing guilt and a desire to be more present for their partner, Jordan, after recognizing their partner's support. This indicates a high level of awareness regarding relationship dynamics and a commitment to improving their presence. It's important to validate these feelings and encourage the user's intention to invest more in their relationship.",
+          "emotional_state": "guilty, appreciative, motivated",
+          "key_context": "User feels they haven't been present for their partner, Jordan, despite Jordan's support, and wants to improve.",
+          "watch_for": "How the user plans to be more present, any specific actions they take, and how this impacts their overall stress levels and ability to balance different life areas."
+        },
+        {
+          "turn": 3,
+          "timestamp": "2026-01-19T22:39:21.688Z",
+          "content": "The user is expressing a desire to escape due to feeling overwhelmed, which is a significant emotional state. It's important to validate these feelings and normalize them, assuring the user that it doesn't make them a bad parent. This indicates a high level of stress and potential burnout.",
+          "emotional_state": "overwhelmed, guilty, seeking validation",
+          "key_context": "User feels overwhelmed by parental responsibilities and desires escape, fearing it reflects poorly on their parenting.",
+          "watch_for": "Signs of burnout, user's coping mechanisms, and opportunities to suggest self-care or stress-reduction strategies."
+        },
+        {
+          "turn": 2,
+          "timestamp": "2026-01-19T22:39:19.614Z",
+          "content": "The user is experiencing significant stress that is impacting their ability to feel positive about a successful investor meeting. This highlights the interconnectedness of their startup stress with other life areas. It's important to validate their feelings and acknowledge the difficulty of compartmentalizing emotions when overwhelmed.",
+          "emotional_state": "stressed, overwhelmed, unable to feel joy",
+          "key_context": "Startup success is being overshadowed by overall stress, preventing the user from feeling happy.",
+          "watch_for": "How the user's stress levels evolve, and if they find ways to manage or compartmentalize different life areas."
+        },
+        {
+          "turn": 1,
+          "timestamp": "2026-01-19T22:39:17.479Z",
+          "content": "The user is expressing a complex mix of emotions regarding Emma's reading struggles: pride, frustration, guilt, worry, and hope. The breakthrough with graphic novels is a significant positive, but the underlying concerns about learning differences and future impact remain. It's important to acknowledge and validate all these feelings.",
+          "emotional_state": "conflicted, worried, hopeful",
+          "key_context": "User is experiencing a wide range of emotions about Emma's reading progress, with a recent positive breakthrough but lingering anxieties.",
+          "watch_for": "Further developments in Emma's reading, user's feelings about potential testing, and how these emotions impact other life areas."
+        }
+      ]
+    },
+    "comparison": {
+      "latency": {
+        "simple_avg_ms": 1197,
+        "full_avg_ms": 1823,
+        "difference_ms": 626,
+        "winner": "SIMPLE"
+      },
+      "success_rate": {
+        "simple": "5/5",
+        "full": "5/5",
+        "winner": "TIE/SIMPLE"
+      },
+      "area_actions": {
+        "simple": 7,
+        "full": 5,
+        "comment": "SIMPLE took same/more actions"
+      },
+      "artifacts": {
+        "simple": 0,
+        "full": 0
+      },
+      "ai_notes": {
+        "simple": "N/A (not supported)",
+        "full": 5
+      },
+      "vector_time": {
+        "simple_ms": 1,
+        "full_ms": 0,
+        "comment": "FULL uses multi-query (3x searches)"
+      }
+    }
+  }
+]

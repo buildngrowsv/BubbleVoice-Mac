@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma's Reading Journey - Emotional Landscape</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #2c5282; /* Darker blue for title */
+            letter-spacing: -1px;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            font-weight: 400;
+            color: #718096; /* Medium gray */
+            margin-bottom: 30px;
+        }
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .emotion-box {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, background 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .emotion-box:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .emotion-box .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        .emotion-box .title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #3182ce; /* Blue */
+            margin-bottom: 8px;
+        }
+        .emotion-box .description {
+            font-size: 0.95em;
+            font-weight: 400;
+            color: #5a67d8; /* Indigo */
+            line-height: 1.5;
+        }
+        .positive {
+            background: linear-gradient(135deg, #90cdf4 0%, #63b3ed 100%); /* Light Blue Gradient */
+            color: white;
+        }
+        .positive .title {
+            color: white;
+        }
+        .positive .description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .negative {
+            background: linear-gradient(135deg, #fbb6ce 0%, #f6ad55 100%); /* Pink/Orange Gradient */
+            color: white;
+        }
+        .negative .title {
+            color: white;
+        }
+        .negative .description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .hopeful {
+            background: linear-gradient(135deg, #9ae6b4 0%, #68d391 100%); /* Green Gradient */
+            color: white;
+        }
+        .hopeful .title {
+            color: white;
+        }
+        .hopeful .description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .conflicted {
+            background: linear-gradient(135deg, #b794f4 0%, #9f7aea 100%); /* Purple Gradient */
+            color: white;
+        }
+        .conflicted .title {
+            color: white;
+        }
+        .conflicted .description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Emma's Reading Journey</h1>
+        <p class="subtitle">Navigating a complex mix of emotions</p>
+        <div class="emotion-grid">
+            <div class="emotion-box positive">
+                <div class="icon">😊</div>
+                <div class="title">Pride</div>
+                <div class="description">Proud of Emma's effort and resilience.</div>
+            </div>
+            <div class="emotion-box negative">
+                <div class="icon">😟</div>
+                <div class="title">Frustration</div>
+                <div class="description">Frustrated by the difficulty she's facing.</div>
+            </div>
+            <div class="emotion-box negative">
+                <div class="icon">😔</div>
+                <div class="title">Guilt</div>
+                <div class="description">Guilty for not noticing her struggles sooner.</div>
+            </div>
+            <div class="emotion-box negative">
+                <div class="icon">😥</div>
+                <div class="title">Worry</div>
+                <div class="description">Worried about the long-term implications for her future.</div>
+            </div>
+            <div class="emotion-box hopeful">
+                <div class="icon">💡</div>
+                <div class="title">Hope</div>
+                <div class="description">Hopeful due to the recent breakthrough with graphic novels.</div>
+            </div>
+             <div class="emotion-box conflicted">
+                <div class="icon">⚖️</div>
+                <div class="title">Complexity</div>
+                <div class="description">Holding multiple, sometimes conflicting, feelings simultaneously.</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

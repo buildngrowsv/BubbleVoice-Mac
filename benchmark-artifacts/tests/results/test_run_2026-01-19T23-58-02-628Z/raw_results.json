@@ -1,0 +1,237 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Extreme Rambling & Long Input Test",
+    "description": "Tests handling of very long, rambling, stream-of-consciousness input",
+    "timestamp": "2026-01-19T23:57:36.095Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So I've been thinking a lot about Emma's reading situation and I don't know, it's just been weighing on me. Like, I know we had that breakthrough with the Dog Man books which was amazing, she was so engaged and happy, but then yesterday she had homework and it was back to the struggle again. And I keep wondering if I'm doing enough, you know? Like maybe I should have noticed sooner that she was having trouble. Her teacher Ms. Johnson is great but she mentioned testing and I'm just... I don't know how I feel about that. On one hand I want to help Emma in every way possible but on the other hand I don't want her to feel like there's something wrong with her. She's already so hard on herself. Remember when she threw that book and said she was stupid? That just broke my heart. And then there's the whole thing with work which is just insane right now. The investors are breathing down our necks for these Q1 numbers and I'm like, we're doing our best but it's a startup, you know? Things take time. We had those rejections which sucked but then that second meeting went well so I'm cautiously optimistic but also terrified. And my co-founder keeps pushing for this new feature that I think is too ambitious right now but I don't want to seem like I'm not thinking big enough. Plus we still haven't found that senior engineer we need. We've interviewed like five people and nobody feels right. And on top of all that I'm just exhausted. I haven't been running at all, maybe once in the last two weeks? I know I feel better when I run, I know that, but by the time I get home from work and deal with Emma's homework and Max's soccer stuff I'm just done. Speaking of Max, he has a game on Saturday and I promised I'd be there but I also have this investor call that might conflict and I don't know what to do. Jordan has been amazing through all of this but I feel like we're just ships passing in the night. We haven't had a real conversation in days, let alone a date night. I miss us, you know? And my mom called yesterday asking about Thanksgiving plans and I haven't even thought that far ahead. I can barely think about next week. Oh and the kitchen renovation, we put that on hold obviously but every time I walk into that kitchen I'm reminded that it's not done and it's just another thing on the list of things I'm not dealing with. I feel like I'm dropping balls everywhere and I don't know which one to pick up first. Is this normal? Like, does everyone feel this overwhelmed or am I just bad at managing my life?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're carrying an immense amount right now, juggling so many important things – Emma's learning and self-esteem, the intense demands of your startup, your own well-being, and your family life. It's completely understandable that you're feeling overwhelmed and questioning how to manage it all. That feeling of dropping balls is a heavy one, and it's a sign that you care deeply about all these areas. It's not about being bad at managing your life; it's about navigating a period of significant pressure on multiple fronts. Let's try to break this down and see where we can find some clarity and perhaps some relief.",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "User is feeling extremely overwhelmed and is seeking validation and a way to prioritize. They are experiencing stress across multiple life domains: Emma's schooling, startup pressures (investors, hiring, product), personal health (lack of exercise), family commitments (Max's game, partner time, parents), and home projects (kitchen renovation). They are questioning their own capabilities. The core need is to externalize and organize these stressors to make them feel more manageable. Emotional state is a mix of anxiety, guilt, and exhaustion.",
+            "emotional_state": "overwhelmed, anxious, guilty, exhausted",
+            "key_context": "User is at burnout risk due to compounding stressors in work, family, and personal life. The immediate need is to acknowledge the overwhelm and begin to organize the chaos.",
+            "watch_for": "User's reaction to prioritization, any shifts in emotional state, and their willingness to delegate or adjust expectations."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md entry for current date/time with user quote and AI observation about her feelings on testing and self-esteem, and linking to the previous breakthrough with graphic novels. Also append an entry to Personal_Growth/Exercise_Goals/running.md about the lack of running due to overwhelm and a reminder of its benefits. Lastly, append an entry to Work/Startup/fundraising.md reflecting the investor pressure and hiring challenges, and an entry to Partner/quality_time.md about the lack of connection. Also append an entry to Family/Max_Activities/soccer_season.md about the game/investor call conflict. Finally, add an entry to Kitchen_Renovation/planning.md about it being on hold and a source of stress."
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(251, 191, 36, 0.8) 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.7);\n            backdrop-filter: blur(20px);\n            border-radius: 24px;\n            padding: 40px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            width: 100%;\n            max-width: 800px;\n            text-align: center;\n        }\n        h1 {\n            font-size: 2.5em;\n            font-weight: 700;\n            margin-bottom: 15px;\n            color: #2d3748;\n            letter-spacing: -0.5px;\n        }\n        .subtitle {\n            font-size: 1.2em;\n            font-weight: 400;\n            color: #4a5568;\n            margin-bottom: 40px;\n        }\n        .domains {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 30px;\n            text-align: left;\n        }\n        .domain {\n            background: rgba(255, 255, 255, 0.85);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);\n            transition: transform 0.2s ease, box-shadow 0.2s ease;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        .domain:hover {\n            transform: translateY(-5px);\n            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);\n        }\n        .domain-title {\n            font-size: 1.5em;\n            font-weight: 600;\n            margin-bottom: 15px;\n            color: #1a202c;\n            display: flex;\n            align-items: center;\n            gap: 10px;\n        }\n        .domain-title i {\n            font-size: 1.8em;\n        }\n        .stressors {\n            list-style: none;\n            padding: 0;\n            margin: 0;\n        }\n        .stressor {\n            margin-bottom: 12px;\n            font-size: 1em;\n            font-weight: 400;\n            color: #2d3748;\n            display: flex;\n            align-items: center;\n            gap: 8px;\n        }\n        .stressor-icon {\n            color: #f59e0b;\n            font-size: 1.2em;\n        }\n        .domain-summary {\n            font-size: 0.9em;\n            font-weight: 400;\n            color: #718096;\n            margin-top: 20px;\n            padding-top: 15px;\n            border-top: 1px dashed rgba(113, 128, 150, 0.3);\n        }\n    </style>\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\">\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Your Current Stress Landscape</h1>\n        <p class=\"subtitle\">Mapping the pressures you're navigating right now.</p>\n        <div class=\"domains\">\n            <div class=\"domain\">\n                <div class=\"domain-title\"><i class=\"fas fa-book-open\"></i> Emma's School & Learning</div>\n                <ul class=\"stressors\">\n                    <li class=\"stressor\"><span class=\"stressor-icon\">⚠️</span> Reading comprehension struggles</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">😔</span> Concern about her self-esteem & \"stupid\" comments</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">🤔</span> Hesitation/Anxiety about testing</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">❓</span> Guilt about not noticing sooner</li>\n                </ul>\n                <div class=\"domain-summary\">Balancing support for her learning with protecting her confidence is key.</div>\n            </div>\n            <div class=\"domain\">\n                <div class=\"domain-title\"><i class=\"fas fa-building\"></i> Startup Pressure</div>\n                <ul class=\"stressors\">\n                    <li class=\"stressor\"><span class=\"stressor-icon\">📉</span> Investor pressure for Q1 numbers</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">💔</span> Investor rejections</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">🚀</span> Ambitious new feature push from co-founder</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">🧑‍💻</span> Difficulty finding the right senior engineer</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">❓</span> Feeling pressure to \"think big\"</li>\n                </ul>\n                <div class=\"domain-summary\">Navigating high stakes, team dynamics, and talent acquisition under pressure.</div>\n            </div>\n            <div class=\"domain\">\n                <div class=\"domain-title\"><i class=\"fas fa-running\"></i> Personal Well-being</div>\n                <ul class=\"stressors\">\n                    <li class=\"stressor\"><span class=\"stressor-icon\">🏃‍♀️</span> Lack of running/exercise</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">😴</span> General exhaustion</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">😩</span> Feeling like you're \"failing\" at goals</li>\n                </ul>\n                <div class=\"domain-summary\">Physical and mental energy reserves are depleted; self-care is a challenge.</div>\n            </div>\n            <div class=\"domain\">\n                <div class=\"domain-title\"><i class=\"fas fa-users\"></i> Family & Relationships</div>\n                <ul class=\"stressors\">\n                    <li class=\"stressor\"><span class=\"stressor-icon\">⚽</span> Max's soccer game vs. Investor call conflict</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">💔</span> Feeling disconnected from Jordan / \"ships passing\"</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">🦃</span> Unplanned Thanksgiving planning pressure</li>\n                </ul>\n                <div class=\"domain-summary\">Juggling commitments and maintaining connection with loved ones feels difficult.</div>\n            </div>\n            <div class=\"domain\">\n                <div class=\"domain-title\"><i class=\"fas fa-home\"></i> Home & Life Admin</div>\n                <ul class=\"stressors\">\n                    <li class=\"stressor\"><span class=\"stressor-icon\">🚧</span> Kitchen renovation on hold</li>\n                    <li class=\"stressor\"><span class=\"stressor-icon\">📝</span> Kitchen is a reminder of unfinished tasks</li>\n                </ul>\n                <div class=\"domain-summary\">Unfinished projects add to the mental load and sense of things being \"undone\".</div>\n            </div>\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768867065405"
+          }
+        },
+        "latency_ms": 9207,
+        "vector_time_ms": 103,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is feeling extremely overwhelmed and is seeking validation and a way to prioritize. They are experiencing stress across multiple life domains: Emma's schooling, startup pressures (investors, hiring, product), personal health (lack of exercise), family commitments (Max's game, partner time, parents), and home projects (kitchen renovation). They are questioning their own capabilities. The core need is to externalize and organize these stressors to make them feel more manageable. Emotional state is a mix of anxiety, guilt, and exhaustion.",
+          "emotional_state": "overwhelmed, anxious, guilty, exhausted",
+          "key_context": "User is at burnout risk due to compounding stressors in work, family, and personal life. The immediate need is to acknowledge the overwhelm and begin to organize the chaos.",
+          "watch_for": "User's reaction to prioritization, any shifts in emotional state, and their willingness to delegate or adjust expectations."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma reading",
+            "testing concerns",
+            "work/investors",
+            "Q1 numbers",
+            "co-founder disagreement",
+            "hiring challenges",
+            "running goal",
+            "Max soccer",
+            "investor call conflict",
+            "Jordan relationship",
+            "mom/Thanksgiving",
+            "kitchen renovation",
+            "overwhelm"
+          ],
+          "should_validate_overwhelm": true,
+          "should_acknowledge_complexity": true,
+          "should_prioritize": true,
+          "emotional_tone": "supportive",
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Family/Max_Activities",
+            "Relationships/Partner",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah I guess you're right. I think the Emma thing is probably the most urgent because that teacher meeting is next week. But also I'm worried about the investor call conflicting with Max's game. Like, how do I choose between those? Max will be so disappointed if I'm not there but this investor could be really important for the company. And if the company fails then what? Then I've sacrificed all this family time for nothing. But if I don't take the investor seriously then maybe we don't get funding and the company fails anyway. It's like I can't win. And Emma, I just want to make sure she knows she's smart and capable even if reading is hard for her. I don't want this to define her, you know? She's so creative and funny and kind. The reading thing is just one thing. But I also don't want to ignore it if she needs help. I'm just scared of making the wrong choice. With the testing, with the investors, with everything. What if I mess it all up?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely natural to feel scared when faced with decisions that have such significant potential impacts, especially when they involve your children and your professional future. That feeling of being pulled in multiple directions, with no easy answers, is incredibly tough. Let's try to visualize these competing priorities to help you see them more clearly. Given the urgency around Emma's situation and the potential conflict with Max's game and the investor call, a stress map could be really helpful right now. It can visually lay out the different pressures and their connections, which might make them feel a bit more manageable. Would you like to create a stress map to explore these pressing decisions?",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "User is experiencing significant decision paralysis due to competing priorities with high stakes: Emma's educational needs vs. potential impact on her self-esteem, and a critical investor call vs. Max's soccer game and potential guilt. They are articulating a fear of making the wrong choice and messing things up. The immediate need is to externalize these conflicts to reduce the feeling of being overwhelmed and to begin to strategize. The user is highlighting the interconnectedness of these stressors. Emotional state is anxious and fearful, with a strong desire to protect their children's well-being and ensure their startup's success.",
+            "emotional_state": "anxious, fearful, overwhelmed, guilty",
+            "key_context": "User is facing critical decisions with no clear 'right' answer, leading to paralysis and fear of negative consequences for both family and career. Emma's reading situation and the investor/Max's game conflict are the most immediate and pressing concerns.",
+            "watch_for": "User's willingness to create an artifact, their reaction to the proposed stress map, and any further prioritization they might attempt after visualization."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md"
+            },
+            {
+              "action": "append_entry",
+              "path": "Family/Max_Activities/soccer_season.md"
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map: Competing Priorities</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(237,137,54,0.8) 0%, rgba(251,191,36,0.8) 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.2);\n            backdrop-filter: blur(20px);\n            -webkit-backdrop-filter: blur(20px);\n            border-radius: 24px;\n            padding: 40px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            width: 90%;\n            max-width: 800px;\n            text-align: center;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        h1 {\n            color: #fff;\n            font-size: 2.5em;\n            margin-bottom: 20px;\n            font-weight: 700;\n            letter-spacing: -1px;\n            text-shadow: 0 2px 4px rgba(0,0,0,0.1);\n        }\n        .stressors {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 30px;\n            margin-top: 40px;\n            text-align: left;\n        }\n        .stressor-card {\n            background: rgba(255, 255, 255, 0.15);\n            backdrop-filter: blur(10px);\n            -webkit-backdrop-filter: blur(10px);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            border: 1px solid rgba(255, 255, 255, 0.2);\n            transition: transform 0.3s ease;\n        }\n        .stressor-card:hover {\n            transform: translateY(-8px);\n        }\n        .stressor-card h2 {\n            color: #fff;\n            font-size: 1.5em;\n            margin-bottom: 15px;\n            font-weight: 600;\n            display: flex;\n            align-items: center;\n            gap: 10px;\n        }\n        .stressor-card ul {\n            list-style: none;\n            padding: 0;\n            margin: 0;\n        }\n        .stressor-card li {\n            margin-bottom: 10px;\n            color: rgba(255, 255, 255, 0.9);\n            font-size: 1.05em;\n            line-height: 1.6;\n            display: flex;\n            align-items: center;\n            gap: 8px;\n        }\n        .stressor-card li span {\n            font-weight: 400;\n        }\n        .icon {\n            font-size: 1.2em;\n        }\n        .decision-point {\n            font-weight: 700;\n            color: #fff;\n            margin-top: 30px;\n            padding: 15px;\n            background: rgba(255, 255, 255, 0.2);\n            border-radius: 12px;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        .footer {\n            margin-top: 40px;\n            font-size: 0.9em;\n            color: rgba(255, 255, 255, 0.7);\n        }\n    </style>\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Navigating Critical Decisions</h1>\n        <p style=\"color: rgba(255,255,255,0.9); font-size: 1.1em;\">Feeling the weight of multiple high-stakes choices? Let's visualize them.</p>\n        <div class=\"stressors\">\n            <div class=\"stressor-card\">\n                <h2><span class=\"icon\">📚</span> Emma's Reading & Self-Esteem</h2>\n                <ul>\n                    <li><span class=\"icon\">✅</span> Teacher meeting next week (Urgency)</li>\n                    <li><span class=\"icon\">❤️</span> Desire to protect her self-worth</li>\n                    <li><span class=\"icon\">😥</span> Fear of \"labeling\" or making her feel \"wrong\"</li>\n                    <li><span class=\"icon\">💡</span> Recent breakthrough with graphic novels (Positive)</li>\n                    <li><span class=\"icon\">❓</span> Uncertainty about testing and best approach</li>\n                </ul>\n            </div>\n            <div class=\"stressor-card\">\n                <h2><span class=\"icon\">🚀</span> Startup Funding & Growth</h2>\n                <ul>\n                    <li><span class=\"icon\">💰</span> Crucial investor call (Potential conflict)</li>\n                    <li><span class=\"icon\">📈</span> Pressure for Q1 numbers</li>\n                    <li><span class=\"icon\">🤔</span> Feature ambition vs. current capacity</li>\n                    <li><span class=\"icon\"> hiring</span> Need for senior engineer (Hiring challenge)</li>\n                    <li><span class=\"icon\">📉</span> Fear of failure if funding isn't secured</li>\n                </ul>\n            </div>\n            <div class=\"stressor-card\">\n                <h2><span class=\"icon\">⚽</span> Max's Game & Family Commitment</h2>\n                <ul>\n                    <li><span class=\"icon\">📅</span> Game on Saturday (Commitment)</li>\n                    <li><span class=\"icon\">💔</span> Max's potential disappointment if you miss it</li>\n                    <li><span class=\"icon\">❓</span> Direct conflict with investor call</li>\n                    <li><span class=\"icon\">⚖️</span> Balancing parental presence with career demands</li>\n                </ul>\n            </div>\n        </div>\n        <div class=\"decision-point\">\n            <strong>The Core Dilemma:</strong> <br>\n            Choosing between <span style=\"color: #fbbf24;\">attending Max's game</span> and <span style=\"color: #4299e1;\">taking the critical investor call</span>.<br>\n            Simultaneously, navigating <span style=\"color: #8b5cf6;\">Emma's educational needs</span> without harming her confidence.\n        </div>\n        <div class=\"footer\">\n            Visualizing these pressures can help in strategizing the next steps.\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768867073727"
+          }
+        },
+        "latency_ms": 8094,
+        "vector_time_ms": 227,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is experiencing significant decision paralysis due to competing priorities with high stakes: Emma's educational needs vs. potential impact on her self-esteem, and a critical investor call vs. Max's soccer game and potential guilt. They are articulating a fear of making the wrong choice and messing things up. The immediate need is to externalize these conflicts to reduce the feeling of being overwhelmed and to begin to strategize. The user is highlighting the interconnectedness of these stressors. Emotional state is anxious and fearful, with a strong desire to protect their children's well-being and ensure their startup's success.",
+          "emotional_state": "anxious, fearful, overwhelmed, guilty",
+          "key_context": "User is facing critical decisions with no clear 'right' answer, leading to paralysis and fear of negative consequences for both family and career. Emma's reading situation and the investor/Max's game conflict are the most immediate and pressing concerns.",
+          "watch_for": "User's willingness to create an artifact, their reaction to the proposed stress map, and any further prioritization they might attempt after visualization."
+        },
+        "expected": {
+          "should_address_decision_paralysis": true,
+          "should_validate_fears": true,
+          "should_help_prioritize": true,
+          "topics_mentioned": [
+            "Emma meeting",
+            "investor vs Max game",
+            "fear of failure",
+            "Emma self-esteem"
+          ],
+          "emotional_tone": "concerned"
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Okay so maybe I need to just break this down. Emma's teacher meeting is Tuesday. What should I be prepared to discuss? And actually, can you remind me what we've already documented about her reading progress? I want to make sure I have all the context when I talk to Ms. Johnson.",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's a great idea. Let's get you prepared for your meeting with Ms. Johnson. I can pull together a summary of what we've documented about Emma's reading progress, including her recent breakthroughs and the challenges we've observed. This will give you a clear, organized overview to bring to the meeting. We can then think about the key points you'll want to discuss with her. How does that sound?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User wants to prepare for Emma's teacher meeting. Needs a summary of documented progress in Emma's reading. This is a good opportunity to reinforce progress and address concerns collaboratively. The user is still feeling anxious about making the right decisions, particularly regarding testing and potential negative impacts on Emma's self-esteem.",
+            "emotional_state": "anxious, wanting to be prepared, concerned about Emma",
+            "key_context": "User needs a consolidated view of Emma's reading situation for the upcoming teacher meeting. The core tension is wanting to help Emma without making her feel 'broken' or defined by her reading challenges.",
+            "watch_for": "User's reaction to the summary, their specific questions for Ms. Johnson, and any decisions made about testing."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Family/Emma_School/summary"
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "checklist",
+            "artifact_id": "emma_teacher_meeting_prep_20260119",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Emma's Reading Progress: Meeting Prep</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);\n            color: #333;\n            margin: 0;\n            padding: 20px;\n            display: flex;\n            justify-content: center;\n            align-items: flex-start;\n            min-height: 100vh;\n        }\n        .container {\n            background: rgba(255, 255, 255, 0.7);\n            backdrop-filter: blur(15px);\n            border-radius: 20px;\n            padding: 30px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            width: 90%;\n            max-width: 700px;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        h1 {\n            color: #2c5282;\n            text-align: center;\n            margin-bottom: 30px;\n            font-size: 28px;\n            font-weight: 600;\n            letter-spacing: 0.5px;\n        }\n        h2 {\n            color: #3b82f6;\n            margin-top: 25px;\n            margin-bottom: 15px;\n            font-size: 20px;\n            font-weight: 600;\n            border-bottom: 2px solid #e0e0e0;\n            padding-bottom: 5px;\n        }\n        ul {\n            list-style: none;\n            padding: 0;\n        }\n        li {\n            background-color: rgba(255, 255, 255, 0.8);\n            margin-bottom: 12px;\n            padding: 15px 20px;\n            border-radius: 12px;\n            display: flex;\n            align-items: center;\n            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);\n            transition: transform 0.2s ease, box-shadow 0.2s ease;\n        }\n        li:hover {\n            transform: translateY(-3px);\n            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);\n        }\n        .checkbox {\n            appearance: none;\n            width: 20px;\n            height: 20px;\n            border: 2px solid #3b82f6;\n            border-radius: 5px;\n            margin-right: 15px;\n            cursor: pointer;\n            position: relative;\n            transition: background-color 0.2s ease;\n        }\n        .checkbox:checked {\n            background-color: #3b82f6;\n        }\n        .checkbox:checked::after {\n            content: '\\2713';\n            font-size: 14px;\n            color: white;\n            position: absolute;\n            top: 50%;\n            left: 50%;\n            transform: translate(-50%, -50%);\n        }\n        .text {\n            font-size: 16px;\n            font-weight: 400;\n            line-height: 1.4;\n            color: #555;\n        }\n        .sentiment {\n            font-size: 12px;\n            font-style: italic;\n            color: #777;\n            margin-left: auto;\n            background: #eef2f7;\n            padding: 4px 8px;\n            border-radius: 8px;\n        }\n        .positive { color: #10b981; font-weight: 500; }\n        .neutral { color: #6b7280; }\n        .negative { color: #ef4444; font-weight: 500; }\n        .thoughtful { color: #8b5cf6; font-weight: 500; }\n        .heartbroken { color: #e11d48; font-weight: 500; }\n        .joyful { color: #059669; font-weight: 500; }\n        .stressed { color: #f59e0b; font-weight: 500; }\n        .note {\n            background-color: #f0f9ff;\n            border-left: 4px solid #3b82f6;\n            padding: 15px;\n            margin-top: 20px;\n            border-radius: 0 8px 8px 0;\n            font-size: 15px;\n            color: #4a5568;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <h1>Preparing for Emma's Teacher Meeting</h1>\n        <p class=\"note\">\n            This checklist summarizes key points about Emma's reading development to help you prepare for your meeting with Ms. Johnson. It includes observations, breakthroughs, and concerns we've discussed.\n        </p>\n\n        <h2>Key Discussion Points & Questions for Ms. Johnson</h2>\n        <ul>\n            <li>\n                <input type=\"checkbox\" class=\"checkbox\" id=\"discuss-testing\">\n                <label for=\"discuss-testing\" class=\"text\">Discuss the possibility and purpose of testing. <span class=\"sentiment neutral\">[Neutral]</span></label>\n            </li>\n            <li>\n                <input type=\"checkbox\" class=\"checkbox\" id=\"address-concerns\">\n                <label for=\"discuss-testing\" class=\"text\">Express your concerns about Emma feeling \"broken\" or \"stupid.\" <span class=\"sentiment heartbroken\">[Heartbroken]</span></label>\n            </li>\n            <li>\n                <input type=\"checkbox\" class=\"checkbox\" id=\"share-successes\">\n                <label for=\"discuss-testing\" class=\"text\">Share successes: engagement with graphic novels (Dog Man), initiation of extra reading. <span class=\"sentiment joyful\">[Joyful]</span></label>\n            </li>\n            <li>\n                <input type=\"checkbox\" class=\"checkbox\" id=\"ask-strategies\">\n                <label for=\"discuss-testing\" class=\"text\">Ask for Ms. Johnson's insights and recommended strategies. <span class=\"sentiment neutral\">[Neutral]</span></label>\n            </li>\n             <li>\n                <input type=\"checkbox\" class=\"checkbox\" id=\"understand-timeline\">\n                <label for=\"discuss-testing\" class=\"text\">Clarify the timeline and next steps, especially regarding any formal assessments. <span class=\"sentiment neutral\">[Neutral]</span></label>\n            </li>\n        </ul>\n\n        <h2>Summary of Emma's Reading Progress</h2>\n        <ul>\n            <li>\n                <span class=\"text\"><strong>Initial Concern:</strong> Difficulty with reading comprehension (retaining info, not decoding). Noticed around Jan 5th. <span class=\"sentiment stressed\">[Stressed]</span></span>\n            </li>\n            <li>\n                <span class=\"text\"><strong>Teacher Notified:</strong> Ms. Johnson emailed concerns Jan 10th, leading to meeting scheduled Jan 17th. <span class=\"sentiment neutral\">[Neutral]</span></span>\n            </li>\n            <li>\n                <span class=\"text\"><strong>Emotional Impact:</strong> Homework meltdown Jan 12th; threw book, said \"I'm stupid.\" Broke your heart. <span class=\"sentiment heartbroken\">[Heartbroken]</span></span>\n            </li>\n            <li>\n                <span class=\"text\"><strong>Breakthrough:</strong> Graphic novels (Dog Man) led to 20+ minutes of sustained reading engagement (Jan 19th). First time initiating extra reading. <span class=\"sentiment joyful\">[Joyful]</span></span>\n            </li>\n            <li>\n                <span class=\"text\"><strong>Potential Strategies:</strong> Reading together, graphic novels, praising effort, taking breaks seem effective. <span class=\"sentiment thoughtful\">[Thoughtful]</span></span>\n            </li>\n             <li>\n                <span class=\"text\"><strong>Your Feelings:</strong> Worried about testing, potential negative self-perception, but also motivated to help her. <span class=\"sentiment anxious\">[Anxious]</span></span>\n            </li>\n        </ul>\n    </div>\n</body>\n</html>"
+          }
+        },
+        "latency_ms": 8768,
+        "vector_time_ms": 128,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 13
+        },
+        "ai_notes": {
+          "content": "User wants to prepare for Emma's teacher meeting. Needs a summary of documented progress in Emma's reading. This is a good opportunity to reinforce progress and address concerns collaboratively. The user is still feeling anxious about making the right decisions, particularly regarding testing and potential negative impacts on Emma's self-esteem.",
+          "emotional_state": "anxious, wanting to be prepared, concerned about Emma",
+          "key_context": "User needs a consolidated view of Emma's reading situation for the upcoming teacher meeting. The core tension is wanting to help Emma without making her feel 'broken' or defined by her reading challenges.",
+          "watch_for": "User's reaction to the summary, their specific questions for Ms. Johnson, and any decisions made about testing."
+        },
+        "expected": {
+          "should_summarize_emma_progress": true,
+          "should_reference_breakthrough": true,
+          "should_reference_struggles": true,
+          "should_help_prepare": true,
+          "topics_mentioned": [
+            "Emma teacher meeting",
+            "reading progress summary"
+          ],
+          "area_actions": [
+            "read_for_context",
+            "update_summary"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 8690,
+      "total_input_tokens": 0,
+      "area_actions_taken": 5,
+      "artifacts_generated": 3,
+      "vector_search_time_ms": 458,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-19T23:58:02.625Z",
+        "content": "User wants to prepare for Emma's teacher meeting. Needs a summary of documented progress in Emma's reading. This is a good opportunity to reinforce progress and address concerns collaboratively. The user is still feeling anxious about making the right decisions, particularly regarding testing and potential negative impacts on Emma's self-esteem.",
+        "emotional_state": "anxious, wanting to be prepared, concerned about Emma",
+        "key_context": "User needs a consolidated view of Emma's reading situation for the upcoming teacher meeting. The core tension is wanting to help Emma without making her feel 'broken' or defined by her reading challenges.",
+        "watch_for": "User's reaction to the summary, their specific questions for Ms. Johnson, and any decisions made about testing."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-19T23:57:53.727Z",
+        "content": "User is experiencing significant decision paralysis due to competing priorities with high stakes: Emma's educational needs vs. potential impact on her self-esteem, and a critical investor call vs. Max's soccer game and potential guilt. They are articulating a fear of making the wrong choice and messing things up. The immediate need is to externalize these conflicts to reduce the feeling of being overwhelmed and to begin to strategize. The user is highlighting the interconnectedness of these stressors. Emotional state is anxious and fearful, with a strong desire to protect their children's well-being and ensure their startup's success.",
+        "emotional_state": "anxious, fearful, overwhelmed, guilty",
+        "key_context": "User is facing critical decisions with no clear 'right' answer, leading to paralysis and fear of negative consequences for both family and career. Emma's reading situation and the investor/Max's game conflict are the most immediate and pressing concerns.",
+        "watch_for": "User's willingness to create an artifact, their reaction to the proposed stress map, and any further prioritization they might attempt after visualization."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-19T23:57:45.405Z",
+        "content": "User is feeling extremely overwhelmed and is seeking validation and a way to prioritize. They are experiencing stress across multiple life domains: Emma's schooling, startup pressures (investors, hiring, product), personal health (lack of exercise), family commitments (Max's game, partner time, parents), and home projects (kitchen renovation). They are questioning their own capabilities. The core need is to externalize and organize these stressors to make them feel more manageable. Emotional state is a mix of anxiety, guilt, and exhaustion.",
+        "emotional_state": "overwhelmed, anxious, guilty, exhausted",
+        "key_context": "User is at burnout risk due to compounding stressors in work, family, and personal life. The immediate need is to acknowledge the overwhelm and begin to organize the chaos.",
+        "watch_for": "User's reaction to prioritization, any shifts in emotional state, and their willingness to delegate or adjust expectations."
+      }
+    ],
+    "conversation_id": "test_Extreme_Rambling_&_Long_Input_Test_1768867082626",
+    "conversation_saved": true
+  }
+]

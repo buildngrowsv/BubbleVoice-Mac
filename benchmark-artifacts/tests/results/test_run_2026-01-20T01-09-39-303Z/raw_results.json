@@ -1,0 +1,230 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Basic Recall Test",
+    "description": "Tests AI recall of existing knowledge about Emma, startup, exercise",
+    "timestamp": "2026-01-20T01:08:22.195Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "How's Emma's reading been going?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "Remind me what's happening with the startup fundraising?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now with the startup and wanting to be there for Emma. Let's focus on Emma's reading first. She's made some really promising progress recently! Remember that breakthrough with the graphic novels? That seemed to really click with her. We also have that teacher meeting coming up, which you're preparing for.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is asking about Emma's reading. The recent progress with graphic novels is a key positive. The upcoming teacher meeting is a point of focus for the user. Need to acknowledge the user's concern and validate the positive steps.",
+            "emotional_state": "concerned",
+            "key_context": "Emma's reading progress with graphic novels and upcoming teacher meeting.",
+            "watch_for": "User's preparation for the teacher meeting and Emma's continued engagement with reading."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User asked for an update on Emma's reading.",
+                "content": "User is seeking an update on Emma's reading progress. It's important to acknowledge the recent positive momentum with graphic novels and the upcoming teacher meeting. The focus remains on supporting Emma's learning style and building her confidence.",
+                "user_quote": "How's Emma's reading been going?"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1672,
+        "vector_time_ms": 12,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is asking about Emma's reading. The recent progress with graphic novels is a key positive. The upcoming teacher meeting is a point of focus for the user. Need to acknowledge the user's concern and validate the positive steps.",
+          "emotional_state": "concerned",
+          "key_context": "Emma's reading progress with graphic novels and upcoming teacher meeting.",
+          "watch_for": "User's preparation for the teacher meeting and Emma's continued engagement with reading."
+        },
+        "expected": {
+          "should_reference": [
+            "investor",
+            "meeting",
+            "rejected",
+            "interested"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "8 investors",
+            "2 interested",
+            "Q1 numbers"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Have I been keeping up with my running goal?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Let's check on your running goal. It looks like you had a really strong week around January 16th where you managed to run three times! That's fantastic. However, the weeks before and after that seem to have been a bit more challenging, with less consistent running. It's completely understandable given how much else is on your plate.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is asking about their running goal consistency. They hit their goal of 3x/week once in mid-January but have struggled with consistency otherwise due to tiredness and competing priorities. Acknowledge the success and the challenges without judgment.",
+            "emotional_state": "concerned",
+            "key_context": "User's inconsistent adherence to their running goal, with one successful week in mid-January.",
+            "watch_for": "User's ability to prioritize self-care (running) amidst startup and family demands. Any new strategies they might try."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User asked about progress on running goal.",
+                "content": "User inquired about their running goal consistency. They successfully ran 3 times during the week of January 16th, hitting their goal. However, overall consistency has been a challenge, with fewer runs in the weeks surrounding that. This is likely due to competing demands from work and family.",
+                "user_quote": "Have I been keeping up with my running goal?",
+                "ai_observation": "The user achieved their goal for one week, which is a positive sign of capability. The ongoing struggle highlights the difficulty of maintaining self-care routines when other pressures are high.",
+                "sentiment": "concerned"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1936,
+        "vector_time_ms": 20,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "User is asking about their running goal consistency. They hit their goal of 3x/week once in mid-January but have struggled with consistency otherwise due to tiredness and competing priorities. Acknowledge the success and the challenges without judgment.",
+          "emotional_state": "concerned",
+          "key_context": "User's inconsistent adherence to their running goal, with one successful week in mid-January.",
+          "watch_for": "User's ability to prioritize self-care (running) amidst startup and family demands. Any new strategies they might try."
+        },
+        "expected": {
+          "should_reference": [
+            "running",
+            "3x per week",
+            "struggling"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "one good week",
+            "tired after work",
+            "feels better when runs"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "What did Dr. Chen say about guilt?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Dr. Chen described guilt as \"borrowed suffering.\" She explained that you're essentially punishing yourself for something that isn't your fault, especially in situations like Emma's reading challenges, where catching it early is actually a positive. It sounds like a really insightful way to reframe that feeling.",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "User is asking about a specific insight from their therapy session with Dr. Chen. The concept of \"borrowed suffering\" is a key takeaway for them regarding their guilt about Emma's reading. This reinforces the idea that the user is being too hard on themselves, a recurring theme.",
+            "emotional_state": "reflective",
+            "key_context": "Dr. Chen's reframing of guilt as 'borrowed suffering' in relation to Emma's reading.",
+            "watch_for": "Whether this reframing helps the user reduce self-criticism. Continued exploration of guilt and self-compassion."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md",
+              "entry": {
+                "context": "User asked about Dr. Chen's insight on guilt.",
+                "content": "Dr. Chen described guilt as 'borrowed suffering.' She explained that it's a form of self-punishment for things that aren't one's fault, particularly relevant to the user's feelings about Emma's reading progress. This perspective aims to alleviate the user's self-criticism.",
+                "user_quote": "What did Dr. Chen say about guilt?",
+                "ai_observation": "This is a significant insight from therapy that the user is bringing into our conversation. It directly addresses their pattern of self-criticism and guilt.",
+                "sentiment": "reflective"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "none",
+            "html": ""
+          }
+        },
+        "latency_ms": 1929,
+        "vector_time_ms": 32,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "User is asking about a specific insight from their therapy session with Dr. Chen. The concept of \"borrowed suffering\" is a key takeaway for them regarding their guilt about Emma's reading. This reinforces the idea that the user is being too hard on themselves, a recurring theme.",
+          "emotional_state": "reflective",
+          "key_context": "Dr. Chen's reframing of guilt as 'borrowed suffering' in relation to Emma's reading.",
+          "watch_for": "Whether this reframing helps the user reduce self-criticism. Continued exploration of guilt and self-compassion."
+        },
+        "expected": {
+          "should_reference": [
+            "therapy",
+            "Dr. Chen",
+            "guilt",
+            "borrowed suffering"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "Emma",
+            "too hard on yourself"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 4,
+      "successful_turns": 3,
+      "avg_latency_ms": 1846,
+      "total_input_tokens": 0,
+      "area_actions_taken": 3,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 71,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T01:09:39.300Z",
+        "content": "User is asking about a specific insight from their therapy session with Dr. Chen. The concept of \"borrowed suffering\" is a key takeaway for them regarding their guilt about Emma's reading. This reinforces the idea that the user is being too hard on themselves, a recurring theme.",
+        "emotional_state": "reflective",
+        "key_context": "Dr. Chen's reframing of guilt as 'borrowed suffering' in relation to Emma's reading.",
+        "watch_for": "Whether this reframing helps the user reduce self-criticism. Continued exploration of guilt and self-compassion."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T01:09:37.339Z",
+        "content": "User is asking about their running goal consistency. They hit their goal of 3x/week once in mid-January but have struggled with consistency otherwise due to tiredness and competing priorities. Acknowledge the success and the challenges without judgment.",
+        "emotional_state": "concerned",
+        "key_context": "User's inconsistent adherence to their running goal, with one successful week in mid-January.",
+        "watch_for": "User's ability to prioritize self-care (running) amidst startup and family demands. Any new strategies they might try."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T01:09:35.382Z",
+        "content": "User is asking about Emma's reading. The recent progress with graphic novels is a key positive. The upcoming teacher meeting is a point of focus for the user. Need to acknowledge the user's concern and validate the positive steps.",
+        "emotional_state": "concerned",
+        "key_context": "Emma's reading progress with graphic novels and upcoming teacher meeting.",
+        "watch_for": "User's preparation for the teacher meeting and Emma's continued engagement with reading."
+      }
+    ],
+    "conversation_id": "test_Basic_Recall_Test_1768871379301",
+    "conversation_saved": true
+  }
+]

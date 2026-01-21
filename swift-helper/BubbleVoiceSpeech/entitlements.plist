@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Microphone access for speech recognition -->
+	<key>com.apple.security.device.audio-input</key>
+	<true/>
+	
+	<!-- Allow JIT for Swift runtime -->
+	<key>com.apple.security.cs.allow-jit</key>
+	<true/>
+	
+	<!-- Disable library validation for development -->
+	<key>com.apple.security.cs.disable-library-validation</key>
+	<true/>
+</dict>
+</plist>

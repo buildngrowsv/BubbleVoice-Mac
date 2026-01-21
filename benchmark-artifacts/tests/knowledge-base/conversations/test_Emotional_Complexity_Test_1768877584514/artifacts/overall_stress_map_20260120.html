@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(251, 191, 36, 0.8) 100%); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .stress-map-container { background: rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 30px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); width: 100%; max-width: 600px; text-align: center; }
+        h1 { font-size: 2.5em; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 20px; font-weight: 700; }
+        .stress-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin-top: 30px; }
+        .category { background: rgba(255, 255, 255, 0.3); border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .category:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }
+        .category-icon { font-size: 2.5em; margin-bottom: 15px; }
+        .category-title { font-size: 1.3em; font-weight: 600; color: #fff; margin-bottom: 10px; text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .category-details { font-size: 0.95em; color: rgba(255, 255, 255, 0.9); line-height: 1.5; }
+        .startup-color { background: linear-gradient(135deg, #4299e1 0%, #3b82f6 100%); color: white; }
+        .family-color { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); color: white; }
+        .mental-health-color { background: linear-gradient(135deg, #805ad5 0%, #8b5cf6 100%); color: white; }
+        .other-color { background: linear-gradient(135deg, #48bb78 0%, #10b981 100%); color: white; }
+        .footer { margin-top: 40px; font-size: 0.8em; color: rgba(255, 255, 255, 0.7); }
+    </style>
+</head>
+<body>
+    <div class="stress-map-container">
+        <h1>Feeling the Weight: Your Current Stressors</h1>
+        <p class="category-details">It's completely normal to feel overwhelmed when multiple life areas are demanding your energy. This map visualizes the key areas contributing to your stress right now.</p>
+        <div class="stress-categories">
+            <div class="category startup-color">
+                <div class="category-icon">🚀</div>
+                <div class="category-title">Startup / Fundraising</div>
+                <div class="category-details">Investor meeting went well, but the pressure of funding and business growth remains high.</div>
+            </div>
+            <div class="category family-color">
+                <div class="category-icon">👨‍👩‍👧‍👦</div>
+                <div class="category-title">Emma's School</div>
+                <div class="category-details">Navigating reading comprehension challenges, upcoming teacher meetings, and potential testing. Balancing support with her emotional well-being.</div>
+            </div>
+            <div class="category mental-health-color">
+                <div class="category-icon">🧠</div>
+                <div class="category-title">Mental Health / Self-Care</div>
+                <div class="category-details">Processing guilt and anxiety related to Emma's struggles, and the impact of startup stress. Therapy is ongoing.</div>
+            </div>
+             <div class="category other-color">
+                <div class="category-icon">🏃‍♂️</div>
+                <div class="category-title">Exercise Goals</div>
+                <div class="category-details">Struggling to maintain momentum with running goals amidst other demands.</div>
+            </div>
+        </div>
+        <div class="footer">
+            Remember, acknowledging these pressures is the first step. We can work through them together.
+        </div>
+    </div>
+</body>
+</html>

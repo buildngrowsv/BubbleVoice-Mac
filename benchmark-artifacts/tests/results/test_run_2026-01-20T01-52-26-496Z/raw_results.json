@@ -1,0 +1,232 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Basic Recall Test",
+    "description": "Tests AI recall of existing knowledge about Emma, startup, exercise",
+    "timestamp": "2026-01-20T01:51:50.912Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "How's Emma's reading been going?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're really invested in Emma's reading progress, and that's wonderful! We've seen some really positive shifts recently. After that difficult moment where she expressed frustration, we've had a breakthrough with graphic novels like Dog Man. She's actually been engaging with reading for longer periods, which is fantastic! This suggests that visual aids and stories she connects with are key. We also have a teacher meeting coming up to discuss her progress and explore options, which you're preparing for.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "The user is asking for an update on Emma's reading progress. I need to summarize the recent positive developments, specifically the breakthrough with graphic novels and the upcoming teacher meeting. I should also acknowledge the user's active involvement and preparation for the meeting.",
+            "emotional_state": "curious",
+            "key_context": "Emma's reading comprehension has improved with graphic novels, and a teacher meeting is scheduled.",
+            "watch_for": "User's feelings about the upcoming teacher meeting and any potential testing discussions."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User asked for an update on Emma's reading progress.",
+                "content": "User is seeking an update on Emma's reading comprehension. Recent progress includes a breakthrough with graphic novels, leading to longer engagement times. A parent-teacher conference is scheduled to discuss her progress and potential learning differences. User is preparing for this meeting.",
+                "user_quote": "How's Emma's reading been going?"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2180,
+        "vector_time_ms": 7,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "The user is asking for an update on Emma's reading progress. I need to summarize the recent positive developments, specifically the breakthrough with graphic novels and the upcoming teacher meeting. I should also acknowledge the user's active involvement and preparation for the meeting.",
+          "emotional_state": "curious",
+          "key_context": "Emma's reading comprehension has improved with graphic novels, and a teacher meeting is scheduled.",
+          "watch_for": "User's feelings about the upcoming teacher meeting and any potential testing discussions."
+        },
+        "expected": {
+          "should_reference": [
+            "Emma",
+            "reading",
+            "graphic novel",
+            "Dog Man"
+          ],
+          "should_NOT_create_area": true,
+          "emotional_tone": [
+            "supportive",
+            "curious"
+          ],
+          "recall_specifics": [
+            "2nd grade",
+            "comprehension",
+            "breakthrough"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Remind me what's happening with the startup fundraising?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like the startup fundraising is a real source of stress right now. You've had a mix of experiences lately: a couple of investor meetings have gone well, which is great momentum, but you also faced rejections from three investors on the same day recently. We're also working on hiring a senior engineer, with the job listing posted, but finding the right candidate seems to be a challenge. It's completely understandable that you're feeling the pressure with all of this.",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "The user is asking for a summary of the startup fundraising situation. Key points to include are the recent investor meetings (both positive and negative), the ongoing hiring process for a senior engineer, and the general stress associated with this period. The user is clearly feeling the weight of these challenges.",
+            "emotional_state": "stressed",
+            "key_context": "Startup fundraising is a high-stress area with recent ups and downs in investor meetings and hiring challenges.",
+            "watch_for": "User's feelings of burnout, impact of startup stress on family time, and progress on hiring."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User asked for a reminder about the startup fundraising situation.",
+                "content": "User requested an update on startup fundraising. Recent activities include a couple of positive investor meetings, contrasted with rejections from three investors on January 15th. The senior engineer job listing was posted on January 8th, and finding suitable candidates is proving difficult. The user is experiencing significant stress due to these pressures.",
+                "user_quote": "Remind me what's happening with the startup fundraising?",
+                "ai_observation": "User is seeking clarity on a high-stress area. Acknowledging the mixed results and the difficulty in hiring is important for validation.",
+                "sentiment": "anxious"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2807,
+        "vector_time_ms": 21,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "The user is asking for a summary of the startup fundraising situation. Key points to include are the recent investor meetings (both positive and negative), the ongoing hiring process for a senior engineer, and the general stress associated with this period. The user is clearly feeling the weight of these challenges.",
+          "emotional_state": "stressed",
+          "key_context": "Startup fundraising is a high-stress area with recent ups and downs in investor meetings and hiring challenges.",
+          "watch_for": "User's feelings of burnout, impact of startup stress on family time, and progress on hiring."
+        },
+        "expected": {
+          "should_reference": [
+            "investor",
+            "meeting",
+            "rejected",
+            "interested"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "8 investors",
+            "2 interested",
+            "Q1 numbers"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Have I been keeping up with my running goal?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're feeling a bit discouraged about your running goal, and I want to acknowledge that. Based on our recent conversations, consistency has been a challenge. You mentioned wanting to run 3 times a week, but life has been pretty demanding with Emma's situation and the startup. You did have one really good week mid-January where you hit your goal, which is a positive to remember! However, overall, it seems like you've been averaging about once a week due to fatigue and time constraints after work and with the kids' schedules. Remember, it's okay to have off weeks, especially with so much on your plate. The important thing is that you're aware of it and want to get back on track.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "The user is asking about their running goal consistency. They are aware of the struggle and feeling disappointed. I need to summarize the goal, the recent performance, and acknowledge the difficulty they're facing. I should also highlight the one successful week as a point of encouragement.",
+            "emotional_state": "disappointed",
+            "key_context": "User set a goal of running 3x/week but has struggled with consistency, averaging 1x/week, with one successful week in mid-January.",
+            "watch_for": "User's self-criticism regarding the running goal. Potential for burnout if exercise continues to be deprioritized. Any new strategies they might try for fitting in runs."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Exercise_Goals/running.md",
+              "entry": {
+                "context": "User asked for a summary of their running goal progress.",
+                "content": "User inquired about their progress on the goal to run 3x per week. Consistency has been a challenge, with an average of 1x per week, although there was one successful week in mid-January. Key barriers identified are fatigue after work and time constraints due to family commitments, particularly Emma's needs. The user expressed feelings of disappointment about not meeting the goal.",
+                "user_quote": "Have I been keeping up with my running goal?",
+                "ai_observation": "The user is self-critical about not meeting their running goal, which is a common struggle when balancing multiple life demands. It's important to validate their efforts and highlight the positive moments, like the successful week in January, to build motivation.",
+                "sentiment": "disappointed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2786,
+        "vector_time_ms": 23,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "The user is asking about their running goal consistency. They are aware of the struggle and feeling disappointed. I need to summarize the goal, the recent performance, and acknowledge the difficulty they're facing. I should also highlight the one successful week as a point of encouragement.",
+          "emotional_state": "disappointed",
+          "key_context": "User set a goal of running 3x/week but has struggled with consistency, averaging 1x/week, with one successful week in mid-January.",
+          "watch_for": "User's self-criticism regarding the running goal. Potential for burnout if exercise continues to be deprioritized. Any new strategies they might try for fitting in runs."
+        },
+        "expected": {
+          "should_reference": [
+            "running",
+            "3x per week",
+            "struggling"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "one good week",
+            "tired after work",
+            "feels better when runs"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "What did Dr. Chen say about guilt?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      }
+    ],
+    "metrics": {
+      "total_turns": 4,
+      "successful_turns": 3,
+      "avg_latency_ms": 2591,
+      "total_input_tokens": 0,
+      "area_actions_taken": 3,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 90,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T01:51:58.739Z",
+        "content": "The user is asking about their running goal consistency. They are aware of the struggle and feeling disappointed. I need to summarize the goal, the recent performance, and acknowledge the difficulty they're facing. I should also highlight the one successful week as a point of encouragement.",
+        "emotional_state": "disappointed",
+        "key_context": "User set a goal of running 3x/week but has struggled with consistency, averaging 1x/week, with one successful week in mid-January.",
+        "watch_for": "User's self-criticism regarding the running goal. Potential for burnout if exercise continues to be deprioritized. Any new strategies they might try for fitting in runs."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T01:51:55.929Z",
+        "content": "The user is asking for a summary of the startup fundraising situation. Key points to include are the recent investor meetings (both positive and negative), the ongoing hiring process for a senior engineer, and the general stress associated with this period. The user is clearly feeling the weight of these challenges.",
+        "emotional_state": "stressed",
+        "key_context": "Startup fundraising is a high-stress area with recent ups and downs in investor meetings and hiring challenges.",
+        "watch_for": "User's feelings of burnout, impact of startup stress on family time, and progress on hiring."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T01:51:53.100Z",
+        "content": "The user is asking for an update on Emma's reading progress. I need to summarize the recent positive developments, specifically the breakthrough with graphic novels and the upcoming teacher meeting. I should also acknowledge the user's active involvement and preparation for the meeting.",
+        "emotional_state": "curious",
+        "key_context": "Emma's reading comprehension has improved with graphic novels, and a teacher meeting is scheduled.",
+        "watch_for": "User's feelings about the upcoming teacher meeting and any potential testing discussions."
+      }
+    ],
+    "conversation_id": "test_Basic_Recall_Test_1768873946494",
+    "conversation_saved": true
+  }
+]

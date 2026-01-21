@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(251, 191, 36, 0.8) 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .stress-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stress-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        .card-header i {
+            margin-right: 12px;
+            font-size: 1.8em;
+        }
+        .card-content {
+            font-size: 1em;
+            line-height: 1.6;
+            color: #4a5568;
+            flex-grow: 1;
+        }
+        .card-content p {
+            margin-bottom: 12px;
+        }
+        .card-content strong {
+            color: #2d3748;
+        }
+        .card-footer {
+            font-size: 0.9em;
+            color: #718096;
+            text-align: right;
+            margin-top: 16px;
+        }
+        .icon-emma {
+            color: #4299e1;
+        }
+        .icon-startup {
+            color: #f59e0b;
+        }
+        .icon-health {
+            color: #48bb78;
+        }
+        .icon-family {
+            color: #805ad5;
+        }
+        .icon-partner {
+            color: #ed8936;
+        }
+        .icon-home {
+            color: #3b82f6;
+        }
+        .icon-general {
+            color: #60a5fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <div class="stress-card">
+            <div class="card-header"><i class="icon-emma">&#127874;</i> Emma's Reading</div>
+            <div class="card-content">
+                <p><strong>Concerns:</strong> Fluctuating progress, anxiety about testing, potential impact on self-esteem.</p>
+                <p><strong>Recent Wins:</strong> Breakthrough with graphic novels (Dog Man).</p>
+                <p><strong>Challenges:</strong> Homework struggles, self-criticism.</p>
+            </div>
+            <div class="card-footer">Weighing heavily on your mind</div>
+        </div>
+        <div class="stress-card">
+            <div class="card-header"><i class="icon-startup">&#127979;</i> Startup Pressure</div>
+            <div class="card-content">
+                <p><strong>Concerns:</strong> Investor pressure for Q1 numbers, ambitious new feature push, difficulty finding a senior engineer.</p>
+                <p><strong>Current Status:</strong> Cautiously optimistic after a good second meeting, but still facing rejections and internal team disagreements.</p>
+                <p><strong>Feelings:</strong> Terrified, pressured.</p>
+            </div>
+            <div class="card-footer">High stakes and demanding</div>
+        </div>
+        <div class="stress-card">
+            <div class="card-header"><i class="icon-health">&#128176;</i> Personal Well-being</div>
+            <div class="card-content">
+                <p><strong>Challenges:</strong> Extreme exhaustion, lack of running/exercise (only once in 2 weeks).</p>
+                <p><strong>Impact:</strong> Knows running helps, but time and energy are depleted by other commitments.</p>
+                <p><strong>Feelings:</strong> Drained, struggling to prioritize self-care.</p>
+            </div>
+            <div class="card-footer">Feeling depleted</div>
+        </div>
+        <div class="stress-card">
+            <div class="card-header"><i class="icon-family">&#127881;</i> Max's Activities</div>
+            <div class="card-content">
+                <p><strong>Challenge:</strong> Conflicting commitments - Max's soccer game on Saturday vs. potential investor call.</p>
+                <p><strong>Dilemma:</strong> Difficulty prioritizing family events over critical work demands.</p>
+            </div>
+            <div class="card-footer">Scheduling conflicts</div>
+        </div>
+        <div class="stress-card">
+            <div class="card-header"><i class="icon-partner">&#128106;&#127998;</i> Relationship with Jordan</div>
+            <div class="card-content">
+                <p><strong>Challenges:</strong> Feeling like "ships passing in the night," lack of real conversation or date nights.</p>
+                <p><strong>Desire:</strong> Missing the connection and quality time.</p>
+                <p><strong>Feelings:</strong> Longing for deeper connection.</p>
+            </div>
+            <div class="card-footer">Connection feels distant</div>
+        </div>
+        <div class="stress-card">
+            <div class="card-header"><i class="icon-home">&#127968;</i> Home & Life Admin</div>
+            <div class="card-content">
+                <p><strong>Tasks:</strong> Kitchen renovation on hold, Thanksgiving plans (mom called), general life admin feels unmanageable.</p>
+                <p><strong>Impact:</strong> Constant reminders of unfinished tasks leading to feelings of inadequacy.</p>
+            </div>
+            <div class="card-footer">Unfinished business</div>
+        </div>
+         <div class="stress-card">
+            <div class="card-header"><i class="icon-general">&#128197;</i> Overall Feeling</div>
+            <div class="card-content">
+                <p><strong>Self-Assessment:</strong> Feeling like "dropping balls everywhere," questioning life management skills.</p>
+                <p><strong>Core Question:</strong> "Is this normal? Or am I just bad at managing my life?"</p>
+            </div>
+            <div class="card-footer">Seeking validation and clarity</div>
+        </div>
+    </div>
+</body>
+</html>

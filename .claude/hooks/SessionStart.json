@@ -1,0 +1,47 @@
+{
+  "name": "SessionStart Context Hook",
+  "description": "Injects important context at the start of every Claude Code session",
+  "type": "SessionStart",
+  "enabled": true,
+  
+  "inject_context": [
+    {
+      "type": "reminder",
+      "content": "🎯 PROJECT: BubbleVoice-Mac - Voice AI for macOS with Liquid Glass UI"
+    },
+    {
+      "type": "reminder", 
+      "content": "📅 DATE: It's 2026. Your knowledge may be outdated. Use Context7 for docs."
+    },
+    {
+      "type": "reminder",
+      "content": "⚠️ CRITICAL: Never use mock/fake data. Always run builds after Swift changes."
+    },
+    {
+      "type": "reminder",
+      "content": "📝 COMMENTS: Write extensive WHY/BECAUSE comments in all code."
+    },
+    {
+      "type": "reminder",
+      "content": "🔊 ANNOUNCE: Use 'say' command at end of tasks for accessibility."
+    }
+  ],
+  
+  "auto_run": [
+    {
+      "description": "Show project structure",
+      "command": "tree -L 2 -I 'node_modules|.git|dist|build' | head -50",
+      "when": "always"
+    },
+    {
+      "description": "Check for uncommitted changes",
+      "command": "git status --short 2>/dev/null | head -10",
+      "when": "git_repo"
+    }
+  ],
+  
+  "load_files": [
+    ".claude/CLAUDE.md",
+    "README.md"
+  ]
+}

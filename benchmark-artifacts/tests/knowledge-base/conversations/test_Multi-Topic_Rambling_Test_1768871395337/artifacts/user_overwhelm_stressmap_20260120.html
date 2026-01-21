@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(173, 216, 230, 0.3));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #4299e1;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        .stressors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .stressor {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+            border: 1px solid rgba(200, 200, 200, 0.3);
+        }
+        .stressor:hover {
+            transform: translateY(-5px);
+        }
+        .stressor-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        .stressor-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #3182ce;
+            margin-bottom: 5px;
+        }
+        .stressor-detail {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.5;
+        }
+        .area-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #a0c4f0;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Your Current Stress Landscape</h1>
+        <p class="subtitle">A visual snapshot of your priorities and pressures right now.</p>
+        <div class="stressors">
+            <div class="stressor">
+                <span class="stressor-icon">⚽</span>
+                <div class="area-title">Max's Activities</div>
+                <p class="stressor-detail">Saturday game is coming up. Ensuring Max has support for his activities is important.</p>
+            </div>
+            <div class="stressor">
+                <span class="stressor-icon">📚</span>
+                <div class="area-title">Emma's School</div>
+                <p class="stressor-detail">Upcoming teacher meeting next week requires preparation. Focus on her reading progress and any concerns.</p>
+            </div>
+            <div class="stressor">
+                <span class="stressor-icon">📈</span>
+                <div class="area-title">Startup</div>
+                <p class="stressor-detail">Urgent need for Q1 financial numbers. This is a high-pressure work demand.</p>
+            </div>
+            <div class="stressor">
+                <span class="stressor-icon">🏃</span>
+                <div class="area-title">Personal Well-being</div>
+                <p class="stressor-detail">Two weeks without exercise due to exhaustion. Prioritizing your own energy levels is crucial.</p>
+            </div>
+        </div>
+        <div class="footer">
+            Remember, acknowledging these pressures is the first step to managing them. We can break them down together.
+        </div>
+    </div>
+</body>
+</html>

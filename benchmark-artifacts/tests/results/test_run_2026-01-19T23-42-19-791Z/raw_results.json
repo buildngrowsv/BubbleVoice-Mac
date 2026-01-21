@@ -1,0 +1,268 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Basic Recall Test",
+    "description": "Tests AI recall of existing knowledge about Emma, startup, exercise",
+    "timestamp": "2026-01-19T23:42:14.007Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "How's Emma's reading been going?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're really seeing some wonderful progress with Emma's reading, especially with the graphic novels! It's fantastic that she's engaging more and even asking to read extra. Remember what Dr. Chen said about not being too hard on yourself – you're doing a great job navigating this.",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "The user is asking about Emma's reading progress. Recent entries show a significant breakthrough with graphic novels and Emma initiating extra reading, which has brought joy. However, the user is also dealing with guilt and anxiety around testing and Emma's self-esteem, as discussed in therapy. It's important to acknowledge the positive progress while validating the user's ongoing concerns and reinforcing the therapeutic insights.",
+            "emotional_state": "hopeful, but still carrying some guilt/anxiety",
+            "key_context": "Emma's reading comprehension is improving with visual aids (graphic novels), and the user is experiencing a mix of joy and residual guilt/anxiety.",
+            "watch_for": "How the user integrates the success with graphic novels into their overall strategy, and their continued emotional state regarding testing and Emma's self-esteem."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "area_name": "Family/Emma_School",
+              "description": "Update summary to reflect recent progress and user's emotional state.",
+              "path": "Family/Emma_School/summary"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1746,
+        "vector_time_ms": 7,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "The user is asking about Emma's reading progress. Recent entries show a significant breakthrough with graphic novels and Emma initiating extra reading, which has brought joy. However, the user is also dealing with guilt and anxiety around testing and Emma's self-esteem, as discussed in therapy. It's important to acknowledge the positive progress while validating the user's ongoing concerns and reinforcing the therapeutic insights.",
+          "emotional_state": "hopeful, but still carrying some guilt/anxiety",
+          "key_context": "Emma's reading comprehension is improving with visual aids (graphic novels), and the user is experiencing a mix of joy and residual guilt/anxiety.",
+          "watch_for": "How the user integrates the success with graphic novels into their overall strategy, and their continued emotional state regarding testing and Emma's self-esteem."
+        },
+        "expected": {
+          "should_reference": [
+            "Emma",
+            "reading",
+            "graphic novel",
+            "Dog Man"
+          ],
+          "should_NOT_create_area": true,
+          "emotional_tone": [
+            "supportive",
+            "curious"
+          ],
+          "recall_specifics": [
+            "2nd grade",
+            "comprehension",
+            "breakthrough"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Remind me what's happening with the startup fundraising?",
+        "response": {
+          "user_response": {
+            "spoken_text": "You've been actively fundraising for the startup. You had a second investor meeting recently that went well, which is great news after facing rejections from three investors on January 15th. You're also looking to hire a senior engineer, having posted a job listing on January 8th.",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "The user is asking for a summary of the startup fundraising situation. Key events include recent positive investor feedback after initial rejections, and the ongoing search for a senior engineer. This is a high-stress area for the user, and they are feeling the pressure of balancing startup demands with family life.",
+            "emotional_state": "stressed but hopeful",
+            "key_context": "Startup fundraising is progressing with some positive signs after a difficult period, but the need for a senior engineer remains.",
+            "watch_for": "The user's continued stress levels and how they are managing the demands of fundraising alongside other life areas."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Work/Startup/fundraising.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1378,
+        "vector_time_ms": 23,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "The user is asking for a summary of the startup fundraising situation. Key events include recent positive investor feedback after initial rejections, and the ongoing search for a senior engineer. This is a high-stress area for the user, and they are feeling the pressure of balancing startup demands with family life.",
+          "emotional_state": "stressed but hopeful",
+          "key_context": "Startup fundraising is progressing with some positive signs after a difficult period, but the need for a senior engineer remains.",
+          "watch_for": "The user's continued stress levels and how they are managing the demands of fundraising alongside other life areas."
+        },
+        "expected": {
+          "should_reference": [
+            "investor",
+            "meeting",
+            "rejected",
+            "interested"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "8 investors",
+            "2 interested",
+            "Q1 numbers"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Have I been keeping up with my running goal?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It looks like you've been struggling a bit with consistency on your running goal. You mentioned skipping an entire week recently, and while you did hit your goal of running three times in the week of January 16th, it seems like a tough habit to maintain right now. Remember, it's okay to have off weeks, and we can explore strategies that might make it easier to fit in.",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "The user is asking about their running goal. They have been struggling with consistency, with a recent period of skipping a whole week. They did manage to hit their goal once mid-January. It's important to acknowledge the difficulty without adding to their guilt, and to remember that exercise is a form of self-care that they deprioritize when stressed.",
+            "emotional_state": "disappointed, struggling with motivation",
+            "key_context": "User is struggling to maintain their running goal (3x/week), with consistency being the main issue. They know it helps their mental health but find it hard to prioritize.",
+            "watch_for": "User's continued struggles with exercise consistency and their self-talk around it. Exploring potential solutions like morning runs or shorter durations."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Personal_Growth/Exercise_Goals/summary"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1365,
+        "vector_time_ms": 24,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "The user is asking about their running goal. They have been struggling with consistency, with a recent period of skipping a whole week. They did manage to hit their goal once mid-January. It's important to acknowledge the difficulty without adding to their guilt, and to remember that exercise is a form of self-care that they deprioritize when stressed.",
+          "emotional_state": "disappointed, struggling with motivation",
+          "key_context": "User is struggling to maintain their running goal (3x/week), with consistency being the main issue. They know it helps their mental health but find it hard to prioritize.",
+          "watch_for": "User's continued struggles with exercise consistency and their self-talk around it. Exploring potential solutions like morning runs or shorter durations."
+        },
+        "expected": {
+          "should_reference": [
+            "running",
+            "3x per week",
+            "struggling"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "one good week",
+            "tired after work",
+            "feels better when runs"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "What did Dr. Chen say about guilt?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Dr. Chen described your guilt as 'borrowed suffering,' suggesting you're carrying the weight of things that aren't your fault. She also pointed out that catching Emma's reading challenges in second grade is actually quite early.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "The user is asking about Dr. Chen's insights on guilt, specifically in relation to Emma's reading progress. It's important to reiterate Dr. Chen's perspective that the user's guilt is 'borrowed suffering' and that addressing Emma's reading challenges now is a positive thing. This reinforces the therapeutic message and helps counter the user's self-criticism.",
+            "emotional_state": "reflective, carrying guilt",
+            "key_context": "Dr. Chen's reframing of guilt as 'borrowed suffering' and the positive aspect of early intervention for Emma's reading.",
+            "watch_for": "How the user internalizes this reframing and if it reduces their self-criticism regarding Emma's schoolwork."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1205,
+        "vector_time_ms": 34,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "The user is asking about Dr. Chen's insights on guilt, specifically in relation to Emma's reading progress. It's important to reiterate Dr. Chen's perspective that the user's guilt is 'borrowed suffering' and that addressing Emma's reading challenges now is a positive thing. This reinforces the therapeutic message and helps counter the user's self-criticism.",
+          "emotional_state": "reflective, carrying guilt",
+          "key_context": "Dr. Chen's reframing of guilt as 'borrowed suffering' and the positive aspect of early intervention for Emma's reading.",
+          "watch_for": "How the user internalizes this reframing and if it reduces their self-criticism regarding Emma's schoolwork."
+        },
+        "expected": {
+          "should_reference": [
+            "therapy",
+            "Dr. Chen",
+            "guilt",
+            "borrowed suffering"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "Emma",
+            "too hard on yourself"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 4,
+      "successful_turns": 4,
+      "avg_latency_ms": 1424,
+      "total_input_tokens": 0,
+      "area_actions_taken": 4,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 88,
+      "ai_notes_generated": 4
+    },
+    "ai_notes_final": [
+      {
+        "turn": 4,
+        "timestamp": "2026-01-19T23:42:19.790Z",
+        "content": "The user is asking about Dr. Chen's insights on guilt, specifically in relation to Emma's reading progress. It's important to reiterate Dr. Chen's perspective that the user's guilt is 'borrowed suffering' and that addressing Emma's reading challenges now is a positive thing. This reinforces the therapeutic message and helps counter the user's self-criticism.",
+        "emotional_state": "reflective, carrying guilt",
+        "key_context": "Dr. Chen's reframing of guilt as 'borrowed suffering' and the positive aspect of early intervention for Emma's reading.",
+        "watch_for": "How the user internalizes this reframing and if it reduces their self-criticism regarding Emma's schoolwork."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-19T23:42:18.551Z",
+        "content": "The user is asking about their running goal. They have been struggling with consistency, with a recent period of skipping a whole week. They did manage to hit their goal once mid-January. It's important to acknowledge the difficulty without adding to their guilt, and to remember that exercise is a form of self-care that they deprioritize when stressed.",
+        "emotional_state": "disappointed, struggling with motivation",
+        "key_context": "User is struggling to maintain their running goal (3x/week), with consistency being the main issue. They know it helps their mental health but find it hard to prioritize.",
+        "watch_for": "User's continued struggles with exercise consistency and their self-talk around it. Exploring potential solutions like morning runs or shorter durations."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-19T23:42:17.161Z",
+        "content": "The user is asking for a summary of the startup fundraising situation. Key events include recent positive investor feedback after initial rejections, and the ongoing search for a senior engineer. This is a high-stress area for the user, and they are feeling the pressure of balancing startup demands with family life.",
+        "emotional_state": "stressed but hopeful",
+        "key_context": "Startup fundraising is progressing with some positive signs after a difficult period, but the need for a senior engineer remains.",
+        "watch_for": "The user's continued stress levels and how they are managing the demands of fundraising alongside other life areas."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-19T23:42:15.760Z",
+        "content": "The user is asking about Emma's reading progress. Recent entries show a significant breakthrough with graphic novels and Emma initiating extra reading, which has brought joy. However, the user is also dealing with guilt and anxiety around testing and Emma's self-esteem, as discussed in therapy. It's important to acknowledge the positive progress while validating the user's ongoing concerns and reinforcing the therapeutic insights.",
+        "emotional_state": "hopeful, but still carrying some guilt/anxiety",
+        "key_context": "Emma's reading comprehension is improving with visual aids (graphic novels), and the user is experiencing a mix of joy and residual guilt/anxiety.",
+        "watch_for": "How the user integrates the success with graphic novels into their overall strategy, and their continued emotional state regarding testing and Emma's self-esteem."
+      }
+    ],
+    "conversation_id": "test_Basic_Recall_Test_1768866139790",
+    "conversation_saved": true
+  }
+]

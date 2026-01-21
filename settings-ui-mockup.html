@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BubbleVoice Settings - UI Mockup</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+      color: white;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 32px;
+      text-align: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .settings-section {
+      margin-bottom: 32px;
+    }
+
+    .settings-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .settings-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-size: 14px;
+      gap: 12px;
+    }
+
+    .folder-selector {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .settings-input {
+      flex: 1;
+      padding: 10px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .settings-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .settings-button {
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .settings-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #667eea;
+      transform: translateY(-1px);
+    }
+
+    .settings-hint {
+      display: block;
+      font-size: 12px;
+      opacity: 0.6;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .permission-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      gap: 16px;
+    }
+
+    .permission-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .permission-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .permission-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.8;
+    }
+
+    .permission-description {
+      font-size: 13px;
+      opacity: 0.7;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    .permission-status {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .permission-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .permission-badge.granted {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .permission-badge.denied {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .demo-note {
+      background: rgba(102, 126, 234, 0.1);
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .demo-note h2 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: #667eea;
+    }
+
+    .demo-note p {
+      font-size: 14px;
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-top: 16px;
+    }
+
+    .feature-list li {
+      padding: 8px 0;
+      padding-left: 24px;
+      position: relative;
+    }
+
+    .feature-list li:before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #4ade80;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>BubbleVoice Settings</h1>
+
+    <div class="demo-note">
+      <h2>✨ New Settings Features</h2>
+      <p>Target folder selection and permissions management have been added to BubbleVoice!</p>
+      <ul class="feature-list">
+        <li>Choose where to save your conversations and recordings</li>
+        <li>Manage microphone and accessibility permissions</li>
+        <li>Visual status indicators for all permissions</li>
+        <li>One-click access to system settings</li>
+      </ul>
+    </div>
+
+    <!-- DATA STORAGE -->
+    <div class="settings-section">
+      <h3>Data Storage</h3>
+      <label class="settings-label">
+        <span>Target Folder</span>
+        <div class="folder-selector">
+          <input type="text" class="settings-input" value="/Users/username/Documents/BubbleVoice" readonly>
+          <button class="settings-button">Choose Folder</button>
+        </div>
+        <small class="settings-hint">Where conversations and recordings will be saved</small>
+      </label>
+    </div>
+
+    <!-- PERMISSIONS -->
+    <div class="settings-section">
+      <h3>Permissions</h3>
+      
+      <!-- Microphone Permission -->
+      <div class="permission-item">
+        <div class="permission-info">
+          <div class="permission-title">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="permission-icon">
+              <path d="M8 1a2 2 0 00-2 2v5a2 2 0 004 0V3a2 2 0 00-2-2z" fill="currentColor"/>
+              <path d="M12 8v1a4 4 0 01-8 0V8M8 12v3M6 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>Microphone Access</span>
+          </div>
+          <p class="permission-description">Required for voice input</p>
+        </div>
+        <div class="permission-status">
+          <span class="permission-badge granted">Granted ✓</span>
+        </div>
+      </div>
+
+      <!-- Accessibility Permission -->
+      <div class="permission-item">
+        <div class="permission-info">
+          <div class="permission-title">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" class="permission-icon">
+              <path d="M8 2a1 1 0 100-2 1 1 0 000 2zM8 5v6M5 8h6M8 11l-3 4M8 11l3 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>Accessibility</span>
+          </div>
+          <p class="permission-description">Required for global hotkeys (⌘⇧Space)</p>
+        </div>
+        <div class="permission-status">
+          <span class="permission-badge denied">Not Granted</span>
+          <button class="settings-button">Open Settings</button>
+        </div>
+      </div>
+
+      <small class="settings-hint">
+        Permissions are managed by macOS System Preferences. 
+        Changes may require restarting the app.
+      </small>
+    </div>
+
+  </div>
+</body>
+</html>

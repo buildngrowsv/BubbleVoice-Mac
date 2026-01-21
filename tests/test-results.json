@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-01-21T07:08:33.096Z",
+  "summary": {
+    "totalSuites": 5,
+    "totalTests": 78,
+    "totalPassed": 78,
+    "totalFailed": 0,
+    "success": true
+  },
+  "suites": [
+    {
+      "name": "Electron Main Process",
+      "type": "unit",
+      "passed": 9,
+      "failed": 0,
+      "errors": []
+    },
+    {
+      "name": "Backend Server",
+      "type": "unit",
+      "passed": 14,
+      "failed": 0,
+      "errors": []
+    },
+    {
+      "name": "Frontend Components",
+      "type": "unit",
+      "passed": 18,
+      "failed": 0,
+      "errors": []
+    },
+    {
+      "name": "Hybrid UI Tests",
+      "type": "ui",
+      "passed": 11,
+      "failed": 0,
+      "errors": []
+    },
+    {
+      "name": "Integration Tests",
+      "type": "integration",
+      "passed": 26,
+      "failed": 0,
+      "errors": []
+    }
+  ]
+}

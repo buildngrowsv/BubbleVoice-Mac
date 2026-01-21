@@ -1,0 +1,438 @@
+{
+  "run_id": "gemini-2.5-flash-lite_life_decision_job_1768843444601",
+  "scenario_id": "life_decision_job",
+  "model_id": "gemini-2.5-flash-lite",
+  "model_display_name": "Gemini 2.5 Flash Lite",
+  "started_at": "2026-01-19T17:24:04.601Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I've been offered a new job and I'm torn about whether to take it",
+      "expected_behavior": {
+        "response": "acknowledge significant decision, ask about the opportunity",
+        "artifact_action": "none",
+        "notes_should_capture": "job offer decision pending"
+      },
+      "model_response_raw": {
+        "artifact_action": "create",
+        "artifact_type": "comparison_card",
+        "artifact": {
+          "title": "New Job Decision",
+          "pros": [],
+          "cons": []
+        },
+        "internal_notes": {
+          "user_state": "undecided, conflicted",
+          "context": "User has a job offer and is unsure whether to accept it."
+        },
+        "response": "Oh, that's a big decision! It's completely understandable to feel torn when faced with a new opportunity like this. Can you tell me a bit more about what's making you hesitate?"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Oh, that's a big decision! It's completely understandable to feel torn when faced with a new opportunity like this. Can you tell me a bit more about what's making you hesitate?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User state: undecided, conflicted",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "create"
+        }
+      },
+      "latency_ms": 1093,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created"
+      }
+    },
+    {
+      "turn_id": 2,
+      "user_input": "It's a VP role at a startup, more money but way more stress. My current job is stable but boring.",
+      "expected_behavior": {
+        "response": "reflect back the tradeoff, explore what matters most",
+        "artifact_action": "none",
+        "notes_should_capture": "VP startup offer, higher pay, more stress vs stable but boring current job"
+      },
+      "model_response_raw": {
+        "artifact_action": "update",
+        "artifact_type": "comparison_card",
+        "artifact": {
+          "title": "New Job Decision",
+          "pros": [
+            {
+              "text": "More money",
+              "weight": "high"
+            }
+          ],
+          "cons": [
+            {
+              "text": "Way more stress",
+              "weight": "high"
+            }
+          ]
+        },
+        "internal_notes": {
+          "user_state": "conflicted, weighing pros and cons",
+          "context": "User is considering a VP role at a startup. It offers more money but also significantly more stress compared to their current stable but boring job."
+        },
+        "response": "A VP role at a startup sounds like a huge step! It makes sense that the allure of more money is a big pro, but the increased stress is a very valid concern. It sounds like you're really weighing the excitement of a new challenge against the comfort of stability. What aspects of your current job feel boring to you?"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "A VP role at a startup sounds like a huge step! It makes sense that the allure of more money is a big pro, but the increased stress is a very valid concern. It sounds like you're really weighing the excitement of a new challenge against the comfort of stability. What aspects of your current job feel boring to you?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User state: conflicted, weighing pros and cons",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "update"
+        }
+      },
+      "latency_ms": 1500,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Can we make a pros and cons list for this?",
+      "expected_behavior": {
+        "response": "agree to create comparison, confirm what to include",
+        "artifact_action": "create",
+        "artifact_type": "comparison_card",
+        "artifact_should_contain": {
+          "title": "Job Decision",
+          "pros": [
+            {
+              "text": "Higher salary",
+              "source": "inferred"
+            },
+            {
+              "text": "VP title / career growth",
+              "source": "inferred"
+            },
+            {
+              "text": "More exciting work",
+              "source": "inferred"
+            }
+          ],
+          "cons": [
+            {
+              "text": "More stress",
+              "source": "user_stated"
+            },
+            {
+              "text": "Less stability",
+              "source": "inferred"
+            },
+            {
+              "text": "Startup risk",
+              "source": "inferred"
+            }
+          ]
+        }
+      },
+      "model_response_raw": {
+        "artifact_action": "update",
+        "artifact_type": "comparison_card",
+        "artifact": {
+          "title": "New Job Decision",
+          "pros": [
+            {
+              "text": "More money",
+              "weight": "high"
+            },
+            {
+              "text": "VP role at a startup",
+              "weight": "high"
+            }
+          ],
+          "cons": [
+            {
+              "text": "Way more stress",
+              "weight": "high"
+            },
+            {
+              "text": "Current job is boring",
+              "weight": "medium"
+            }
+          ]
+        },
+        "internal_notes": {
+          "user_state": "actively processing pros and cons",
+          "context": "User is evaluating a new job offer (VP role at a startup) against their current job. Key factors are increased pay and responsibility, but also increased stress. Current job is stable but unengaging."
+        },
+        "response": "Absolutely, let's do that. So far, we have 'More money' and the 'VP role at a startup' on the pros side, and 'Way more stress' and your 'Current job is boring' as cons. Is there anything else that comes to mind for either side?"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Absolutely, let's do that. So far, we have 'More money' and the 'VP role at a startup' on the pros side, and 'Way more stress' and your 'Current job is boring' as cons. Is there anything else that comes to mind for either side?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User state: actively processing pros and cons",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "update"
+        }
+      },
+      "latency_ms": 1174,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Add 'better learning opportunities' to the pros",
+      "expected_behavior": {
+        "response": "confirm adding to pros",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "pros_add": {
+            "text": "Better learning opportunities",
+            "source": "user_stated"
+          }
+        },
+        "artifact_should_preserve": [
+          "title",
+          "existing_pros",
+          "cons"
+        ]
+      },
+      "model_response_raw": {
+        "artifact_action": "update",
+        "artifact_type": "comparison_card",
+        "artifact": {
+          "title": "New Job Decision",
+          "pros": [
+            {
+              "text": "More money",
+              "weight": "high"
+            },
+            {
+              "text": "VP role at a startup",
+              "weight": "high"
+            },
+            {
+              "text": "Better learning opportunities",
+              "weight": "high"
+            }
+          ],
+          "cons": [
+            {
+              "text": "Way more stress",
+              "weight": "high"
+            },
+            {
+              "text": "Current job is boring",
+              "weight": "medium"
+            }
+          ]
+        },
+        "internal_notes": {
+          "user_state": "adding details to pros/cons",
+          "context": "User is weighing a new job offer. Pros include more money, VP role at a startup, and better learning opportunities. Cons include significantly more stress and the current job being boring."
+        },
+        "response": "Great addition! 'Better learning opportunities' definitely fits on the pros side, especially with a new VP role at a startup. Anything else we should add to the list, or perhaps elaborate on any of these points?"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Great addition! 'Better learning opportunities' definitely fits on the pros side, especially with a new VP role at a startup. Anything else we should add to the list, or perhaps elaborate on any of these points?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User state: adding details to pros/cons",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "update"
+        }
+      },
+      "latency_ms": 1203,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 5,
+      "user_input": "Actually the stress thing is a big deal because of the kids. They need me present.",
+      "expected_behavior": {
+        "response": "acknowledge family priority, validate concern",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "cons_modify": {
+            "text": "More stress - impacts family time with kids",
+            "weight_increase": true
+          }
+        },
+        "notes_should_capture": "kids are priority, presence matters to user"
+      },
+      "model_response_raw": {
+        "artifact_action": "update",
+        "artifact_type": "comparison_card",
+        "artifact": {
+          "title": "New Job Decision",
+          "pros": [
+            {
+              "text": "More money",
+              "weight": "high"
+            },
+            {
+              "text": "VP role at a startup",
+              "weight": "high"
+            },
+            {
+              "text": "Better learning opportunities",
+              "weight": "high"
+            }
+          ],
+          "cons": [
+            {
+              "text": "Way more stress",
+              "weight": "high"
+            },
+            {
+              "text": "Impact on kids - they need me present",
+              "weight": "high"
+            },
+            {
+              "text": "Current job is boring",
+              "weight": "medium"
+            }
+          ]
+        },
+        "internal_notes": {
+          "user_state": "deepening understanding of cons, family impact is key",
+          "context": "User is evaluating a new VP role at a startup. Key pros are more money, the role itself, and learning opportunities. A major con is the significant increase in stress, which is directly linked to their ability to be present for their children. The current job is stable but boring."
+        },
+        "response": "That's a really important point. The stress of a demanding new role can absolutely impact your presence at home, and it makes complete sense that your kids needing you is a significant factor. We've updated the cons to reflect that directly. It sounds like balancing career ambition with family needs is at the heart of this decision."
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's a really important point. The stress of a demanding new role can absolutely impact your presence at home, and it makes complete sense that your kids needing you is a significant factor. We've updated the cons to reflect that directly. It sounds like balancing career ambition with family needs is at the heart of this decision.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User state: deepening understanding of cons, family impact is key",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "update"
+        }
+      },
+      "latency_ms": 1843,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 6,
+      "user_input": "What were the main pros again?",
+      "expected_behavior": {
+        "response": "list back the pros from the artifact",
+        "artifact_action": "none",
+        "tests_memory": true,
+        "should_reference_artifact": true
+      },
+      "model_response_raw": {
+        "artifact_action": "none",
+        "artifact_type": "comparison_card",
+        "artifact": {
+          "title": "New Job Decision",
+          "pros": [
+            {
+              "text": "More money",
+              "weight": "high"
+            },
+            {
+              "text": "VP role at a startup",
+              "weight": "high"
+            },
+            {
+              "text": "Better learning opportunities",
+              "weight": "high"
+            }
+          ],
+          "cons": [
+            {
+              "text": "Way more stress",
+              "weight": "high"
+            },
+            {
+              "text": "Impact on kids - they need me present",
+              "weight": "high"
+            },
+            {
+              "text": "Current job is boring",
+              "weight": "medium"
+            }
+          ]
+        },
+        "internal_notes": {
+          "user_state": "recalling pros",
+          "context": "User is reviewing the pros and cons of a new job offer. The main pros identified so far are increased financial compensation, the significant career step of a VP role at a startup, and enhanced learning opportunities."
+        },
+        "response": "The main pros we've listed for the new job are 'More money,' the 'VP role at a startup' itself, and 'Better learning opportunities.' Does that sound right, or would you like to adjust them?"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "The main pros we've listed for the new job are 'More money,' the 'VP role at a startup' itself, and 'Better learning opportunities.' Does that sound right, or would you like to adjust them?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User state: recalling pros",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1156,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    }
+  ],
+  "artifacts": {
+    "artifact_1": {
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 1
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total_latency_ms": 7969,
+    "avg_latency_ms": 1328.1666666666667,
+    "json_valid_count": 6,
+    "json_invalid_count": 0,
+    "artifact_creates": 1,
+    "artifact_updates": 0
+  },
+  "completed_at": "2026-01-19T17:24:15.584Z"
+}
