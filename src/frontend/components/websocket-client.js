@@ -563,19 +563,42 @@ class WebSocketClient {
    * 
    * Called when switching to a different conversation.
    * Loads the conversation messages into the UI.
+   * 
+   * CRITICAL FIX:
+   * Don't clear messages if we're already displaying messages for this conversation.
+   * This prevents a race condition where:
+   * 1. User sends message
+   * 2. Message is added to UI
+   * 3. Conversation switch happens
+   * 4. conversation_loaded arrives and clears the message we just added
+   * 
+   * SOLUTION:
+   * Only clear and reload if the conversation has different messages than what's displayed.
    */
   handleConversationLoaded(data) {
     console.log('[WebSocketClient] Conversation loaded:', data.conversation?.id);
     
     if (window.app && window.app.conversationManager) {
-      // Clear current messages
-      window.app.conversationManager.clearMessages();
+      // Get current messages in UI
+      const currentMessages = window.app.conversationManager.messages;
+      const loadedMessages = data.conversation?.messages || [];
       
-      // Load conversation messages
-      if (data.conversation && data.conversation.messages) {
-        data.conversation.messages.forEach(msg => {
-          window.app.conversationManager.addMessage(msg);
-        });
+      // Only clear and reload if the message count is different
+      // This prevents clearing messages that were just added
+      // WHY: Race condition between message sending and conversation loading
+      // BECAUSE: New conversations trigger an immediate switch, which loads empty state
+      if (currentMessages.length === 0 || loadedMessages.length > currentMessages.length) {
+        // Clear current messages
+        window.app.conversationManager.clearMessages();
+        
+        // Load conversation messages
+        if (data.conversation && data.conversation.messages) {
+          data.conversation.messages.forEach(msg => {
+            window.app.conversationManager.addMessage(msg);
+          });
+        }
+      } else {
+        console.log('[WebSocketClient] Skipping message reload - current messages are newer');
       }
     }
   }
