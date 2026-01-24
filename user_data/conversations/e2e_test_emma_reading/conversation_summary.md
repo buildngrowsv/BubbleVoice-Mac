@@ -1,6 +1,6 @@
-# Conversation Summary - conv_artifacts_test
+# Conversation Summary - e2e_test_emma_reading
 
-**Last Updated**: 2026-01-24T21:43:31.912Z
+**Last Updated**: 2026-01-24T21:49:57.403Z
 
 ## Key Topics
 
