@@ -399,7 +399,10 @@ Always include 2-4 relevant bubbles.
    * 
    * GEMINI FORMAT:
    * The Gemini SDK expects an array of content objects with role and parts.
-   * System instructions should be included as the first user message.
+   * 
+   * CRITICAL FIX (2026-01-24): System prompt is now passed via `systemInstruction`
+   * in the model config (see generateGeminiResponse), NOT as a user message.
+   * This prevents the system prompt from being sent twice.
    * 
    * IMPORTANT: Gemini alternates between 'user' and 'model' roles.
    * We need to ensure proper alternation and combine consecutive messages
@@ -411,9 +414,14 @@ Always include 2-4 relevant bubbles.
   buildMessagesForGemini(conversation) {
     const contents = [];
 
-    // Start with system prompt as first user message
-    let currentRole = 'user';
-    let currentParts = [{ text: this.systemPrompt }];
+    // NO LONGER: Start with system prompt as first user message
+    // WHY: System prompt is now passed via systemInstruction in model config
+    // BECAUSE: Passing it twice wastes tokens and could confuse the model
+    // HISTORY: Bug discovered 2026-01-24 - system prompt was being sent twice
+    
+    // Track current message being built (for combining consecutive same-role messages)
+    let currentRole = null;
+    let currentParts = [];
 
     // Add conversation history
     if (conversation.messages && conversation.messages.length > 0) {
@@ -424,22 +432,38 @@ Always include 2-4 relevant bubbles.
         if (msgRole === currentRole) {
           currentParts.push({ text: msg.content });
         } else {
-          // Different role, push current and start new
-          contents.push({
-            role: currentRole,
-            parts: currentParts
-          });
+          // Different role - first push any accumulated message
+          if (currentParts.length > 0) {
+            contents.push({
+              role: currentRole,
+              parts: currentParts
+            });
+          }
+          // Then start new message
           currentRole = msgRole;
           currentParts = [{ text: msg.content }];
         }
       }
+      
+      // Push the last accumulated message
+      if (currentParts.length > 0) {
+        contents.push({
+          role: currentRole,
+          parts: currentParts
+        });
+      }
     }
 
-    // Push the last accumulated message
-    contents.push({
-      role: currentRole,
-      parts: currentParts
-    });
+    // SAFETY CHECK: Gemini requires at least one message
+    // If conversation is empty, this shouldn't happen (we always add user message first)
+    // but just in case, add a placeholder
+    if (contents.length === 0) {
+      console.warn('[LLMService] buildMessagesForGemini: Empty conversation, adding placeholder');
+      contents.push({
+        role: 'user',
+        parts: [{ text: '(Start of conversation)' }]
+      });
+    }
 
     return contents;
   }

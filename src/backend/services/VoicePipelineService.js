@@ -503,6 +503,29 @@ class VoicePipelineService extends EventEmitter {
         
         console.log(`[VoicePipelineService] LLM response cached: "${fullResponse.substring(0, 50)}..."`);
         
+        // CRITICAL FIX (2026-01-24): Save AI response to conversation history
+        // WHY: Without this, the AI forgets what IT said in previous turns!
+        // BECAUSE: The conversation.messages array only had user messages, not assistant responses.
+        // This caused the AI to lose context of the entire conversation flow.
+        // 
+        // EXAMPLE OF THE BUG:
+        // - User: "show me a timeline" → AI: "What kind?" (not saved)
+        // - User: "pick one" → AI sees only user messages, doesn't know it asked "What kind?"
+        // - AI responds as if starting fresh: "Hello! What would you like to explore?"
+        //
+        // THE FIX:
+        // After generating the response, add it to conversation.messages so the AI
+        // can see its own previous responses when processing the next user message.
+        //
+        // HISTORY: Bug discovered from user screenshot showing AI repeatedly forgetting context.
+        await this.conversationService.addMessage(conversation.id, {
+          role: 'assistant',
+          content: fullResponse,
+          timestamp: Date.now()
+        });
+        
+        console.log(`[VoicePipelineService] AI response saved to conversation history`);
+        
       } catch (error) {
         console.error('[VoicePipelineService] Error in LLM processing:', error);
         
