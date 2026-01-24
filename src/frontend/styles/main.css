@@ -113,6 +113,23 @@ button, input, select, textarea, [contenteditable] {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* PIN BUTTON ACTIVE STATE */
+/* When the pin button is pressed (window is pinned on top), rotate the icon 45 degrees
+   to show it's "stuck" in place, and change color to indicate active state */
+#pin-button[aria-pressed="true"] {
+  background: rgba(59, 130, 246, 0.2);
+  color: rgb(96, 165, 250);
+}
+
+#pin-button[aria-pressed="true"] svg {
+  transform: rotate(45deg);
+  transition: transform var(--transition-base);
+}
+
+#pin-button svg {
+  transition: transform var(--transition-base);
+}
+
 #close-button:hover {
   background: var(--color-error);
   color: white;

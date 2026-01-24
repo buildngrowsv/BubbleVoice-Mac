@@ -46,6 +46,7 @@
     </div>
     <div class="title-bar-right" data-testid="title-bar-actions" role="group" aria-label="Window controls">
       <!-- TEST ID: settings-button - Opens the settings panel -->
+      <!-- ICON DESIGN: Standard gear/cog icon for settings - universally recognized pattern -->
       <button class="title-bar-button"
               id="settings-button"
               data-testid="settings-button"
@@ -53,11 +54,13 @@
               aria-label="Open settings"
               aria-haspopup="dialog">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M8 10a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M14 8a6 6 0 11-12 0 6 6 0 0112 0z" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13.5 8a5.5 5.5 0 01-.5 2.3l1.2 1.2-1.4 1.4-1.2-1.2a5.5 5.5 0 01-2.3.5v1.7h-2v-1.7a5.5 5.5 0 01-2.3-.5l-1.2 1.2-1.4-1.4 1.2-1.2A5.5 5.5 0 012.5 8v-2h1.7a5.5 5.5 0 01.5-2.3L3.5 2.5l1.4-1.4 1.2 1.2A5.5 5.5 0 018.4 2V.3h2V2a5.5 5.5 0 012.3.5l1.2-1.2 1.4 1.4-1.2 1.2a5.5 5.5 0 01.5 2.3h1.7v2h-1.8z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
       <!-- TEST ID: pin-button - Toggles always-on-top window behavior -->
+      <!-- ICON DESIGN: Classic pushpin icon - clear metaphor for "pinning" window on top -->
+      <!-- The pin rotates 45 degrees when active to show it's "pinned" -->
       <button class="title-bar-button"
               id="pin-button"
               data-testid="pin-button"
@@ -65,7 +68,9 @@
               aria-label="Toggle always on top"
               aria-pressed="false">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M8 2v6m0 0L5 5m3 3l3-3M8 14v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Pushpin icon: head (circle) + pin body + needle point -->
+          <circle cx="8" cy="4" r="2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+          <path d="M8 6v4M6 10h4M8 10v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
       <!-- TEST ID: minimize-button - Minimizes the application window -->
