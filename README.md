@@ -4,6 +4,19 @@
 
 BubbleVoice is a voice-first Mac app for having meaningful conversations about your personal life - your goals, your kids, your startup, your daily struggles - with an AI that actually remembers and understands your context.
 
+---
+
+## 📚 Documentation
+
+- **[Build Checklist](COMPREHENSIVE_BUILD_CHECKLIST_2026-01-24.md)** - Current status and roadmap (95% complete)
+- **[Testing Guide](docs/TESTING_GUIDE.md)** - How to test the app
+- **[Known Issues](docs/KNOWN_ISSUES.md)** - Current issues and workarounds
+- **[Changelog](docs/CHANGELOG.md)** - Version history and fixes
+- **[Latest Fixes](FIXES_AND_TESTS_2026-01-24.md)** - Recent bug fixes
+- **[UI Layout Fix](UI_LAYOUT_FIX_2026-01-24.md)** - Critical UI fix details
+
+---
+
 ## Features
 
 - **Voice-First Interface**: Speak naturally, see real-time transcription, edit before sending
