@@ -133,15 +133,15 @@ button, input, select, textarea, [contenteditable] {
 /**
  * CONVERSATION CONTAINER
  * 
- * Scrollable area for conversation messages.
+ * Main container for conversation area including messages, bubbles, and input.
+ * Uses flex layout to stack welcome/messages, bubbles, and input vertically.
  */
 .conversation-container {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Prevent outer scroll, let inner elements scroll */
+  position: relative;
 }
 
 /* Custom scrollbar */
@@ -166,15 +166,17 @@ button, input, select, textarea, [contenteditable] {
  * WELCOME STATE
  * 
  * Shown when there's no active conversation.
+ * Takes up flex space, pushing input to bottom.
  */
 .welcome-state {
+  flex: 1; /* Take up available space */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
   text-align: center;
   padding: var(--spacing-xl);
+  overflow-y: auto; /* Allow scrolling if content is too tall */
   animation: fade-in 0.5s ease-in;
 }
 
@@ -248,10 +250,13 @@ button, input, select, textarea, [contenteditable] {
  * Container for conversation messages.
  */
 .messages {
+  flex: 1; /* Take up available space */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  padding-bottom: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  overflow-y: auto; /* Allow scrolling */
+  overflow-x: hidden;
 }
 
 .message {
@@ -354,8 +359,10 @@ button, input, select, textarea, [contenteditable] {
  * BUBBLES CONTAINER
  * 
  * Floating area for proactive bubble suggestions.
+ * Sits above input, below messages.
  */
 .bubbles-container {
+  flex-shrink: 0; /* Don't shrink */
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
@@ -390,6 +397,7 @@ button, input, select, textarea, [contenteditable] {
  * Fixed input area at the bottom of the window.
  */
 .input-container {
+  flex-shrink: 0; /* Don't shrink, stay at natural height */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
@@ -1356,15 +1364,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   flex-direction: row; /* Horizontal layout for sidebar + conversation */
   height: calc(100% - 44px); /* Account for title bar */
   overflow: hidden;
-}
-
-/* Conversation Container (adjusted for sidebar) */
-.main-container .conversation-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-width: 0; /* Allow flex shrinking */
 }
 
 /* Responsive adjustments */
