@@ -1239,3 +1239,1052 @@ Example: `4.1_01_artifact_collapsed_1706123456.png`
 ---
 
 **Ready to build consequential AI conversations! 🚀**
+
+---
+
+## 🤖 AGENT-EXECUTABLE TESTING SUITE
+
+This section contains tests the AI agent can run autonomously using Puppeteer, terminal commands, and file analysis. These tests enable continuous self-verification without human intervention.
+
+---
+
+### 7.1 Automated UI Screenshot Analysis
+**Agent Can Run**: ✅ Yes  
+**Tools**: Puppeteer MCP, File Read, Terminal
+
+#### Test: Main Window Layout Verification
+```bash
+# Agent runs this test by:
+# 1. Navigate to app URL with Puppeteer
+# 2. Take screenshot
+# 3. Analyze screenshot for expected elements
+```
+
+**Steps for Agent:**
+1. [ ] Navigate: `puppeteer_navigate` to `file:///path/to/index.html` or `http://localhost:7482`
+2. [ ] Screenshot: `puppeteer_screenshot` name="main_window_layout"
+3. [ ] Analyze screenshot for:
+   - [ ] Voice button visible (bottom right area)
+   - [ ] Input field visible (bottom center)
+   - [ ] Settings gear icon visible (top right)
+   - [ ] Message area visible (center)
+   - [ ] No visual overflow or clipping
+   - [ ] Glass effect visible (blur/transparency)
+
+**Pass Criteria:**
+- All UI elements present
+- No obvious visual bugs
+- Layout appears balanced
+
+---
+
+#### Test: Settings Panel UI Verification
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Click settings icon: `puppeteer_click` selector=`[data-testid="settings-btn"]` or `.settings-btn`
+3. [ ] Wait 500ms for animation
+4. [ ] Screenshot: `puppeteer_screenshot` name="settings_panel_open"
+5. [ ] Analyze screenshot for:
+   - [ ] Settings panel visible (slides from right)
+   - [ ] API key inputs visible
+   - [ ] Model dropdown visible
+   - [ ] Voice settings section visible
+   - [ ] Save button visible
+   - [ ] Close button (X) visible
+   - [ ] Scrollbar if content overflows
+
+**Pass Criteria:**
+- Panel fully visible
+- All form elements present
+- No text truncation
+
+---
+
+#### Test: Artifact Display Verification
+**Steps for Agent:**
+1. [ ] Create test artifact HTML file in temp location
+2. [ ] Navigate to app
+3. [ ] Inject test artifact into conversation (via WebSocket or test endpoint)
+4. [ ] Screenshot: `puppeteer_screenshot` name="artifact_in_conversation"
+5. [ ] Analyze screenshot for:
+   - [ ] Artifact card visible below AI message
+   - [ ] Glass effect on artifact card
+   - [ ] Toolbar visible (expand, export, close)
+   - [ ] No content overflow
+   - [ ] Shadow visible (depth effect)
+
+**Test Artifact HTML:**
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .card {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 24px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Test Artifact</h2>
+        <p>This is a test artifact to verify rendering.</p>
+    </div>
+</body>
+</html>
+```
+
+---
+
+### 7.2 User Flow Automation Tests
+**Agent Can Run**: ✅ Yes  
+**Tools**: Puppeteer MCP, Terminal
+
+#### Flow 1: New Conversation Creation
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Screenshot: `puppeteer_screenshot` name="flow1_01_initial_state"
+3. [ ] Verify no messages displayed (empty state)
+4. [ ] Click input field: `puppeteer_click` selector=`.message-input`
+5. [ ] Type message: `puppeteer_fill` selector=`.message-input` value="Hello, this is a test message"
+6. [ ] Screenshot: `puppeteer_screenshot` name="flow1_02_message_typed"
+7. [ ] Click send button: `puppeteer_click` selector=`.send-btn`
+8. [ ] Wait 3000ms for AI response
+9. [ ] Screenshot: `puppeteer_screenshot` name="flow1_03_response_received"
+10. [ ] Verify:
+    - [ ] User message appears (right-aligned, blue)
+    - [ ] AI message appears (left-aligned, glass effect)
+    - [ ] Bubble suggestions appear below AI message
+    - [ ] Timestamps visible
+
+**Pass Criteria:**
+- Complete conversation round-trip
+- Both messages visible
+- No errors in console
+
+---
+
+#### Flow 2: Settings Save and Persist
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Open settings panel
+3. [ ] Fill API key field: `puppeteer_fill` selector=`#gemini-key` value="test-api-key-12345"
+4. [ ] Select model from dropdown: `puppeteer_select` selector=`#model-select` value="gemini-2.5-flash-lite"
+5. [ ] Screenshot: `puppeteer_screenshot` name="flow2_01_settings_filled"
+6. [ ] Click save button: `puppeteer_click` selector=`.save-btn`
+7. [ ] Wait 500ms
+8. [ ] Screenshot: `puppeteer_screenshot` name="flow2_02_settings_saved"
+9. [ ] Close settings panel
+10. [ ] Reopen settings panel
+11. [ ] Screenshot: `puppeteer_screenshot` name="flow2_03_settings_persisted"
+12. [ ] Verify:
+    - [ ] API key field shows dots (masked) or saved state
+    - [ ] Model selection persisted
+    - [ ] Save confirmation shown
+
+**Pass Criteria:**
+- Settings persist after close/reopen
+- Visual feedback on save
+
+---
+
+#### Flow 3: Conversation with Area Creation
+**Prerequisites**: App running, API key configured
+
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Type message about a life area topic:
+   ```
+   puppeteer_fill selector=".message-input" value="I'm worried about my daughter Emma. She's struggling with reading in 2nd grade and her teacher wants to discuss testing."
+   ```
+3. [ ] Send message
+4. [ ] Wait 5000ms for AI response with area creation
+5. [ ] Screenshot: `puppeteer_screenshot` name="flow3_01_area_topic_response"
+6. [ ] Check terminal/logs for area creation:
+   ```bash
+   # Agent runs:
+   grep -r "create_area" /path/to/logs --include="*.log" | tail -5
+   ```
+7. [ ] Verify file created:
+   ```bash
+   # Agent runs:
+   ls -la user_data/life_areas/Family/ 2>/dev/null || echo "Area not created yet"
+   ```
+8. [ ] Take follow-up turn:
+   ```
+   puppeteer_fill selector=".message-input" value="She can read the words but doesn't remember what she read afterwards."
+   ```
+9. [ ] Send and wait 5000ms
+10. [ ] Screenshot: `puppeteer_screenshot` name="flow3_02_entry_appended"
+11. [ ] Verify entry appended to file:
+    ```bash
+    # Agent runs:
+    head -50 user_data/life_areas/Family/Emma_School/reading_comprehension.md 2>/dev/null || echo "File not found"
+    ```
+
+**Pass Criteria:**
+- AI creates area on first mention
+- Entry appended on follow-up
+- Files exist with correct content
+
+---
+
+#### Flow 4: Artifact Generation Request
+**Steps for Agent:**
+1. [ ] Have existing conversation context (from Flow 3)
+2. [ ] Type artifact request:
+   ```
+   puppeteer_fill selector=".message-input" value="Can you create a visual summary of what we've discussed about Emma's reading?"
+   ```
+3. [ ] Send message
+4. [ ] Wait 8000ms (artifact generation takes longer)
+5. [ ] Screenshot: `puppeteer_screenshot` name="flow4_01_artifact_request"
+6. [ ] Check for artifact in response:
+   - [ ] Artifact card visible in chat
+   - [ ] Artifact type badge visible
+7. [ ] If artifact visible, click expand: `puppeteer_click` selector=`.artifact-expand-btn`
+8. [ ] Screenshot: `puppeteer_screenshot` name="flow4_02_artifact_expanded"
+9. [ ] Verify artifact file exists:
+   ```bash
+   # Agent runs:
+   ls -la user_data/conversations/*/artifacts/*.html 2>/dev/null | tail -5
+   ```
+10. [ ] Read artifact HTML and verify quality:
+    ```bash
+    # Agent runs:
+    cat $(ls user_data/conversations/*/artifacts/*.html | tail -1) | head -100
+    ```
+
+**Pass Criteria:**
+- Artifact generated and displayed
+- HTML file saved
+- Liquid glass styling present in HTML
+
+---
+
+#### Flow 5: Bubble Suggestion Interaction
+**Steps for Agent:**
+1. [ ] Navigate to app with existing conversation
+2. [ ] Identify bubble suggestions below AI message
+3. [ ] Screenshot: `puppeteer_screenshot` name="flow5_01_bubbles_visible"
+4. [ ] Click first bubble: `puppeteer_click` selector=`.bubble-suggestion:first-child`
+5. [ ] Verify bubble text appears in input field
+6. [ ] Screenshot: `puppeteer_screenshot` name="flow5_02_bubble_clicked"
+7. [ ] Send the suggested message
+8. [ ] Wait for response
+9. [ ] Screenshot: `puppeteer_screenshot` name="flow5_03_bubble_response"
+10. [ ] Verify new bubbles generated (different from previous)
+
+**Pass Criteria:**
+- Bubble click populates input
+- New relevant bubbles appear
+- No bubble repetition
+
+---
+
+### 7.3 Visual Regression Tests
+**Agent Can Run**: ✅ Yes  
+**Tools**: Puppeteer screenshots, File comparison
+
+#### Test: Component Visual Consistency
+
+**Baseline Screenshots to Create:**
+```
+tests/visual-baselines/
+├── main_window_empty.png
+├── main_window_with_messages.png
+├── settings_panel_open.png
+├── artifact_card_collapsed.png
+├── artifact_card_expanded.png
+├── life_areas_sidebar.png
+├── error_state.png
+└── loading_state.png
+```
+
+**Agent Comparison Process:**
+1. [ ] Take new screenshot of component
+2. [ ] Compare with baseline (if exists)
+3. [ ] Report differences:
+   - Size differences
+   - Major layout shifts
+   - Missing elements
+   - Color/contrast changes
+
+**Automated Check Script:**
+```bash
+#!/bin/bash
+# Agent can run this to compare screenshots
+
+BASELINE_DIR="tests/visual-baselines"
+CURRENT_DIR="tests/visual-current"
+
+for baseline in $BASELINE_DIR/*.png; do
+    name=$(basename "$baseline")
+    current="$CURRENT_DIR/$name"
+    
+    if [ -f "$current" ]; then
+        # Check file sizes (crude but fast check)
+        baseline_size=$(stat -f%z "$baseline")
+        current_size=$(stat -f%z "$current")
+        diff=$((current_size - baseline_size))
+        
+        if [ ${diff#-} -gt 10000 ]; then
+            echo "⚠️  VISUAL CHANGE: $name (size diff: $diff bytes)"
+        else
+            echo "✅ OK: $name"
+        fi
+    else
+        echo "❌ MISSING: $current"
+    fi
+done
+```
+
+---
+
+### 7.4 Accessibility Checks
+**Agent Can Run**: ✅ Yes  
+**Tools**: Puppeteer evaluate, Terminal
+
+#### Test: Color Contrast Verification
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Execute contrast check script:
+   ```javascript
+   // puppeteer_evaluate
+   const elements = document.querySelectorAll('*');
+   const issues = [];
+   
+   elements.forEach(el => {
+       const style = window.getComputedStyle(el);
+       const color = style.color;
+       const bg = style.backgroundColor;
+       
+       // Check if text is visible
+       if (el.textContent.trim() && color && bg) {
+           // Simple check: white text on light background
+           if (color.includes('255, 255, 255') && 
+               !bg.includes('0, 0, 0') && 
+               !bg.includes('rgba(0')) {
+               issues.push({
+                   element: el.tagName,
+                   text: el.textContent.slice(0, 30),
+                   issue: 'Potential low contrast'
+               });
+           }
+       }
+   });
+   
+   return issues;
+   ```
+3. [ ] Report any contrast issues found
+
+---
+
+#### Test: Keyboard Navigation
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Execute tab navigation test:
+   ```javascript
+   // puppeteer_evaluate
+   const focusableElements = document.querySelectorAll(
+       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+   );
+   
+   const results = {
+       totalFocusable: focusableElements.length,
+       withVisibleFocus: 0,
+       elements: []
+   };
+   
+   focusableElements.forEach((el, i) => {
+       el.focus();
+       const style = window.getComputedStyle(el);
+       const hasOutline = style.outline !== 'none' && style.outline !== '';
+       const hasBoxShadow = style.boxShadow !== 'none';
+       
+       if (hasOutline || hasBoxShadow) {
+           results.withVisibleFocus++;
+       }
+       
+       results.elements.push({
+           index: i,
+           tag: el.tagName,
+           hasVisibleFocus: hasOutline || hasBoxShadow
+       });
+   });
+   
+   return results;
+   ```
+3. [ ] Verify all interactive elements have visible focus state
+
+**Pass Criteria:**
+- All buttons/inputs focusable
+- Visible focus indicator on each
+
+---
+
+### 7.5 Performance Measurement Tests
+**Agent Can Run**: ✅ Yes  
+**Tools**: Puppeteer evaluate, Terminal
+
+#### Test: Page Load Performance
+**Steps for Agent:**
+1. [ ] Navigate to app with performance timing:
+   ```javascript
+   // puppeteer_evaluate after navigation
+   const timing = performance.timing;
+   const metrics = {
+       // Time to first byte
+       ttfb: timing.responseStart - timing.navigationStart,
+       // DOM Content Loaded
+       domContentLoaded: timing.domContentLoadedEventEnd - timing.navigationStart,
+       // Full page load
+       pageLoad: timing.loadEventEnd - timing.navigationStart,
+       // DOM Interactive
+       domInteractive: timing.domInteractive - timing.navigationStart
+   };
+   
+   return metrics;
+   ```
+2. [ ] Record metrics
+3. [ ] Compare against thresholds:
+   - TTFB: < 200ms
+   - DOM Content Loaded: < 1000ms
+   - Page Load: < 2000ms
+
+---
+
+#### Test: Runtime Performance
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Send 10 messages in rapid succession
+3. [ ] Measure frame rate during scroll:
+   ```javascript
+   // puppeteer_evaluate
+   let frameCount = 0;
+   let startTime = performance.now();
+   
+   function countFrame() {
+       frameCount++;
+       if (performance.now() - startTime < 1000) {
+           requestAnimationFrame(countFrame);
+       }
+   }
+   
+   requestAnimationFrame(countFrame);
+   
+   // Trigger scroll
+   const container = document.querySelector('.messages-container');
+   if (container) {
+       container.scrollTop = container.scrollHeight;
+   }
+   
+   // Return after 1 second
+   return new Promise(resolve => {
+       setTimeout(() => resolve({ fps: frameCount }), 1100);
+   });
+   ```
+4. [ ] Verify FPS > 30 during scroll
+
+---
+
+#### Test: Memory Usage
+**Steps for Agent:**
+1. [ ] Run app and monitor memory:
+   ```bash
+   # Agent runs:
+   # Get initial memory
+   ps aux | grep -i "BubbleVoice\|Electron" | grep -v grep | awk '{print $4, $11}' | head -5
+   ```
+2. [ ] Interact with app (send 20 messages)
+3. [ ] Check memory again:
+   ```bash
+   ps aux | grep -i "BubbleVoice\|Electron" | grep -v grep | awk '{print $4, $11}' | head -5
+   ```
+4. [ ] Calculate memory growth
+5. [ ] Flag if growth > 100MB
+
+---
+
+### 7.6 File System Verification Tests
+**Agent Can Run**: ✅ Yes  
+**Tools**: Terminal, File Read
+
+#### Test: Conversation File Structure
+**Steps for Agent:**
+```bash
+# Agent runs after creating a conversation:
+
+# 1. List conversation directories
+echo "=== Conversation Directories ==="
+ls -la user_data/conversations/ 2>/dev/null || echo "No conversations yet"
+
+# 2. For each conversation, verify 4-file structure
+for dir in user_data/conversations/conv_*/; do
+    if [ -d "$dir" ]; then
+        echo ""
+        echo "=== Checking: $dir ==="
+        
+        # Check for required files
+        [ -f "${dir}conversation.md" ] && echo "✅ conversation.md exists" || echo "❌ MISSING: conversation.md"
+        [ -f "${dir}user_inputs.md" ] && echo "✅ user_inputs.md exists" || echo "❌ MISSING: user_inputs.md"
+        [ -f "${dir}conversation_ai_notes.md" ] && echo "✅ conversation_ai_notes.md exists" || echo "❌ MISSING: conversation_ai_notes.md"
+        [ -f "${dir}conversation_summary.md" ] && echo "✅ conversation_summary.md exists" || echo "❌ MISSING: conversation_summary.md"
+        
+        # Check artifacts folder
+        [ -d "${dir}artifacts" ] && echo "✅ artifacts/ directory exists" || echo "⚠️  No artifacts/ directory"
+    fi
+done
+```
+
+---
+
+#### Test: User Input Isolation Verification
+**Steps for Agent:**
+```bash
+# Agent runs to verify user inputs are truly isolated:
+
+# 1. Read user_inputs.md
+echo "=== User Inputs File ==="
+CONV_DIR=$(ls -td user_data/conversations/conv_*/ 2>/dev/null | head -1)
+
+if [ -n "$CONV_DIR" ]; then
+    cat "${CONV_DIR}user_inputs.md" 2>/dev/null | head -50
+    
+    echo ""
+    echo "=== Checking for AI content leak ==="
+    
+    # Search for AI markers that shouldn't be in user_inputs.md
+    if grep -q "**AI**:" "${CONV_DIR}user_inputs.md" 2>/dev/null; then
+        echo "❌ FAIL: Found AI response in user_inputs.md!"
+    else
+        echo "✅ PASS: No AI responses in user_inputs.md"
+    fi
+    
+    if grep -q "Operations:" "${CONV_DIR}user_inputs.md" 2>/dev/null; then
+        echo "❌ FAIL: Found operations log in user_inputs.md!"
+    else
+        echo "✅ PASS: No operations in user_inputs.md"
+    fi
+else
+    echo "No conversations found"
+fi
+```
+
+---
+
+#### Test: Life Areas Structure Verification
+**Steps for Agent:**
+```bash
+# Agent runs to verify life areas structure:
+
+echo "=== Life Areas Tree ==="
+tree user_data/life_areas/ 2>/dev/null || ls -laR user_data/life_areas/ 2>/dev/null
+
+echo ""
+echo "=== Checking Area Summaries ==="
+
+# Find all _AREA_SUMMARY.md files
+find user_data/life_areas -name "_AREA_SUMMARY.md" 2>/dev/null | while read summary; do
+    echo ""
+    echo "--- $summary ---"
+    head -20 "$summary"
+done
+
+echo ""
+echo "=== Checking Entry Ordering (Newest First) ==="
+
+# Check first document file
+DOC=$(find user_data/life_areas -name "*.md" ! -name "_*" 2>/dev/null | head -1)
+if [ -n "$DOC" ]; then
+    echo "Checking: $DOC"
+    
+    # Extract timestamps and verify descending order
+    grep -E "^### [0-9]{4}-[0-9]{2}-[0-9]{2}" "$DOC" | head -5
+    
+    # Check if first entry is newest
+    FIRST_DATE=$(grep -E "^### [0-9]{4}-[0-9]{2}-[0-9]{2}" "$DOC" | head -1 | grep -oE "[0-9]{4}-[0-9]{2}-[0-9]{2}")
+    SECOND_DATE=$(grep -E "^### [0-9]{4}-[0-9]{2}-[0-9]{2}" "$DOC" | head -2 | tail -1 | grep -oE "[0-9]{4}-[0-9]{2}-[0-9]{2}")
+    
+    if [[ "$FIRST_DATE" > "$SECOND_DATE" ]] || [[ "$FIRST_DATE" == "$SECOND_DATE" ]]; then
+        echo "✅ PASS: Entries in newest-first order"
+    else
+        echo "❌ FAIL: Entries NOT in newest-first order"
+    fi
+else
+    echo "No document files found"
+fi
+```
+
+---
+
+#### Test: Artifact HTML Quality Check
+**Steps for Agent:**
+```bash
+# Agent runs to verify artifact HTML quality:
+
+echo "=== Artifact Quality Checks ==="
+
+ARTIFACT=$(find user_data -name "*.html" -path "*/artifacts/*" 2>/dev/null | head -1)
+
+if [ -n "$ARTIFACT" ]; then
+    echo "Checking: $ARTIFACT"
+    
+    # Check for required styling elements
+    echo ""
+    echo "--- Liquid Glass Styling ---"
+    
+    grep -q "backdrop-filter" "$ARTIFACT" && echo "✅ backdrop-filter present" || echo "❌ MISSING: backdrop-filter"
+    grep -q "blur" "$ARTIFACT" && echo "✅ blur effect present" || echo "❌ MISSING: blur effect"
+    grep -q "border-radius" "$ARTIFACT" && echo "✅ border-radius present" || echo "❌ MISSING: border-radius"
+    grep -q "box-shadow" "$ARTIFACT" && echo "✅ box-shadow present" || echo "❌ MISSING: box-shadow"
+    grep -q "linear-gradient\|radial-gradient" "$ARTIFACT" && echo "✅ gradient present" || echo "⚠️  No gradient found"
+    
+    echo ""
+    echo "--- Interactive Elements ---"
+    grep -q ":hover" "$ARTIFACT" && echo "✅ hover states present" || echo "⚠️  No hover states"
+    grep -q "transition" "$ARTIFACT" && echo "✅ transitions present" || echo "⚠️  No transitions"
+    
+    echo ""
+    echo "--- Typography ---"
+    grep -q "font-family" "$ARTIFACT" && echo "✅ font-family set" || echo "⚠️  No font-family"
+    grep -q "font-weight" "$ARTIFACT" && echo "✅ font-weight used" || echo "⚠️  No font-weight"
+    
+    echo ""
+    echo "--- File Size ---"
+    SIZE=$(stat -f%z "$ARTIFACT" 2>/dev/null || stat --format=%s "$ARTIFACT" 2>/dev/null)
+    echo "File size: $SIZE bytes"
+    
+    if [ "$SIZE" -lt 500 ]; then
+        echo "⚠️  WARNING: Artifact seems too small (< 500 bytes)"
+    elif [ "$SIZE" -gt 50000 ]; then
+        echo "⚠️  WARNING: Artifact seems too large (> 50KB)"
+    else
+        echo "✅ File size reasonable"
+    fi
+else
+    echo "No artifact files found"
+fi
+```
+
+---
+
+### 7.7 Database Integrity Tests
+**Agent Can Run**: ✅ Yes  
+**Tools**: Terminal (sqlite3)
+
+#### Test: Database Schema Verification
+**Steps for Agent:**
+```bash
+# Agent runs to verify database schema:
+
+DB_PATH="user_data/bubblevoice.db"
+
+if [ -f "$DB_PATH" ]; then
+    echo "=== Database Tables ==="
+    sqlite3 "$DB_PATH" ".tables"
+    
+    echo ""
+    echo "=== Table Schemas ==="
+    sqlite3 "$DB_PATH" ".schema"
+    
+    echo ""
+    echo "=== Row Counts ==="
+    for table in conversations messages life_areas area_entries artifacts settings; do
+        COUNT=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM $table;" 2>/dev/null || echo "N/A")
+        echo "$table: $COUNT rows"
+    done
+    
+    echo ""
+    echo "=== Foreign Key Check ==="
+    sqlite3 "$DB_PATH" "PRAGMA foreign_key_check;"
+    
+    RESULT=$?
+    if [ $RESULT -eq 0 ]; then
+        echo "✅ Foreign keys valid"
+    else
+        echo "❌ Foreign key violations found!"
+    fi
+    
+    echo ""
+    echo "=== Integrity Check ==="
+    sqlite3 "$DB_PATH" "PRAGMA integrity_check;"
+else
+    echo "Database not found at $DB_PATH"
+fi
+```
+
+---
+
+#### Test: Data Consistency Check
+**Steps for Agent:**
+```bash
+# Agent runs to verify data consistency:
+
+DB_PATH="user_data/bubblevoice.db"
+
+if [ -f "$DB_PATH" ]; then
+    echo "=== Orphaned Messages Check ==="
+    ORPHANS=$(sqlite3 "$DB_PATH" "
+        SELECT COUNT(*) FROM messages m 
+        WHERE NOT EXISTS (
+            SELECT 1 FROM conversations c WHERE c.id = m.conversation_id
+        );
+    ")
+    
+    if [ "$ORPHANS" -eq 0 ]; then
+        echo "✅ No orphaned messages"
+    else
+        echo "❌ Found $ORPHANS orphaned messages!"
+    fi
+    
+    echo ""
+    echo "=== Orphaned Entries Check ==="
+    ORPHAN_ENTRIES=$(sqlite3 "$DB_PATH" "
+        SELECT COUNT(*) FROM area_entries e 
+        WHERE NOT EXISTS (
+            SELECT 1 FROM life_areas a WHERE a.path = e.area_path
+        );
+    ")
+    
+    if [ "$ORPHAN_ENTRIES" -eq 0 ]; then
+        echo "✅ No orphaned area entries"
+    else
+        echo "❌ Found $ORPHAN_ENTRIES orphaned entries!"
+    fi
+    
+    echo ""
+    echo "=== Recent Activity ==="
+    sqlite3 "$DB_PATH" "
+        SELECT 'Conversations:', COUNT(*), MAX(updated_at) FROM conversations
+        UNION ALL
+        SELECT 'Messages:', COUNT(*), MAX(timestamp) FROM messages
+        UNION ALL  
+        SELECT 'Areas:', COUNT(*), MAX(updated_at) FROM life_areas
+        UNION ALL
+        SELECT 'Artifacts:', COUNT(*), MAX(created_at) FROM artifacts;
+    "
+else
+    echo "Database not found"
+fi
+```
+
+---
+
+### 7.8 API Response Validation Tests
+**Agent Can Run**: ✅ Yes  
+**Tools**: Terminal (curl), File Read
+
+#### Test: LLM Structured Output Validation
+**Steps for Agent:**
+```bash
+# Agent runs to validate LLM response structure:
+
+# 1. Make test request to backend (if running)
+RESPONSE=$(curl -s -X POST http://localhost:7482/api/chat \
+    -H "Content-Type: application/json" \
+    -d '{"message": "Hello, how are you?", "conversationId": "test_123"}' \
+    2>/dev/null)
+
+if [ -n "$RESPONSE" ]; then
+    echo "=== Raw Response ==="
+    echo "$RESPONSE" | head -c 500
+    
+    echo ""
+    echo ""
+    echo "=== Structure Validation ==="
+    
+    # Check for required fields using jq if available, otherwise grep
+    if command -v jq &> /dev/null; then
+        echo "$RESPONSE" | jq -e '.user_response.spoken_text' > /dev/null && \
+            echo "✅ user_response.spoken_text present" || \
+            echo "❌ MISSING: user_response.spoken_text"
+        
+        echo "$RESPONSE" | jq -e '.area_actions' > /dev/null && \
+            echo "✅ area_actions present" || \
+            echo "❌ MISSING: area_actions"
+        
+        echo "$RESPONSE" | jq -e '.artifact_action' > /dev/null && \
+            echo "✅ artifact_action present" || \
+            echo "❌ MISSING: artifact_action"
+        
+        echo "$RESPONSE" | jq -e '.proactive_bubbles' > /dev/null && \
+            echo "✅ proactive_bubbles present" || \
+            echo "⚠️  proactive_bubbles not present"
+    else
+        echo "jq not available, using grep..."
+        echo "$RESPONSE" | grep -q "spoken_text" && echo "✅ spoken_text found" || echo "❌ spoken_text missing"
+        echo "$RESPONSE" | grep -q "area_actions" && echo "✅ area_actions found" || echo "❌ area_actions missing"
+    fi
+else
+    echo "No response from server (is it running?)"
+fi
+```
+
+---
+
+### 7.9 Full Automated Test Suite Runner
+**Agent Can Run**: ✅ Yes  
+**Tools**: Terminal
+
+#### Master Test Script
+```bash
+#!/bin/bash
+# AGENT TEST SUITE RUNNER
+# Agent can run this to execute all automated tests
+
+echo "╔════════════════════════════════════════════════════════════╗"
+echo "║     BubbleVoice Artifacts & Data Management Test Suite     ║"
+echo "╚════════════════════════════════════════════════════════════╝"
+echo ""
+echo "Started: $(date)"
+echo ""
+
+PASS_COUNT=0
+FAIL_COUNT=0
+WARN_COUNT=0
+
+# Function to run a test
+run_test() {
+    local name="$1"
+    local command="$2"
+    
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "TEST: $name"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    eval "$command"
+    
+    echo ""
+}
+
+# Directory structure tests
+run_test "Directory Structure" '
+    [ -d "user_data/life_areas" ] && echo "✅ life_areas exists" || echo "❌ life_areas missing"
+    [ -d "user_data/conversations" ] && echo "✅ conversations exists" || echo "❌ conversations missing"
+    [ -d "user_data/embeddings" ] && echo "✅ embeddings exists" || echo "❌ embeddings missing"
+'
+
+# Database tests
+run_test "Database Integrity" '
+    DB="user_data/bubblevoice.db"
+    if [ -f "$DB" ]; then
+        sqlite3 "$DB" "PRAGMA integrity_check;" && echo "✅ DB integrity OK"
+    else
+        echo "⚠️  Database not found"
+    fi
+'
+
+# File structure tests
+run_test "Conversation File Structure" '
+    for dir in user_data/conversations/conv_*/; do
+        [ -d "$dir" ] || continue
+        MISSING=0
+        [ -f "${dir}conversation.md" ] || MISSING=$((MISSING+1))
+        [ -f "${dir}user_inputs.md" ] || MISSING=$((MISSING+1))
+        [ -f "${dir}conversation_ai_notes.md" ] || MISSING=$((MISSING+1))
+        [ -f "${dir}conversation_summary.md" ] || MISSING=$((MISSING+1))
+        
+        if [ $MISSING -eq 0 ]; then
+            echo "✅ $(basename $dir): All 4 files present"
+        else
+            echo "❌ $(basename $dir): Missing $MISSING files"
+        fi
+    done
+'
+
+# Artifact quality tests
+run_test "Artifact Quality" '
+    for artifact in user_data/conversations/*/artifacts/*.html; do
+        [ -f "$artifact" ] || continue
+        NAME=$(basename "$artifact")
+        
+        CHECKS=0
+        grep -q "backdrop-filter" "$artifact" && CHECKS=$((CHECKS+1))
+        grep -q "border-radius" "$artifact" && CHECKS=$((CHECKS+1))
+        grep -q "box-shadow" "$artifact" && CHECKS=$((CHECKS+1))
+        
+        if [ $CHECKS -ge 2 ]; then
+            echo "✅ $NAME: Quality OK ($CHECKS/3 style checks)"
+        else
+            echo "⚠️  $NAME: Low quality ($CHECKS/3 style checks)"
+        fi
+    done
+'
+
+# Performance check
+run_test "Performance (Memory)" '
+    MEM=$(ps aux | grep -i "node.*server\|electron" | grep -v grep | awk "{sum+=\$4} END {print sum}")
+    if [ -n "$MEM" ]; then
+        echo "Current memory usage: ${MEM}%"
+        if (( $(echo "$MEM > 10" | bc -l) )); then
+            echo "⚠️  High memory usage"
+        else
+            echo "✅ Memory usage OK"
+        fi
+    else
+        echo "⚠️  Process not found"
+    fi
+'
+
+echo ""
+echo "═══════════════════════════════════════════════════════════════"
+echo "TEST SUITE COMPLETE"
+echo "Finished: $(date)"
+echo "═══════════════════════════════════════════════════════════════"
+```
+
+---
+
+### 7.10 Puppeteer Screenshot Comparison Workflow
+**Agent Can Run**: ✅ Yes  
+**Tools**: Puppeteer MCP, File operations
+
+#### Complete Agent Workflow for UI Verification:
+
+```
+AGENT UI VERIFICATION WORKFLOW
+==============================
+
+1. PREPARATION
+   - Ensure app is running (npm run dev)
+   - Navigate to app: puppeteer_navigate url="http://localhost:7482"
+   - Wait for load
+
+2. CAPTURE BASELINE (First Run Only)
+   - Screenshot each state:
+     - Empty state
+     - With messages
+     - Settings open
+     - Artifact displayed
+     - Error state
+   - Save to tests/visual-baselines/
+
+3. CAPTURE CURRENT STATE
+   - Repeat all screenshots
+   - Save to tests/visual-current/
+
+4. COMPARE AND REPORT
+   - For each pair:
+     - Check file sizes (major changes)
+     - Visual inspection via puppeteer view
+     - Report differences
+
+5. DOCUMENT FINDINGS
+   - Create markdown report
+   - Include screenshots of issues
+   - Suggest fixes
+
+SCREENSHOT NAMING CONVENTION:
+  {component}_{state}_{timestamp}.png
+  
+  Examples:
+  - main_window_empty_1706185234.png
+  - settings_panel_open_1706185240.png
+  - artifact_stress_map_expanded_1706185250.png
+```
+
+---
+
+### 7.11 Error State Testing
+**Agent Can Run**: ✅ Yes  
+**Tools**: Puppeteer, Terminal
+
+#### Test: Network Error Handling
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Disable network in Puppeteer or stop backend
+3. [ ] Attempt to send message
+4. [ ] Screenshot: `puppeteer_screenshot` name="error_network_failure"
+5. [ ] Verify:
+   - [ ] Error message displayed to user
+   - [ ] Error is user-friendly (not technical jargon)
+   - [ ] Retry option available
+   - [ ] App doesn't crash
+
+---
+
+#### Test: Invalid API Key Handling
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Set invalid API key in settings
+3. [ ] Send message
+4. [ ] Wait for error response
+5. [ ] Screenshot: `puppeteer_screenshot` name="error_invalid_api_key"
+6. [ ] Verify:
+   - [ ] Clear error about API key
+   - [ ] Suggestion to check settings
+   - [ ] Link to settings panel
+
+---
+
+#### Test: Large Input Handling
+**Steps for Agent:**
+1. [ ] Navigate to app
+2. [ ] Generate large input (10,000 characters):
+   ```javascript
+   // puppeteer_evaluate
+   const largeText = 'This is a test sentence. '.repeat(500);
+   document.querySelector('.message-input').value = largeText;
+   return largeText.length;
+   ```
+3. [ ] Click send
+4. [ ] Screenshot: `puppeteer_screenshot` name="error_large_input"
+5. [ ] Verify:
+   - [ ] Input handled or truncated gracefully
+   - [ ] No browser freeze
+   - [ ] Error message if rejected
+
+---
+
+## 📋 AGENT TEST EXECUTION CHECKLIST
+
+Use this checklist to track which tests the agent has run:
+
+### Quick Tests (< 1 minute each)
+- [ ] 7.1 Main Window Layout Screenshot
+- [ ] 7.1 Settings Panel Screenshot
+- [ ] 7.6 Directory Structure Check
+- [ ] 7.6 File Structure Verification
+- [ ] 7.7 Database Schema Check
+
+### Medium Tests (1-5 minutes each)
+- [ ] 7.2 Flow 1: New Conversation
+- [ ] 7.2 Flow 2: Settings Save
+- [ ] 7.4 Color Contrast Check
+- [ ] 7.4 Keyboard Navigation
+- [ ] 7.5 Page Load Performance
+- [ ] 7.6 User Input Isolation
+- [ ] 7.6 Artifact Quality Check
+- [ ] 7.7 Data Consistency Check
+
+### Long Tests (5-15 minutes each)
+- [ ] 7.2 Flow 3: Area Creation
+- [ ] 7.2 Flow 4: Artifact Generation
+- [ ] 7.2 Flow 5: Bubble Interaction
+- [ ] 7.5 Runtime Performance
+- [ ] 7.5 Memory Usage
+- [ ] 7.9 Full Test Suite
+
+### Visual Regression (Manual trigger)
+- [ ] 7.3 Baseline Screenshots Created
+- [ ] 7.10 Current Screenshots Captured
+- [ ] 7.10 Comparison Report Generated
+
+### Error Handling
+- [ ] 7.11 Network Error Test
+- [ ] 7.11 Invalid API Key Test
+- [ ] 7.11 Large Input Test
+
+---
+
+**Total Agent-Executable Tests**: 25+  
+**Estimated Agent Runtime**: 30-60 minutes for full suite
