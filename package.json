@@ -38,6 +38,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
     "@google/generative-ai": "^0.21.0",
+    "better-sqlite3": "^12.6.2",
     "canvas": "^2.11.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
