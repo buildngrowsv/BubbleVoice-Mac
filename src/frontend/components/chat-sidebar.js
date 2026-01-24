@@ -147,15 +147,16 @@ class ChatSidebar {
     // The backend will respond with 'conversations_list' event
     // Wait for WebSocket to be connected before sending
     const tryLoad = () => {
-      if (window.websocketClient && window.websocketClient.isConnected) {
+      const ws = window.app?.websocketClient || window.websocketClient;
+      if (ws && ws.isConnected) {
         console.log('[ChatSidebar] Sending get_conversations request');
-        window.websocketClient.sendMessage({
+        ws.sendMessage({
           type: 'get_conversations',
           data: {}
         });
       } else {
         // Retry after a short delay
-        console.log('[ChatSidebar] WebSocket not connected yet, retrying...');
+        console.log('[ChatSidebar] WebSocket not connected yet, retrying... (ws:', !!ws, 'connected:', ws?.isConnected, ')');
         setTimeout(tryLoad, 500);
       }
     };
@@ -342,8 +343,9 @@ class ChatSidebar {
     
     // Request new conversation from backend
     // The backend will respond with 'conversation_created' event
-    if (window.websocketClient) {
-      window.websocketClient.sendMessage({
+    const ws = window.app?.websocketClient || window.websocketClient;
+    if (ws) {
+      ws.sendMessage({
         type: 'create_conversation',
         data: {}
       });
@@ -405,8 +407,9 @@ class ChatSidebar {
     
     // Request conversation data from backend
     // The backend will respond with 'conversation_loaded' event
-    if (window.websocketClient) {
-      window.websocketClient.sendMessage({
+    const ws = window.app?.websocketClient || window.websocketClient;
+    if (ws) {
+      ws.sendMessage({
         type: 'switch_conversation',
         data: { conversationId }
       });
@@ -468,8 +471,9 @@ class ChatSidebar {
     
     // Request deletion from backend
     // The backend will respond with 'conversation_deleted' event
-    if (window.websocketClient) {
-      window.websocketClient.sendMessage({
+    const ws = window.app?.websocketClient || window.websocketClient;
+    if (ws) {
+      ws.sendMessage({
         type: 'delete_conversation',
         data: { conversationId }
       });
@@ -747,8 +751,9 @@ class ChatSidebar {
     }
     
     // Send to backend
-    if (window.websocketClient) {
-      window.websocketClient.sendMessage({
+    const ws = window.app?.websocketClient || window.websocketClient;
+    if (ws) {
+      ws.sendMessage({
         type: 'update_conversation_title',
         data: {
           conversationId,
