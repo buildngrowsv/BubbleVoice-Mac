@@ -197,6 +197,18 @@ class ConversationService {
   async getConversationCount() {
     return this.conversations.size;
   }
+
+  /**
+   * GET ALL CONVERSATIONS
+   * 
+   * Returns the Map of all conversations.
+   * Used by chat sidebar to display conversation list.
+   * 
+   * @returns {Map} Map of all conversations
+   */
+  getAllConversations() {
+    return this.conversations;
+  }
 }
 
 module.exports = ConversationService;

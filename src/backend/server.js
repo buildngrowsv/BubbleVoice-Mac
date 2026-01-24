@@ -288,6 +288,26 @@ class BackendServer {
           this.sendMessage(ws, { type: 'pong', data: { timestamp: Date.now() } });
           break;
 
+        case 'get_conversations':
+          await this.handleGetConversations(ws, message, connectionState);
+          break;
+
+        case 'create_conversation':
+          await this.handleCreateConversation(ws, message, connectionState);
+          break;
+
+        case 'switch_conversation':
+          await this.handleSwitchConversation(ws, message, connectionState);
+          break;
+
+        case 'delete_conversation':
+          await this.handleDeleteConversation(ws, message, connectionState);
+          break;
+
+        case 'update_conversation_title':
+          await this.handleUpdateConversationTitle(ws, message, connectionState);
+          break;
+
         default:
           console.warn(`[Backend] Unknown message type: ${message.type}`);
           this.sendMessage(ws, {
@@ -740,6 +760,198 @@ class BackendServer {
         ws.ping();
       });
     }, 30000); // Ping every 30 seconds
+  }
+
+  // ===================================================================
+  // CONVERSATION MANAGEMENT HANDLERS
+  // ===================================================================
+
+  async handleGetConversations(ws, message, connectionState) {
+    console.log(`[Backend] Getting conversations for ${connectionState.id}`);
+    
+    try {
+      const conversations = this.conversationService.getAllConversations();
+      const conversationsArray = Array.from(conversations.values()).map(conv => ({
+        id: conv.id,
+        title: conv.title,
+        createdAt: conv.createdAt,
+        updatedAt: conv.updatedAt,
+        messages: conv.messages,
+        lastMessage: conv.messages.length > 0 
+          ? conv.messages[conv.messages.length - 1].content 
+          : ''
+      }));
+      
+      this.sendMessage(ws, {
+        type: 'conversations_list',
+        data: { conversations: conversationsArray }
+      });
+      
+      console.log(`[Backend] Sent ${conversationsArray.length} conversations`);
+    } catch (error) {
+      console.error('[Backend] Error getting conversations:', error);
+      this.sendMessage(ws, {
+        type: 'error',
+        data: { message: 'Failed to get conversations', error: error.message }
+      });
+    }
+  }
+
+  async handleCreateConversation(ws, message, connectionState) {
+    console.log(`[Backend] Creating new conversation`);
+    
+    try {
+      const conversation = await this.conversationService.createConversation();
+      
+      this.sendMessage(ws, {
+        type: 'conversation_created',
+        data: {
+          conversation: {
+            id: conversation.id,
+            title: conversation.title,
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt,
+            messages: conversation.messages,
+            lastMessage: ''
+          }
+        }
+      });
+      
+      console.log(`[Backend] Created conversation ${conversation.id}`);
+    } catch (error) {
+      console.error('[Backend] Error creating conversation:', error);
+      this.sendMessage(ws, {
+        type: 'error',
+        data: { message: 'Failed to create conversation', error: error.message }
+      });
+    }
+  }
+
+  async handleSwitchConversation(ws, message, connectionState) {
+    const conversationId = message.data?.conversationId;
+    console.log(`[Backend] Switching to conversation ${conversationId}`);
+    
+    if (!conversationId) {
+      this.sendMessage(ws, {
+        type: 'error',
+        data: { message: 'Missing conversationId' }
+      });
+      return;
+    }
+    
+    try {
+      const conversation = this.conversationService.getConversation(conversationId);
+      
+      if (!conversation) {
+        this.sendMessage(ws, {
+          type: 'error',
+          data: { message: 'Conversation not found' }
+        });
+        return;
+      }
+      
+      connectionState.currentConversationId = conversationId;
+      
+      this.sendMessage(ws, {
+        type: 'conversation_loaded',
+        data: {
+          conversation: {
+            id: conversation.id,
+            title: conversation.title,
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt,
+            messages: conversation.messages
+          }
+        }
+      });
+      
+      console.log(`[Backend] Loaded conversation ${conversationId}`);
+    } catch (error) {
+      console.error('[Backend] Error switching conversation:', error);
+      this.sendMessage(ws, {
+        type: 'error',
+        data: { message: 'Failed to switch conversation', error: error.message }
+      });
+    }
+  }
+
+  async handleDeleteConversation(ws, message, connectionState) {
+    const conversationId = message.data?.conversationId;
+    console.log(`[Backend] Deleting conversation ${conversationId}`);
+    
+    if (!conversationId) {
+      this.sendMessage(ws, {
+        type: 'error',
+        data: { message: 'Missing conversationId' }
+      });
+      return;
+    }
+    
+    try {
+      const deleted = this.conversationService.deleteConversation(conversationId);
+      
+      if (!deleted) {
+        this.sendMessage(ws, {
+          type: 'error',
+          data: { message: 'Conversation not found' }
+        });
+        return;
+      }
+      
+      this.sendMessage(ws, {
+        type: 'conversation_deleted',
+        data: { conversationId }
+      });
+      
+      console.log(`[Backend] Deleted conversation ${conversationId}`);
+    } catch (error) {
+      console.error('[Backend] Error deleting conversation:', error);
+      this.sendMessage(ws, {
+        type: 'error',
+        data: { message: 'Failed to delete conversation', error: error.message }
+      });
+    }
+  }
+
+  async handleUpdateConversationTitle(ws, message, connectionState) {
+    const { conversationId, title } = message.data || {};
+    console.log(`[Backend] Updating title for conversation ${conversationId}`);
+    
+    if (!conversationId || !title) {
+      this.sendMessage(ws, {
+        type: 'error',
+        data: { message: 'Missing conversationId or title' }
+      });
+      return;
+    }
+    
+    try {
+      const conversation = this.conversationService.getConversation(conversationId);
+      
+      if (!conversation) {
+        this.sendMessage(ws, {
+          type: 'error',
+          data: { message: 'Conversation not found' }
+        });
+        return;
+      }
+      
+      conversation.title = title;
+      conversation.updatedAt = new Date().toISOString();
+      
+      this.sendMessage(ws, {
+        type: 'conversation_title_updated',
+        data: { conversationId, title }
+      });
+      
+      console.log(`[Backend] Updated title for conversation ${conversationId}`);
+    } catch (error) {
+      console.error('[Backend] Error updating conversation title:', error);
+      this.sendMessage(ws, {
+        type: 'error',
+        data: { message: 'Failed to update conversation title', error: error.message }
+      });
+    }
   }
 }
 
