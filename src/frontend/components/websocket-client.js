@@ -355,6 +355,26 @@ class WebSocketClient {
           console.log('[WebSocketClient] Received pong');
           break;
 
+        case 'conversations_list':
+          this.handleConversationsList(message.data);
+          break;
+
+        case 'conversation_created':
+          this.handleConversationCreated(message.data);
+          break;
+
+        case 'conversation_loaded':
+          this.handleConversationLoaded(message.data);
+          break;
+
+        case 'conversation_deleted':
+          this.handleConversationDeleted(message.data);
+          break;
+
+        case 'conversation_title_updated':
+          this.handleConversationTitleUpdated(message.data);
+          break;
+
         default:
           console.warn('[WebSocketClient] Unknown message type:', message.type);
       }
@@ -504,6 +524,84 @@ class WebSocketClient {
         this.app.populateVoices();
       }
     }
+  }
+
+  /**
+   * HANDLE CONVERSATIONS LIST
+   * 
+   * Called when backend sends list of all conversations.
+   * Forwards to ChatSidebar to update the UI.
+   */
+  handleConversationsList(data) {
+    console.log('[WebSocketClient] Received conversations list:', data.conversations?.length || 0, 'conversations');
+    
+    if (window.app && window.app.chatSidebar) {
+      window.app.chatSidebar.updateConversationsList(data.conversations || []);
+    }
+  }
+
+  /**
+   * HANDLE CONVERSATION CREATED
+   * 
+   * Called when a new conversation is created.
+   * Forwards to ChatSidebar and switches to the new conversation.
+   */
+  handleConversationCreated(data) {
+    console.log('[WebSocketClient] Conversation created:', data.conversation?.id);
+    
+    if (window.app && window.app.chatSidebar) {
+      // Add to list
+      window.app.chatSidebar.updateConversationsList([data.conversation]);
+      
+      // Switch to new conversation
+      window.app.chatSidebar.handleConversationClick(data.conversation.id);
+    }
+  }
+
+  /**
+   * HANDLE CONVERSATION LOADED
+   * 
+   * Called when switching to a different conversation.
+   * Loads the conversation messages into the UI.
+   */
+  handleConversationLoaded(data) {
+    console.log('[WebSocketClient] Conversation loaded:', data.conversation?.id);
+    
+    if (window.app && window.app.conversationManager) {
+      // Clear current messages
+      window.app.conversationManager.clearMessages();
+      
+      // Load conversation messages
+      if (data.conversation && data.conversation.messages) {
+        data.conversation.messages.forEach(msg => {
+          window.app.conversationManager.addMessage(msg);
+        });
+      }
+    }
+  }
+
+  /**
+   * HANDLE CONVERSATION DELETED
+   * 
+   * Called when a conversation is deleted.
+   * Removes from sidebar.
+   */
+  handleConversationDeleted(data) {
+    console.log('[WebSocketClient] Conversation deleted:', data.conversationId);
+    
+    // ChatSidebar handles this locally, no need to update
+  }
+
+  /**
+   * HANDLE CONVERSATION TITLE UPDATED
+   * 
+   * Called when a conversation title is updated.
+   * Updates the sidebar display.
+   */
+  handleConversationTitleUpdated(data) {
+    console.log('[WebSocketClient] Conversation title updated:', data.conversationId, data.title);
+    
+    // ChatSidebar handles this locally, no need to update
   }
 }
 

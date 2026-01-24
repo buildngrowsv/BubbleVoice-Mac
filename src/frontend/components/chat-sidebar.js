@@ -46,6 +46,7 @@ class ChatSidebar {
     this.conversationsList = document.getElementById('conversations-list');
     this.newChatButton = document.getElementById('new-chat-button');
     this.toggleButton = document.getElementById('toggle-sidebar-button');
+    this.floatingToggle = document.getElementById('sidebar-toggle-floating');
     
     // State
     // Track which conversation is currently active and sidebar visibility
@@ -90,6 +91,10 @@ class ChatSidebar {
     
     if (this.toggleButton) {
       this.toggleButton.addEventListener('click', this.handleToggleSidebar);
+    }
+    
+    if (this.floatingToggle) {
+      this.floatingToggle.addEventListener('click', this.handleToggleSidebar);
     }
     
     // Event delegation for conversation items
@@ -140,9 +145,22 @@ class ChatSidebar {
     
     // Request conversation list from backend via WebSocket
     // The backend will respond with 'conversations_list' event
-    if (window.websocketClient) {
-      window.websocketClient.send('get_conversations', {});
-    }
+    // Wait for WebSocket to be connected before sending
+    const tryLoad = () => {
+      if (window.websocketClient && window.websocketClient.isConnected) {
+        console.log('[ChatSidebar] Sending get_conversations request');
+        window.websocketClient.sendMessage({
+          type: 'get_conversations',
+          data: {}
+        });
+      } else {
+        // Retry after a short delay
+        console.log('[ChatSidebar] WebSocket not connected yet, retrying...');
+        setTimeout(tryLoad, 500);
+      }
+    };
+    
+    tryLoad();
   }
   
   /**
@@ -325,7 +343,10 @@ class ChatSidebar {
     // Request new conversation from backend
     // The backend will respond with 'conversation_created' event
     if (window.websocketClient) {
-      window.websocketClient.send('create_conversation', {});
+      window.websocketClient.sendMessage({
+        type: 'create_conversation',
+        data: {}
+      });
     }
     
     // Visual feedback
@@ -385,7 +406,10 @@ class ChatSidebar {
     // Request conversation data from backend
     // The backend will respond with 'conversation_loaded' event
     if (window.websocketClient) {
-      window.websocketClient.send('switch_conversation', { conversationId });
+      window.websocketClient.sendMessage({
+        type: 'switch_conversation',
+        data: { conversationId }
+      });
     }
     
     // Notify app component about conversation switch
@@ -445,7 +469,10 @@ class ChatSidebar {
     // Request deletion from backend
     // The backend will respond with 'conversation_deleted' event
     if (window.websocketClient) {
-      window.websocketClient.send('delete_conversation', { conversationId });
+      window.websocketClient.sendMessage({
+        type: 'delete_conversation',
+        data: { conversationId }
+      });
     }
     
     // Remove from local state
@@ -499,6 +526,13 @@ class ChatSidebar {
       } else {
         this.sidebar.classList.add('collapsed');
       }
+    }
+    
+    // Show/hide floating toggle button
+    // WHY: Floating button should only be visible when sidebar is collapsed
+    // BECAUSE: When sidebar is open, the toggle is in the sidebar footer
+    if (this.floatingToggle) {
+      this.floatingToggle.style.display = this.isExpanded ? 'none' : 'flex';
     }
     
     // Update button aria-expanded
@@ -714,9 +748,12 @@ class ChatSidebar {
     
     // Send to backend
     if (window.websocketClient) {
-      window.websocketClient.send('update_conversation_title', {
-        conversationId,
-        title: newTitle
+      window.websocketClient.sendMessage({
+        type: 'update_conversation_title',
+        data: {
+          conversationId,
+          title: newTitle
+        }
       });
     }
   }

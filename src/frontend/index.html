@@ -95,6 +95,18 @@
   <!-- TEST ID: main-container - The primary content container below the title bar -->
   <div class="main-container" data-testid="main-container" role="main">
 
+    <!-- SIDEBAR TOGGLE BUTTON (visible when sidebar is collapsed) -->
+    <button class="sidebar-toggle-floating"
+            id="sidebar-toggle-floating"
+            data-testid="sidebar-toggle-floating"
+            title="Show Conversations (⌘B)"
+            aria-label="Show conversation sidebar"
+            style="display: none;">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M4 6h12M4 10h12M4 14h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+
     <!-- CHAT HISTORY SIDEBAR -->
     <!--
       PRODUCT CONTEXT:

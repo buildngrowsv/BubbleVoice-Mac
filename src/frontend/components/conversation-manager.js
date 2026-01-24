@@ -73,6 +73,24 @@ class ConversationManager {
   }
 
   /**
+   * CLEAR MESSAGES
+   * 
+   * Clears all messages from the conversation view.
+   * Used when switching between conversations.
+   */
+  clearMessages() {
+    console.log('[ConversationManager] Clearing messages');
+    
+    // Clear message history
+    this.messages = [];
+    
+    // Clear DOM
+    if (this.messagesContainer) {
+      this.messagesContainer.innerHTML = '';
+    }
+  }
+
+  /**
    * CREATE MESSAGE ELEMENT
    * 
    * Creates the DOM element for a message.
