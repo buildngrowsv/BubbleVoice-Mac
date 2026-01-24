@@ -317,11 +317,16 @@ class ConversationManager {
    * 
    * Smoothly scrolls the conversation to the latest message.
    * Uses smooth scrolling for better UX.
+   * 
+   * CRITICAL FIX: Scroll the messages container itself, not its parent
+   * WHY: The .messages container has overflow-y: auto, so it's the scrollable element
+   * BECAUSE: Trying to scroll the parent doesn't work when child is the scroll container
+   * HISTORY: Bug discovered 2026-01-24 - conversation area wasn't scrollable
    */
   scrollToBottom() {
     // Use requestAnimationFrame to ensure DOM has updated
     requestAnimationFrame(() => {
-      this.messagesContainer.parentElement.scrollTo({
+      this.messagesContainer.scrollTo({
         top: this.messagesContainer.scrollHeight,
         behavior: 'smooth'
       });

@@ -369,14 +369,13 @@ class BubbleVoiceApp {
 
     console.log('[App] Sending message:', text);
 
-    // Add user message to conversation
-    this.conversationManager.addMessage({
-      role: 'user',
-      content: text,
-      timestamp: Date.now()
-    });
-
-    // Clear input
+    // CRITICAL FIX: Do NOT add message to UI here
+    // WHY: The backend will send back a user_message event after processing
+    // BECAUSE: Adding it here AND from backend causes duplicate messages
+    // HISTORY: Bug discovered 2026-01-24 - messages appeared twice in UI
+    // SOLUTION: Let the backend be the single source of truth for message display
+    
+    // Clear input immediately for better UX (user sees their action registered)
     this.elements.inputField.textContent = '';
     this.updateSendButtonState();
 
@@ -385,6 +384,7 @@ class BubbleVoiceApp {
     this.updateStatus('Thinking...', 'processing');
 
     // Send to backend via WebSocket
+    // Backend will send back user_message event which will add it to UI
     try {
       await this.websocketClient.sendMessage({
         type: 'user_message',
