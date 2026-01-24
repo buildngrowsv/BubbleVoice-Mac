@@ -30,7 +30,7 @@ const assert = require('assert');
  * through different pathways.
  */
 describe('Conversation Sidebar Display', function() {
-  this.timeout(10000);
+  // Note: timeout is handled by test runner
   
   let mockWebSocket;
   let chatSidebar;

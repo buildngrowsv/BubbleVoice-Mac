@@ -51,6 +51,7 @@
     "@playwright/test": "^1.57.0",
     "electron": "^33.3.0",
     "electron-builder": "^25.1.8",
+    "jsdom": "^27.0.1",
     "puppeteer": "^22.15.0"
   },
   "build": {
