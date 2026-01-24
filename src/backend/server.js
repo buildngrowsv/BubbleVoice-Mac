@@ -420,11 +420,31 @@ class BackendServer {
 
       // Get or create conversation
       let conversation;
+      let isNewConversation = false;
       if (conversationId) {
         conversation = await this.conversationService.getConversation(conversationId);
       } else {
         conversation = await this.conversationService.createConversation();
         connectionState.conversationId = conversation.id;
+        isNewConversation = true;
+        
+        // CRITICAL FIX: Notify frontend about new conversation
+        // WHY: The sidebar needs to know about all created conversations
+        // BECAUSE: Without this event, conversations are "invisible" in the UI
+        // HISTORY: Bug discovered 2026-01-24 via comprehensive testing
+        this.sendMessage(ws, {
+          type: 'conversation_created',
+          data: {
+            conversation: {
+              id: conversation.id,
+              title: conversation.metadata.title || 'New Conversation',
+              createdAt: conversation.metadata.createdAt,
+              updatedAt: conversation.metadata.updatedAt,
+              messages: conversation.messages,
+              lastMessage: ''
+            }
+          }
+        });
       }
 
       // Add user message to conversation

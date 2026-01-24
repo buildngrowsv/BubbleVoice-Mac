@@ -456,6 +456,12 @@ class VoicePipelineService extends EventEmitter {
         if (!conversation) {
           conversation = await this.conversationService.createConversation();
           session.conversation = conversation;
+          
+          // CRITICAL FIX: Notify frontend about new conversation
+          // WHY: The sidebar needs to know about voice-created conversations
+          // BECAUSE: Without this event, conversations are "invisible" in the UI
+          // HISTORY: Bug discovered 2026-01-24 via comprehensive testing
+          this.sendConversationCreatedToFrontend(session, conversation);
         }
         
         // Add user message to conversation history
@@ -707,6 +713,56 @@ class VoicePipelineService extends EventEmitter {
 
     // Stop any ongoing TTS playback
     await this.stopSpeaking(session);
+  }
+
+  /**
+   * SEND CONVERSATION CREATED TO FRONTEND
+   * 
+   * Notifies the frontend that a new conversation has been created.
+   * This allows the sidebar to display the conversation immediately.
+   * 
+   * WHY THIS EXISTS:
+   * When a conversation is auto-created during voice input, the frontend
+   * needs to be notified so the sidebar can update. Without this, voice-created
+   * conversations are "invisible" in the UI.
+   * 
+   * TECHNICAL NOTE:
+   * This mirrors the same event sent by handleCreateConversation in server.js
+   * when the user manually creates a conversation via the "New Chat" button.
+   * 
+   * HISTORY:
+   * Added 2026-01-24 to fix bug where voice-created conversations didn't
+   * appear in the sidebar. Bug was discovered through comprehensive testing.
+   * 
+   * @param {Object} session - Voice session
+   * @param {Object} conversation - Newly created conversation
+   */
+  sendConversationCreatedToFrontend(session, conversation) {
+    console.log(`[VoicePipelineService] Sending conversation_created to frontend for ${session.id}`);
+    
+    // Find the WebSocket connection for this session
+    if (this.server && this.server.connections) {
+      for (const [ws, connectionState] of this.server.connections) {
+        if (connectionState.id === session.id) {
+          this.server.sendMessage(ws, {
+            type: 'conversation_created',
+            data: {
+              conversation: {
+                id: conversation.id,
+                title: conversation.metadata.title || 'New Conversation',
+                createdAt: conversation.metadata.createdAt,
+                updatedAt: conversation.metadata.updatedAt,
+                messages: conversation.messages,
+                lastMessage: ''
+              }
+            }
+          });
+          return;
+        }
+      }
+    }
+    
+    console.warn(`[VoicePipelineService] Could not find WebSocket connection for session ${session.id}`);
   }
 
   /**
