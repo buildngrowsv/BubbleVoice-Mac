@@ -167,7 +167,9 @@ class BubbleVoiceApp {
    */
   setupUIEventListeners() {
     // Voice button - start/stop voice input
+    console.log('[App] Setting up voice button listener, button:', this.elements.voiceButton);
     this.elements.voiceButton.addEventListener('click', () => {
+      console.log('[App] Voice button clicked!');
       this.toggleVoiceInput();
     });
 
@@ -291,6 +293,7 @@ class BubbleVoiceApp {
    * Starts or stops voice input based on current state.
    */
   toggleVoiceInput() {
+    console.log('[App] toggleVoiceInput called, isListening:', this.state.isListening);
     if (this.state.isListening) {
       this.stopVoiceInput();
     } else {

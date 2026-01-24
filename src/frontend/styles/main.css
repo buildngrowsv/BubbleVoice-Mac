@@ -169,7 +169,8 @@ button, input, select, textarea, [contenteditable] {
  * Takes up flex space, pushing input to bottom.
  */
 .welcome-state {
-  flex: 1; /* Take up available space */
+  flex: 1 1 auto; /* Grow and shrink as needed */
+  min-height: 0; /* Allow shrinking below content size */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -250,7 +251,8 @@ button, input, select, textarea, [contenteditable] {
  * Container for conversation messages.
  */
 .messages {
-  flex: 1; /* Take up available space */
+  flex: 1 1 auto; /* Grow and shrink as needed */
+  min-height: 0; /* Allow shrinking below content size */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
@@ -397,7 +399,8 @@ button, input, select, textarea, [contenteditable] {
  * Fixed input area at the bottom of the window.
  */
 .input-container {
-  flex-shrink: 0; /* Don't shrink, stay at natural height */
+  flex: 0 0 auto; /* Don't grow or shrink, use natural height */
+  min-height: 100px; /* Ensure always visible */
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
@@ -406,6 +409,7 @@ button, input, select, textarea, [contenteditable] {
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border-top: 1px solid var(--glass-border);
+  z-index: 10; /* Ensure it's above other content */
 }
 
 /**
