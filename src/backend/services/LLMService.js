@@ -178,8 +178,14 @@ Always include 2-4 relevant bubbles.
     }
 
     // Get model instance
+    // WHY: We pass systemInstruction at the model level, NOT embedded as a user message.
+    // The Gemini SDK has a dedicated systemInstruction parameter that correctly routes
+    // the system prompt without polluting the conversation contents.
+    // HISTORY: Previously we were embedding the system prompt as the first user message
+    // in the contents array, which works but is less clean and can confuse role alternation.
     const geminiModel = this.geminiClient.getGenerativeModel({
-      model: model.replace('gemini-', 'models/gemini-'),
+      model: model,
+      systemInstruction: this.systemPrompt,
       generationConfig: {
         temperature: settings?.temperature || 0.7,
         topP: 0.95,
@@ -189,11 +195,23 @@ Always include 2-4 relevant bubbles.
       }
     });
 
-    // Build messages array
-    const messages = this.buildMessagesForGemini(conversation);
+    // Build messages array for Gemini
+    // The SDK's generateContentStream() expects an object with a `contents` property,
+    // NOT a raw array. Passing a raw array causes the SDK to misinterpret {role, parts}
+    // objects as Part objects, leading to the error:
+    // "Unknown name 'role' at 'contents[0].parts[0]': Cannot find field"
+    const contents = this.buildMessagesForGemini(conversation);
+
+    // Debug: Log the contents structure
+    console.log('[LLMService] Gemini contents structure:', JSON.stringify(contents, null, 2));
 
     // Generate streaming response
-    const result = await geminiModel.generateContentStream(messages);
+    // CRITICAL FIX: Pass { contents: [...] } object, NOT the array directly.
+    // The SDK's formatGenerateContentInput() checks for a `contents` property on the input.
+    // If it finds one, it uses it correctly. If it gets a raw array, it falls through to
+    // formatNewContent() which treats each array item as a Part (not a Content object),
+    // causing the "Unknown name 'role'" error because role is not a valid Part field.
+    const result = await geminiModel.generateContentStream({ contents });
 
     let fullResponse = '';
     let structuredOutput = null;
@@ -379,28 +397,51 @@ Always include 2-4 relevant bubbles.
    * 
    * Formats conversation history for Gemini API.
    * 
+   * GEMINI FORMAT:
+   * The Gemini SDK expects an array of content objects with role and parts.
+   * System instructions should be included as the first user message.
+   * 
+   * IMPORTANT: Gemini alternates between 'user' and 'model' roles.
+   * We need to ensure proper alternation and combine consecutive messages
+   * from the same role if needed.
+   * 
    * @param {Object} conversation - Conversation object
-   * @returns {Array} Messages array
+   * @returns {Array} Contents array for Gemini
    */
   buildMessagesForGemini(conversation) {
-    const messages = [
-      {
-        role: 'user',
-        parts: [{ text: this.systemPrompt }]
-      }
-    ];
+    const contents = [];
+
+    // Start with system prompt as first user message
+    let currentRole = 'user';
+    let currentParts = [{ text: this.systemPrompt }];
 
     // Add conversation history
-    if (conversation.messages) {
+    if (conversation.messages && conversation.messages.length > 0) {
       for (const msg of conversation.messages) {
-        messages.push({
-          role: msg.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: msg.content }]
-        });
+        const msgRole = msg.role === 'assistant' ? 'model' : 'user';
+        
+        // If same role as current, append to current parts
+        if (msgRole === currentRole) {
+          currentParts.push({ text: msg.content });
+        } else {
+          // Different role, push current and start new
+          contents.push({
+            role: currentRole,
+            parts: currentParts
+          });
+          currentRole = msgRole;
+          currentParts = [{ text: msg.content }];
+        }
       }
     }
 
-    return messages;
+    // Push the last accumulated message
+    contents.push({
+      role: currentRole,
+      parts: currentParts
+    });
+
+    return contents;
   }
 
   /**

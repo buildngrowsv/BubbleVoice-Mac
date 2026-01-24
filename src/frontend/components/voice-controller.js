@@ -72,6 +72,16 @@ class VoiceController {
     console.log('[VoiceController] Starting voice input via backend');
     this.isListening = true;
 
+    // CRITICAL: Clear the input field when starting new voice session
+    // WHY: Without this, transcriptions from previous sessions accumulate
+    // BECAUSE: The Swift helper maintains its own transcription buffer that
+    // doesn't reset between sessions, so we need to clear the UI
+    const inputField = this.app.elements.inputField;
+    if (inputField) {
+      inputField.textContent = '';
+      inputField.style.opacity = '1.0';
+    }
+
     try {
       // Send command to backend to start native speech recognition
       await this.app.websocketClient.sendMessage({
@@ -120,6 +130,16 @@ class VoiceController {
    * Called when backend sends partial or final transcription.
    * Updates the input field with the transcribed text.
    * 
+   * WHY THIS APPROACH:
+   * We need to update a contenteditable div while the user might be focused on it.
+   * Direct innerHTML manipulation can cause DOMExceptions when the selection is active.
+   * Instead, we check if the content actually changed before updating, and we use
+   * textContent for safety.
+   * 
+   * BECAUSE:
+   * Previous implementation caused frequent DOMException errors on every transcription
+   * update because it was modifying innerHTML while the div had focus/selection.
+   * 
    * @param {Object} data - Transcription data from backend
    * @param {string} data.text - Transcribed text
    * @param {boolean} data.isFinal - Whether this is final transcription
@@ -128,15 +148,29 @@ class VoiceController {
     console.log('[VoiceController] Transcription:', data.text, 'Final:', data.isFinal);
 
     const inputField = this.app.elements.inputField;
-
-    if (data.isFinal) {
-      // Final transcription - replace content with plain text
-      inputField.textContent = data.text;
-    } else {
-      // Partial transcription - update in real-time
-      // Show in a lighter color to indicate it's not final
-      const escapedText = this.escapeHtml(data.text);
-      inputField.innerHTML = `<span style="opacity: 0.7">${escapedText}</span>`;
+    
+    // Get current text content (without HTML)
+    const currentText = inputField.textContent || '';
+    
+    // Only update if text actually changed
+    // This prevents unnecessary DOM manipulation and DOMExceptions
+    if (currentText !== data.text) {
+      try {
+        // Use textContent instead of innerHTML to avoid DOMExceptions
+        // This is safer when the element has focus
+        inputField.textContent = data.text;
+        
+        // If not final, add visual indicator by styling the element itself
+        if (!data.isFinal) {
+          inputField.style.opacity = '0.7';
+        } else {
+          inputField.style.opacity = '1.0';
+        }
+      } catch (error) {
+        // Silently catch DOMExceptions that might still occur
+        // The transcription will update on the next cycle
+        console.debug('[VoiceController] DOM update skipped (element busy):', error.name);
+      }
     }
 
     // Update send button state

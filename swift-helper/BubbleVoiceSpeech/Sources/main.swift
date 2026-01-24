@@ -120,6 +120,12 @@ class SpeechHelper {
     private var isListening = false
     private var isSpeaking = false
     
+    // CRITICAL: Track whether we have any active timers or playback
+    // This is used by the Node.js backend to determine if user speech
+    // should trigger an interruption
+    // We send this state with every transcription update
+    private var hasActiveTimersOrPlayback = false
+    
     init() {
         // Initialize speech recognizer for US English
         self.speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
@@ -238,10 +244,21 @@ class SpeechHelper {
             let inputNode = audioEngine.inputNode
             
             // Start recognition task
+            // CRITICAL CHANGE (2026-01-21): Keep recognition running continuously
+            // This enables interruption detection - if user speaks while AI is responding,
+            // we'll get partial transcription results that trigger interruption
             recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { [weak self] result, error in
                 guard let self = self else { return }
                 
                 if let error = error {
+                    // Only stop on actual errors, not on normal completion
+                    let nsError = error as NSError
+                    // Error code 216 is "speech recognition cancelled" - this is normal
+                    if nsError.domain == "kAFAssistantErrorDomain" && nsError.code == 216 {
+                        self.logError("Recognition task cancelled (normal)")
+                        return
+                    }
+                    
                     self.sendError("Recognition error: \(error.localizedDescription)")
                     self.stopListening()
                     return
@@ -251,10 +268,19 @@ class SpeechHelper {
                     let transcription = result.bestTranscription.formattedString
                     let isFinal = result.isFinal
                     
+                    // Send transcription with current speaking state
+                    // This allows backend to detect interruptions
                     self.sendTranscription(text: transcription, isFinal: isFinal)
                     
+                    // CRITICAL: DO NOT stop listening on isFinal
+                    // We need to keep listening to detect user interruptions
+                    // The backend will manage the turn detection via timers
+                    
+                    // Instead, if isFinal, we restart recognition to get a fresh session
+                    // This prevents the recognizer from timing out
                     if isFinal {
-                        self.stopListening()
+                        self.logError("Got final transcription, restarting recognition for next utterance")
+                        self.restartRecognition()
                     }
                 }
             }
@@ -274,6 +300,109 @@ class SpeechHelper {
             
         } catch {
             sendError("Failed to start listening: \(error.localizedDescription)")
+        }
+    }
+    
+    /**
+     * RESTART RECOGNITION
+     * 
+     * Restarts speech recognition after a final result.
+     * This keeps the recognition running continuously to detect interruptions.
+     * 
+     * CRITICAL FIX (2026-01-23):
+     * The audio tap captures the recognitionRequest variable at install time.
+     * When we create a new recognitionRequest, the tap is still appending to the OLD one!
+     * This causes transcription accumulation across restarts.
+     * 
+     * SOLUTION: Remove and reinstall the audio tap with the new request.
+     * This is what Accountability AI does - it stops and restarts the entire recording.
+     * 
+     * ADDITIONAL FIX (2026-01-23):
+     * Apple's SFSpeechRecognizer returns the FULL transcription from the start of
+     * the recognition session, not incremental text. Even with a fresh request,
+     * we need to ensure we're not getting accumulated text from the audio buffer.
+     * 
+     * The solution is to add a small delay after removing the tap to let the
+     * audio pipeline flush, then reinstall with a completely fresh request.
+     * 
+     * PRODUCT CONTEXT:
+     * In the Accountability app, speech recognition runs continuously even while
+     * the AI is speaking. This allows immediate detection of user interruptions.
+     * We restart the recognition task AND the audio tap to get a fresh session.
+     */
+    private func restartRecognition() {
+        guard isListening else { return }
+        guard let audioEngine = audioEngine else { return }
+        
+        logError("Restarting recognition task for continuous listening")
+        
+        // Cancel the old task
+        recognitionTask?.cancel()
+        recognitionTask = nil
+        
+        // CRITICAL: Remove the old audio tap
+        // This prevents it from appending to the old recognitionRequest
+        let inputNode = audioEngine.inputNode
+        inputNode.removeTap(onBus: 0)
+        
+        // CRITICAL: Add a small delay to let the audio pipeline flush
+        // This prevents accumulated audio from being processed by the new request
+        // WHY: The audio engine may have buffered audio that hasn't been processed yet
+        // BECAUSE: Without this delay, the new tap immediately starts receiving
+        // buffered audio from before the restart, causing accumulation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            guard let self = self else { return }
+            guard self.isListening else { return }
+            
+            // Create a new recognition request
+            self.recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
+            guard let recognitionRequest = self.recognitionRequest,
+                  let speechRecognizer = self.speechRecognizer else {
+                self.sendError("Failed to create new recognition request")
+                return
+            }
+            
+            recognitionRequest.shouldReportPartialResults = true
+            
+            // Start a new recognition task
+            self.recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { [weak self] result, error in
+                guard let self = self else { return }
+                
+                if let error = error {
+                    let nsError = error as NSError
+                    if nsError.domain == "kAFAssistantErrorDomain" && nsError.code == 216 {
+                        self.logError("Recognition task cancelled (normal)")
+                        return
+                    }
+                    
+                    self.sendError("Recognition error: \(error.localizedDescription)")
+                    self.stopListening()
+                    return
+                }
+                
+                if let result = result {
+                    let transcription = result.bestTranscription.formattedString
+                    let isFinal = result.isFinal
+                    
+                    self.sendTranscription(text: transcription, isFinal: isFinal)
+                    
+                    if isFinal {
+                        self.logError("Got final transcription, restarting recognition for next utterance")
+                        self.restartRecognition()
+                    }
+                }
+            }
+            
+            // CRITICAL: Reinstall the audio tap with the NEW recognitionRequest
+            // This ensures audio buffers go to the new request, not the old one
+            let recordingFormat = inputNode.outputFormat(forBus: 0)
+            inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
+                // Use self?.recognitionRequest to get the CURRENT request
+                // This way if we restart again, it will use the new one
+                self?.recognitionRequest?.append(buffer)
+            }
+            
+            self.logError("Audio tap reinstalled with new recognition request after flush delay")
         }
     }
     
@@ -476,6 +605,15 @@ class SpeechHelper {
         case "stop_listening":
             stopListening()
             
+        case "reset_recognition":
+            // CRITICAL: Explicitly reset the recognition session
+            // This is called by the backend after the AI finishes speaking
+            // to ensure a fresh transcription session for the next user utterance
+            logError("Received reset_recognition command")
+            if isListening {
+                restartRecognition()
+            }
+            
         case "speak":
             guard let data = command.data,
                   let textValue = data["text"],
@@ -507,9 +645,14 @@ class SpeechHelper {
     }
     
     func sendTranscription(text: String, isFinal: Bool) {
+        // CRITICAL: Include isSpeaking state with every transcription
+        // This allows the backend to detect interruptions
+        // If isSpeaking is true and we get a transcription, it means
+        // the user is interrupting the AI's response
         sendResponse(type: "transcription_update", data: [
             "text": AnyCodable(text),
-            "isFinal": AnyCodable(isFinal)
+            "isFinal": AnyCodable(isFinal),
+            "isSpeaking": AnyCodable(isSpeaking)
         ])
     }
     

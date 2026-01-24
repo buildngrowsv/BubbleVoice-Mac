@@ -310,6 +310,10 @@ class WebSocketClient {
           this.handleTranscriptionUpdate(message.data);
           break;
 
+        case 'user_message':
+          this.handleUserMessage(message.data);
+          break;
+
         case 'ai_response':
           this.handleAIResponse(message.data);
           break;
@@ -367,6 +371,52 @@ class WebSocketClient {
 
   handleTranscriptionUpdate(data) {
     this.app.voiceController.handleTranscription(data);
+  }
+
+  /**
+   * HANDLE USER MESSAGE
+   * 
+   * Called when the backend sends a user message to display.
+   * This happens after the turn detection timer fires (2s of silence).
+   * 
+   * WHY THIS IS NEEDED:
+   * The backend's VoicePipelineService sends user messages when the
+   * playback timer fires. This ensures the user's transcribed speech
+   * appears as a sent bubble in the conversation.
+   * 
+   * TECHNICAL NOTES:
+   * - Message includes text and timestamp from backend
+   * - Displayed as a right-aligned blue bubble (user role)
+   * - This is separate from the real-time transcription updates
+   * 
+   * @param {Object} data - User message data
+   * @param {string} data.text - User's transcribed speech
+   * @param {number} data.timestamp - When the message was sent
+   */
+  handleUserMessage(data) {
+    console.log('[WebSocketClient] Handling user message:', data.text);
+    
+    // Add user message to conversation display
+    this.app.conversationManager.addMessage({
+      role: 'user',
+      content: data.text,
+      timestamp: data.timestamp
+    });
+
+    // Clear the input field if it contains the transcription
+    // This prevents the user from seeing duplicate text
+    // Handle both input elements and contenteditable divs
+    const inputField = this.app.elements.inputField;
+    if (inputField) {
+      const currentText = inputField.value || inputField.textContent || '';
+      if (currentText.trim() === data.text.trim()) {
+        if (inputField.value !== undefined) {
+          inputField.value = '';
+        } else {
+          inputField.textContent = '';
+        }
+      }
+    }
   }
 
   handleAIResponse(data) {

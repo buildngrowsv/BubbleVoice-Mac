@@ -280,6 +280,10 @@ class BackendServer {
           await this.handleInterrupt(ws, message, connectionState);
           break;
 
+        case 'update_api_keys':
+          await this.handleUpdateApiKeys(ws, message, connectionState);
+          break;
+
         case 'ping':
           this.sendMessage(ws, { type: 'pong', data: { timestamp: Date.now() } });
           break;
@@ -532,6 +536,68 @@ class BackendServer {
    * @param {Object} message - Message object
    * @param {Object} connectionState - Connection state
    */
+  /**
+   * HANDLE UPDATE API KEYS
+   * 
+   * Receives API keys from frontend and updates the environment variables
+   * so the LLM service can use them for API calls.
+   * 
+   * WHY THIS IS NEEDED:
+   * Users enter their API keys in the frontend settings panel.
+   * We need to send them to the backend so the LLM service can make
+   * authenticated requests to AI providers (Gemini, Claude, GPT).
+   * 
+   * SECURITY NOTE:
+   * - Keys are sent over localhost WebSocket (not exposed to internet)
+   * - Keys are stored in process.env (memory only, not persisted to disk)
+   * - Keys are never logged or sent to external servers
+   * 
+   * @param {WebSocket} ws - WebSocket connection
+   * @param {Object} message - Message object with API keys
+   * @param {Object} connectionState - Connection state
+   */
+  async handleUpdateApiKeys(ws, message, connectionState) {
+    console.log(`[Backend] Updating API keys for ${connectionState.id}`);
+
+    try {
+      const { googleApiKey, anthropicApiKey, openaiApiKey } = message.data;
+
+      // Update environment variables
+      // These will be used by the LLM service
+      if (googleApiKey) {
+        process.env.GOOGLE_API_KEY = googleApiKey;
+        console.log('[Backend] Google API key updated');
+      }
+      if (anthropicApiKey) {
+        process.env.ANTHROPIC_API_KEY = anthropicApiKey;
+        console.log('[Backend] Anthropic API key updated');
+      }
+      if (openaiApiKey) {
+        process.env.OPENAI_API_KEY = openaiApiKey;
+        console.log('[Backend] OpenAI API key updated');
+      }
+
+      // Send confirmation
+      this.sendMessage(ws, {
+        type: 'api_keys_updated',
+        data: {
+          success: true,
+          message: 'API keys updated successfully'
+        }
+      });
+
+    } catch (error) {
+      console.error('[Backend] Error updating API keys:', error);
+      this.sendMessage(ws, {
+        type: 'error',
+        data: {
+          message: 'Failed to update API keys',
+          error: error.message
+        }
+      });
+    }
+  }
+
   async handleInterrupt(ws, message, connectionState) {
     console.log(`[Backend] Interrupt from ${connectionState.id}`);
 

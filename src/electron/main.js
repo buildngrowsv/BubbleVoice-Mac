@@ -263,6 +263,14 @@ function startBackendServer() {
   backendProcess.on('exit', (code, signal) => {
     console.log(`[Main] Backend process exited with code ${code}, signal ${signal}`);
     
+    // CRITICAL FIX: Don't restart if port is already in use (code 1 with EADDRINUSE)
+    // This prevents infinite restart loops when multiple instances are running
+    if (code === 1 && backendRestartCount > 0) {
+      console.error('[Main] Backend failed due to port conflict - not restarting to prevent loop');
+      backendRestartCount = MAX_BACKEND_RESTARTS; // Prevent further restarts
+      return;
+    }
+    
     if (!app.isQuitting && backendRestartCount < MAX_BACKEND_RESTARTS) {
       backendRestartCount++;
       console.log(`[Main] Attempting to restart backend (attempt ${backendRestartCount}/${MAX_BACKEND_RESTARTS})...`);

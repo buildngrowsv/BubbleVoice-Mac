@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turn Detection Flow Diagram - BubbleVoice Mac</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .flows {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .flow {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .flow h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .flow.normal h2::before {
+            content: "✅";
+            font-size: 1.2em;
+        }
+        
+        .flow.interrupt h2::before {
+            content: "⚠️";
+            font-size: 1.2em;
+        }
+        
+        .step {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        
+        .step.user {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+        
+        .step.system {
+            border-left-color: #667eea;
+            background: #ebf4ff;
+        }
+        
+        .step.ai {
+            border-left-color: #ed8936;
+            background: #fffaf0;
+        }
+        
+        .step.interrupt {
+            border-left-color: #f56565;
+            background: #fff5f5;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+            font-size: 1.05em;
+        }
+        
+        .step-desc {
+            color: #4a5568;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .step-code {
+            background: #2d3748;
+            color: #68d391;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85em;
+            margin-top: 8px;
+            overflow-x: auto;
+        }
+        
+        .arrow {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 1.5em;
+            margin: 5px 0;
+        }
+        
+        .comparison {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        .comparison h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .comparison-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .comparison-item.before {
+            border-left: 4px solid #f56565;
+        }
+        
+        .comparison-item.after {
+            border-left: 4px solid #48bb78;
+        }
+        
+        .comparison-item h3 {
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+        
+        .comparison-item.before h3::before {
+            content: "❌ ";
+        }
+        
+        .comparison-item.after h3::before {
+            content: "✅ ";
+        }
+        
+        .comparison-item ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .comparison-item li {
+            padding: 8px 0;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        .comparison-item li::before {
+            content: "• ";
+            color: #a0aec0;
+            font-weight: bold;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .legend-color.user { background: #f0fff4; border-left: 4px solid #48bb78; }
+        .legend-color.system { background: #ebf4ff; border-left: 4px solid #667eea; }
+        .legend-color.ai { background: #fffaf0; border-left: 4px solid #ed8936; }
+        .legend-color.interrupt { background: #fff5f5; border-left: 4px solid #f56565; }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .stat {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ Turn Detection Flow Diagram</h1>
+        <p class="subtitle">BubbleVoice Mac - Accountability AI Pattern Implementation</p>
+        
+        <div class="flows">
+            <!-- Normal Flow -->
+            <div class="flow normal">
+                <h2>Normal Turn Detection</h2>
+                
+                <div class="step user">
+                    <div class="step-title">1. User Speaks</div>
+                    <div class="step-desc">User says: "What's the weather today?"</div>
+                    <div class="step-code">Recognition: ACTIVE (continuous)</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step system">
+                    <div class="step-title">2. Partial Transcriptions</div>
+                    <div class="step-desc">Real-time updates sent to frontend</div>
+                    <div class="step-code">text: "What's...", isFinal: false</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step user">
+                    <div class="step-title">3. User Stops Speaking</div>
+                    <div class="step-desc">Silence detected by speech recognizer</div>
+                    <div class="step-code">text: "What's the weather today?", isFinal: true</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step system">
+                    <div class="step-title">4. Recognition Restarts</div>
+                    <div class="step-desc">NEW: Keeps listening (doesn't stop!)</div>
+                    <div class="step-code">restartRecognition() → STILL LISTENING</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step system">
+                    <div class="step-title">5. Timer Cascade Begins</div>
+                    <div class="step-desc">Three-timer system starts</div>
+                    <div class="step-code">isInResponsePipeline = true</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step system">
+                    <div class="step-title">6. Timer 1 (0.5s) - LLM</div>
+                    <div class="step-desc">Start LLM processing, cache result</div>
+                    <div class="step-code">cachedResponses.llm = {...}</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step system">
+                    <div class="step-title">7. Timer 2 (1.5s) - TTS</div>
+                    <div class="step-desc">Generate TTS from cached LLM</div>
+                    <div class="step-code">cachedResponses.tts = {...}</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step ai">
+                    <div class="step-title">8. Timer 3 (2.0s) - Playback</div>
+                    <div class="step-desc">AI starts speaking</div>
+                    <div class="step-code">isTTSPlaying = true</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step system">
+                    <div class="step-title">9. Playback Ends</div>
+                    <div class="step-desc">Reset state, ready for next turn</div>
+                    <div class="step-code">isInResponsePipeline = false</div>
+                </div>
+            </div>
+            
+            <!-- Interruption Flow -->
+            <div class="flow interrupt">
+                <h2>Interruption Flow</h2>
+                
+                <div class="step user">
+                    <div class="step-title">1. User Speaks</div>
+                    <div class="step-desc">User says: "What's the weather?"</div>
+                    <div class="step-code">Recognition: ACTIVE</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step system">
+                    <div class="step-title">2. isFinal Received</div>
+                    <div class="step-desc">Recognition restarts (keeps listening)</div>
+                    <div class="step-code">restartRecognition()</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step system">
+                    <div class="step-title">3. Timer Cascade Starts</div>
+                    <div class="step-desc">Response pipeline begins</div>
+                    <div class="step-code">isInResponsePipeline = true</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step ai">
+                    <div class="step-title">4. AI Starts Speaking</div>
+                    <div class="step-desc">TTS playback begins</div>
+                    <div class="step-code">isTTSPlaying = true</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step interrupt">
+                    <div class="step-title">5. USER INTERRUPTS! 🚨</div>
+                    <div class="step-desc">User says: "Actually, never mind"</div>
+                    <div class="step-code">Partial transcription: "Actually..."</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step interrupt">
+                    <div class="step-title">6. Interruption Detected</div>
+                    <div class="step-desc">System checks: isInResponsePipeline && text.length > 0</div>
+                    <div class="step-code">if (isInResponsePipeline && text.trim().length > 0)</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step interrupt">
+                    <div class="step-title">7. Stop Everything!</div>
+                    <div class="step-desc">handleSpeechDetected() called</div>
+                    <div class="step-code">
+                        clearAllTimers();<br>
+                        cachedResponses = null;<br>
+                        stopSpeaking();<br>
+                        isInResponsePipeline = false;
+                    </div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step user">
+                    <div class="step-title">8. User Continues</div>
+                    <div class="step-desc">User finishes: "Tell me about traffic"</div>
+                    <div class="step-code">Recognition still active</div>
+                </div>
+                
+                <div class="arrow">↓</div>
+                
+                <div class="step system">
+                    <div class="step-title">9. New Turn Begins</div>
+                    <div class="step-desc">Fresh timer cascade for new request</div>
+                    <div class="step-code">Clean slate, no stale responses</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison Section -->
+        <div class="comparison">
+            <h2>Before vs After Implementation</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item before">
+                    <h3>Before (Broken)</h3>
+                    <ul>
+                        <li>Recognition stopped after isFinal</li>
+                        <li>No interruption detection</li>
+                        <li>Stale responses could play</li>
+                        <li>Timers executed regardless</li>
+                        <li>TTS couldn't be stopped</li>
+                        <li>Robotic conversation feel</li>
+                    </ul>
+                </div>
+                
+                <div class="comparison-item after">
+                    <h3>After (Fixed)</h3>
+                    <ul>
+                        <li>Recognition runs continuously</li>
+                        <li>Immediate interruption detection</li>
+                        <li>Stale responses prevented</li>
+                        <li>Timers check state before executing</li>
+                        <li>TTS stops on interruption</li>
+                        <li>Natural conversation feel</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Timer Cascade</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">0.5s</div>
+                <div class="stat-label">LLM Start</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">1.5s</div>
+                <div class="stat-label">TTS Start</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">2.0s</div>
+                <div class="stat-label">Playback Start</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">~100ms</div>
+                <div class="stat-label">Interrupt Latency</div>
+            </div>
+        </div>
+        
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color user"></div>
+                <span>User Action</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color system"></div>
+                <span>System Processing</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color ai"></div>
+                <span>AI Response</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color interrupt"></div>
+                <span>Interruption</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

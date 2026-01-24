@@ -427,16 +427,34 @@ class BubbleVoiceApp {
    * Called when AI response is received from backend.
    * Adds message to conversation and triggers TTS if enabled.
    * 
+   * WHY THIS FORMAT:
+   * The backend's VoicePipelineService sends AI responses with the following structure:
+   * - text: The AI's response text
+   * - bubbles: Proactive suggestions for follow-up
+   * - artifact: Optional visual artifact (timeline, checklist, etc.)
+   * - timestamp: When the response was generated
+   * 
+   * TECHNICAL NOTES:
+   * - Uses backend's timestamp for accurate message ordering
+   * - Displays AI message as left-aligned gray bubble (assistant role)
+   * - Bubbles and artifacts are optional and handled separately
+   * - TTS playback is triggered automatically if audio is available
+   * 
    * @param {Object} data - Response data from backend
+   * @param {string} data.text - AI response text
+   * @param {Array} [data.bubbles] - Optional bubble suggestions
+   * @param {Object} [data.artifact] - Optional artifact
+   * @param {number} data.timestamp - Response timestamp
    */
   handleAIResponse(data) {
-    console.log('[App] Received AI response');
+    console.log('[App] Received AI response:', data.text ? data.text.substring(0, 50) + '...' : '(no text)');
 
     // Add AI message to conversation
+    // Use backend's timestamp for accurate ordering
     this.conversationManager.addMessage({
       role: 'assistant',
-      content: data.content,
-      timestamp: Date.now()
+      content: data.text || data.content || '', // Support both 'text' and 'content' for backwards compatibility
+      timestamp: data.timestamp || Date.now()
     });
 
     // Handle bubbles if present
@@ -449,12 +467,9 @@ class BubbleVoiceApp {
       this.conversationManager.addArtifact(data.artifact);
     }
 
-    // Trigger TTS - use Web Speech API to speak the response
-    if (data.content) {
-      const selectedVoice = this.state.settings.voice || '';
-      this.voiceController.playAudio(data.audioUrl, data.content)
-        .catch(err => console.error('[App] TTS error:', err));
-    }
+    // Trigger TTS - the backend will handle actual audio playback through Swift helper
+    // The frontend just needs to display the message
+    // Audio playback is managed by the backend's VoicePipelineService
 
     // Update status
     this.state.isProcessing = false;
@@ -611,27 +626,92 @@ class BubbleVoiceApp {
     // These handle checking and requesting macOS system permissions
     this.setupPermissionsUI();
 
-    // API keys
+    // API keys - Load saved values
     const googleApiKey = document.getElementById('google-api-key');
-    googleApiKey.value = this.state.settings.googleApiKey || '';
-    googleApiKey.addEventListener('change', (e) => {
-      this.state.settings.googleApiKey = e.target.value;
-      this.saveSettings();
-    });
-
     const anthropicApiKey = document.getElementById('anthropic-api-key');
+    const openaiApiKey = document.getElementById('openai-api-key');
+    
+    googleApiKey.value = this.state.settings.googleApiKey || '';
     anthropicApiKey.value = this.state.settings.anthropicApiKey || '';
-    anthropicApiKey.addEventListener('change', (e) => {
-      this.state.settings.anthropicApiKey = e.target.value;
-      this.saveSettings();
+    openaiApiKey.value = this.state.settings.openaiApiKey || '';
+
+    // API key visibility toggles
+    document.querySelectorAll('.toggle-visibility').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const targetId = button.getAttribute('data-target');
+        const input = document.getElementById(targetId);
+        if (input) {
+          input.type = input.type === 'password' ? 'text' : 'password';
+        }
+      });
     });
 
-    const openaiApiKey = document.getElementById('openai-api-key');
-    openaiApiKey.value = this.state.settings.openaiApiKey || '';
-    openaiApiKey.addEventListener('change', (e) => {
-      this.state.settings.openaiApiKey = e.target.value;
+    // Save API keys button
+    const saveApiKeysButton = document.getElementById('save-api-keys');
+    saveApiKeysButton.addEventListener('click', () => {
+      // Update settings
+      this.state.settings.googleApiKey = googleApiKey.value.trim();
+      this.state.settings.anthropicApiKey = anthropicApiKey.value.trim();
+      this.state.settings.openaiApiKey = openaiApiKey.value.trim();
+      
+      // Save to localStorage
       this.saveSettings();
+      
+      // Send to backend
+      this.sendApiKeysToBackend();
+      
+      // Show success feedback
+      const originalText = saveApiKeysButton.textContent;
+      saveApiKeysButton.textContent = 'Saved ✓';
+      saveApiKeysButton.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.9) 100%)';
+      
+      setTimeout(() => {
+        saveApiKeysButton.textContent = originalText;
+        saveApiKeysButton.style.background = '';
+      }, 2000);
     });
+  }
+
+  /**
+   * SEND API KEYS TO BACKEND
+   * 
+   * Sends the API keys to the backend server so it can use them
+   * for LLM API calls. Keys are sent securely over WebSocket.
+   * 
+   * WHY THIS IS NEEDED:
+   * The backend needs the API keys to make requests to LLM providers.
+   * We store keys in frontend localStorage for persistence, but send
+   * them to backend when they change so it can use them immediately.
+   * 
+   * SECURITY NOTE:
+   * Keys are sent over localhost WebSocket (not exposed to internet).
+   * Backend stores them in memory only (not persisted to disk).
+   */
+  sendApiKeysToBackend() {
+    if (!this.websocketClient || !this.websocketClient.isConnected) {
+      console.warn('[App] Cannot send API keys - not connected to backend');
+      return;
+    }
+
+    const keys = {
+      googleApiKey: this.state.settings.googleApiKey,
+      anthropicApiKey: this.state.settings.anthropicApiKey,
+      openaiApiKey: this.state.settings.openaiApiKey
+    };
+
+    console.log('[App] Sending API keys to backend:', {
+      hasGoogle: !!keys.googleApiKey,
+      hasAnthropic: !!keys.anthropicApiKey,
+      hasOpenAI: !!keys.openaiApiKey,
+      googleKeyLength: keys.googleApiKey ? keys.googleApiKey.length : 0
+    });
+
+    this.websocketClient.sendMessage({
+      type: 'update_api_keys',
+      data: keys
+    });
+
+    console.log('[App] API keys sent to backend successfully');
   }
 
   /**
@@ -844,6 +924,23 @@ class BubbleVoiceApp {
     console.log('[App] Connected to backend');
     this.state.isConnected = true;
     this.updateStatus('Ready', 'connected');
+    
+    // Send API keys to backend if they exist
+    // This ensures the backend has the keys immediately after connection
+    console.log('[App] Checking for API keys to send:', {
+      hasGoogle: !!this.state.settings.googleApiKey,
+      hasAnthropic: !!this.state.settings.anthropicApiKey,
+      hasOpenAI: !!this.state.settings.openaiApiKey
+    });
+    
+    if (this.state.settings.googleApiKey || 
+        this.state.settings.anthropicApiKey || 
+        this.state.settings.openaiApiKey) {
+      console.log('[App] Sending API keys to backend...');
+      this.sendApiKeysToBackend();
+    } else {
+      console.warn('[App] No API keys found in settings - user needs to add them');
+    }
   }
 
   onDisconnected() {
