@@ -95,6 +95,81 @@
   <!-- TEST ID: main-container - The primary content container below the title bar -->
   <div class="main-container" data-testid="main-container" role="main">
 
+    <!-- CHAT HISTORY SIDEBAR -->
+    <!--
+      PRODUCT CONTEXT:
+      The chat sidebar allows users to manage multiple conversations.
+      Each conversation has a title, timestamp, and preview of the last message.
+      Users can switch between conversations, create new ones, and delete old ones.
+      
+      DESIGN:
+      - Collapsible sidebar on the left
+      - Liquid Glass styling consistent with main UI
+      - Smooth animations for open/close
+      - Keyboard shortcuts for quick access
+      
+      TECHNICAL NOTES:
+      - Managed by ChatSidebar component (chat-sidebar.js)
+      - Conversations stored in ConversationService
+      - Will be persisted to SQLite in future
+    -->
+    <!-- TEST ID: chat-sidebar - The collapsible sidebar for conversation history -->
+    <div class="chat-sidebar"
+         id="chat-sidebar"
+         data-testid="chat-sidebar"
+         role="navigation"
+         aria-label="Conversation history">
+      
+      <!-- Sidebar Header -->
+      <div class="sidebar-header" data-testid="sidebar-header">
+        <h2 class="sidebar-title">Conversations</h2>
+        <!-- TEST ID: new-chat-button - Creates a new conversation -->
+        <button class="new-chat-button"
+                id="new-chat-button"
+                data-testid="new-chat-button"
+                title="New Conversation (⌘N)"
+                aria-label="Start new conversation">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Conversations List -->
+      <!-- TEST ID: conversations-list - Scrollable list of all conversations -->
+      <div class="conversations-list"
+           id="conversations-list"
+           data-testid="conversations-list"
+           role="list">
+        <!-- Conversation items will be inserted here by JavaScript -->
+        <!-- Example structure:
+        <div class="conversation-item active" data-conversation-id="123">
+          <div class="conversation-title">My conversation</div>
+          <div class="conversation-meta">
+            <span class="conversation-time">5m ago</span>
+            <span class="conversation-preview">Last message preview...</span>
+          </div>
+          <button class="delete-conversation" aria-label="Delete conversation">×</button>
+        </div>
+        -->
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer" data-testid="sidebar-footer">
+        <!-- TEST ID: toggle-sidebar-button - Collapses/expands the sidebar -->
+        <button class="toggle-sidebar-button"
+                id="toggle-sidebar-button"
+                data-testid="toggle-sidebar-button"
+                title="Toggle Sidebar (⌘B)"
+                aria-label="Toggle conversation sidebar"
+                aria-expanded="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
     <!-- CONVERSATION AREA -->
     <!-- TEST ID: conversation-container - Container for all conversation content -->
     <div class="conversation-container"
@@ -609,6 +684,7 @@
   <script src="components/conversation-manager.js"></script>
   <script src="components/voice-controller.js"></script>
   <script src="components/websocket-client.js"></script>
+  <script src="components/chat-sidebar.js"></script>
   <script src="components/app.js"></script>
 
 </body>

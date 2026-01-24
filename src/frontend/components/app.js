@@ -31,6 +31,7 @@ class BubbleVoiceApp {
     this.conversationManager = null;
     this.voiceController = null;
     this.websocketClient = null;
+    this.chatSidebar = null;
 
     // DOM element references
     // Cached for performance (avoid repeated querySelector calls)
@@ -92,6 +93,7 @@ class BubbleVoiceApp {
       this.conversationManager = new ConversationManager(this.elements.messages);
       this.voiceController = new VoiceController(this);
       this.websocketClient = new WebSocketClient(backendConfig.websocketUrl, this);
+      this.chatSidebar = new ChatSidebar();
 
       // Set up event listeners
       this.setupUIEventListeners();
