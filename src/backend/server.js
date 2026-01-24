@@ -448,10 +448,23 @@ class BackendServer {
       }
 
       // Add user message to conversation
+      const userMessageTimestamp = Date.now();
       await this.conversationService.addMessage(conversation.id, {
         role: 'user',
         content,
-        timestamp: Date.now()
+        timestamp: userMessageTimestamp
+      });
+
+      // CRITICAL FIX: Send user message to frontend for display
+      // WHY: The frontend needs to show what the user said
+      // BECAUSE: Without this, user messages are invisible in the UI
+      // HISTORY: Bug discovered 2026-01-24 - messages weren't appearing
+      this.sendMessage(ws, {
+        type: 'user_message',
+        data: {
+          text: content,
+          timestamp: userMessageTimestamp
+        }
       });
 
       // Generate AI response (streaming)
