@@ -227,6 +227,29 @@ class BubbleVoiceApp {
 
     // Settings inputs - save on change
     this.setupSettingsListeners();
+    
+    // CRITICAL FIX (2026-01-24): Listen for conversation switches from chat sidebar
+    // WHY: When user clicks a conversation or a new one is created, we need to track the active conversation ID
+    // BECAUSE: Without this, every message creates a NEW conversation (currentConversationId stays null)
+    // HISTORY: Bug discovered - AI forgot everything because each message started a new conversation!
+    // 
+    // The flow:
+    // 1. User sends message with conversationId: null (first message)
+    // 2. Backend creates conversation and sends conversation_created event
+    // 3. ChatSidebar receives it and calls handleConversationClick
+    // 4. handleConversationClick dispatches 'conversation-switched' event
+    // 5. THIS LISTENER updates app.state.currentConversationId
+    // 6. Next message includes the conversationId, so conversation continues!
+    window.addEventListener('conversation-switched', (event) => {
+      const { conversationId } = event.detail;
+      console.log('[App] Conversation switched to:', conversationId);
+      this.state.currentConversationId = conversationId;
+      
+      // Also hide welcome state when a conversation is active
+      if (this.elements.welcomeState) {
+        this.elements.welcomeState.style.display = 'none';
+      }
+    });
   }
 
   /**
