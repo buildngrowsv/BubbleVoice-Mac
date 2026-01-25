@@ -442,13 +442,13 @@ class AdminPanel {
     async loadData() {
         try {
             // Load prompt sections
-            this.sections = await window.electronAPI.getPromptSections();
+            this.sections = await window.electronAPI.adminPanel.getPromptSections();
             
             // Load context assembly config
-            this.config = await window.electronAPI.getContextConfig();
+            this.config = await window.electronAPI.adminPanel.getContextConfig();
             
             // Load metadata
-            this.metadata = await window.electronAPI.getPromptMetadata();
+            this.metadata = await window.electronAPI.adminPanel.getPromptMetadata();
             
             // Update UI
             this.updatePromptUI();
@@ -610,7 +610,7 @@ class AdminPanel {
         const content = this.element.querySelector('#section-content').value;
         
         try {
-            await window.electronAPI.updatePromptSection(this.currentSection, content);
+            await window.electronAPI.adminPanel.updatePromptSection(this.currentSection, content);
             
             // Reload data
             await this.loadData();
@@ -634,7 +634,7 @@ class AdminPanel {
         if (!confirm('Reset this section to default?')) return;
         
         try {
-            await window.electronAPI.resetPromptSection(this.currentSection);
+            await window.electronAPI.adminPanel.resetPromptSection(this.currentSection);
             
             // Reload data
             await this.loadData();
@@ -656,7 +656,7 @@ class AdminPanel {
      */
     async previewFullPrompt() {
         try {
-            const fullPrompt = await window.electronAPI.getFullSystemPrompt();
+            const fullPrompt = await window.electronAPI.adminPanel.getFullSystemPrompt();
             
             // Create modal
             const modal = document.createElement('div');
@@ -702,7 +702,7 @@ class AdminPanel {
         if (!confirm('Reset ALL prompts to defaults? This cannot be undone.')) return;
         
         try {
-            await window.electronAPI.resetAllPrompts();
+            await window.electronAPI.adminPanel.resetAllPrompts();
             
             // Reload data
             await this.loadData();
@@ -740,7 +740,7 @@ class AdminPanel {
         };
         
         try {
-            await window.electronAPI.updateContextConfig(config);
+            await window.electronAPI.adminPanel.updateContextConfig(config);
             
             // Reload data
             await this.loadData();
@@ -764,7 +764,7 @@ class AdminPanel {
         if (!confirm('Reset configuration to defaults?')) return;
         
         try {
-            await window.electronAPI.resetContextConfig();
+            await window.electronAPI.adminPanel.resetContextConfig();
             
             // Reload data
             await this.loadData();
@@ -786,7 +786,7 @@ class AdminPanel {
      */
     async refreshPerformance() {
         try {
-            const metrics = await window.electronAPI.getPerformanceMetrics();
+            const metrics = await window.electronAPI.adminPanel.getPerformanceMetrics();
             
             // Update performance cards
             this.element.querySelector('#perf-llm').textContent = `${metrics.llmResponseTime || '--'} ms`;

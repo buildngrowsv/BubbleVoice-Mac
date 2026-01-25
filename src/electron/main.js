@@ -578,6 +578,188 @@ ipcMain.handle('create-life-area', async (event, { areaPath, name, description }
 });
 
 /**
+ * ADMIN PANEL IPC HANDLERS
+ * 
+ * Provides access to the PromptManagementService for the admin panel UI.
+ * These handlers allow the frontend to manage system prompts and configuration.
+ * 
+ * ARCHITECTURE NOTE:
+ * The PromptManagementService is initialized in the backend server,
+ * so we need to communicate with it via HTTP or shared state.
+ * For now, we'll create a local instance here for the admin panel.
+ * 
+ * TODO: In production, consider moving this to a shared service
+ * or using HTTP API to communicate with the backend's instance.
+ */
+
+// Lazy-load PromptManagementService
+let promptManagementService = null;
+
+function getPromptManagementService() {
+  if (!promptManagementService) {
+    const PromptManagementService = require('../backend/services/PromptManagementService');
+    const userDataPath = path.join(app.getPath('userData'), 'user_data');
+    promptManagementService = new PromptManagementService(userDataPath);
+    console.log('[Main] PromptManagementService initialized for admin panel');
+  }
+  return promptManagementService;
+}
+
+// Get all prompt sections
+ipcMain.handle('admin:get-prompt-sections', async () => {
+  try {
+    const service = getPromptManagementService();
+    const sections = service.getAllSections();
+    console.log('[Main] Retrieved prompt sections');
+    return sections;
+  } catch (error) {
+    console.error('[Main] Error getting prompt sections:', error);
+    throw error;
+  }
+});
+
+// Get a specific prompt section
+ipcMain.handle('admin:get-prompt-section', async (event, section) => {
+  try {
+    const service = getPromptManagementService();
+    const content = service.getPromptSection(section);
+    console.log(`[Main] Retrieved prompt section: ${section}`);
+    return content;
+  } catch (error) {
+    console.error(`[Main] Error getting prompt section ${section}:`, error);
+    throw error;
+  }
+});
+
+// Update a prompt section
+ipcMain.handle('admin:update-prompt-section', async (event, { section, content }) => {
+  try {
+    const service = getPromptManagementService();
+    service.updatePromptSection(section, content);
+    console.log(`[Main] Updated prompt section: ${section}`);
+    return { success: true };
+  } catch (error) {
+    console.error(`[Main] Error updating prompt section ${section}:`, error);
+    throw error;
+  }
+});
+
+// Reset a prompt section to default
+ipcMain.handle('admin:reset-prompt-section', async (event, section) => {
+  try {
+    const service = getPromptManagementService();
+    service.updatePromptSection(section, null); // null resets to default
+    console.log(`[Main] Reset prompt section: ${section}`);
+    return { success: true };
+  } catch (error) {
+    console.error(`[Main] Error resetting prompt section ${section}:`, error);
+    throw error;
+  }
+});
+
+// Get full system prompt
+ipcMain.handle('admin:get-full-system-prompt', async () => {
+  try {
+    const service = getPromptManagementService();
+    const prompt = service.getSystemPrompt();
+    console.log('[Main] Retrieved full system prompt');
+    return prompt;
+  } catch (error) {
+    console.error('[Main] Error getting full system prompt:', error);
+    throw error;
+  }
+});
+
+// Reset all prompts to defaults
+ipcMain.handle('admin:reset-all-prompts', async () => {
+  try {
+    const service = getPromptManagementService();
+    service.resetToDefaults();
+    console.log('[Main] Reset all prompts to defaults');
+    return { success: true };
+  } catch (error) {
+    console.error('[Main] Error resetting all prompts:', error);
+    throw error;
+  }
+});
+
+// Get context assembly configuration
+ipcMain.handle('admin:get-context-config', async () => {
+  try {
+    const service = getPromptManagementService();
+    const config = service.getContextAssemblyConfig();
+    console.log('[Main] Retrieved context assembly config');
+    return config;
+  } catch (error) {
+    console.error('[Main] Error getting context config:', error);
+    throw error;
+  }
+});
+
+// Update context assembly configuration
+ipcMain.handle('admin:update-context-config', async (event, config) => {
+  try {
+    const service = getPromptManagementService();
+    service.updateContextAssemblyConfig(config);
+    console.log('[Main] Updated context assembly config');
+    return { success: true };
+  } catch (error) {
+    console.error('[Main] Error updating context config:', error);
+    throw error;
+  }
+});
+
+// Reset context assembly configuration
+ipcMain.handle('admin:reset-context-config', async () => {
+  try {
+    const service = getPromptManagementService();
+    const defaultConfig = service.loadDefaultPrompts().contextAssembly;
+    service.updateContextAssemblyConfig(defaultConfig);
+    console.log('[Main] Reset context assembly config');
+    return { success: true };
+  } catch (error) {
+    console.error('[Main] Error resetting context config:', error);
+    throw error;
+  }
+});
+
+// Get prompt metadata
+ipcMain.handle('admin:get-prompt-metadata', async () => {
+  try {
+    const service = getPromptManagementService();
+    const metadata = service.getMetadata();
+    console.log('[Main] Retrieved prompt metadata');
+    return metadata;
+  } catch (error) {
+    console.error('[Main] Error getting prompt metadata:', error);
+    throw error;
+  }
+});
+
+// Get performance metrics
+ipcMain.handle('admin:get-performance-metrics', async () => {
+  try {
+    // TODO: Integrate with actual performance monitoring
+    // For now, return mock data
+    const metrics = {
+      llmResponseTime: 2500,
+      vectorSearchTime: 150,
+      embeddingTime: 80,
+      contextAssemblyTime: 230,
+      embeddingsCount: 1250,
+      lifeAreasCount: 8,
+      conversationsCount: 42,
+      databaseSize: '12.5 MB'
+    };
+    console.log('[Main] Retrieved performance metrics');
+    return metrics;
+  } catch (error) {
+    console.error('[Main] Error getting performance metrics:', error);
+    throw error;
+  }
+});
+
+/**
  * APP LIFECYCLE EVENTS
  */
 

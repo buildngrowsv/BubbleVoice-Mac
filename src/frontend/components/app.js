@@ -33,6 +33,7 @@ class BubbleVoiceApp {
     this.websocketClient = null;
     this.chatSidebar = null;
     this.lifeAreasSidebar = null;
+    this.adminPanel = null;
 
     // DOM element references
     // Cached for performance (avoid repeated querySelector calls)
@@ -102,6 +103,11 @@ class BubbleVoiceApp {
       if (sidebarContainer) {
         sidebarContainer.appendChild(this.lifeAreasSidebar.element);
       }
+
+      // Initialize admin panel
+      this.adminPanel = new AdminPanel();
+      document.body.appendChild(this.adminPanel.element);
+      console.log('[App] Admin panel initialized');
 
       // Set up event listeners
       this.setupUIEventListeners();
@@ -218,6 +224,30 @@ class BubbleVoiceApp {
     this.elements.closeSettings.addEventListener('click', () => {
       this.closeSettings();
     });
+
+    // Admin panel button - add to settings panel
+    // This is a power-user feature, so we put it in settings
+    const adminPanelButton = document.createElement('button');
+    adminPanelButton.className = 'settings-button admin-panel-trigger';
+    adminPanelButton.innerHTML = '⚙️ Admin Panel';
+    adminPanelButton.title = 'Advanced configuration (power users)';
+    adminPanelButton.addEventListener('click', () => {
+      console.log('[App] Opening admin panel');
+      this.adminPanel.open();
+    });
+    
+    // Add to settings panel
+    const settingsPanel = this.elements.settingsPanel;
+    if (settingsPanel) {
+      // Find the save button and insert before it
+      const saveButton = settingsPanel.querySelector('#save-settings');
+      if (saveButton && saveButton.parentNode) {
+        saveButton.parentNode.insertBefore(adminPanelButton, saveButton);
+      } else {
+        // Fallback: append to settings panel
+        settingsPanel.appendChild(adminPanelButton);
+      }
+    }
 
     // Window controls
     this.elements.minimizeButton.addEventListener('click', async () => {

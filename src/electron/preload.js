@@ -135,6 +135,35 @@ contextBridge.exposeInMainWorld('electronAPI', {
    */
   removeAllListeners: (channel) => {
     ipcRenderer.removeAllListeners(channel);
+  },
+
+  /**
+   * ADMIN PANEL API
+   * 
+   * Methods for the admin panel to manage prompts and configuration.
+   * These provide access to the PromptManagementService.
+   * 
+   * SECURITY NOTE:
+   * These are power-user features. In production, you might want to
+   * add authentication or restrict access.
+   */
+  adminPanel: {
+    // Prompt management
+    getPromptSections: () => ipcRenderer.invoke('admin:get-prompt-sections'),
+    getPromptSection: (section) => ipcRenderer.invoke('admin:get-prompt-section', section),
+    updatePromptSection: (section, content) => ipcRenderer.invoke('admin:update-prompt-section', { section, content }),
+    resetPromptSection: (section) => ipcRenderer.invoke('admin:reset-prompt-section', section),
+    getFullSystemPrompt: () => ipcRenderer.invoke('admin:get-full-system-prompt'),
+    resetAllPrompts: () => ipcRenderer.invoke('admin:reset-all-prompts'),
+    
+    // Context assembly configuration
+    getContextConfig: () => ipcRenderer.invoke('admin:get-context-config'),
+    updateContextConfig: (config) => ipcRenderer.invoke('admin:update-context-config', config),
+    resetContextConfig: () => ipcRenderer.invoke('admin:reset-context-config'),
+    
+    // Metadata and performance
+    getPromptMetadata: () => ipcRenderer.invoke('admin:get-prompt-metadata'),
+    getPerformanceMetrics: () => ipcRenderer.invoke('admin:get-performance-metrics')
   }
 });
 
