@@ -1,0 +1,303 @@
+/**
+ * LIFE AREAS SIDEBAR STYLES
+ * 
+ * Liquid glass styling for the life areas navigation sidebar.
+ * Tree view with smooth animations and beautiful hover states.
+ */
+
+/* Sidebar Container */
+.life-areas-sidebar {
+    position: fixed;
+    right: 0;
+    top: 40px; /* Below title bar */
+    bottom: 0;
+    width: 300px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+
+.life-areas-sidebar.collapsed {
+    transform: translateX(100%);
+}
+
+.life-areas-sidebar.expanded {
+    transform: translateX(0);
+}
+
+/* Header */
+.life-areas-sidebar .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.life-areas-sidebar .sidebar-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: -0.3px;
+}
+
+.new-area-button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(102, 126, 234, 0.2);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.new-area-button:hover {
+    background: rgba(102, 126, 234, 0.3);
+    border-color: rgba(102, 126, 234, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Search Box */
+.areas-search-box {
+    position: relative;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.areas-search-input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.areas-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.areas-search-input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.areas-search-box .search-icon {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+}
+
+/* Areas List */
+.areas-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+/* Area Item */
+.area-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.area-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.area-item:active {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Expand Button */
+.area-expand-button {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.area-expand-button:hover {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.area-expand-button svg {
+    transition: transform 0.2s ease;
+}
+
+.area-item[aria-expanded="true"] .area-expand-button svg {
+    transform: rotate(180deg);
+}
+
+.area-spacer {
+    width: 20px;
+    flex-shrink: 0;
+}
+
+/* Area Content */
+.area-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.area-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.area-meta {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.area-count {
+    font-weight: 500;
+}
+
+.area-activity {
+    opacity: 0.8;
+}
+
+/* Empty State */
+.areas-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    height: 100%;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+}
+
+.empty-subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+    max-width: 240px;
+}
+
+/* Footer */
+.life-areas-sidebar .sidebar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.life-areas-sidebar .toggle-sidebar-button {
+    width: 100%;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.life-areas-sidebar .toggle-sidebar-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.life-areas-sidebar .toggle-sidebar-button svg {
+    transition: transform 0.3s ease;
+}
+
+.life-areas-sidebar.expanded .toggle-sidebar-button svg {
+    transform: rotate(180deg);
+}
+
+/* Scrollbar */
+.areas-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.areas-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.areas-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.areas-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .life-areas-sidebar {
+        width: 260px;
+    }
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    .life-areas-sidebar {
+        background: rgba(0, 0, 0, 0.4);
+        border-left-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Accessibility */
+.area-item:focus {
+    outline: 2px solid rgba(102, 126, 234, 0.6);
+    outline-offset: -2px;
+}
+
+.area-expand-button:focus {
+    outline: 2px solid rgba(102, 126, 234, 0.6);
+    outline-offset: 2px;
+}

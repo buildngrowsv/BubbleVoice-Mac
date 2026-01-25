@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Components Test - BubbleVoice</title>
+    <link rel="stylesheet" href="src/frontend/styles/main.css">
+    <link rel="stylesheet" href="src/frontend/styles/liquid-glass.css">
+    <link rel="stylesheet" href="src/frontend/styles/artifact-viewer.css">
+    <link rel="stylesheet" href="src/frontend/styles/life-areas-sidebar.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+        }
+        
+        .test-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.8px;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .message {
+            margin-bottom: 16px;
+        }
+        
+        .message-bubble {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px;
+            color: white;
+            max-width: 600px;
+        }
+        
+        .message.assistant .message-bubble {
+            background: rgba(102, 126, 234, 0.2);
+        }
+        
+        .test-button {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 12px;
+        }
+        
+        .test-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>UI Components Test</h1>
+        <div class="subtitle">Testing Artifact Viewer and Life Areas Sidebar</div>
+        
+        <!-- Test Section 1: Artifact Viewer -->
+        <div class="section">
+            <div class="section-title">1. Artifact Viewer Component</div>
+            
+            <div class="message assistant">
+                <div class="message-bubble">
+                    Based on what you've shared, I've created a stress map to help visualize what's on your mind.
+                </div>
+            </div>
+            
+            <div id="artifact-container-1"></div>
+            
+            <button class="test-button" onclick="testArtifact1()">Load Stress Map</button>
+            <button class="test-button" onclick="testArtifact2()">Load Checklist</button>
+            <button class="test-button" onclick="testArtifact3()">Load Reflection</button>
+        </div>
+        
+        <!-- Test Section 2: Life Areas Sidebar -->
+        <div class="section">
+            <div class="section-title">2. Life Areas Sidebar</div>
+            <button class="test-button" onclick="toggleLifeAreasSidebar()">Toggle Life Areas Sidebar</button>
+            <button class="test-button" onclick="loadMockAreas()">Load Mock Areas</button>
+        </div>
+    </div>
+    
+    <!-- Life Areas Sidebar Container -->
+    <div id="life-areas-sidebar-container"></div>
+    
+    <script src="src/frontend/components/artifact-viewer.js"></script>
+    <script src="src/frontend/components/life-areas-sidebar.js"></script>
+    
+    <script>
+        // Mock window.electronAPI for testing
+        window.electronAPI = {
+            getLifeAreas: async () => {
+                return [
+                    {
+                        path: 'Family',
+                        name: 'Family',
+                        entry_count: 5,
+                        last_activity: new Date().toISOString()
+                    },
+                    {
+                        path: 'Family/Emma_School',
+                        name: "Emma's School",
+                        entry_count: 2,
+                        last_activity: new Date().toISOString()
+                    },
+                    {
+                        path: 'Work',
+                        name: 'Work',
+                        entry_count: 8,
+                        last_activity: new Date(Date.now() - 3600000).toISOString()
+                    },
+                    {
+                        path: 'Work/Startup',
+                        name: 'Startup Project',
+                        entry_count: 5,
+                        last_activity: new Date(Date.now() - 3600000).toISOString()
+                    },
+                    {
+                        path: 'Personal',
+                        name: 'Personal Growth',
+                        entry_count: 3,
+                        last_activity: new Date(Date.now() - 86400000).toISOString()
+                    }
+                ];
+            },
+            getAreaDetails: async (areaPath) => {
+                return {
+                    path: areaPath,
+                    name: areaPath.split('/').pop(),
+                    entry_count: 5,
+                    last_activity: new Date().toISOString()
+                };
+            },
+            createLifeArea: async (areaPath) => {
+                console.log('Mock: Creating area', areaPath);
+                return { success: true, path: areaPath };
+            }
+        };
+        
+        // Initialize life areas sidebar
+        let lifeAreasSidebar;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            lifeAreasSidebar = new LifeAreasSidebar();
+            const container = document.getElementById('life-areas-sidebar-container');
+            container.appendChild(lifeAreasSidebar.element);
+        });
+        
+        // Test function: Load stress map artifact
+        function testArtifact1() {
+            const container = document.getElementById('artifact-container-1');
+            container.innerHTML = '';
+            
+            const stressMapHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; color: white; }
+        .header h1 { font-size: 42px; font-weight: 700; letter-spacing: -1px; margin-bottom: 12px; }
+        .stress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .stress-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            color: white;
+        }
+        .stress-card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); }
+        .stress-card .icon { font-size: 36px; margin-bottom: 16px; }
+        .stress-card .title { font-size: 22px; font-weight: 600; margin-bottom: 12px; }
+        .stress-card .description { font-size: 15px; line-height: 1.6; opacity: 0.9; }
+        .intensity {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Current Stressors</h1>
+            <p>Understanding what's weighing on you</p>
+        </div>
+        <div class="stress-grid">
+            <div class="stress-card">
+                <div class="icon">👨‍👩‍👧‍👦</div>
+                <div class="title">Family</div>
+                <div class="description">Emma's reading struggles, Max's soccer schedule</div>
+                <div class="intensity">High</div>
+            </div>
+            <div class="stress-card">
+                <div class="icon">💼</div>
+                <div class="title">Work</div>
+                <div class="description">Startup fundraising, team hiring challenges</div>
+                <div class="intensity">Very High</div>
+            </div>
+            <div class="stress-card">
+                <div class="icon">🏃‍♀️</div>
+                <div class="title">Personal</div>
+                <div class="description">Exercise goals, work-life balance</div>
+                <div class="intensity">Medium</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+            
+            const viewer = new ArtifactViewer(
+                'stress_map_test_1',
+                'stress_map',
+                stressMapHtml,
+                null
+            );
+            
+            container.appendChild(viewer.element);
+            
+            // Auto-expand
+            setTimeout(() => viewer.expand(), 100);
+        }
+        
+        // Test function: Load checklist artifact
+        function testArtifact2() {
+            const container = document.getElementById('artifact-container-1');
+            container.innerHTML = '';
+            
+            const checklistHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 40px;
+            color: white;
+        }
+        h1 { font-size: 36px; font-weight: 700; margin-bottom: 32px; }
+        .checklist-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 16px;
+        }
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+        }
+        .checkbox.checked {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .item-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+        .item-description { font-size: 14px; opacity: 0.85; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Emma's Reading Plan</h1>
+        <div class="checklist-item">
+            <div class="checkbox checked"></div>
+            <div>
+                <div class="item-title">Try graphic novels</div>
+                <div class="item-description">Start with Dog Man series</div>
+            </div>
+        </div>
+        <div class="checklist-item">
+            <div class="checkbox"></div>
+            <div>
+                <div class="item-title">Schedule teacher meeting</div>
+                <div class="item-description">Discuss visual learning strategies</div>
+            </div>
+        </div>
+        <div class="checklist-item">
+            <div class="checkbox"></div>
+            <div>
+                <div class="item-title">Research illustrated chapter books</div>
+                <div class="item-description">Bridge between graphic novels and text-only</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+            
+            const viewer = new ArtifactViewer(
+                'checklist_test_1',
+                'checklist',
+                checklistHtml,
+                {
+                    items: [
+                        { title: 'Try graphic novels', completed: true },
+                        { title: 'Schedule teacher meeting', completed: false },
+                        { title: 'Research illustrated chapter books', completed: false }
+                    ]
+                }
+            );
+            
+            container.appendChild(viewer.element);
+            setTimeout(() => viewer.expand(), 100);
+        }
+        
+        // Test function: Load reflection artifact
+        function testArtifact3() {
+            const container = document.getElementById('artifact-container-1');
+            container.innerHTML = '';
+            
+            const reflectionHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 48px;
+            color: #2d3748;
+        }
+        h1 { font-size: 40px; font-weight: 700; margin-bottom: 32px; }
+        .section { margin-bottom: 32px; }
+        .section h2 { font-size: 24px; font-weight: 600; margin-bottom: 16px; }
+        .section p { font-size: 16px; line-height: 1.7; }
+        .timeline-item {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid rgba(102, 126, 234, 0.6);
+        }
+        .timeline-item .date { font-size: 14px; font-weight: 600; color: #667eea; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Emma's Reading Journey</h1>
+        <div class="section">
+            <h2>The Challenge</h2>
+            <p>Emma (2nd grade) has been struggling with reading comprehension. She can decode words but doesn't retain what she reads.</p>
+        </div>
+        <div class="section">
+            <h2>The Breakthrough</h2>
+            <p>We discovered that graphic novels (like Dog Man) help Emma stay engaged. She read for 20 minutes straight - a huge win!</p>
+        </div>
+        <div class="section">
+            <h2>Timeline</h2>
+            <div class="timeline-item">
+                <div class="date">Jan 24</div>
+                <div>Breakthrough with Dog Man graphic novel</div>
+            </div>
+            <div class="timeline-item">
+                <div class="date">Jan 24</div>
+                <div>Initial discussion about reading struggles</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>`;
+            
+            const viewer = new ArtifactViewer(
+                'reflection_test_1',
+                'reflection_summary',
+                reflectionHtml,
+                null
+            );
+            
+            container.appendChild(viewer.element);
+            setTimeout(() => viewer.expand(), 100);
+        }
+        
+        // Toggle life areas sidebar
+        function toggleLifeAreasSidebar() {
+            if (window.lifeAreasSidebar) {
+                window.lifeAreasSidebar.toggle();
+            }
+        }
+        
+        // Load mock areas
+        function loadMockAreas() {
+            if (window.lifeAreasSidebar) {
+                window.lifeAreasSidebar.loadAreas();
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            window.lifeAreasSidebar = new LifeAreasSidebar();
+            const container = document.getElementById('life-areas-sidebar-container');
+            container.appendChild(window.lifeAreasSidebar.element);
+            
+            console.log('UI Components test page loaded');
+        });
+    </script>
+</body>
+</html>

@@ -518,6 +518,66 @@ ipcMain.handle('open-accessibility-settings', async () => {
 });
 
 /**
+ * LIFE AREAS IPC HANDLERS
+ * 
+ * Handlers for life areas system integration.
+ * These connect the frontend UI to the backend AreaManagerService.
+ */
+
+// Get all life areas
+ipcMain.handle('get-life-areas', async () => {
+  try {
+    // TODO: Integrate with AreaManagerService
+    // For now, return mock data
+    return [
+      {
+        path: 'Family/Emma_School',
+        name: "Emma's School",
+        entry_count: 2,
+        last_activity: new Date().toISOString()
+      },
+      {
+        path: 'Work/Startup',
+        name: 'Startup Project',
+        entry_count: 5,
+        last_activity: new Date(Date.now() - 86400000).toISOString()
+      }
+    ];
+  } catch (error) {
+    console.error('[Main] Error getting life areas:', error);
+    return [];
+  }
+});
+
+// Get area details
+ipcMain.handle('get-area-details', async (event, areaPath) => {
+  try {
+    // TODO: Integrate with AreaManagerService
+    return {
+      path: areaPath,
+      name: areaPath.split('/').pop(),
+      entry_count: 0,
+      last_activity: null
+    };
+  } catch (error) {
+    console.error('[Main] Error getting area details:', error);
+    throw error;
+  }
+});
+
+// Create new life area
+ipcMain.handle('create-life-area', async (event, { areaPath, name, description }) => {
+  try {
+    // TODO: Integrate with AreaManagerService
+    console.log('[Main] Creating life area:', areaPath);
+    return { success: true, path: areaPath };
+  } catch (error) {
+    console.error('[Main] Error creating life area:', error);
+    throw error;
+  }
+});
+
+/**
  * APP LIFECYCLE EVENTS
  */
 

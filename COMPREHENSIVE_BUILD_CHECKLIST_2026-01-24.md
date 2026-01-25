@@ -610,44 +610,753 @@ inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [wea
 
 ---
 
-## 🧪 TODO - TESTING
+## 🧪 TODO - TESTING (PRODUCTION-LEVEL)
 
-### 11. Automated Testing
+### 11. Automated Testing Suite - Phase 1: Core Tests
+**Priority**: High  
+**Estimated Time**: 8-10 hours  
+**Status**: Partially complete (51 tests, 86% pass rate)
+
+**Current Status**:
+- ✅ 51 Playwright UI tests implemented
+- ✅ Screenshot capture infrastructure
+- ✅ Smoke tests passing
+- ⚠️ Need voice pipeline integration tests
+- ⚠️ Need performance benchmarks
+- ⚠️ Need error recovery tests
+
+**Tasks - Backend Unit Tests** (3-4 hours):
+- [ ] **LLMService Tests**
+  - [ ] Test Gemini API integration
+  - [ ] Test Claude API integration
+  - [ ] Test GPT API integration
+  - [ ] Test streaming response handling
+  - [ ] Test error handling (invalid API key, rate limits, timeouts)
+  - [ ] Test conversation context management
+  - [ ] Test structured JSON output parsing
+  - [ ] Test fallback behavior when primary model fails
+
+- [ ] **VoicePipelineService Tests**
+  - [ ] Test timer cascade (0.5s, 1.5s, 2.0s)
+  - [ ] Test timer reset on text growth
+  - [ ] Test interruption detection
+  - [ ] Test state management (isInResponsePipeline, isTTSPlaying)
+  - [ ] Test cached response clearing
+  - [ ] Test Swift helper communication
+  - [ ] Test session management
+  - [ ] Test silence detection accuracy
+
+- [ ] **ConversationService Tests**
+  - [ ] Test conversation creation
+  - [ ] Test message storage and retrieval
+  - [ ] Test conversation history management
+  - [ ] Test metadata tracking
+  - [ ] Test conversation deletion
+  - [ ] Test concurrent conversation handling
+
+- [ ] **BubbleGeneratorService Tests**
+  - [ ] Test bubble validation (≤7 words)
+  - [ ] Test repetition prevention
+  - [ ] Test contextual generation
+  - [ ] Test fallback bubbles
+  - [ ] Test edge cases (empty context, very long context)
+
+**Tasks - Integration Tests** (2-3 hours):
+- [ ] **WebSocket Communication**
+  - [ ] Test connection establishment
+  - [ ] Test automatic reconnection with exponential backoff
+  - [ ] Test message queuing when disconnected
+  - [ ] Test event routing
+  - [ ] Test API key synchronization
+  - [ ] Test connection state changes
+
+- [ ] **Swift Helper IPC**
+  - [ ] Test speech recognition start/stop
+  - [ ] Test transcription streaming
+  - [ ] Test TTS playback
+  - [ ] Test interruption handling
+  - [ ] Test error propagation
+  - [ ] Test JSON parsing edge cases
+
+- [ ] **End-to-End Conversation Flow**
+  - [ ] Test complete voice conversation (mock audio)
+  - [ ] Test text message sending
+  - [ ] Test AI response display
+  - [ ] Test bubble suggestions display
+  - [ ] Test conversation persistence
+  - [ ] Test context maintenance across messages
+
+**Success Criteria**:
+- 80%+ code coverage for backend services
+- All critical paths tested
+- No flaky tests
+- Fast test execution (<2 minutes for unit tests)
+
+---
+
+### 12. Automated Testing Suite - Phase 2: Voice Pipeline
+**Priority**: High  
+**Estimated Time**: 4-6 hours  
+**Status**: Not started
+
+**Tasks - Voice Pipeline Integration Tests** (4-6 hours):
+- [ ] **Complete Voice Flow with Mocked Audio**
+  ```javascript
+  test('complete voice conversation flow', async () => {
+    // 1. Mock Swift helper to simulate speech
+    // 2. Click voice button
+    // 3. Verify listening state
+    // 4. Wait for transcription
+    // 5. Verify timer cascade starts
+    // 6. Mock LLM response
+    // 7. Verify AI response displays
+    // 8. Verify suggestion bubbles appear
+    // 9. Verify TTS would trigger
+  });
+  ```
+
+- [ ] **Interruption During Timer Cascade**
+  ```javascript
+  test('interruption before playback', async () => {
+    // 1. Start voice input and get response
+    // 2. Wait for timer cascade to start
+    // 3. Interrupt by starting new voice input
+    // 4. Verify interruption detected
+    // 5. Verify timers cleared
+    // 6. Verify cached responses cleared
+  });
+  ```
+
+- [ ] **Interruption During TTS Playback**
+  ```javascript
+  test('interruption during audio playback', async () => {
+    // 1. Start AI response with TTS
+    // 2. Wait for playback to start
+    // 3. Speak during playback
+    // 4. Verify TTS stops immediately
+    // 5. Verify new transcription processed
+  });
+  ```
+
+- [ ] **Multiple Rapid Interruptions**
+  ```javascript
+  test('handles rapid interruptions cleanly', async () => {
+    // 1. Start voice input
+    // 2. Interrupt after 0.3s
+    // 3. Interrupt again after 0.3s
+    // 4. Verify only final request processed
+    // 5. Verify no overlapping timers
+    // 6. Verify clean state
+  });
+  ```
+
+- [ ] **Timer Accuracy Tests**
+  - [ ] Test Timer 1 fires at ~500ms (±50ms)
+  - [ ] Test Timer 2 fires at ~1500ms (±50ms)
+  - [ ] Test Timer 3 fires at ~2000ms (±50ms)
+  - [ ] Test timers don't fire after interruption
+  - [ ] Test timer reset on text growth
+
+- [ ] **State Synchronization Tests**
+  - [ ] Test state during timer cascade
+  - [ ] Test state during TTS playback
+  - [ ] Test state after interruption
+  - [ ] Test state after error
+  - [ ] Test state across multiple sessions
+
+**Success Criteria**:
+- All voice pipeline states tested
+- Interruption system verified
+- Timer accuracy within ±50ms
+- No race conditions
+- Clean state management
+
+---
+
+### 13. Performance and Load Testing
+**Priority**: High  
+**Estimated Time**: 4-6 hours  
+**Status**: Not started
+
+**Tasks - Performance Benchmarks** (2-3 hours):
+- [ ] **Response Time Tests**
+  ```javascript
+  test('message rendering performance', async () => {
+    // Add 100 messages rapidly
+    // Verify all render in <2 seconds
+    // Measure individual render times
+  });
+  ```
+
+- [ ] **Memory Usage Tests**
+  ```javascript
+  test('memory stays stable over time', async () => {
+    // Simulate 50 conversations
+    // Force garbage collection
+    // Verify memory growth <50MB
+  });
+  ```
+
+- [ ] **CPU Usage Tests**
+  ```javascript
+  test('CPU usage remains reasonable', async () => {
+    // Monitor CPU during heavy operations
+    // Verify <30% average CPU usage
+    // Verify no CPU spikes >80%
+  });
+  ```
+
+- [ ] **UI Responsiveness Tests**
+  ```javascript
+  test('UI remains responsive under load', async () => {
+    // Start heavy processing
+    // Verify UI still responds to clicks <100ms
+    // Test scrolling smoothness
+    // Test input field responsiveness
+  });
+  ```
+
+**Tasks - Load Testing** (2-3 hours):
+- [ ] **Concurrent Operations**
+  - [ ] Test multiple voice sessions in sequence
+  - [ ] Test rapid message sending (100 messages)
+  - [ ] Test large conversation history (1000+ messages)
+  - [ ] Test multiple windows open simultaneously
+
+- [ ] **Resource Limits**
+  - [ ] Test with 10MB+ conversation data
+  - [ ] Test with 100+ conversations
+  - [ ] Test with slow network (throttled WebSocket)
+  - [ ] Test with limited memory (simulate low RAM)
+
+- [ ] **Long-Running Tests**
+  - [ ] Run app for 1 hour with periodic interactions
+  - [ ] Verify no memory leaks
+  - [ ] Verify no performance degradation
+  - [ ] Verify no connection issues
+
+**Success Criteria**:
+- Message rendering: <20ms per message
+- Memory growth: <50MB over 50 conversations
+- CPU usage: <30% average, <80% peak
+- UI response: <100ms for all interactions
+- No memory leaks over 1 hour
+- No performance degradation over time
+
+---
+
+### 14. Error Recovery and Resilience Testing
+**Priority**: High  
+**Estimated Time**: 4-6 hours  
+**Status**: Not started
+
+**Tasks - Backend Failure Tests** (2-3 hours):
+- [ ] **Backend Disconnection**
+  ```javascript
+  test('handles backend crash gracefully', async () => {
+    // 1. Verify connected initially
+    // 2. Kill backend server
+    // 3. Verify disconnection detected
+    // 4. Verify error message shown
+    // 5. Verify reconnection attempts
+    // 6. Restart backend
+    // 7. Verify reconnection successful
+  });
+  ```
+
+- [ ] **WebSocket Reconnection**
+  - [ ] Test reconnection after temporary disconnect
+  - [ ] Test exponential backoff (300ms, 600ms, 1200ms, etc.)
+  - [ ] Test message queuing during disconnect
+  - [ ] Test message replay after reconnect
+  - [ ] Test max reconnection attempts
+
+- [ ] **Backend Timeout**
+  - [ ] Test LLM API timeout (>30s)
+  - [ ] Test TTS generation timeout
+  - [ ] Test health check timeout
+  - [ ] Verify timeout error messages
+  - [ ] Verify app remains functional after timeout
+
+**Tasks - API Failure Tests** (1-2 hours):
+- [ ] **Invalid API Key**
+  ```javascript
+  test('handles invalid API key', async () => {
+    // 1. Clear API key
+    // 2. Try to send message
+    // 3. Verify error shown
+    // 4. Verify settings panel opens
+    // 5. Verify API key input focused
+  });
+  ```
+
+- [ ] **Rate Limiting**
+  - [ ] Test Gemini rate limit error
+  - [ ] Test Claude rate limit error
+  - [ ] Test GPT rate limit error
+  - [ ] Verify rate limit messages
+  - [ ] Test retry after rate limit
+
+- [ ] **API Response Errors**
+  - [ ] Test malformed JSON response
+  - [ ] Test empty response
+  - [ ] Test very long response (>10k tokens)
+  - [ ] Test invalid model name
+  - [ ] Test network error during streaming
+
+**Tasks - UI Error Recovery** (1-2 hours):
+- [ ] **JavaScript Errors**
+  ```javascript
+  test('recovers from JavaScript errors', async () => {
+    // 1. Inject error in code
+    // 2. Trigger the error
+    // 3. Verify error caught
+    // 4. Verify app still functional
+    // 5. Verify error logged
+  });
+  ```
+
+- [ ] **DOM Errors**
+  - [ ] Test missing elements
+  - [ ] Test invalid selectors
+  - [ ] Test null reference errors
+  - [ ] Verify graceful degradation
+
+- [ ] **State Corruption**
+  - [ ] Test invalid conversation state
+  - [ ] Test corrupted localStorage
+  - [ ] Test invalid settings
+  - [ ] Verify state reset works
+
+**Success Criteria**:
+- All error scenarios handled gracefully
+- No app crashes or freezes
+- Clear error messages to user
+- Automatic recovery where possible
+- User can manually recover from all errors
+
+---
+
+### 15. Visual Regression Testing
 **Priority**: Medium  
+**Estimated Time**: 3-4 hours  
+**Status**: Infrastructure ready, needs baselines
+
+**Tasks - Baseline Capture** (1-2 hours):
+- [ ] **Capture Baseline Screenshots**
+  - [ ] Welcome screen (default state)
+  - [ ] Welcome screen (with API key error)
+  - [ ] Settings panel (all sections visible)
+  - [ ] Settings panel (scrolled to bottom)
+  - [ ] Conversation with 1 message
+  - [ ] Conversation with 10 messages
+  - [ ] Conversation with suggestion bubbles
+  - [ ] Input area (empty)
+  - [ ] Input area (with text)
+  - [ ] Input area (with long text)
+  - [ ] Voice button (idle state)
+  - [ ] Voice button (listening state)
+  - [ ] Voice button (processing state)
+  - [ ] Status indicator (connected)
+  - [ ] Status indicator (disconnected)
+  - [ ] Status indicator (reconnecting)
+
+**Tasks - Automated Comparison** (2 hours):
+- [ ] **Set Up Visual Diff Tool**
+  ```javascript
+  test('welcome screen matches baseline', async () => {
+    await expect(window).toHaveScreenshot('welcome-screen.png', {
+      maxDiffPixels: 100 // Allow minor rendering differences
+    });
+  });
+  ```
+
+- [ ] **Configure Diff Thresholds**
+  - [ ] Set pixel difference threshold (100 pixels)
+  - [ ] Set percentage threshold (0.1%)
+  - [ ] Configure anti-aliasing tolerance
+  - [ ] Set up failure reporting
+
+- [ ] **Test All UI States**
+  - [ ] Responsive layouts (600x500, 900x700, 1400x900)
+  - [ ] Dark mode (current)
+  - [ ] Light mode (if implemented)
+  - [ ] Different font sizes
+  - [ ] Different zoom levels
+
+**Tasks - Liquid Glass Effect Verification** (1 hour):
+- [ ] **Test Vibrancy Effects**
+  ```javascript
+  test('liquid glass effect renders correctly', async () => {
+    const hasVibrancy = await window.evaluate(() => {
+      const style = window.getComputedStyle(document.body);
+      return style.backdropFilter !== 'none' || 
+             style.webkitBackdropFilter !== 'none';
+    });
+    expect(hasVibrancy).toBe(true);
+  });
+  ```
+
+- [ ] **Test Glass Cards**
+  - [ ] Verify backdrop blur applied
+  - [ ] Verify translucency
+  - [ ] Verify gradient effects
+  - [ ] Verify smooth animations
+
+- [ ] **Test Contrast and Readability**
+  - [ ] Verify text contrast meets WCAG AA (4.5:1)
+  - [ ] Test readability on different backgrounds
+  - [ ] Verify no text clipping
+
+**Success Criteria**:
+- Baseline screenshots captured for all UI states
+- Automated comparison working
+- <0.1% pixel difference tolerance
+- All visual regressions caught
+- Liquid Glass effect verified
+
+---
+
+### 16. Accessibility Testing (WCAG 2.1 AA)
+**Priority**: Medium  
+**Estimated Time**: 4-6 hours  
+**Status**: Partial (ARIA attributes tested, needs full audit)
+
+**Tasks - Keyboard Navigation** (2 hours):
+- [ ] **Tab Order Tests**
+  ```javascript
+  test('keyboard navigation works throughout app', async () => {
+    // Tab through all interactive elements
+    // Verify all have accessible names
+    // Verify focus visible
+    // Verify logical tab order
+  });
+  ```
+
+- [ ] **Keyboard Shortcuts**
+  - [ ] Test ⌘⇧Space (global hotkey)
+  - [ ] Test Escape (close panels)
+  - [ ] Test Enter (send message)
+  - [ ] Test Tab (navigate)
+  - [ ] Test Space (activate buttons)
+  - [ ] Test Arrow keys (navigate lists)
+
+- [ ] **Focus Management**
+  - [ ] Test focus trap in modals
+  - [ ] Test focus return after modal close
+  - [ ] Test focus on error messages
+  - [ ] Test focus on new messages
+
+**Tasks - Screen Reader Compatibility** (2 hours):
+- [ ] **ARIA Announcements**
+  ```javascript
+  test('screen reader announcements work', async () => {
+    // Listen for aria-live announcements
+    // Trigger actions that should announce
+    // Verify announcements made
+  });
+  ```
+
+- [ ] **ARIA Attributes**
+  - [ ] Verify all buttons have aria-label
+  - [ ] Verify all inputs have aria-label
+  - [ ] Verify all regions have aria-labelledby
+  - [ ] Verify all live regions have aria-live
+  - [ ] Verify all dialogs have role="dialog"
+  - [ ] Verify all status indicators have role="status"
+
+- [ ] **Semantic HTML**
+  - [ ] Verify proper heading hierarchy (h1, h2, h3)
+  - [ ] Verify lists use <ul>/<ol>
+  - [ ] Verify buttons use <button>
+  - [ ] Verify links use <a>
+
+**Tasks - Color Contrast** (1-2 hours):
+- [ ] **WCAG AA Compliance**
+  ```javascript
+  test('color contrast meets WCAG AA', async () => {
+    // Check all text elements
+    // Calculate contrast ratio
+    // Verify ≥4.5:1 for normal text
+    // Verify ≥3:1 for large text
+  });
+  ```
+
+- [ ] **Test All Text Elements**
+  - [ ] Body text
+  - [ ] Button text
+  - [ ] Link text
+  - [ ] Status text
+  - [ ] Error messages
+  - [ ] Placeholder text
+
+**Success Criteria**:
+- All interactive elements keyboard accessible
+- All elements have accessible names
+- Screen reader can navigate entire app
+- All text meets WCAG AA contrast (4.5:1)
+- No keyboard traps
+- Focus visible at all times
+
+---
+
+### 17. Cross-Platform Testing
+**Priority**: Low (macOS-first, but important for future)  
 **Estimated Time**: 6-8 hours  
 **Status**: Not started
 
-**Tasks**:
-- [ ] Unit tests for backend services
-  - [ ] LLMService tests
-  - [ ] VoicePipelineService tests
-  - [ ] ConversationService tests
-  - [ ] BubbleGeneratorService tests
-- [ ] Integration tests
-  - [ ] WebSocket communication tests
-  - [ ] Swift helper IPC tests
-  - [ ] End-to-end conversation flow tests
-- [ ] E2E tests with Playwright
-  - [ ] Voice input flow
-  - [ ] Settings panel
-  - [ ] Message display
-  - [ ] Error handling
-- [ ] Performance benchmarks
-  - [ ] Response time tests
-  - [ ] Memory leak tests
-  - [ ] CPU usage tests
+**Tasks - macOS Testing** (2 hours):
+- [ ] Test on macOS Monterey (12.x)
+- [ ] Test on macOS Ventura (13.x)
+- [ ] Test on macOS Sonoma (14.x)
+- [ ] Test on macOS Sequoia (15.x)
+- [ ] Test on Intel Macs
+- [ ] Test on Apple Silicon Macs
+- [ ] Verify native voice recognition works
+- [ ] Verify TTS works
+- [ ] Verify global hotkey works
+
+**Tasks - Windows Testing** (2-3 hours):
+- [ ] Test on Windows 10
+- [ ] Test on Windows 11
+- [ ] Verify UI renders correctly
+- [ ] Verify WebSocket connections work
+- [ ] Test voice input (if supported)
+- [ ] Test TTS (if supported)
+- [ ] Verify file paths work (backslashes)
+
+**Tasks - Linux Testing** (2-3 hours):
+- [ ] Test on Ubuntu 22.04
+- [ ] Test on Fedora 39
+- [ ] Verify UI renders correctly
+- [ ] Verify dependencies install
+- [ ] Test voice input (if supported)
+- [ ] Test TTS (if supported)
 
 **Success Criteria**:
-- 80%+ code coverage
-- All critical paths tested
-- No flaky tests
-- Fast test execution (<2 minutes)
+- App works on all macOS versions (12+)
+- App works on both Intel and Apple Silicon
+- UI looks consistent across platforms
+- All features work on supported platforms
+- Platform-specific issues documented
+
+---
+
+### 18. Security and Privacy Testing
+**Priority**: High (for production)  
+**Estimated Time**: 4-6 hours  
+**Status**: Not started
+
+**Tasks - API Key Security** (2 hours):
+- [ ] **Storage Security**
+  - [ ] Verify API keys stored securely (encrypted)
+  - [ ] Verify API keys not in logs
+  - [ ] Verify API keys not in error messages
+  - [ ] Verify API keys not in screenshots
+  - [ ] Verify API keys not in memory dumps
+
+- [ ] **Transmission Security**
+  - [ ] Verify API keys sent over HTTPS only
+  - [ ] Verify no API keys in URL parameters
+  - [ ] Verify no API keys in WebSocket messages (unless encrypted)
+
+**Tasks - Data Privacy** (2 hours):
+- [ ] **Conversation Data**
+  - [ ] Verify conversations stored locally only
+  - [ ] Verify no conversations sent to external servers (except LLM APIs)
+  - [ ] Verify conversation deletion works
+  - [ ] Verify no conversation data in logs
+
+- [ ] **Audio Data**
+  - [ ] Verify audio not stored permanently
+  - [ ] Verify audio not sent to external servers (except speech recognition)
+  - [ ] Verify audio buffers cleared after use
+
+**Tasks - Input Validation** (1-2 hours):
+- [ ] Test XSS prevention in message display
+- [ ] Test SQL injection prevention (if using SQL)
+- [ ] Test command injection prevention
+- [ ] Test path traversal prevention
+- [ ] Test buffer overflow prevention
+
+**Success Criteria**:
+- API keys encrypted at rest
+- No sensitive data in logs
+- All inputs validated
+- No XSS vulnerabilities
+- Privacy policy compliant
+
+---
+
+### 19. CI/CD Integration
+**Priority**: High  
+**Estimated Time**: 4-6 hours  
+**Status**: Not started
+
+**Tasks - GitHub Actions Setup** (2-3 hours):
+- [ ] **Create Test Workflow**
+  ```yaml
+  name: Tests
+  on: [push, pull_request]
+  jobs:
+    test:
+      runs-on: macos-latest
+      steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-node@v3
+        - run: npm ci
+        - run: npm run test:all
+        - uses: actions/upload-artifact@v3
+          if: failure()
+          with:
+            name: screenshots
+            path: tests/screenshots/
+  ```
+
+- [ ] **Configure Test Matrix**
+  - [ ] Test on macOS (latest)
+  - [ ] Test on multiple Node versions (18, 20)
+  - [ ] Run unit tests
+  - [ ] Run integration tests
+  - [ ] Run UI tests
+
+**Tasks - Automated Checks** (1-2 hours):
+- [ ] **Pre-commit Hooks**
+  - [ ] Run linter
+  - [ ] Run type checking
+  - [ ] Run unit tests (fast ones)
+
+- [ ] **PR Checks**
+  - [ ] Run all tests
+  - [ ] Check code coverage
+  - [ ] Run visual regression tests
+  - [ ] Check for breaking changes
+
+**Tasks - Failure Reporting** (1-2 hours):
+- [ ] **Screenshot Upload**
+  - [ ] Upload screenshots on test failure
+  - [ ] Generate HTML report with screenshots
+  - [ ] Comment on PR with failure details
+
+- [ ] **Notifications**
+  - [ ] Slack notification on failure
+  - [ ] Email notification on failure
+  - [ ] GitHub issue creation on repeated failures
+
+**Success Criteria**:
+- All tests run automatically on push
+- Test results visible in PR
+- Screenshots uploaded on failure
+- Fast feedback (<10 minutes)
+- Clear failure reports
+
+---
+
+### 20. Test Documentation and Maintenance
+**Priority**: Medium  
+**Estimated Time**: 2-3 hours  
+**Status**: Partial (good inline docs, needs guides)
+
+**Tasks - Documentation** (1-2 hours):
+- [ ] **Test Running Guide**
+  - [ ] How to run all tests
+  - [ ] How to run specific test suites
+  - [ ] How to run tests in watch mode
+  - [ ] How to run tests in headed mode (see UI)
+  - [ ] How to debug failing tests
+
+- [ ] **Writing Tests Guide**
+  - [ ] Test structure and patterns
+  - [ ] How to use test helpers
+  - [ ] How to mock dependencies
+  - [ ] How to capture screenshots
+  - [ ] Best practices and anti-patterns
+
+- [ ] **Troubleshooting Guide**
+  - [ ] Common test failures and fixes
+  - [ ] Port conflicts
+  - [ ] Timing issues
+  - [ ] Screenshot differences
+  - [ ] Flaky tests
+
+**Tasks - Maintenance** (1 hour):
+- [ ] **Test Health Monitoring**
+  - [ ] Track test pass rate over time
+  - [ ] Track test execution time
+  - [ ] Track flaky test rate
+  - [ ] Set up alerts for degradation
+
+- [ ] **Regular Tasks**
+  - [ ] Review and fix flaky tests monthly
+  - [ ] Update baselines when UI changes
+  - [ ] Archive old screenshots
+  - [ ] Update dependencies quarterly
+
+**Success Criteria**:
+- Complete test documentation
+- Clear troubleshooting guide
+- Test health metrics tracked
+- Regular maintenance scheduled
+- New contributors can run tests easily
+
+---
+
+## 📊 TESTING SUMMARY
+
+### Test Coverage Goals
+- **Unit Tests**: 80%+ coverage of backend services
+- **Integration Tests**: All critical paths covered
+- **UI Tests**: All interactive elements tested
+- **Performance Tests**: Benchmarks for all operations
+- **Error Recovery**: All failure scenarios tested
+- **Visual Regression**: All UI states baselined
+- **Accessibility**: WCAG 2.1 AA compliant
+- **Security**: All attack vectors tested
+
+### Test Execution Targets
+- **Unit Tests**: <30 seconds
+- **Integration Tests**: <2 minutes
+- **UI Tests**: <5 minutes
+- **Full Suite**: <10 minutes
+- **CI/CD**: <15 minutes (including setup)
+
+### Quality Metrics
+- **Pass Rate**: >95% (allow 5% for known flaky tests)
+- **Flaky Rate**: <2% (tests that fail intermittently)
+- **Coverage**: >80% for critical code
+- **Performance**: No regressions >10%
+- **Visual Diff**: <0.1% pixel difference
+
+### Estimated Total Time
+- **Phase 1 (Core Tests)**: 8-10 hours
+- **Phase 2 (Voice Pipeline)**: 4-6 hours
+- **Phase 3 (Performance)**: 4-6 hours
+- **Phase 4 (Error Recovery)**: 4-6 hours
+- **Phase 5 (Visual Regression)**: 3-4 hours
+- **Phase 6 (Accessibility)**: 4-6 hours
+- **Phase 7 (CI/CD)**: 4-6 hours
+- **Phase 8 (Documentation)**: 2-3 hours
+- **Total**: 33-47 hours
+
+### Priority Order
+1. ✅ **Current Tests** (51 tests, 86% pass rate) - Already done
+2. 🔥 **Voice Pipeline Integration** (4-6 hours) - Critical for core feature
+3. 🔥 **Error Recovery** (4-6 hours) - Critical for reliability
+4. 🔥 **Performance Benchmarks** (4-6 hours) - Critical for UX
+5. ⚡ **Backend Unit Tests** (3-4 hours) - Important for maintainability
+6. ⚡ **Visual Regression Baselines** (3-4 hours) - Important for UI consistency
+7. ⚡ **CI/CD Integration** (4-6 hours) - Important for automation
+8. 📋 **Accessibility Testing** (4-6 hours) - Important for compliance
+9. 📋 **Security Testing** (4-6 hours) - Important for production
+10. 📋 **Cross-Platform Testing** (6-8 hours) - Future expansion
+
+**Total Estimated Time to Production-Ready Testing**: 40-50 hours
 
 ---
 
 ## 📦 TODO - DISTRIBUTION
 
-### 12. DMG Packaging
+### 21. DMG Packaging
 **Priority**: Medium  
 **Estimated Time**: 2-3 hours (excluding code signing)  
 **Status**: electron-builder configured, not tested

@@ -63,6 +63,11 @@ class ConversationManager {
     // Append to container
     this.messagesContainer.appendChild(messageElement);
 
+    // If message has artifact, render it below the message
+    if (message.artifact) {
+      this.addArtifact(message.artifact, messageElement);
+    }
+
     // Scroll to bottom
     this.scrollToBottom();
 
@@ -70,6 +75,35 @@ class ConversationManager {
     requestAnimationFrame(() => {
       messageElement.classList.add('fade-in');
     });
+  }
+
+  /**
+   * ADD ARTIFACT
+   * 
+   * Adds an artifact card below a message.
+   * 
+   * @param {Object} artifact - Artifact data
+   * @param {HTMLElement} messageElement - Message element to attach artifact to
+   */
+  addArtifact(artifact, messageElement) {
+    console.log('[ConversationManager] Adding artifact:', artifact.artifact_type);
+
+    try {
+      // Create artifact viewer
+      const viewer = new ArtifactViewer(
+        artifact.artifact_id,
+        artifact.artifact_type,
+        artifact.html,
+        artifact.data || null
+      );
+
+      // Insert artifact card after message
+      messageElement.parentNode.insertBefore(viewer.element, messageElement.nextSibling);
+
+      console.log('[ConversationManager] Artifact added successfully');
+    } catch (error) {
+      console.error('[ConversationManager] Failed to add artifact:', error);
+    }
   }
 
   /**

@@ -118,6 +118,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   /**
+   * LIFE AREAS API
+   * 
+   * Methods for interacting with the Life Areas system.
+   * Allows frontend to fetch, create, and manage life areas.
+   */
+  getLifeAreas: () => ipcRenderer.invoke('get-life-areas'),
+  getAreaDetails: (areaPath) => ipcRenderer.invoke('get-area-details', areaPath),
+  createLifeArea: (areaPath, name, description) => ipcRenderer.invoke('create-life-area', { areaPath, name, description }),
+
+  /**
    * CLEANUP
    * 
    * Removes event listeners to prevent memory leaks.

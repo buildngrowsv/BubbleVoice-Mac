@@ -32,6 +32,7 @@ class BubbleVoiceApp {
     this.voiceController = null;
     this.websocketClient = null;
     this.chatSidebar = null;
+    this.lifeAreasSidebar = null;
 
     // DOM element references
     // Cached for performance (avoid repeated querySelector calls)
@@ -94,6 +95,13 @@ class BubbleVoiceApp {
       this.voiceController = new VoiceController(this);
       this.websocketClient = new WebSocketClient(backendConfig.websocketUrl, this);
       this.chatSidebar = new ChatSidebar();
+      
+      // Initialize life areas sidebar
+      this.lifeAreasSidebar = new LifeAreasSidebar();
+      const sidebarContainer = document.getElementById('life-areas-sidebar-container');
+      if (sidebarContainer) {
+        sidebarContainer.appendChild(this.lifeAreasSidebar.element);
+      }
 
       // Set up event listeners
       this.setupUIEventListeners();

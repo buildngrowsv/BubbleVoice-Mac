@@ -7,6 +7,8 @@
   <title>BubbleVoice</title>
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/liquid-glass.css">
+  <link rel="stylesheet" href="styles/artifact-viewer.css">
+  <link rel="stylesheet" href="styles/life-areas-sidebar.css">
 </head>
 <body>
   <!-- 
@@ -344,6 +346,10 @@
     </div>
 
   </div>
+
+  <!-- LIFE AREAS SIDEBAR (slides in from right, above settings) -->
+  <!-- Dynamically created by LifeAreasSidebar component -->
+  <div id="life-areas-sidebar-container"></div>
 
   <!-- SETTINGS PANEL (slides in from right) -->
   <!-- TEST ID: settings-panel - The slide-out settings panel -->
@@ -695,6 +701,8 @@
   </div>
 
   <!-- SCRIPTS -->
+  <script src="components/artifact-viewer.js"></script>
+  <script src="components/life-areas-sidebar.js"></script>
   <script src="components/web-speech-service.js"></script>
   <script src="components/conversation-manager.js"></script>
   <script src="components/voice-controller.js"></script>
