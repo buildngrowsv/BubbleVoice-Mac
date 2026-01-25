@@ -32,7 +32,12 @@ const Anthropic = require('@anthropic-ai/sdk');
 const OpenAI = require('openai');
 
 class LLMService {
-  constructor() {
+  constructor(promptService = null) {
+    // Prompt management service (optional)
+    // If provided, allows customizable prompts via admin panel
+    // If not provided, uses hardcoded defaults
+    this.promptService = promptService;
+    
     // Initialize API clients
     // These are created lazily when first needed
     this.geminiClient = null;
@@ -53,6 +58,7 @@ class LLMService {
 
     // System prompt
     // Defines the AI's personality and capabilities
+    // Now uses PromptManagementService if available (2026-01-24)
     this.systemPrompt = this.buildSystemPrompt();
   }
 
@@ -67,9 +73,19 @@ class LLMService {
    * It should be empathetic, remember personal context, and help
    * users work through life decisions and personal growth.
    * 
+   * UPDATED 2026-01-24:
+   * Now uses PromptManagementService if available, allowing users
+   * to customize the AI's behavior via admin panel.
+   * 
    * @returns {string} System prompt
    */
   buildSystemPrompt() {
+    // Use PromptManagementService if available (allows customization)
+    if (this.promptService) {
+      return this.promptService.getSystemPrompt();
+    }
+    
+    // Fallback to hardcoded default (backward compatibility)
     return `You are BubbleVoice, a personal AI companion designed to help people think through their lives.
 
 **Your Purpose:**

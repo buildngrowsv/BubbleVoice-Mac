@@ -36,19 +36,28 @@ class ContextAssemblyService {
      * @param {VectorStoreService} vectorStoreService - Vector store instance
      * @param {AreaManagerService} areaManagerService - Area manager instance
      * @param {ConversationStorageService} conversationStorageService - Conversation storage instance
+     * @param {PromptManagementService} promptService - Prompt management service (optional)
      * 
      * Why we pass all services:
      * - Need vector search for semantic matching
      * - Need area manager for life areas tree
      * - Need conversation storage for history
+     * 
+     * UPDATED 2026-01-24:
+     * - Added promptService parameter for customizable config
+     * - Token budgets and query weights now come from PromptManagementService
      */
-    constructor(vectorStoreService, areaManagerService, conversationStorageService) {
+    constructor(vectorStoreService, areaManagerService, conversationStorageService, promptService = null) {
         this.vectorStore = vectorStoreService;
         this.areaManager = areaManagerService;
         this.convStorage = conversationStorageService;
+        this.promptService = promptService;
         
-        // Token budgets (can be adjusted)
-        this.tokenBudgets = {
+        // Get config from PromptManagementService if available
+        const config = promptService ? promptService.getContextAssemblyConfig() : null;
+        
+        // Token budgets (can be customized via admin panel)
+        this.tokenBudgets = config?.tokenBudgets || {
             systemInstruction: 1300,
             aiNotes: 1500,
             knowledgeTree: 300,
@@ -59,7 +68,30 @@ class ContextAssemblyService {
             total: 10000
         };
         
+        // Multi-query weights (can be customized via admin panel)
+        this.multiQueryWeights = config?.multiQueryWeights || {
+            recentUserInputs: 3.0,
+            allUserInputs: 1.5,
+            fullConversation: 0.5
+        };
+        
+        // Multi-query counts (can be customized via admin panel)
+        this.multiQueryCounts = config?.multiQueryCounts || {
+            recentUserInputsCount: 2,
+            recentUserInputsTopK: 10,
+            allUserInputsTopK: 10,
+            fullConversationTopK: 5,
+            finalTopK: 10
+        };
+        
+        // Boost values (can be customized via admin panel)
+        this.boosts = config?.boosts || {
+            recencyBoostPerDay: 0.05,
+            areaBoost: 1.5
+        };
+        
         console.log('[ContextAssemblyService] Initialized');
+        console.log(`  Using ${promptService ? 'custom' : 'default'} configuration`);
     }
 
     /**
@@ -118,8 +150,8 @@ class ContextAssemblyService {
         try {
             const startTime = Date.now();
             
-            // Extract queries
-            const recentUserQuery = this.getRecentUserInputs(messages, 2);
+            // Extract queries (using configurable counts)
+            const recentUserQuery = this.getRecentUserInputs(messages, this.multiQueryCounts.recentUserInputsCount);
             const allUserQuery = this.getAllUserInputs(messages);
             const fullConvQuery = this.getFullConversation(messages);
             
@@ -135,28 +167,28 @@ class ContextAssemblyService {
                 fullConvQuery
             ]);
             
-            // Run searches in parallel with different weights
+            // Run searches in parallel with configurable top K values
             const [results1, results2, results3] = await Promise.all([
-                this.vectorStore.vectorSearch(queryEmbeddings[0], 10),
-                this.vectorStore.vectorSearch(queryEmbeddings[1], 10),
-                this.vectorStore.vectorSearch(queryEmbeddings[2], 5)
+                this.vectorStore.vectorSearch(queryEmbeddings[0], this.multiQueryCounts.recentUserInputsTopK),
+                this.vectorStore.vectorSearch(queryEmbeddings[1], this.multiQueryCounts.allUserInputsTopK),
+                this.vectorStore.vectorSearch(queryEmbeddings[2], this.multiQueryCounts.fullConversationTopK)
             ]);
             
-            // Apply weights
-            const weighted1 = results1.map(r => ({ ...r, score: r.score * 3.0, source: 'recent_user' }));
-            const weighted2 = results2.map(r => ({ ...r, score: r.score * 1.5, source: 'all_user' }));
-            const weighted3 = results3.map(r => ({ ...r, score: r.score * 0.5, source: 'full_conv' }));
+            // Apply configurable weights
+            const weighted1 = results1.map(r => ({ ...r, score: r.score * this.multiQueryWeights.recentUserInputs, source: 'recent_user' }));
+            const weighted2 = results2.map(r => ({ ...r, score: r.score * this.multiQueryWeights.allUserInputs, source: 'all_user' }));
+            const weighted3 = results3.map(r => ({ ...r, score: r.score * this.multiQueryWeights.fullConversation, source: 'full_conv' }));
             
             // Merge and deduplicate (keep highest score per chunk)
             const merged = this.deduplicateResults([...weighted1, ...weighted2, ...weighted3]);
             
-            // Apply recency boost
-            const recencyBoosted = this.vectorStore.applyRecencyBoost(merged, 0.05);
+            // Apply configurable recency boost
+            const recencyBoosted = this.vectorStore.applyRecencyBoost(merged, this.boosts.recencyBoostPerDay);
             
-            // Apply area boost if current area provided
+            // Apply configurable area boost if current area provided
             let final = recencyBoosted;
             if (currentAreaPath) {
-                final = this.vectorStore.applyAreaBoost(recencyBoosted, currentAreaPath, 1.5);
+                final = this.vectorStore.applyAreaBoost(recencyBoosted, currentAreaPath, this.boosts.areaBoost);
             }
             
             // Sort by final score
@@ -167,7 +199,7 @@ class ContextAssemblyService {
             console.log(`  Total unique results: ${final.length}`);
             
             return {
-                results: final.slice(0, 10),
+                results: final.slice(0, this.multiQueryCounts.finalTopK),
                 totalResults: final.length,
                 searchTime: duration
             };
