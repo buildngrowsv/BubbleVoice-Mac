@@ -127,7 +127,13 @@ class IntegrationService {
                     result.entriesAppended.push(actionResult.entryId);
                     
                     // Generate and store embedding for entry
-                    const embedding = await this.embeddingService.generateEmbedding(action.content);
+                    // Use the same fallback logic as entry creation
+                    const embeddingText = action.content || 
+                                        action.user_quote || 
+                                        action.ai_observation ||
+                                        'Entry added to area';
+                    
+                    const embedding = await this.embeddingService.generateEmbedding(embeddingText);
                     await this.vectorStore.storeEmbedding(
                         actionResult.entryId,
                         embedding,
@@ -137,7 +143,7 @@ class IntegrationService {
                             timestamp: new Date().toISOString(),
                             entry_type: 'time_ordered_log',
                             sentiment: action.sentiment,
-                            content: action.content,
+                            content: embeddingText,
                             user_quote: action.user_quote,
                             ai_observation: action.ai_observation
                         }
@@ -217,13 +223,19 @@ class IntegrationService {
                     };
                 
                 case 'append_entry':
+                    // Ensure content exists (fallback to user_quote or generic message)
+                    const entryContent = action.content || 
+                                       action.user_quote || 
+                                       action.ai_observation ||
+                                       'Entry added to area';
+                    
                     const entry = await this.areaManager.appendEntry(
                         action.area_path,
                         action.document,
                         {
                             timestamp: new Date().toISOString(),
                             conversation_context: action.conversation_context || 'General discussion',
-                            content: action.content,
+                            content: entryContent,
                             user_quote: action.user_quote || null,
                             ai_observation: action.ai_observation || null,
                             sentiment: action.sentiment || 'neutral',

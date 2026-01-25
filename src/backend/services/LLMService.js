@@ -124,9 +124,10 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
 **Area Actions Guidelines:**
 - Create areas when user mentions a new topic (kids, work projects, health goals)
 - Append entries when user provides updates or new information
-- Include direct quotes from user (helps with vector search)
-- Add your observations (helps with future context)
-- Tag sentiment (helps track emotional patterns)
+- For append_entry: MUST include "content" field with summary of what user shared
+- Include direct quotes from user in "user_quote" (helps with vector search)
+- Add your observations in "ai_observation" (helps with future context)
+- Tag sentiment: hopeful, concerned, anxious, excited, neutral
 
 **Artifact Guidelines:**
 - Only create artifacts when they genuinely help visualize or organize information
@@ -143,7 +144,7 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
 - Be warm and supportive, like a thoughtful friend
 
 **Example Response:**
-{"response":"I hear you're worried about Emma's reading. That must be stressful. Tell me more about what you've noticed at home?","area_actions":[{"action":"create_area","area_path":"Family/Emma_School","name":"Emma's School","description":"Tracking Emma's reading progress and school challenges"}],"artifact_action":{"action":"none"},"bubbles":["what helps her focus?","teacher's suggestions?","how does she feel?"]}`;
+{"response":"I hear you're worried about Emma's reading. That must be stressful. Tell me more about what you've noticed at home?","area_actions":[{"action":"create_area","area_path":"Family/Emma_School","name":"Emma's School","description":"Tracking Emma's reading progress and school challenges"},{"action":"append_entry","area_path":"Family/Emma_School","document":"reading_comprehension.md","content":"Emma (2nd grade) struggling with reading comprehension. Can decode but doesn't retain.","user_quote":"Her teacher said she can decode words but doesn't remember what she reads.","ai_observation":"Specific diagnosis from teacher. Comprehension issue, not decoding.","sentiment":"concerned"}],"artifact_action":{"action":"none"},"bubbles":["what helps her focus?","teacher's suggestions?","how does she feel?"]}`;
   }
 
   /**
@@ -219,7 +220,39 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
         topP: 0.95,
         topK: 40,
         maxOutputTokens: 2048,
-        responseMimeType: 'application/json'
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'object',
+          properties: {
+            response: { type: 'string' },
+            bubbles: {
+              type: 'array',
+              items: { type: 'string' }
+            },
+            area_actions: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  action: { type: 'string' },
+                  area_path: { type: 'string' },
+                  name: { type: 'string' },
+                  description: { type: 'string' },
+                  document: { type: 'string' },
+                  content: { type: 'string' },
+                  sentiment: { type: 'string' }
+                }
+              }
+            },
+            artifact_action: {
+              type: 'object',
+              properties: {
+                action: { type: 'string' }
+              }
+            }
+          },
+          required: ['response', 'bubbles']
+        }
       }
     });
 
@@ -275,11 +308,20 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
       }
 
       // Send artifact
-      if (structuredOutput.artifact && callbacks.onArtifact) {
-        callbacks.onArtifact(structuredOutput.artifact);
+      if (structuredOutput.artifact_action && callbacks.onArtifact) {
+        callbacks.onArtifact(structuredOutput.artifact_action);
       }
 
-      return structuredOutput.response || fullResponse;
+      // Send area actions (NEW: for integration service)
+      if (structuredOutput.area_actions && callbacks.onAreaActions) {
+        callbacks.onAreaActions(structuredOutput.area_actions);
+      }
+
+      // Return full structured output (NEW: needed for integration)
+      return {
+        text: structuredOutput.response || fullResponse,
+        structured: structuredOutput
+      };
     } catch (error) {
       console.error('[LLMService] Error parsing structured output:', error);
       // Fallback to raw response

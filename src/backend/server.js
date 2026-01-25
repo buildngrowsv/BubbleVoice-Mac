@@ -481,9 +481,11 @@ class BackendServer {
       let fullResponse = '';
       let bubbles = [];
       let artifact = null;
+      let areaActions = [];
+      let structuredOutput = null;
 
       // Stream LLM response
-      await this.llmService.generateResponse(
+      const llmResult = await this.llmService.generateResponse(
         conversation,
         settings,
         {
@@ -499,9 +501,20 @@ class BackendServer {
           },
           onArtifact: (generatedArtifact) => {
             artifact = generatedArtifact;
+          },
+          onAreaActions: (generatedAreaActions) => {
+            areaActions = generatedAreaActions;
           }
         }
       );
+      
+      // Extract structured output from LLM result
+      if (typeof llmResult === 'object' && llmResult.structured) {
+        structuredOutput = llmResult.structured;
+        fullResponse = llmResult.text;
+      } else {
+        fullResponse = llmResult;
+      }
 
       // Add AI response to conversation
       await this.conversationService.addMessage(conversation.id, {
@@ -513,31 +526,20 @@ class BackendServer {
       // Process structured outputs (NEW: area_actions and artifact_action)
       let processingResult = null;
       try {
-        // Parse structured output from LLM response
-        // The LLM should return JSON with area_actions and artifact_action
-        let structuredOutput = { area_actions: [], artifact_action: { action: 'none' } };
-        
-        // Try to extract JSON from response if it's wrapped in code blocks
-        const jsonMatch = fullResponse.match(/```json\n([\s\S]*?)\n```/);
-        if (jsonMatch) {
-          structuredOutput = JSON.parse(jsonMatch[1]);
-        } else {
-          // Try parsing the whole response as JSON
-          try {
-            structuredOutput = JSON.parse(fullResponse);
-          } catch (e) {
-            // Not JSON, that's okay - no structured outputs
-          }
-        }
-        
-        // Process turn with integration service
-        if (structuredOutput.area_actions || structuredOutput.artifact_action) {
+        // If we have structured output from LLM, process it
+        if (structuredOutput && (structuredOutput.area_actions || structuredOutput.artifact_action)) {
+          console.log('[Backend] Processing structured output...');
+          console.log(`  Area actions: ${structuredOutput.area_actions?.length || 0}`);
+          console.log(`  Artifact action: ${structuredOutput.artifact_action?.action || 'none'}`);
+          
           processingResult = await this.integrationService.processTurn(
             conversation.id,
             content,
-            structuredOutput.response || fullResponse,
+            fullResponse,
             structuredOutput
           );
+          
+          console.log('[Backend] ✅ Structured output processed');
         }
       } catch (error) {
         console.error('[Backend] Error processing structured outputs:', error);

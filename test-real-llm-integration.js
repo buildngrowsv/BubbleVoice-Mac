@@ -85,12 +85,15 @@ async function runRealLLMTest() {
     
     let fullResponse = '';
     let structuredOutput = null;
+    let receivedBubbles = [];
+    let receivedArtifact = null;
+    let receivedAreaActions = [];
     
     try {
         // Call LLM with streaming
         const startTime = Date.now();
         
-        await llmService.generateResponse(
+        const llmResult = await llmService.generateResponse(
             conversation,
             { model: 'gemini-2.5-flash-lite', temperature: 0.7 },
             {
@@ -99,14 +102,28 @@ async function runRealLLMTest() {
                     process.stdout.write('.');
                 },
                 onBubbles: (bubbles) => {
+                    receivedBubbles = bubbles;
                     console.log('\n');
                     console.log('✅ Bubbles received:', bubbles);
                 },
                 onArtifact: (artifact) => {
-                    console.log('✅ Artifact received:', artifact?.type || 'none');
+                    receivedArtifact = artifact;
+                    console.log('✅ Artifact received:', artifact?.action || 'none');
+                },
+                onAreaActions: (areaActions) => {
+                    receivedAreaActions = areaActions;
+                    console.log('✅ Area actions received:', areaActions.length);
                 }
             }
         );
+        
+        // Extract structured output from result
+        if (typeof llmResult === 'object' && llmResult.structured) {
+            structuredOutput = llmResult.structured;
+            fullResponse = llmResult.text;
+        } else {
+            fullResponse = llmResult;
+        }
         
         const duration = Date.now() - startTime;
         
@@ -121,43 +138,22 @@ async function runRealLLMTest() {
         
         // Try to parse structured output
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('Parsing Structured Output:');
+        console.log('Structured Output from LLM:');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         
-        // Try to extract JSON from response
-        const jsonMatch = fullResponse.match(/```json\n([\s\S]*?)\n```/);
-        if (jsonMatch) {
-            console.log('✅ Found JSON in code block');
-            structuredOutput = JSON.parse(jsonMatch[1]);
+        // Check if we got structured output from LLM
+        if (structuredOutput) {
+            console.log('✅ Received structured output from LLM');
         } else {
-            // Try parsing whole response
-            try {
-                structuredOutput = JSON.parse(fullResponse);
-                console.log('✅ Parsed entire response as JSON');
-            } catch (e) {
-                console.log('⚠️  Response is not JSON format');
-                console.log('   This is expected - LLM needs system prompt update');
-                console.log('');
-                
-                // Create mock structured output for testing
-                structuredOutput = {
-                    response: fullResponse,
-                    area_actions: [
-                        {
-                            action: 'create_area',
-                            area_path: 'Family/Emma_School',
-                            name: "Emma's School",
-                            description: "Tracking Emma's reading progress"
-                        }
-                    ],
-                    artifact_action: {
-                        action: 'none'
-                    },
-                    bubbles: ["tell me more?", "what helps her?", "teacher's advice?"]
-                };
-                
-                console.log('📝 Using mock structured output for testing');
-            }
+            console.log('⚠️  No structured output - using callbacks data');
+            
+            // Build from callbacks
+            structuredOutput = {
+                response: fullResponse,
+                area_actions: receivedAreaActions,
+                artifact_action: receivedArtifact || { action: 'none' },
+                bubbles: receivedBubbles
+            };
         }
         
         console.log('');
