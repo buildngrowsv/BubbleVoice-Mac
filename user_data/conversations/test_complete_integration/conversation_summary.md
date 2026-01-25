@@ -1,6 +1,6 @@
-# Conversation Summary - e2e_test_emma_reading
+# Conversation Summary - test_complete_integration
 
-**Last Updated**: 2026-01-24T21:49:57.403Z
+**Last Updated**: 2026-01-25T01:16:44.495Z
 
 ## Key Topics
 
