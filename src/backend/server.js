@@ -40,6 +40,7 @@ const ConversationService = require('./services/ConversationService');
 const LLMService = require('./services/LLMService');
 const VoicePipelineService = require('./services/VoicePipelineService');
 const BubbleGeneratorService = require('./services/BubbleGeneratorService');
+const IntegrationService = require('./services/IntegrationService');
 
 // Configuration
 const PORT = process.env.PORT || 7482;
@@ -66,6 +67,10 @@ class BackendServer {
     this.llmService = new LLMService();
     this.voicePipelineService = new VoicePipelineService(this);
     this.bubbleGeneratorService = new BubbleGeneratorService();
+    
+    // Integration service (NEW: connects all data management services)
+    const userDataDir = path.join(__dirname, '../../user_data');
+    this.integrationService = new IntegrationService(userDataDir);
 
     // Active connections
     // Maps WebSocket connections to conversation sessions
@@ -505,6 +510,40 @@ class BackendServer {
         timestamp: Date.now()
       });
 
+      // Process structured outputs (NEW: area_actions and artifact_action)
+      let processingResult = null;
+      try {
+        // Parse structured output from LLM response
+        // The LLM should return JSON with area_actions and artifact_action
+        let structuredOutput = { area_actions: [], artifact_action: { action: 'none' } };
+        
+        // Try to extract JSON from response if it's wrapped in code blocks
+        const jsonMatch = fullResponse.match(/```json\n([\s\S]*?)\n```/);
+        if (jsonMatch) {
+          structuredOutput = JSON.parse(jsonMatch[1]);
+        } else {
+          // Try parsing the whole response as JSON
+          try {
+            structuredOutput = JSON.parse(fullResponse);
+          } catch (e) {
+            // Not JSON, that's okay - no structured outputs
+          }
+        }
+        
+        // Process turn with integration service
+        if (structuredOutput.area_actions || structuredOutput.artifact_action) {
+          processingResult = await this.integrationService.processTurn(
+            conversation.id,
+            content,
+            structuredOutput.response || fullResponse,
+            structuredOutput
+          );
+        }
+      } catch (error) {
+        console.error('[Backend] Error processing structured outputs:', error);
+        // Continue anyway - don't fail the whole response
+      }
+
       // Generate TTS audio (if enabled)
       let audioUrl = null;
       // TODO: Implement TTS generation
@@ -516,7 +555,8 @@ class BackendServer {
         data: {
           bubbles,
           artifact,
-          audioUrl
+          audioUrl,
+          processing_result: processingResult // NEW: includes areas/entries/artifacts created
         }
       });
 
