@@ -257,14 +257,39 @@ class ChatSidebar {
     // BECAUSE: Default titles like "Conversation 1" aren't meaningful
     const title = conversation.title || this.generateDefaultTitle(conversation);
     
+    // Get artifact count and area tags
+    // NEW: Enhanced metadata for artifacts and life areas
+    const artifactCount = conversation.artifact_count || 0;
+    const areaTags = conversation.area_tags || [];
+    
     // Build HTML structure
     // TECHNICAL NOTE: We use data attributes for accessibility and testing
+    // ENHANCEMENT: Added artifact badges and area tags for better context
     item.innerHTML = `
       <div class="conversation-title" data-testid="conversation-title">${this.escapeHtml(title)}</div>
       <div class="conversation-meta">
         <span class="conversation-time" data-testid="conversation-time">${timeAgo}</span>
         <span class="conversation-preview" data-testid="conversation-preview">${this.escapeHtml(preview)}</span>
       </div>
+      ${artifactCount > 0 || areaTags.length > 0 ? `
+        <div class="conversation-badges">
+          ${artifactCount > 0 ? `
+            <span class="conversation-badge artifact-badge" title="${artifactCount} artifacts">
+              📊 ${artifactCount}
+            </span>
+          ` : ''}
+          ${areaTags.slice(0, 2).map(tag => `
+            <span class="conversation-badge area-badge" title="Life area: ${tag}">
+              ${this.getAreaIcon(tag)} ${tag.split('/').pop()}
+            </span>
+          `).join('')}
+          ${areaTags.length > 2 ? `
+            <span class="conversation-badge more-badge" title="${areaTags.length - 2} more areas">
+              +${areaTags.length - 2}
+            </span>
+          ` : ''}
+        </div>
+      ` : ''}
       <button class="delete-conversation"
               data-testid="delete-conversation"
               aria-label="Delete conversation"
@@ -723,6 +748,32 @@ class ChatSidebar {
     return div.innerHTML;
   }
   
+  /**
+   * GET AREA ICON
+   * 
+   * Returns emoji icon for life area.
+   * 
+   * @param {string} areaPath - Area path (e.g., "Family/Emma_School")
+   * @returns {string} Emoji icon
+   */
+  getAreaIcon(areaPath) {
+    const topLevel = areaPath.split('/')[0].toLowerCase();
+    
+    const icons = {
+      'family': '👨‍👩‍👧‍👦',
+      'work': '💼',
+      'personal': '🌱',
+      'home': '🏡',
+      'relationships': '❤️',
+      'finances': '💰',
+      'hobbies': '🎨',
+      'health': '🏃',
+      'learning': '📚'
+    };
+    
+    return icons[topLevel] || '📁';
+  }
+
   /**
    * UPDATE CONVERSATION TITLE
    * 

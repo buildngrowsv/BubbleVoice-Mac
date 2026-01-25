@@ -1248,6 +1248,54 @@ input[type="range"]::-webkit-slider-thumb:hover {
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* Conversation Badges (NEW: for artifacts and areas) */
+.conversation-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.conversation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.artifact-badge {
+  background: rgba(102, 126, 234, 0.25);
+  border: 1px solid rgba(102, 126, 234, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.area-badge {
+  background: rgba(79, 172, 254, 0.25);
+  border: 1px solid rgba(79, 172, 254, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.more-badge {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.conversation-item.active .artifact-badge {
+  background: rgba(102, 126, 234, 0.4);
+  border-color: rgba(102, 126, 234, 0.6);
+}
+
+.conversation-item.active .area-badge {
+  background: rgba(79, 172, 254, 0.4);
+  border-color: rgba(79, 172, 254, 0.6);
+}
+
 /* Delete Button */
 .delete-conversation {
   position: absolute;

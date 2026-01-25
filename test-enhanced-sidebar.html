@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Sidebar Test - BubbleVoice</title>
+    <link rel="stylesheet" href="src/frontend/styles/main.css">
+    <link rel="stylesheet" href="src/frontend/styles/liquid-glass.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+            padding: 0;
+            margin: 0;
+        }
+        
+        .test-container {
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 32px;
+        }
+        
+        .demo-sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px;
+        }
+        
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Enhanced Conversation Sidebar</h1>
+        <div class="subtitle">With artifact badges and area tags</div>
+        
+        <div class="demo-sidebar">
+            <div class="sidebar-title">Conversations</div>
+            <div class="conversations-list" id="test-conversations-list">
+                <!-- Conversations will be rendered here -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="src/frontend/components/chat-sidebar.js"></script>
+    
+    <script>
+        // Mock conversations with artifacts and areas
+        const mockConversations = [
+            {
+                id: 'conv_1',
+                title: "Emma's Reading Journey",
+                updatedAt: new Date().toISOString(),
+                messages: [
+                    { role: 'user', content: "I'm worried about Emma's reading" },
+                    { role: 'assistant', content: "Tell me more about what you've noticed" }
+                ],
+                artifact_count: 3,
+                area_tags: ['Family/Emma_School']
+            },
+            {
+                id: 'conv_2',
+                title: 'Startup Fundraising Strategy',
+                updatedAt: new Date(Date.now() - 3600000).toISOString(),
+                messages: [
+                    { role: 'user', content: "Need to prepare for investor meeting" },
+                    { role: 'assistant', content: "Let's create a pitch deck outline" }
+                ],
+                artifact_count: 5,
+                area_tags: ['Work/Startup', 'Work/Fundraising']
+            },
+            {
+                id: 'conv_3',
+                title: 'Weekly Planning',
+                updatedAt: new Date(Date.now() - 86400000).toISOString(),
+                messages: [
+                    { role: 'user', content: "Help me plan this week" },
+                    { role: 'assistant', content: "Let's break down your priorities" }
+                ],
+                artifact_count: 1,
+                area_tags: ['Personal/Planning']
+            },
+            {
+                id: 'conv_4',
+                title: 'Home Renovation Ideas',
+                updatedAt: new Date(Date.now() - 172800000).toISOString(),
+                messages: [
+                    { role: 'user', content: "Thinking about kitchen remodel" },
+                    { role: 'assistant', content: "What's your budget and timeline?" }
+                ],
+                artifact_count: 0,
+                area_tags: ['Home/Kitchen']
+            },
+            {
+                id: 'conv_5',
+                title: 'Health Goals Discussion',
+                updatedAt: new Date(Date.now() - 259200000).toISOString(),
+                messages: [
+                    { role: 'user', content: "Want to get back to running" },
+                    { role: 'assistant', content: "Let's create a sustainable plan" }
+                ],
+                artifact_count: 2,
+                area_tags: ['Personal/Health', 'Personal/Fitness', 'Personal/Goals']
+            }
+        ];
+        
+        // Create mock ChatSidebar instance
+        class MockChatSidebar {
+            constructor() {
+                this.conversationsList = document.getElementById('test-conversations-list');
+                this.currentConversationId = 'conv_1';
+                this.conversations = new Map();
+                
+                mockConversations.forEach(conv => {
+                    this.conversations.set(conv.id, conv);
+                });
+                
+                this.render();
+            }
+            
+            render() {
+                mockConversations.forEach(conv => {
+                    this.renderConversationItem(conv);
+                });
+            }
+            
+            renderConversationItem(conversation) {
+                const item = document.createElement('div');
+                item.className = 'conversation-item';
+                item.dataset.conversationId = conversation.id;
+                
+                if (conversation.id === this.currentConversationId) {
+                    item.classList.add('active');
+                }
+                
+                const timeAgo = this.formatTimeAgo(conversation.updatedAt);
+                const preview = conversation.messages[conversation.messages.length - 1]?.content.slice(0, 50) + '...';
+                const title = conversation.title;
+                
+                const artifactCount = conversation.artifact_count || 0;
+                const areaTags = conversation.area_tags || [];
+                
+                item.innerHTML = `
+                    <div class="conversation-title">${this.escapeHtml(title)}</div>
+                    <div class="conversation-meta">
+                        <span class="conversation-time">${timeAgo}</span>
+                        <span class="conversation-preview">${this.escapeHtml(preview)}</span>
+                    </div>
+                    ${artifactCount > 0 || areaTags.length > 0 ? `
+                        <div class="conversation-badges">
+                            ${artifactCount > 0 ? `
+                                <span class="conversation-badge artifact-badge" title="${artifactCount} artifacts">
+                                    📊 ${artifactCount}
+                                </span>
+                            ` : ''}
+                            ${areaTags.slice(0, 2).map(tag => `
+                                <span class="conversation-badge area-badge" title="Life area: ${tag}">
+                                    ${this.getAreaIcon(tag)} ${tag.split('/').pop()}
+                                </span>
+                            `).join('')}
+                            ${areaTags.length > 2 ? `
+                                <span class="conversation-badge more-badge" title="${areaTags.length - 2} more areas">
+                                    +${areaTags.length - 2}
+                                </span>
+                            ` : ''}
+                        </div>
+                    ` : ''}
+                    <button class="delete-conversation" title="Delete conversation">
+                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                            <path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                `;
+                
+                this.conversationsList.appendChild(item);
+            }
+            
+            formatTimeAgo(timestamp) {
+                const now = new Date();
+                const then = new Date(timestamp);
+                const diffMs = now - then;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffHours = Math.floor(diffMs / 3600000);
+                const diffDays = Math.floor(diffMs / 86400000);
+                
+                if (diffMins < 1) return 'just now';
+                if (diffMins < 60) return `${diffMins}m ago`;
+                if (diffHours < 24) return `${diffHours}h ago`;
+                return `${diffDays}d ago`;
+            }
+            
+            getAreaIcon(areaPath) {
+                const topLevel = areaPath.split('/')[0].toLowerCase();
+                const icons = {
+                    'family': '👨‍👩‍👧‍👦',
+                    'work': '💼',
+                    'personal': '🌱',
+                    'home': '🏡',
+                    'health': '🏃'
+                };
+                return icons[topLevel] || '📁';
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            new MockChatSidebar();
+            console.log('Enhanced sidebar test loaded');
+        });
+    </script>
+</body>
+</html>
