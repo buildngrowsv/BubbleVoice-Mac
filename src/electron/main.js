@@ -670,7 +670,7 @@ ipcMain.handle('chat-history:get-conversations', async () => {
         // Enrich with message count and last message
         const enriched = conversations.map(conv => {
             const messageCount = db.getMessageCount(conv.id);
-            const messages = db.getConversationMessages(conv.id, 1); // Get last message
+            const messages = db.getMessages(conv.id, 1); // Get last message
             const lastMessage = messages.length > 0 ? messages[0].content : null;
             
             return {
@@ -752,7 +752,7 @@ ipcMain.handle('chat-history:get-conversation', async (event, conversationId) =>
         const { db } = getChatHistoryServices();
         
         const conversation = db.getConversation(conversationId);
-        const messages = db.getConversationMessages(conversationId);
+        const messages = db.getMessages(conversationId);
         
         console.log(`[Main] Retrieved conversation: ${conversationId} (${messages.length} messages)`);
         return { conversation, messages };
