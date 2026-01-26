@@ -403,12 +403,26 @@ ipcMain.handle('get-backend-config', () => {
  * - Returns the selected folder path or null if cancelled
  * - The frontend is responsible for persisting this in localStorage
  */
+// Lazy-load StorageManagerService
+let storageManagerService = null;
+
+function getStorageManager() {
+  if (!storageManagerService) {
+    const StorageManagerService = require('../backend/services/StorageManagerService');
+    const defaultPath = path.join(app.getPath('userData'), 'user_data');
+    storageManagerService = new StorageManagerService(defaultPath);
+    console.log('[Main] StorageManagerService initialized');
+  }
+  return storageManagerService;
+}
+
+// Select target folder
 ipcMain.handle('select-target-folder', async () => {
   try {
     const result = await dialog.showOpenDialog(mainWindow, {
       properties: ['openDirectory', 'createDirectory'],
-      title: 'Select Target Folder for BubbleVoice Data',
-      message: 'Choose where to save your conversations and recordings',
+      title: 'Select Folder for BubbleVoice Data',
+      message: 'Choose where to save your conversations, life areas, and artifacts',
       buttonLabel: 'Select Folder'
     });
 
@@ -419,10 +433,45 @@ ipcMain.handle('select-target-folder', async () => {
     const selectedPath = result.filePaths[0];
     console.log('[Main] Target folder selected:', selectedPath);
     
+    // Update storage manager
+    const storageManager = getStorageManager();
+    await storageManager.setUserFolder(selectedPath);
+    
     return { success: true, path: selectedPath };
   } catch (error) {
     console.error('[Main] Error selecting folder:', error);
     return { success: false, error: error.message };
+  }
+});
+
+// Get current storage folder
+ipcMain.handle('storage:get-folder', async () => {
+  try {
+    const storageManager = getStorageManager();
+    await storageManager.initialize();
+    
+    return {
+      success: true,
+      path: storageManager.userSelectedPath
+    };
+  } catch (error) {
+    console.error('[Main] Error getting storage folder:', error);
+    throw error;
+  }
+});
+
+// Get storage info
+ipcMain.handle('storage:get-info', async () => {
+  try {
+    const storageManager = getStorageManager();
+    await storageManager.initialize();
+    
+    const info = await storageManager.getStorageInfo();
+    
+    return info;
+  } catch (error) {
+    console.error('[Main] Error getting storage info:', error);
+    throw error;
   }
 });
 

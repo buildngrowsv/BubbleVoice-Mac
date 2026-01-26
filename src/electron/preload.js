@@ -61,6 +61,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectTargetFolder: () => ipcRenderer.invoke('select-target-folder'),
 
   /**
+   * STORAGE MANAGEMENT API
+   * 
+   * Methods for managing the user-selected storage folder.
+   * All BubbleVoice data is stored in this folder.
+   */
+  storage: {
+    getFolder: () => ipcRenderer.invoke('storage:get-folder'),
+    getInfo: () => ipcRenderer.invoke('storage:get-info')
+  },
+
+  /**
    * PERMISSIONS MANAGEMENT
    * 
    * Methods for checking and requesting macOS system permissions.

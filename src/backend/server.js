@@ -41,6 +41,7 @@ const LLMService = require('./services/LLMService');
 const VoicePipelineService = require('./services/VoicePipelineService');
 const BubbleGeneratorService = require('./services/BubbleGeneratorService');
 const IntegrationService = require('./services/IntegrationService');
+const StorageManagerService = require('./services/StorageManagerService');
 
 // Configuration
 const PORT = process.env.PORT || 7482;
@@ -61,16 +62,17 @@ class BackendServer {
     // WebSocket server for real-time communication
     this.wss = null;
 
+    // Storage manager (NEW: manages user-selected folder)
+    // This will be initialized in init() after we know the folder path
+    this.storageManager = null;
+    this.integrationService = null;
+
     // Services
     // Each service handles a specific domain of functionality
     this.conversationService = new ConversationService();
     this.llmService = new LLMService();
     this.voicePipelineService = new VoicePipelineService(this);
     this.bubbleGeneratorService = new BubbleGeneratorService();
-    
-    // Integration service (NEW: connects all data management services)
-    const userDataDir = path.join(__dirname, '../../user_data');
-    this.integrationService = new IntegrationService(userDataDir);
 
     // Active connections
     // Maps WebSocket connections to conversation sessions
@@ -89,6 +91,20 @@ class BackendServer {
     console.log('[Backend] Initializing BubbleVoice backend...');
 
     try {
+      // Initialize storage manager
+      // This determines where all data will be stored
+      const defaultPath = path.join(__dirname, '../../user_data');
+      this.storageManager = new StorageManagerService(defaultPath);
+      const storageRoot = await this.storageManager.initialize();
+      
+      console.log(`[Backend] Storage root: ${storageRoot}`);
+      
+      // Initialize integration service with storage root
+      this.integrationService = new IntegrationService(storageRoot);
+      
+      // Wait for integration service to initialize
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       // Setup Express middleware
       this.setupExpress();
 
