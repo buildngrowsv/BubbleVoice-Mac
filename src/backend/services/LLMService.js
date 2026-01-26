@@ -313,8 +313,7 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
                 action: { type: 'string' },
                 artifact_id: { type: 'string' },
                 artifact_type: { type: 'string' },
-                html: { type: 'string' },
-                data: { type: 'object' }
+                html: { type: 'string' }
               }
             },
             html_toggle: {
