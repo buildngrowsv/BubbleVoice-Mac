@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Icon Changes Test - BubbleVoice</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+      color: white;
+      padding: 40px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 32px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    
+    .comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+    
+    .icon-section {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 30px;
+    }
+    
+    .icon-section h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .icon-display {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    
+    .icon-item {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .icon-label {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .icon-container {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .icon-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .icon-button:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+    
+    .icon-description {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      line-height: 1.5;
+    }
+    
+    .sidebar-test {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 30px;
+    }
+    
+    .sidebar-test h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .sidebar-mockup {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .sidebar-header {
+      padding: 16px;
+      padding-left: 90px; /* NEW: Extra space for traffic lights */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+    
+    .traffic-lights {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 8px;
+    }
+    
+    .traffic-light {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .traffic-light.red { background: #ff5f57; }
+    .traffic-light.yellow { background: #ffbd2e; }
+    .traffic-light.green { background: #28ca42; }
+    
+    .sidebar-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    
+    .new-chat-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 10px;
+    }
+    
+    .badge.old {
+      background: rgba(255, 59, 48, 0.2);
+      border: 1px solid rgba(255, 59, 48, 0.4);
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .badge.new {
+      background: rgba(52, 199, 89, 0.2);
+      border: 1px solid rgba(52, 199, 89, 0.4);
+      color: rgba(255, 255, 255, 0.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>BubbleVoice Icon Updates - Visual Test</h1>
+    
+    <div class="comparison">
+      <!-- OLD ICONS -->
+      <div class="icon-section">
+        <h2>❌ Old Icons (Hand-drawn, Confusing)</h2>
+        <div class="icon-display">
+          <!-- Old Settings Icon -->
+          <div class="icon-item">
+            <div class="icon-label">Settings Icon (Old)</div>
+            <div class="icon-container">
+              <button class="icon-button">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M13.5 8a5.5 5.5 0 01-.5 2.3l1.2 1.2-1.4 1.4-1.2-1.2a5.5 5.5 0 01-2.3.5v1.7h-2v-1.7a5.5 5.5 0 01-2.3-.5l-1.2 1.2-1.4-1.4 1.2-1.2A5.5 5.5 0 012.5 8v-2h1.7a5.5 5.5 0 01.5-2.3L3.5 2.5l1.4-1.4 1.2 1.2A5.5 5.5 0 018.4 2V.3h2V2a5.5 5.5 0 012.3.5l1.2-1.2 1.4 1.4-1.2 1.2a5.5 5.5 0 01.5 2.3h1.7v2h-1.8z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="icon-description">
+                Complex, looks hand-drawn with irregular paths. Too many details for a small icon.
+                <span class="badge old">Removed</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Old Pin Icon -->
+          <div class="icon-item">
+            <div class="icon-label">Always on Top Icon (Old)</div>
+            <div class="icon-container">
+              <button class="icon-button">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="4" r="2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                  <path d="M8 6v4M6 10h4M8 10v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="icon-description">
+                Pushpin metaphor is confusing. Doesn't clearly represent "always on top" concept.
+                <span class="badge old">Removed</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- NEW ICONS -->
+      <div class="icon-section">
+        <h2>✅ New Icons (Clean, Simple, Clear)</h2>
+        <div class="icon-display">
+          <!-- New Settings Icon -->
+          <div class="icon-item">
+            <div class="icon-label">Settings Icon (New)</div>
+            <div class="icon-container">
+              <button class="icon-button">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.5 3.5l1.4 1.4M11.1 11.1l1.4 1.4M3.5 12.5l1.4-1.4M11.1 4.9l1.4-1.4" 
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <div class="icon-description">
+                Simple 8-tooth gear with clean lines. Instantly recognizable as settings. Modern and polished.
+                <span class="badge new">New</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- New Layers Icon -->
+          <div class="icon-item">
+            <div class="icon-label">Always on Top Icon (New)</div>
+            <div class="icon-container">
+              <button class="icon-button">
+                <svg width="24" height="24" viewBox="0 0 16 16" fill="none">
+                  <rect x="5" y="7" width="8" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  <rect x="4" y="5" width="8" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  <rect x="3" y="3" width="8" height="6" rx="1" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+              </button>
+              <div class="icon-description">
+                Stacked layers/windows clearly represent floating on top. Simple and intuitive metaphor.
+                <span class="badge new">New</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- SIDEBAR LAYOUT FIX -->
+    <div class="sidebar-test">
+      <h2>✅ Sidebar Header Layout Fix</h2>
+      <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 20px; line-height: 1.6;">
+        Added 90px left padding to the sidebar header to prevent collision with macOS traffic lights.
+        The "Conversations" text and back button now have proper clearance.
+      </p>
+      
+      <div class="sidebar-mockup">
+        <div class="sidebar-header">
+          <!-- Simulated macOS traffic lights -->
+          <div class="traffic-lights">
+            <div class="traffic-light red"></div>
+            <div class="traffic-light yellow"></div>
+            <div class="traffic-light green"></div>
+          </div>
+          
+          <h2 class="sidebar-title">Conversations</h2>
+          <button class="new-chat-button">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <p style="color: rgba(255, 255, 255, 0.6); margin-top: 20px; font-size: 13px; line-height: 1.6;">
+        <strong>Technical Details:</strong><br>
+        • Added <code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">padding-left: 90px</code> to <code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">.sidebar-header</code><br>
+        • 70px for traffic lights + 20px margin = 90px total clearance<br>
+        • Prevents text overlap with native macOS window controls
+      </p>
+    </div>
+  </div>
+</body>
+</html>

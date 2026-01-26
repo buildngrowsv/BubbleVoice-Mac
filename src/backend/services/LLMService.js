@@ -131,9 +131,13 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
   "artifact_action": {
     "action": "create|update|none",
     "artifact_id": "unique_id",
-    "artifact_type": "stress_map|checklist|reflection_summary|goal_tracker|timeline",
-    "html": "Full HTML content with liquid glass styling",
+    "artifact_type": "comparison_card|stress_map|checklist|reflection_summary|goal_tracker|timeline|decision_matrix|progress_chart|mindmap|celebration_card",
+    "html": "Full standalone HTML with inline CSS (only when html_toggle.generate_html is true)",
     "data": { /* optional JSON data for data artifacts */ }
+  },
+  "html_toggle": {
+    "generate_html": true|false,
+    "reason": "Why HTML is/isn't needed (for debugging and optimization)"
   }
 }
 
@@ -146,10 +150,52 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
 - Tag sentiment: hopeful, concerned, anxious, excited, neutral
 
 **Artifact Guidelines:**
-- Only create artifacts when they genuinely help visualize or organize information
-- Use liquid glass styling (backdrop-filter, blur, gradients)
-- Make artifacts beautiful and marketing-polished
-- Include all necessary HTML/CSS in the artifact (self-contained)
+- **HTML Toggle System**: Control when to generate expensive HTML vs fast data-only responses
+  - **HTML OFF (default)**: Fast mode for simple updates, questions, minor corrections
+  - **HTML ON**: Visual mode for complex decisions, new artifacts, redesign requests
+- **When to Toggle HTML ON**:
+  - User explicitly requests visual ("show me", "visualize", "make a chart")
+  - Complex decision needs visualization (job, family, major life choice)
+  - First time creating artifact (user hasn't seen it yet)
+  - User requests redesign ("change layout", "show as pros/cons")
+  - High-stakes personal decision deserves beautiful visual
+- **When to Keep HTML OFF**:
+  - Simple data update ("change deadline to Thursday")
+  - User just asking questions (no artifact change)
+  - Minor corrections (user already has visual, just update data)
+  - Casual conversation (no artifact needed)
+  - Follow-up turns (don't regenerate HTML for tiny changes)
+- **Artifact Quality Standards**:
+  - Standalone HTML with ALL CSS inline (no external deps)
+  - Liquid glass styling (backdrop-filter: blur(15-20px), modern gradients)
+  - Emotionally resonant language (first-person, validates feelings)
+  - Premium typography (SF Pro Display, Inter, or system fonts)
+  - Sophisticated color palettes (purple, pink, blue, teal gradients)
+  - Smooth hover states and transitions
+  - Responsive layouts (works on different sizes)
+  - Marketing-polished quality
+- **Emotional Depth**:
+  - Use first-person language ("I can sleep well knowing...")
+  - Acknowledge emotional weight ("This is hard because...")
+  - Validate difficulty of choice
+  - Provide perspective and encouragement
+  - Add reflection sections for major decisions
+- **HTML Structure**:
+  - Complete <!DOCTYPE html> document
+  - All styles in <style> tag (no external CSS)
+  - Self-contained (no external images or fonts beyond system fonts)
+  - Accessible (semantic HTML, ARIA labels)
+- **Artifact Types**:
+  - comparison_card: Side-by-side pros/cons with emotional context
+  - stress_map: Topic breakdown with intensity visualization
+  - checklist: Actionable items with progress tracking
+  - reflection_summary: Journey recap with timeline and insights
+  - goal_tracker: Progress visualization with milestones
+  - timeline: Events over time with emotional markers
+  - decision_matrix: Weighted scoring grid with priorities
+  - progress_chart: Metrics over time with trends
+  - mindmap: Connected concepts with relationships
+  - celebration_card: Achievement recognition with encouragement
 
 **Important:**
 - ALWAYS respond with ONLY valid JSON (no markdown, no code blocks, no extra text)
@@ -158,6 +204,7 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
 - Keep responses conversational and natural
 - Reference past conversations when relevant (context provided)
 - Be warm and supportive, like a thoughtful friend
+- Include html_toggle field to control HTML generation
 
 **Example Response:**
 {"response":"I hear you're worried about Emma's reading. That must be stressful. Tell me more about what you've noticed at home?","area_actions":[{"action":"create_area","area_path":"Family/Emma_School","name":"Emma's School","description":"Tracking Emma's reading progress and school challenges"},{"action":"append_entry","area_path":"Family/Emma_School","document":"reading_comprehension.md","content":"Emma (2nd grade) struggling with reading comprehension. Can decode but doesn't retain.","user_quote":"Her teacher said she can decode words but doesn't remember what she reads.","ai_observation":"Specific diagnosis from teacher. Comprehension issue, not decoding.","sentiment":"concerned"}],"artifact_action":{"action":"none"},"bubbles":["what helps her focus?","teacher's suggestions?","how does she feel?"]}`;
@@ -263,7 +310,18 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
             artifact_action: {
               type: 'object',
               properties: {
-                action: { type: 'string' }
+                action: { type: 'string' },
+                artifact_id: { type: 'string' },
+                artifact_type: { type: 'string' },
+                html: { type: 'string' },
+                data: { type: 'object' }
+              }
+            },
+            html_toggle: {
+              type: 'object',
+              properties: {
+                generate_html: { type: 'boolean' },
+                reason: { type: 'string' }
               }
             }
           },
