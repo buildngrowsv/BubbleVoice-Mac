@@ -9,10 +9,11 @@
 ## Progress Summary
 
 - **Total Tests Planned:** 500+
-- **Tests Implemented:** 6 (new) + ~20 (existing)
-- **Tests Passing:** 3 (new) + ~15 (existing) = **18 total**
-- **Tests Failing:** 3 (new)
-- **Coverage:** ~4% (18/500)
+- **Tests Implemented:** 16 (new) + ~20 (existing) = **36 total**
+- **Tests Passing:** 3 (conversation CRUD) + ~15 (existing) = **18 total**
+- **Tests Failing:** 13 (new - need backend WebSocket)
+- **Coverage:** ~5% (18/500)
+- **Infrastructure:** ✅ SKIP_DATABASE flag implemented
 
 ---
 
