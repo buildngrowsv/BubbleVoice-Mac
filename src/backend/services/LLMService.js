@@ -282,7 +282,7 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
         temperature: settings?.temperature || 0.7,
         topP: 0.95,
         topK: 40,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 8192, // Increased for HTML artifacts (was 2048)
         responseMimeType: 'application/json',
         responseSchema: {
           type: 'object',

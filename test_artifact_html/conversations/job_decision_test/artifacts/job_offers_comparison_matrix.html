@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Offer Comparison</title>
+    <style>
+        body {
+            font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background: linear-gradient(135deg, rgba(17, 15, 19, 1) 0%, rgba(50, 45, 57, 1) 100%);
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .comparison-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 900px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #c7a1ff;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 0 4px 15px rgba(199, 161, 255, 0.4);
+        }
+        .matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .header, .cell {
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .header {
+            background-color: rgba(199, 161, 255, 0.15);
+            color: #c7a1ff;
+            font-size: 1.1em;
+        }
+        .cell {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .criterion {
+            text-align: left;
+            font-weight: bold;
+            color: #a0a0a0;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .job-a {
+            font-weight: bold;
+            color: #64b5f6; /* Google Blue */
+        }
+        .job-b {
+            font-weight: bold;
+            color: #ff8a65; /* Startup Orange */
+        }
+        .subtle-text {
+            font-size: 0.85em;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #fff;
+        }
+        .details {
+             font-size: 0.9em;
+             color: #ccc;
+             margin-top: 8px;
+        }
+        .family-consideration {
+            font-style: italic;
+            color: #9fa8da;
+            font-size: 0.9em;
+        }
+        .reflection {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(199, 161, 255, 0.08);
+            border-radius: 10px;
+            border-left: 5px solid #c7a1ff;
+        }
+        .reflection h2 {
+            color: #c7a1ff;
+            margin-top: 0;
+            font-size: 1.6em;
+        }
+        .reflection p {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="comparison-container">
+        <h1>Job Offer Comparison</h1>
+        <div class="matrix">
+            <div class="header"></div>
+            <div class="header job-a">Job A: Google</div>
+            <div class="header job-b">Job B: Startup</div>
+
+            <div class="cell criterion">Salary</div>
+            <div class="cell job-a">$190,000</div>
+            <div class="cell job-b">$140,000 + Equity</div>
+
+            <div class="cell criterion">Work Hours</div>
+            <div class="cell job-a">~60 hrs/week</div>
+            <div class="cell job-b">Flexible / Better Work-Life Balance</div>
+
+            <div class="cell criterion">Stability</div>
+            <div class="cell job-a">High (Stable)</div>
+            <div class="cell job-b">Lower (Risky)</div>
+
+            <div class="cell criterion">Excitement Factor</div>
+            <div class="cell job-a">Lower (Boring)</div>
+            <div class="cell job-b">High (Exciting)</div>
+
+            <div class="cell criterion">Location</div>
+            <div class="cell job-a">Relocate to SF</div>
+            <div class="cell job-b">Remote</div>
+
+            <div class="cell criterion">Family Impact</div>
+            <div class="cell job-a"><span class="family-consideration">Requires major relocation, potentially disruptive. Long hours may limit family time.</span></div>
+            <div class="cell job-b"><span class="family-consideration">Remote work allows more family presence. Better work-life balance supports family needs. Equity is a long-term potential gain.</span></div>
+        </div>
+
+        <div class="reflection">
+            <h2>Considering Your Family</h2>
+            <p>This decision involves more than just salary and job title. Think about what your family needs right now. The startup's remote flexibility and better work-life balance could be incredibly valuable for spending time with your kids, even with a lower base salary. On the other hand, the stability and higher income from Google could offer a different kind of security, though the relocation and demanding hours present significant challenges for family life. The potential upside of startup equity is also a factor to weigh against the guaranteed higher pay of Google.</p>
+        </div>
+    </div>
+</body>
+</html>
