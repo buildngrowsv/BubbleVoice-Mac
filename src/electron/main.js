@@ -241,7 +241,9 @@ function startBackendServer() {
       ...process.env,
       PORT: BACKEND_PORT,
       WEBSOCKET_PORT: WEBSOCKET_PORT,
-      NODE_ENV: isDev ? 'development' : 'production'
+      NODE_ENV: isDev ? 'development' : 'production',
+      // Pass SKIP_DATABASE flag to backend for tests
+      SKIP_DATABASE: process.env.SKIP_DATABASE || 'false'
     },
     stdio: isDev ? 'inherit' : 'pipe'
   });

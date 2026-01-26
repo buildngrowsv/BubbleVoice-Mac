@@ -40,7 +40,7 @@ test.describe('Conversation Frontend (No Backend Required)', () => {
         const window = await app.getMainWindow();
 
         // Verify main UI elements exist
-        await expect(window.locator('#user-input')).toBeVisible();
+        await expect(window.locator('#input-field')).toBeVisible();
         await expect(window.locator('#send-button')).toBeVisible();
         await expect(window.locator('#voice-button')).toBeVisible();
         await expect(window.locator('#settings-button')).toBeVisible();
@@ -57,15 +57,15 @@ test.describe('Conversation Frontend (No Backend Required)', () => {
     test('should accept text input in message field', async () => {
         const window = await app.getMainWindow();
 
-        const inputField = window.locator('#user-input');
+        const inputField = window.locator('#input-field');
         const testText = 'This is a test message';
 
         // Type in input field
         await inputField.click();
         await inputField.fill(testText);
 
-        // Verify text appears
-        const inputValue = await inputField.inputValue();
+        // Verify text appears (contenteditable uses textContent not inputValue)
+        const inputValue = await inputField.textContent();
         expect(inputValue).toBe(testText);
 
         // Take screenshot
@@ -80,7 +80,7 @@ test.describe('Conversation Frontend (No Backend Required)', () => {
     test('should enable send button when input has text', async () => {
         const window = await app.getMainWindow();
 
-        const inputField = window.locator('#user-input');
+        const inputField = window.locator('#input-field');
         const sendButton = window.locator('#send-button');
 
         // Initially, button might be disabled (check implementation)
@@ -107,7 +107,7 @@ test.describe('Conversation Frontend (No Backend Required)', () => {
     test('should clear input field', async () => {
         const window = await app.getMainWindow();
 
-        const inputField = window.locator('#user-input');
+        const inputField = window.locator('#input-field');
 
         // Type text
         await inputField.click();
@@ -116,8 +116,8 @@ test.describe('Conversation Frontend (No Backend Required)', () => {
         // Clear it
         await inputField.clear();
 
-        // Verify empty
-        const inputValue = await inputField.inputValue();
+        // Verify empty (contenteditable uses textContent)
+        const inputValue = await inputField.textContent();
         expect(inputValue).toBe('');
     });
 
@@ -221,7 +221,7 @@ test.describe('Conversation Frontend (No Backend Required)', () => {
     test('should handle rapid input changes', async () => {
         const window = await app.getMainWindow();
 
-        const inputField = window.locator('#user-input');
+        const inputField = window.locator('#input-field');
 
         // Type, clear, type again
         await inputField.click();
@@ -235,8 +235,8 @@ test.describe('Conversation Frontend (No Backend Required)', () => {
         await inputField.clear();
         await inputField.fill('Third message');
 
-        // Verify final value
-        const finalValue = await inputField.inputValue();
+        // Verify final value (contenteditable uses textContent)
+        const finalValue = await inputField.textContent();
         expect(finalValue).toBe('Third message');
     });
 
@@ -247,7 +247,7 @@ test.describe('Conversation Frontend (No Backend Required)', () => {
         const window = await app.getMainWindow();
 
         // Perform multiple interactions
-        const inputField = window.locator('#user-input');
+        const inputField = window.locator('#input-field');
         const settingsButton = window.locator('#settings-button');
 
         // Type
@@ -266,8 +266,8 @@ test.describe('Conversation Frontend (No Backend Required)', () => {
         await inputField.click();
         await inputField.fill('Still responsive');
 
-        // Verify input still works
-        const value = await inputField.inputValue();
+        // Verify input still works (contenteditable uses textContent)
+        const value = await inputField.textContent();
         expect(value).toBe('Still responsive');
 
         // Take screenshot

@@ -88,7 +88,7 @@ test.describe('Conversation CRUD Operations', () => {
 
         // Type and send message
         const testMessage = 'Test message in new conversation';
-        const inputField = window.locator('#user-input');
+        const inputField = window.locator('#input-field');
         await inputField.click();
         await inputField.fill(testMessage);
 
@@ -243,17 +243,17 @@ test.describe('Conversation CRUD Operations', () => {
         await window.locator('#new-conversation-btn').click();
         await window.waitForTimeout(500);
 
-        const message1 = 'Message in conversation 1';
-        await window.locator('#user-input').fill(message1);
-        await window.locator('#send-button').click();
-        await window.waitForTimeout(1000);
+            const message1 = 'Message in conversation 1';
+            await window.locator('#input-field').fill(message1);
+            await window.locator('#send-button').click();
+            await window.waitForTimeout(1000);
 
-        // Create second conversation and send different message
-        await window.locator('#new-conversation-btn').click();
-        await window.waitForTimeout(500);
+            // Create second conversation and send different message
+            await window.locator('#new-conversation-btn').click();
+            await window.waitForTimeout(500);
 
-        const message2 = 'Message in conversation 2';
-        await window.locator('#user-input').fill(message2);
+            const message2 = 'Message in conversation 2';
+            await window.locator('#input-field').fill(message2);
         await window.locator('#send-button').click();
         await window.waitForTimeout(1000);
 
