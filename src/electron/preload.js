@@ -138,6 +138,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   /**
+   * CHAT HISTORY API
+   * 
+   * Methods for managing conversation history.
+   * Provides access to conversation list, switching, and management.
+   */
+  chatHistory: {
+    getConversations: () => ipcRenderer.invoke('chat-history:get-conversations'),
+    createConversation: (title) => ipcRenderer.invoke('chat-history:create-conversation', title),
+    deleteConversation: (id) => ipcRenderer.invoke('chat-history:delete-conversation', id),
+    updateConversationTitle: (id, title) => ipcRenderer.invoke('chat-history:update-title', { id, title }),
+    getConversation: (id) => ipcRenderer.invoke('chat-history:get-conversation', id),
+    exportConversations: () => ipcRenderer.invoke('chat-history:export-conversations')
+  },
+
+  /**
    * ADMIN PANEL API
    * 
    * Methods for the admin panel to manage prompts and configuration.

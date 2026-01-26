@@ -32,6 +32,7 @@ class BubbleVoiceApp {
     this.voiceController = null;
     this.websocketClient = null;
     this.chatSidebar = null;
+    this.chatHistorySidebar = null;
     this.lifeAreasSidebar = null;
     this.adminPanel = null;
 
@@ -97,6 +98,23 @@ class BubbleVoiceApp {
       this.websocketClient = new WebSocketClient(backendConfig.websocketUrl, this);
       this.chatSidebar = new ChatSidebar();
       
+      // Initialize chat history sidebar
+      this.chatHistorySidebar = new ChatHistorySidebar();
+      document.body.insertBefore(this.chatHistorySidebar.element, document.body.firstChild);
+      console.log('[App] Chat history sidebar initialized');
+      
+      // Setup chat history event listeners
+      this.chatHistorySidebar.element.addEventListener('conversation-switched', async (e) => {
+        await this.loadConversation(e.detail.id);
+      });
+      
+      this.chatHistorySidebar.element.addEventListener('conversation-created', async (e) => {
+        await this.loadConversation(e.detail.id);
+      });
+      
+      // Load conversations
+      await this.chatHistorySidebar.loadConversations();
+
       // Initialize life areas sidebar
       this.lifeAreasSidebar = new LifeAreasSidebar();
       const sidebarContainer = document.getElementById('life-areas-sidebar-container');
@@ -568,6 +586,51 @@ class BubbleVoiceApp {
 
       this.elements.bubblesContainer.appendChild(bubble);
     });
+  }
+
+  /**
+   * LOAD CONVERSATION
+   * 
+   * Loads a conversation from history and displays it.
+   * 
+   * @param {string} conversationId - Conversation ID to load
+   */
+  async loadConversation(conversationId) {
+    try {
+      console.log(`[App] Loading conversation: ${conversationId}`);
+      
+      // Get conversation data from backend
+      const { conversation, messages } = await window.electronAPI.chatHistory.getConversation(conversationId);
+      
+      // Clear current messages
+      this.conversationManager.clearMessages();
+      
+      // Load messages into conversation manager
+      messages.forEach(msg => {
+        this.conversationManager.addMessage({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp
+        });
+      });
+      
+      // Update state
+      this.state.currentConversationId = conversationId;
+      
+      // Update chat history sidebar
+      this.chatHistorySidebar.setCurrentConversation(conversationId);
+      
+      // Hide welcome state
+      if (this.elements.welcomeState) {
+        this.elements.welcomeState.style.display = 'none';
+      }
+      
+      console.log(`[App] Loaded ${messages.length} messages`);
+      
+    } catch (error) {
+      console.error('[App] Failed to load conversation:', error);
+      this.showError('Failed to load conversation');
+    }
   }
 
   /**

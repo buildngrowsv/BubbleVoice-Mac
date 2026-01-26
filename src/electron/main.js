@@ -578,6 +578,170 @@ ipcMain.handle('create-life-area', async (event, { areaPath, name, description }
 });
 
 /**
+ * CHAT HISTORY IPC HANDLERS
+ * 
+ * Provides access to conversation history for the chat history sidebar.
+ * These handlers allow the frontend to list, create, delete, and switch conversations.
+ * 
+ * ARCHITECTURE NOTE:
+ * We use the same DatabaseService and ConversationStorageService that the
+ * backend server uses. They share the same user_data directory.
+ */
+
+// Lazy-load services for chat history
+let databaseService = null;
+let conversationStorageService = null;
+
+function getChatHistoryServices() {
+    if (!databaseService) {
+        const DatabaseService = require('../backend/services/DatabaseService');
+        const ConversationStorageService = require('../backend/services/ConversationStorageService');
+        
+        const userDataPath = path.join(app.getPath('userData'), 'user_data');
+        const dbPath = path.join(userDataPath, 'bubblevoice.db');
+        const conversationsDir = path.join(userDataPath, 'conversations');
+        
+        databaseService = new DatabaseService(dbPath);
+        databaseService.initialize();
+        
+        conversationStorageService = new ConversationStorageService(databaseService, conversationsDir);
+        
+        console.log('[Main] Chat history services initialized');
+    }
+    
+    return { db: databaseService, storage: conversationStorageService };
+}
+
+// Get all conversations
+ipcMain.handle('chat-history:get-conversations', async () => {
+    try {
+        const { db } = getChatHistoryServices();
+        const conversations = db.getAllConversations();
+        
+        // Enrich with message count and last message
+        const enriched = conversations.map(conv => {
+            const messageCount = db.getMessageCount(conv.id);
+            const messages = db.getConversationMessages(conv.id, 1); // Get last message
+            const lastMessage = messages.length > 0 ? messages[0].content : null;
+            
+            return {
+                ...conv,
+                message_count: messageCount,
+                lastMessage: lastMessage
+            };
+        });
+        
+        console.log(`[Main] Retrieved ${enriched.length} conversations`);
+        return enriched;
+    } catch (error) {
+        console.error('[Main] Error getting conversations:', error);
+        throw error;
+    }
+});
+
+// Create new conversation
+ipcMain.handle('chat-history:create-conversation', async (event, title) => {
+    try {
+        const { storage } = getChatHistoryServices();
+        
+        const conversationId = `conv_${Date.now()}`;
+        const conversationTitle = title || 'New Conversation';
+        
+        const result = await storage.createConversation(conversationId, conversationTitle);
+        
+        console.log(`[Main] Created conversation: ${conversationId}`);
+        return { success: true, id: conversationId, title: conversationTitle };
+    } catch (error) {
+        console.error('[Main] Error creating conversation:', error);
+        throw error;
+    }
+});
+
+// Delete conversation
+ipcMain.handle('chat-history:delete-conversation', async (event, conversationId) => {
+    try {
+        const { db, storage } = getChatHistoryServices();
+        
+        // Delete from database
+        db.deleteConversation(conversationId);
+        
+        // Delete conversation folder
+        const fs = require('fs');
+        const conversationsDir = path.join(app.getPath('userData'), 'user_data', 'conversations');
+        const convDir = path.join(conversationsDir, conversationId);
+        
+        if (fs.existsSync(convDir)) {
+            fs.rmSync(convDir, { recursive: true, force: true });
+        }
+        
+        console.log(`[Main] Deleted conversation: ${conversationId}`);
+        return { success: true };
+    } catch (error) {
+        console.error('[Main] Error deleting conversation:', error);
+        throw error;
+    }
+});
+
+// Update conversation title
+ipcMain.handle('chat-history:update-title', async (event, { id, title }) => {
+    try {
+        const { db } = getChatHistoryServices();
+        
+        db.updateConversation(id, { title });
+        
+        console.log(`[Main] Updated conversation title: ${id}`);
+        return { success: true };
+    } catch (error) {
+        console.error('[Main] Error updating conversation title:', error);
+        throw error;
+    }
+});
+
+// Get conversation details
+ipcMain.handle('chat-history:get-conversation', async (event, conversationId) => {
+    try {
+        const { db } = getChatHistoryServices();
+        
+        const conversation = db.getConversation(conversationId);
+        const messages = db.getConversationMessages(conversationId);
+        
+        console.log(`[Main] Retrieved conversation: ${conversationId} (${messages.length} messages)`);
+        return { conversation, messages };
+    } catch (error) {
+        console.error('[Main] Error getting conversation:', error);
+        throw error;
+    }
+});
+
+// Export conversations
+ipcMain.handle('chat-history:export-conversations', async () => {
+    try {
+        const { dialog } = require('electron');
+        
+        // Ask user where to save
+        const result = await dialog.showSaveDialog(mainWindow, {
+            title: 'Export Conversations',
+            defaultPath: `bubblevoice-export-${Date.now()}.zip`,
+            filters: [
+                { name: 'ZIP Archive', extensions: ['zip'] }
+            ]
+        });
+        
+        if (result.canceled) {
+            return { success: false, canceled: true };
+        }
+        
+        // TODO: Implement ZIP export
+        console.log(`[Main] Export conversations to: ${result.filePath}`);
+        
+        return { success: true, path: result.filePath };
+    } catch (error) {
+        console.error('[Main] Error exporting conversations:', error);
+        throw error;
+    }
+});
+
+/**
  * ADMIN PANEL IPC HANDLERS
  * 
  * Provides access to the PromptManagementService for the admin panel UI.
