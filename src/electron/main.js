@@ -645,17 +645,102 @@ let conversationStorageService = null;
 
 function getChatHistoryServices() {
     if (!databaseService) {
-        const DatabaseService = require('../backend/services/DatabaseService');
-        const ConversationStorageService = require('../backend/services/ConversationStorageService');
+        // Check if we should use mock storage for tests
+        const skipDatabase = process.env.SKIP_DATABASE === 'true';
         
-        const userDataPath = path.join(app.getPath('userData'), 'user_data');
-        const dbPath = path.join(userDataPath, 'bubblevoice.db');
-        const conversationsDir = path.join(userDataPath, 'conversations');
-        
-        databaseService = new DatabaseService(dbPath);
-        databaseService.initialize();
-        
-        conversationStorageService = new ConversationStorageService(databaseService, conversationsDir);
+        if (skipDatabase) {
+            console.log('[Main] ⚠️  SKIP_DATABASE=true - Using mock storage (shared with backend)');
+            
+            // Import IntegrationService to access MOCK_STORAGE
+            const IntegrationService = require('../backend/services/IntegrationService');
+            
+            // Create mock database service
+            databaseService = {
+                getAllConversations: () => {
+                    // Access the global MOCK_STORAGE from IntegrationService
+                    const mockStorage = require('../backend/services/IntegrationService').MOCK_STORAGE;
+                    if (mockStorage && mockStorage.conversations) {
+                        return Array.from(mockStorage.conversations.values());
+                    }
+                    return [];
+                },
+                getConversation: (convId) => {
+                    const mockStorage = require('../backend/services/IntegrationService').MOCK_STORAGE;
+                    if (mockStorage && mockStorage.conversations) {
+                        return mockStorage.conversations.get(convId) || null;
+                    }
+                    return null;
+                },
+                getMessageCount: (convId) => {
+                    const mockStorage = require('../backend/services/IntegrationService').MOCK_STORAGE;
+                    if (mockStorage && mockStorage.conversations) {
+                        const conv = mockStorage.conversations.get(convId);
+                        return conv ? conv.messages.length : 0;
+                    }
+                    return 0;
+                },
+                getMessages: (convId, limit) => {
+                    const mockStorage = require('../backend/services/IntegrationService').MOCK_STORAGE;
+                    if (mockStorage && mockStorage.conversations) {
+                        const conv = mockStorage.conversations.get(convId);
+                        if (conv && conv.messages) {
+                            return limit ? conv.messages.slice(-limit) : conv.messages;
+                        }
+                    }
+                    return [];
+                },
+                deleteConversation: (convId) => {
+                    const mockStorage = require('../backend/services/IntegrationService').MOCK_STORAGE;
+                    if (mockStorage && mockStorage.conversations) {
+                        mockStorage.conversations.delete(convId);
+                        console.log(`[Main MockDB] Deleted conversation ${convId}, remaining: ${mockStorage.conversations.size}`);
+                    }
+                },
+                updateConversation: (convId, updates) => {
+                    const mockStorage = require('../backend/services/IntegrationService').MOCK_STORAGE;
+                    if (mockStorage && mockStorage.conversations) {
+                        const conv = mockStorage.conversations.get(convId);
+                        if (conv) {
+                            Object.assign(conv, updates);
+                            console.log(`[Main MockDB] Updated conversation ${convId}`);
+                        }
+                    }
+                }
+            };
+            
+            // Create mock conversation storage service
+            conversationStorageService = {
+                createConversation: async (id, title) => {
+                    const mockStorage = require('../backend/services/IntegrationService').MOCK_STORAGE;
+                    if (!mockStorage.conversations) {
+                        mockStorage.conversations = new Map();
+                    }
+                    const conv = {
+                        id: id || 'conv-' + Date.now(),
+                        title: title || 'New Conversation',
+                        messages: [],
+                        createdAt: new Date().toISOString()
+                    };
+                    mockStorage.conversations.set(conv.id, conv);
+                    console.log(`[Main MockStorage] Created conversation ${conv.id}, total: ${mockStorage.conversations.size}`);
+                    return conv;
+                }
+            };
+            
+        } else {
+            // Normal initialization with real database
+            const DatabaseService = require('../backend/services/DatabaseService');
+            const ConversationStorageService = require('../backend/services/ConversationStorageService');
+            
+            const userDataPath = path.join(app.getPath('userData'), 'user_data');
+            const dbPath = path.join(userDataPath, 'bubblevoice.db');
+            const conversationsDir = path.join(userDataPath, 'conversations');
+            
+            databaseService = new DatabaseService(dbPath);
+            databaseService.initialize();
+            
+            conversationStorageService = new ConversationStorageService(databaseService, conversationsDir);
+        }
         
         console.log('[Main] Chat history services initialized');
     }

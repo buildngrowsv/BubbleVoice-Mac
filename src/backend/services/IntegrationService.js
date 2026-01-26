@@ -27,6 +27,28 @@
 const path = require('path');
 
 /**
+ * GLOBAL MOCK STORAGE FOR TESTS
+ * 
+ * When SKIP_DATABASE=true, we use in-memory storage that persists
+ * across IntegrationService instances. This is critical for tests
+ * because the backend server creates one instance, but we need
+ * conversations to persist across IPC calls.
+ * 
+ * WHY GLOBAL:
+ * - Each IntegrationService instance would get its own Map
+ * - IPC calls might create new instances
+ * - Tests need conversations to persist
+ * 
+ * STRUCTURE:
+ * - conversations: Map<id, {id, title, messages[], createdAt}>
+ * - messages: Stored in conversation.messages array
+ */
+const MOCK_STORAGE = {
+    conversations: new Map(),
+    initialized: false
+};
+
+/**
  * IntegrationService Class
  * 
  * Coordinates all data management services with LLM conversation flow.
@@ -53,7 +75,12 @@ class IntegrationService {
         const skipDatabase = process.env.SKIP_DATABASE === 'true';
         
         if (skipDatabase) {
-            console.log('[IntegrationService] ⚠️  SKIP_DATABASE=true - Using mock storage for tests');
+            console.log('[IntegrationService] ⚠️  SKIP_DATABASE=true - Using global mock storage for tests');
+            
+            if (!MOCK_STORAGE.initialized) {
+                console.log('[IntegrationService] Initializing global mock storage');
+                MOCK_STORAGE.initialized = true;
+            }
             
             // Create mock database service
             this.db = {
@@ -62,21 +89,63 @@ class IntegrationService {
                 close: () => {}
             };
             
-            // Create mock conversation storage
-            const mockConversations = new Map();
+            // Create mock conversation storage using GLOBAL storage
             this.convStorage = {
                 createConversation: async (id, title) => {
-                    const conv = { id: id || 'conv-' + Date.now(), title: title || 'New Conversation', messages: [], createdAt: new Date().toISOString() };
-                    mockConversations.set(conv.id, conv);
+                    const convId = id || 'conv-' + Date.now();
+                    const conv = { 
+                        id: convId, 
+                        title: title || 'New Conversation', 
+                        messages: [], 
+                        createdAt: new Date().toISOString() 
+                    };
+                    MOCK_STORAGE.conversations.set(convId, conv);
+                    console.log(`[MockStorage] Created conversation ${convId}, total: ${MOCK_STORAGE.conversations.size}`);
                     return conv;
                 },
-                getConversations: async () => Array.from(mockConversations.values()),
-                getConversation: async (id) => mockConversations.get(id) || null,
-                deleteConversation: async (id) => mockConversations.delete(id),
+                getConversations: async () => {
+                    const convs = Array.from(MOCK_STORAGE.conversations.values());
+                    console.log(`[MockStorage] Getting ${convs.length} conversations`);
+                    return convs;
+                },
+                getConversation: async (id) => {
+                    const conv = MOCK_STORAGE.conversations.get(id);
+                    console.log(`[MockStorage] Getting conversation ${id}: ${conv ? 'found' : 'not found'}`);
+                    return conv || null;
+                },
+                deleteConversation: async (id) => {
+                    const result = MOCK_STORAGE.conversations.delete(id);
+                    console.log(`[MockStorage] Deleted conversation ${id}: ${result}, remaining: ${MOCK_STORAGE.conversations.size}`);
+                    return result;
+                },
                 updateConversationTitle: async (id, title) => {
-                    const conv = mockConversations.get(id);
-                    if (conv) conv.title = title;
+                    const conv = MOCK_STORAGE.conversations.get(id);
+                    if (conv) {
+                        conv.title = title;
+                        console.log(`[MockStorage] Updated conversation ${id} title to "${title}"`);
+                    }
                     return conv;
+                },
+                // Add message to conversation
+                addMessage: async (conversationId, message) => {
+                    const conv = MOCK_STORAGE.conversations.get(conversationId);
+                    if (conv) {
+                        conv.messages.push(message);
+                        console.log(`[MockStorage] Added message to ${conversationId}, total messages: ${conv.messages.length}`);
+                        return message;
+                    }
+                    console.log(`[MockStorage] ERROR: Cannot add message, conversation ${conversationId} not found`);
+                    return null;
+                },
+                // Get messages for conversation
+                getMessages: async (conversationId) => {
+                    const conv = MOCK_STORAGE.conversations.get(conversationId);
+                    if (conv) {
+                        console.log(`[MockStorage] Getting ${conv.messages.length} messages for ${conversationId}`);
+                        return conv.messages;
+                    }
+                    console.log(`[MockStorage] ERROR: Cannot get messages, conversation ${conversationId} not found`);
+                    return [];
                 }
             };
             
@@ -464,3 +533,4 @@ class IntegrationService {
 }
 
 module.exports = IntegrationService;
+module.exports.MOCK_STORAGE = MOCK_STORAGE; // Export for Electron main process
