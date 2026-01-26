@@ -105,6 +105,21 @@ locator.click: Target page, context or browser has been closed
 **Result:** Tests can now interact with UI  
 **Commit:** 8a6ed67
 
+### ✅ Fix 3: SKIP_DATABASE Not Passed to Backend
+
+**Error:** Backend still trying to use database despite SKIP_DATABASE set  
+**Solution:** Added SKIP_DATABASE to spawned backend process env vars  
+**Result:** Backend starts with mock storage in 1.2s  
+**Commit:** a4ef04f
+
+### ✅ Fix 4: Wrong Input Field Selector
+
+**Error:** Tests timing out trying to find #user-input  
+**Solution:** Changed to #input-field (actual HTML ID)  
+**Also:** Changed inputValue() to textContent() for contenteditable  
+**Result:** Tests run without crashing, can interact with input  
+**Commit:** a4ef04f
+
 ---
 
 ## Root Cause Found: better-sqlite3 Version Conflict
