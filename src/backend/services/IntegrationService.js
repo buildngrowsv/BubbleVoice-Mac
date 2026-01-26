@@ -49,24 +49,64 @@ class IntegrationService {
         const VectorStoreService = require('./VectorStoreService');
         const ContextAssemblyService = require('./ContextAssemblyService');
         
-        // Initialize database
-        const dbPath = path.join(userDataDir, 'bubblevoice.db');
-        this.db = new DatabaseService(dbPath);
-        this.db.initialize();
+        // Initialize database (skip if SKIP_DATABASE is set for tests)
+        const skipDatabase = process.env.SKIP_DATABASE === 'true';
         
-        // Initialize services
-        const conversationsDir = path.join(userDataDir, 'conversations');
-        
-        this.areaManager = new AreaManagerService(this.db, userDataDir);
-        this.convStorage = new ConversationStorageService(this.db, conversationsDir);
-        this.artifactManager = new ArtifactManagerService(this.db, conversationsDir);
-        this.embeddingService = new EmbeddingService();
-        this.vectorStore = new VectorStoreService(this.db, this.embeddingService);
-        this.contextAssembly = new ContextAssemblyService(
-            this.vectorStore,
-            this.areaManager,
-            this.convStorage
-        );
+        if (skipDatabase) {
+            console.log('[IntegrationService] ⚠️  SKIP_DATABASE=true - Using mock storage for tests');
+            
+            // Create mock database service
+            this.db = {
+                db: null,
+                initialize: () => {},
+                close: () => {}
+            };
+            
+            // Create mock conversation storage
+            const mockConversations = new Map();
+            this.convStorage = {
+                createConversation: async (id, title) => {
+                    const conv = { id: id || 'conv-' + Date.now(), title: title || 'New Conversation', messages: [], createdAt: new Date().toISOString() };
+                    mockConversations.set(conv.id, conv);
+                    return conv;
+                },
+                getConversations: async () => Array.from(mockConversations.values()),
+                getConversation: async (id) => mockConversations.get(id) || null,
+                deleteConversation: async (id) => mockConversations.delete(id),
+                updateConversationTitle: async (id, title) => {
+                    const conv = mockConversations.get(id);
+                    if (conv) conv.title = title;
+                    return conv;
+                }
+            };
+            
+            // Create mock services
+            this.areaManager = { initializeLifeAreas: async () => {}, processAreaActions: async () => [] };
+            this.artifactManager = { saveArtifact: async () => {}, getArtifact: async () => null };
+            this.embeddingService = { initialize: async () => {}, generateEmbedding: async () => [] };
+            this.vectorStore = { initialize: async () => {}, addDocument: async () => {} };
+            this.contextAssembly = { assembleContext: async () => ({ relevantMemories: [], activeAreas: [] }) };
+            
+        } else {
+            // Normal initialization with real database
+            const dbPath = path.join(userDataDir, 'bubblevoice.db');
+            this.db = new DatabaseService(dbPath);
+            this.db.initialize();
+            
+            // Initialize services
+            const conversationsDir = path.join(userDataDir, 'conversations');
+            
+            this.areaManager = new AreaManagerService(this.db, userDataDir);
+            this.convStorage = new ConversationStorageService(this.db, conversationsDir);
+            this.artifactManager = new ArtifactManagerService(this.db, conversationsDir);
+            this.embeddingService = new EmbeddingService();
+            this.vectorStore = new VectorStoreService(this.db, this.embeddingService);
+            this.contextAssembly = new ContextAssemblyService(
+                this.vectorStore,
+                this.areaManager,
+                this.convStorage
+            );
+        }
         
         // Initialize async components
         this.initializeAsync();

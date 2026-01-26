@@ -185,6 +185,7 @@ class ElectronAppHelper {
         env: {
           ...process.env,
           NODE_ENV: 'test',
+          SKIP_DATABASE: 'true', // Skip database to avoid better-sqlite3 version issues
           ELECTRON_IS_DEV: '0', // Treat as production for cleaner test runs
           PORT: BACKEND_PORT.toString(),
           WEBSOCKET_PORT: WEBSOCKET_PORT.toString(),
