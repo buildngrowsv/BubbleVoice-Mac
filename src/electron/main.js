@@ -833,6 +833,26 @@ ipcMain.handle('chat-history:update-title', async (event, { id, title }) => {
     }
 });
 
+// TEST HELPER: Reset mock storage (only works when SKIP_DATABASE=true)
+ipcMain.handle('test:reset-storage', async () => {
+    try {
+        if (process.env.SKIP_DATABASE === 'true') {
+            console.log('[Main] Resetting MOCK_STORAGE for tests');
+            const { MOCK_STORAGE } = require('../backend/services/IntegrationService');
+            if (MOCK_STORAGE && MOCK_STORAGE.reset) {
+                MOCK_STORAGE.reset();
+                console.log('[Main] MOCK_STORAGE reset complete');
+                return { success: true, message: 'Storage reset' };
+            }
+            return { success: false, message: 'MOCK_STORAGE.reset not available' };
+        }
+        return { success: false, message: 'Not in test mode (SKIP_DATABASE not set)' };
+    } catch (error) {
+        console.error('[Main] Error resetting storage:', error);
+        return { success: false, message: error.message };
+    }
+});
+
 // Get conversation details
 ipcMain.handle('chat-history:get-conversation', async (event, conversationId) => {
     try {

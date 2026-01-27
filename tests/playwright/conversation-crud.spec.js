@@ -31,6 +31,17 @@ test.describe('Conversation CRUD Operations', () => {
     test.beforeEach(async () => {
         app = new ElectronAppHelper();
         await app.launch();
+        
+        // Reset mock storage to ensure clean state between tests
+        const window = await app.getMainWindow();
+        try {
+            const result = await window.evaluate(() => {
+                return window.electronAPI.test.resetStorage();
+            });
+            console.log('[Test] Storage reset:', result);
+        } catch (error) {
+            console.log('[Test] Could not reset storage (may not be in test mode):', error.message);
+        }
     });
 
     test.afterEach(async () => {

@@ -164,6 +164,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
 
   /**
+   * TEST HELPERS
+   * 
+   * Methods for Playwright tests to reset state between test runs.
+   * Only available when SKIP_DATABASE=true.
+   */
+  test: {
+    resetStorage: () => ipcRenderer.invoke('test:reset-storage')
+  },
+
+  /**
    * ADMIN PANEL API
    * 
    * Methods for the admin panel to manage prompts and configuration.
