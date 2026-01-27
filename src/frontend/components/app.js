@@ -546,8 +546,8 @@ class BubbleVoiceApp {
       this.displayBubbles(data.bubbles);
     }
 
-    // Handle artifacts if present
-    if (data.artifact) {
+    // Handle artifacts if present (must have type property)
+    if (data.artifact && data.artifact.type) {
       this.conversationManager.addArtifact(data.artifact);
     }
 

@@ -455,10 +455,11 @@ class WebSocketClient {
     this.app.conversationManager.endStreamingMessage();
     
     // Handle bubbles and artifacts if present
-    if (data.bubbles) {
+    if (data.bubbles && data.bubbles.length > 0) {
       this.handleBubbles(data.bubbles);
     }
-    if (data.artifact) {
+    // Only handle artifact if it has required properties (type and content)
+    if (data.artifact && data.artifact.type) {
       this.handleArtifact(data.artifact);
     }
     if (data.audioUrl) {
