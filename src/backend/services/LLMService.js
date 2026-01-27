@@ -556,6 +556,11 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
    * in the model config (see generateGeminiResponse), NOT as a user message.
    * This prevents the system prompt from being sent twice.
    * 
+   * CRITICAL FIX (2026-01-27): Now includes artifact context.
+   * The AI needs to know what artifact is currently displayed to decide
+   * whether to edit vs create. Without this context, AI always creates
+   * new artifacts (0% update rate documented in COMPREHENSIVE_EVALUATION.md).
+   * 
    * IMPORTANT: Gemini alternates between 'user' and 'model' roles.
    * We need to ensure proper alternation and combine consecutive messages
    * from the same role if needed.
@@ -570,6 +575,40 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
     // WHY: System prompt is now passed via systemInstruction in model config
     // BECAUSE: Passing it twice wastes tokens and could confuse the model
     // HISTORY: Bug discovered 2026-01-24 - system prompt was being sent twice
+    
+    // ARTIFACT CONTEXT INJECTION (2026-01-27)
+    // If there's a current artifact displayed, prepend context so AI knows
+    // what artifact exists and can decide to edit vs create
+    if (conversation.currentArtifact) {
+      const artifact = conversation.currentArtifact;
+      const artifactContext = `[CURRENT ARTIFACT DISPLAYED]
+Artifact ID: ${artifact.artifact_id}
+Type: ${artifact.artifact_type}
+Content Summary: ${artifact.html_summary || 'No content summary'}
+${artifact.data ? `Data: ${JSON.stringify(artifact.data)}` : ''}
+
+IMPORTANT: When the user asks to modify, change, update, or edit something about this artifact:
+- Use action: "update" with the SAME artifact_id
+- Only regenerate the parts that need to change
+- Preserve the overall structure and other content
+- Do NOT create a new artifact unless user explicitly asks for something completely different
+
+[END ARTIFACT CONTEXT]
+
+`;
+      contents.push({
+        role: 'user',
+        parts: [{ text: artifactContext }]
+      });
+      
+      // Add a model acknowledgment to maintain alternation
+      contents.push({
+        role: 'model',
+        parts: [{ text: 'I see the current artifact. I will edit it if the user wants modifications, rather than creating a new one.' }]
+      });
+      
+      console.log('[LLMService] Injected artifact context:', artifact.artifact_id, artifact.artifact_type);
+    }
     
     // Track current message being built (for combining consecutive same-role messages)
     let currentRole = null;

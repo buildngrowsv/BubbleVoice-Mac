@@ -585,6 +585,22 @@ class BackendServer {
           action: artifact.action
         });
         responseData.artifact = artifact;
+        
+        // CRITICAL FIX (2026-01-27): Track artifact in conversation state
+        // WHY: Without this, AI has no visibility into what artifact is displayed
+        // BECAUSE: This was causing 0% artifact update rate - AI always created
+        // new artifacts instead of editing existing ones. User says "change dreams
+        // to potatoes" and AI creates entirely new diagram.
+        // 
+        // Now the conversation tracks currentArtifact, which is included in the
+        // prompt context for the LLM, enabling proper edit vs create decisions.
+        try {
+          await this.conversationService.setCurrentArtifact(conversation.id, artifact);
+          console.log('[Backend] ✅ Artifact tracked in conversation state');
+        } catch (trackError) {
+          console.error('[Backend] Failed to track artifact:', trackError);
+          // Non-fatal - continue even if tracking fails
+        }
       } else {
         console.log('[Backend] No artifact in response');
       }

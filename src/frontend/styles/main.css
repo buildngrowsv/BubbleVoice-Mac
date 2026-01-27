@@ -49,6 +49,29 @@ button, input, select, textarea, [contenteditable] {
 }
 
 /**
+ * SCROLL CONTAINERS - Must be non-draggable for scrolling to work
+ * 
+ * CRITICAL FIX (2026-01-27):
+ * In Electron, elements inherit -webkit-app-region: drag from body.
+ * This makes the entire window draggable BUT prevents mouse scroll
+ * from working in those areas. Any element that needs to scroll
+ * must explicitly be set to no-drag.
+ * 
+ * WHY: User couldn't scroll the chat messages - mouse wheel did nothing
+ * BECAUSE: The .messages div inherited drag region from body
+ * HISTORY: Bug discovered via user screenshot showing unscrollable chat
+ */
+.messages,
+.conversations-list,
+.areas-list,
+.settings-content,
+.bubbles-container,
+.artifact-content,
+.admin-panel-body {
+  -webkit-app-region: no-drag;
+}
+
+/**
  * TITLE BAR
  * 
  * Custom title bar for frameless window.
