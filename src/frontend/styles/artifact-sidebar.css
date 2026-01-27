@@ -57,6 +57,7 @@
     z-index: 1100;
     
     /* Prevent text selection during animations */
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -144,6 +145,7 @@
 /* Prevent text selection while resizing */
 body.artifact-sidebar-resizing {
     cursor: ew-resize !important;
+    -webkit-user-select: none !important;
     user-select: none !important;
 }
 
