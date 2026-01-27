@@ -484,8 +484,36 @@ class WebSocketClient {
     }
   }
 
+  /**
+   * HANDLE ARTIFACT
+   * 
+   * Routes artifacts to the dedicated artifact sidebar instead of
+   * rendering them inline with messages.
+   * 
+   * DESIGN FIX (2026-01-27):
+   * Previously, artifacts were rendered inline in the conversation area.
+   * This caused visual confusion when artifact HTML contained sidebar-like
+   * UI elements (headers, buttons, etc.) - making it look like there were
+   * two sidebars on screen.
+   * 
+   * Now artifacts are displayed in a dedicated sidebar panel on the right
+   * side of the screen, clearly separated from the conversation flow.
+   * This matches the PRODUCT_INTENT.md design where artifacts appear in
+   * a "center panel" while "conversation continues in right panel".
+   * 
+   * @param {Object} data - Artifact data from backend
+   */
   handleArtifact(data) {
-    this.app.conversationManager.addArtifact(data);
+    console.log('[WebSocketClient] Routing artifact to sidebar:', data.artifact_type || data.type);
+    
+    // Route to artifact sidebar (not inline in conversation)
+    if (this.app.artifactSidebar) {
+      this.app.artifactSidebar.showArtifact(data);
+    } else {
+      // Fallback to inline if sidebar not available
+      console.warn('[WebSocketClient] Artifact sidebar not available, falling back to inline');
+      this.app.conversationManager.addArtifact(data);
+    }
   }
 
   handleError(data) {

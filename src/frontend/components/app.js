@@ -34,6 +34,7 @@ class BubbleVoiceApp {
     this.chatSidebar = null;
     this.chatHistorySidebar = null;
     this.lifeAreasSidebar = null;
+    this.artifactSidebar = null;  // Sidebar for displaying artifacts (not inline)
     this.adminPanel = null;
 
     // DOM element references
@@ -121,6 +122,15 @@ class BubbleVoiceApp {
       if (sidebarContainer) {
         sidebarContainer.appendChild(this.lifeAreasSidebar.element);
       }
+
+      // Initialize artifact sidebar
+      // DESIGN FIX (2026-01-27): Artifacts now display in a dedicated sidebar
+      // instead of inline with messages. This prevents visual confusion when
+      // artifact HTML contains sidebar-like UI elements.
+      // Per PRODUCT_INTENT.md: artifacts should appear in "center panel"
+      // while "conversation continues in right panel"
+      this.artifactSidebar = new ArtifactSidebar();
+      console.log('[App] Artifact sidebar initialized');
 
       // Initialize admin panel
       this.adminPanel = new AdminPanel();

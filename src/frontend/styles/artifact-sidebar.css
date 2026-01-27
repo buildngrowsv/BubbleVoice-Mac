@@ -1,0 +1,471 @@
+/**
+ * ARTIFACT SIDEBAR STYLES
+ * 
+ * Styles for the dedicated artifact sidebar panel.
+ * Displays artifacts in a separate panel from the conversation,
+ * preventing visual confusion when artifact HTML contains sidebar-like elements.
+ * 
+ * LAYOUT:
+ * - Fixed position on the right side of the window
+ * - Slides in/out with smooth animation
+ * - Can be minimized to a thin strip
+ * - Responsive width based on viewport
+ * 
+ * DESIGN:
+ * - Liquid glass styling consistent with app
+ * - Clear visual separation from conversation
+ * - Smooth animations for all state changes
+ * - Accessible with keyboard navigation
+ * 
+ * Created: 2026-01-27
+ * Fixes: Duplicate sidebar appearance issue
+ */
+
+/* ===================================================================
+   MAIN SIDEBAR CONTAINER
+   =================================================================== */
+
+.artifact-sidebar {
+    /* Fixed positioning on right side */
+    position: fixed;
+    top: 44px; /* Below title bar */
+    right: 0;
+    width: 420px;
+    height: calc(100% - 44px);
+    
+    /* Initially hidden off-screen */
+    transform: translateX(100%);
+    
+    /* Liquid glass effect */
+    background: rgba(30, 30, 50, 0.85);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+    
+    /* Layout */
+    display: flex;
+    flex-direction: column;
+    
+    /* Animation */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Layer above other content */
+    z-index: 900;
+    
+    /* Prevent text selection during animations */
+    user-select: none;
+}
+
+/* Open state - slides in */
+.artifact-sidebar.open {
+    transform: translateX(0);
+}
+
+/* Minimized state - thin strip on right edge */
+.artifact-sidebar.minimized {
+    width: 48px;
+    transform: translateX(0);
+}
+
+.artifact-sidebar.minimized .artifact-sidebar-content,
+.artifact-sidebar.minimized .artifact-sidebar-toolbar,
+.artifact-sidebar.minimized .artifact-sidebar-history,
+.artifact-sidebar.minimized .artifact-sidebar-name,
+.artifact-sidebar.minimized .artifact-sidebar-type {
+    display: none;
+}
+
+.artifact-sidebar.minimized .artifact-sidebar-header {
+    flex-direction: column;
+    padding: 12px 8px;
+    gap: 12px;
+}
+
+.artifact-sidebar.minimized .artifact-sidebar-title {
+    flex-direction: column;
+}
+
+.artifact-sidebar.minimized .artifact-sidebar-icon {
+    font-size: 24px;
+}
+
+/* ===================================================================
+   HEADER
+   =================================================================== */
+
+.artifact-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.artifact-sidebar-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.artifact-sidebar-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.artifact-sidebar-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: -0.2px;
+}
+
+.artifact-sidebar-type {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(102, 126, 234, 0.3);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.artifact-sidebar-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.artifact-sidebar-button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.artifact-sidebar-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.artifact-sidebar-button:active {
+    transform: translateY(0);
+}
+
+/* ===================================================================
+   CONTENT AREA
+   =================================================================== */
+
+.artifact-sidebar-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* Empty state */
+.artifact-empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+}
+
+.artifact-empty-state .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.6;
+}
+
+.artifact-empty-state .empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+}
+
+.artifact-empty-state .empty-subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.5;
+    max-width: 280px;
+}
+
+/* Iframe for artifact content */
+.artifact-sidebar-iframe {
+    width: 100%;
+    flex: 1;
+    border: none;
+    background: white;
+    border-radius: 0;
+    min-height: 300px;
+}
+
+/* ===================================================================
+   TOOLBAR
+   =================================================================== */
+
+.artifact-sidebar-toolbar {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.artifact-toolbar-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.artifact-toolbar-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.artifact-toolbar-btn:active {
+    transform: translateY(0);
+}
+
+.artifact-toolbar-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* ===================================================================
+   HISTORY STRIP
+   =================================================================== */
+
+.artifact-sidebar-history {
+    display: none; /* Hidden by default, shown when multiple artifacts */
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-x: auto;
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* Hide scrollbar but keep functionality */
+.artifact-sidebar-history::-webkit-scrollbar {
+    height: 4px;
+}
+
+.artifact-sidebar-history::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.artifact-sidebar-history::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.history-item {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.history-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+.history-item.active {
+    background: rgba(102, 126, 234, 0.3);
+    border-color: rgba(102, 126, 234, 0.5);
+}
+
+.history-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+/* ===================================================================
+   BODY LAYOUT ADJUSTMENTS
+   =================================================================== */
+
+/**
+ * When artifact sidebar is open, shrink the main content area
+ * to make room for the sidebar without overlapping.
+ * 
+ * This ensures a clean three-column layout:
+ * - Left: Conversation history sidebar
+ * - Center: Active conversation
+ * - Right: Artifact sidebar
+ */
+body.artifact-sidebar-open .main-container {
+    margin-right: 420px;
+    transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.artifact-sidebar-open .settings-panel {
+    /* Move settings panel left to avoid conflict with artifact sidebar */
+    right: 420px;
+}
+
+/* ===================================================================
+   RESPONSIVE ADJUSTMENTS
+   =================================================================== */
+
+@media (max-width: 1200px) {
+    .artifact-sidebar {
+        width: 360px;
+    }
+    
+    body.artifact-sidebar-open .main-container {
+        margin-right: 360px;
+    }
+    
+    body.artifact-sidebar-open .settings-panel {
+        right: 360px;
+    }
+}
+
+@media (max-width: 900px) {
+    /* On smaller screens, overlay instead of pushing content */
+    .artifact-sidebar {
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    body.artifact-sidebar-open .main-container {
+        margin-right: 0;
+    }
+    
+    body.artifact-sidebar-open .settings-panel {
+        right: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Full width on mobile */
+    .artifact-sidebar {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .artifact-sidebar-toolbar {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* ===================================================================
+   ANIMATIONS
+   =================================================================== */
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* ===================================================================
+   ACCESSIBILITY
+   =================================================================== */
+
+.artifact-sidebar:focus-within {
+    outline: 2px solid rgba(102, 126, 234, 0.6);
+    outline-offset: -2px;
+}
+
+.artifact-sidebar-button:focus,
+.artifact-toolbar-btn:focus,
+.history-item:focus {
+    outline: 2px solid rgba(102, 126, 234, 0.6);
+    outline-offset: 2px;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .artifact-sidebar {
+        transition: none;
+    }
+    
+    body.artifact-sidebar-open .main-container {
+        transition: none;
+    }
+}
+
+/* ===================================================================
+   PRINT STYLES
+   =================================================================== */
+
+@media print {
+    .artifact-sidebar {
+        position: static;
+        width: 100%;
+        transform: none;
+        box-shadow: none;
+        page-break-before: always;
+    }
+    
+    .artifact-sidebar-header,
+    .artifact-sidebar-toolbar,
+    .artifact-sidebar-history {
+        display: none;
+    }
+    
+    .artifact-sidebar-iframe {
+        min-height: auto;
+        height: auto;
+    }
+}
