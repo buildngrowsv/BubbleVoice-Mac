@@ -45,7 +45,12 @@ const path = require('path');
  */
 const MOCK_STORAGE = {
     conversations: new Map(),
-    initialized: false
+    initialized: false,
+    reset: function() {
+        this.conversations.clear();
+        this.initialized = false;
+        console.log('[MOCK_STORAGE] Reset - all conversations cleared');
+    }
 };
 
 /**

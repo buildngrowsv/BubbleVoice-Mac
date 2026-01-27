@@ -191,32 +191,35 @@ test.describe('Conversation CRUD Operations', () => {
     test('should delete conversation', async () => {
         const window = await app.getMainWindow();
 
-        // Create a new conversation
+        // Create TWO conversations so we can delete one without it being recreated
+        await window.locator('#new-conversation-btn').click();
+        await window.waitForTimeout(500);
         await window.locator('#new-conversation-btn').click();
         await window.waitForTimeout(500);
 
         const initialCount = await window.locator('.conversation-item').count();
 
-        // Find delete button (might be in conversation item)
-        const firstConversation = window.locator('.conversation-item').first();
+        // Switch to first conversation (make it NOT active)
+        await window.locator('.conversation-item').first().click();
+        await window.waitForTimeout(300);
+
+        // Now delete the SECOND conversation (which is not active)
+        const secondConversation = window.locator('.conversation-item').nth(1);
         
         // Hover to show delete button
-        await firstConversation.hover();
+        await secondConversation.hover();
         await window.waitForTimeout(300);
 
         // Click delete button
-        const deleteButton = firstConversation.locator('.delete-conversation');
+        const deleteButton = secondConversation.locator('.delete-conversation');
         if (await deleteButton.isVisible()) {
+            // Accept the confirmation dialog that will appear
+            window.on('dialog', dialog => dialog.accept());
+            
             await deleteButton.click();
-            await window.waitForTimeout(300);
-
-            // Handle confirmation dialog if it appears
-            // Note: This depends on implementation - might need adjustment
-            const confirmButton = window.locator('button:has-text("Delete"), button:has-text("Confirm")');
-            if (await confirmButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-                await confirmButton.click();
-                await window.waitForTimeout(500);
-            }
+            
+            // Wait for delete operation and UI refresh
+            await window.waitForTimeout(1000);
 
             // Verify conversation count decreased
             const finalCount = await window.locator('.conversation-item').count();
