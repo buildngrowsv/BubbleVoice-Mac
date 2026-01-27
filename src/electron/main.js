@@ -236,14 +236,20 @@ function startBackendServer() {
   
   console.log('[Main] Starting backend server...');
   
+  // IMPORTANT: In development mode, we skip the database to avoid
+  // native module version conflicts between Electron's Node.js and
+  // system Node.js. Both need different versions of better-sqlite3.
+  // In production, the app is packaged with the correct version.
+  const skipDatabase = isDev || process.env.SKIP_DATABASE === 'true';
+  
   backendProcess = spawn('node', [backendPath], {
     env: {
       ...process.env,
       PORT: BACKEND_PORT,
       WEBSOCKET_PORT: WEBSOCKET_PORT,
       NODE_ENV: isDev ? 'development' : 'production',
-      // Pass SKIP_DATABASE flag to backend for tests
-      SKIP_DATABASE: process.env.SKIP_DATABASE || 'false'
+      // Skip database in dev mode to avoid native module conflicts
+      SKIP_DATABASE: skipDatabase ? 'true' : 'false'
     },
     stdio: isDev ? 'inherit' : 'pipe'
   });
@@ -645,11 +651,15 @@ let conversationStorageService = null;
 
 function getChatHistoryServices() {
     if (!databaseService) {
-        // Check if we should use mock storage for tests
-        const skipDatabase = process.env.SKIP_DATABASE === 'true';
+        // IMPORTANT: In development mode, we skip the real database to avoid
+        // native module version conflicts. Electron uses its own Node.js version
+        // which is different from system Node.js. The better-sqlite3 native module
+        // can only be compiled for ONE version at a time, causing conflicts.
+        // In production, the app is packaged with the correct version.
+        const skipDatabase = isDev || process.env.SKIP_DATABASE === 'true';
         
         if (skipDatabase) {
-            console.log('[Main] ⚠️  SKIP_DATABASE=true - Using mock storage (shared with backend)');
+            console.log('[Main] ⚠️  DEV MODE or SKIP_DATABASE=true - Using mock storage');
             
             // Import IntegrationService to access MOCK_STORAGE
             const IntegrationService = require('../backend/services/IntegrationService');
@@ -833,11 +843,12 @@ ipcMain.handle('chat-history:update-title', async (event, { id, title }) => {
     }
 });
 
-// TEST HELPER: Reset mock storage (only works when SKIP_DATABASE=true)
+// TEST HELPER: Reset mock storage (works in dev mode or when SKIP_DATABASE=true)
 ipcMain.handle('test:reset-storage', async () => {
     try {
-        if (process.env.SKIP_DATABASE === 'true') {
-            console.log('[Main] Resetting MOCK_STORAGE for tests');
+        const skipDatabase = isDev || process.env.SKIP_DATABASE === 'true';
+        if (skipDatabase) {
+            console.log('[Main] Resetting MOCK_STORAGE');
             const { MOCK_STORAGE } = require('../backend/services/IntegrationService');
             if (MOCK_STORAGE && MOCK_STORAGE.reset) {
                 MOCK_STORAGE.reset();
@@ -846,7 +857,7 @@ ipcMain.handle('test:reset-storage', async () => {
             }
             return { success: false, message: 'MOCK_STORAGE.reset not available' };
         }
-        return { success: false, message: 'Not in test mode (SKIP_DATABASE not set)' };
+        return { success: false, message: 'Not in dev/test mode' };
     } catch (error) {
         console.error('[Main] Error resetting storage:', error);
         return { success: false, message: error.message };
