@@ -576,8 +576,17 @@ class BackendServer {
       };
       
       // Only add artifact if it's defined and not null
+      // LOGGING: Track when artifacts are sent to frontend
       if (artifact) {
+        console.log('[Backend] ✨ Artifact to send:', {
+          artifact_type: artifact.artifact_type,
+          has_html: !!artifact.html,
+          html_length: artifact.html ? artifact.html.length : 0,
+          action: artifact.action
+        });
         responseData.artifact = artifact;
+      } else {
+        console.log('[Backend] No artifact in response');
       }
       
       this.sendMessage(ws, {

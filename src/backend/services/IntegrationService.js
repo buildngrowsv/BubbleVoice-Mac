@@ -154,9 +154,85 @@ class IntegrationService {
                 }
             };
             
-            // Create mock services
-            this.areaManager = { initializeLifeAreas: async () => {}, processAreaActions: async () => [] };
-            this.artifactManager = { saveArtifact: async () => {}, getArtifact: async () => null };
+            // Create mock services with functional implementations
+            // IMPORTANT: These need all methods that executeAreaAction and artifact processing call
+            // Otherwise artifacts and areas won't work in dev mode (SKIP_DATABASE=true)
+            
+            // Mock area manager - stores areas in memory
+            // Methods called by executeAreaAction: createArea, appendEntry, updateAreaSummary
+            this.areaManager = {
+                areas: new Map(), // In-memory storage
+                entries: new Map(),
+                initializeLifeAreas: async () => {
+                    console.log('[MockAreaManager] Life areas initialized');
+                },
+                processAreaActions: async () => [],
+                createArea: async (areaPath, name, description = '', initialDocuments = []) => {
+                    console.log(`[MockAreaManager] Creating area: ${areaPath}`);
+                    const area = { areaPath, name, description, initialDocuments, createdAt: new Date().toISOString() };
+                    this.areaManager.areas.set(areaPath, area);
+                    return area;
+                },
+                appendEntry: async (areaPath, document, entryData) => {
+                    console.log(`[MockAreaManager] Appending entry to ${areaPath}/${document}`);
+                    const entryId = `entry_${Date.now()}`;
+                    const entry = { entryId, areaPath, document, ...entryData };
+                    const key = `${areaPath}/${document}`;
+                    if (!this.areaManager.entries.has(key)) {
+                        this.areaManager.entries.set(key, []);
+                    }
+                    this.areaManager.entries.get(key).unshift(entry); // Newest first
+                    return entry;
+                },
+                updateAreaSummary: async (areaPath, updates) => {
+                    console.log(`[MockAreaManager] Updating summary for ${areaPath}`);
+                    const area = this.areaManager.areas.get(areaPath);
+                    if (area) {
+                        Object.assign(area, updates);
+                    }
+                    return area;
+                },
+                generateAreasTree: async () => {
+                    return Array.from(this.areaManager.areas.keys()).join('\n');
+                }
+            };
+            
+            // Mock artifact manager - stores artifacts in memory and returns proper structure
+            // Methods called: saveArtifact, getArtifact
+            this.artifactManager = {
+                artifacts: new Map(), // In-memory storage
+                saveArtifact: async (conversationId, artifactAction, turnNumber) => {
+                    console.log(`[MockArtifactManager] Saving artifact: ${artifactAction.artifact_type}`);
+                    // Generate artifact ID if not provided (matching real implementation)
+                    const artifactId = artifactAction.artifact_id || 
+                        `${artifactAction.artifact_type || 'artifact'}_${Date.now()}`;
+                    const artifact = {
+                        artifact_id: artifactId,
+                        conversation_id: conversationId,
+                        artifact_type: artifactAction.artifact_type,
+                        html: artifactAction.html || null,
+                        data: artifactAction.data || null,
+                        turn_number: turnNumber,
+                        created_at: new Date().toISOString()
+                    };
+                    this.artifactManager.artifacts.set(artifactId, artifact);
+                    console.log(`[MockArtifactManager] ✅ Saved artifact: ${artifactId}`);
+                    return artifact;
+                },
+                getArtifact: async (artifactId) => {
+                    return this.artifactManager.artifacts.get(artifactId) || null;
+                },
+                getArtifactsByConversation: (conversationId) => {
+                    const results = [];
+                    for (const artifact of this.artifactManager.artifacts.values()) {
+                        if (artifact.conversation_id === conversationId) {
+                            results.push(artifact);
+                        }
+                    }
+                    return results;
+                }
+            };
+            
             this.embeddingService = { initialize: async () => {}, generateEmbedding: async () => [] };
             this.vectorStore = { initialize: async () => {}, addDocument: async () => {} };
             this.contextAssembly = { assembleContext: async () => ({ relevantMemories: [], activeAreas: [] }) };

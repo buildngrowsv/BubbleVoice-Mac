@@ -458,9 +458,17 @@ class WebSocketClient {
     if (data.bubbles && data.bubbles.length > 0) {
       this.handleBubbles(data.bubbles);
     }
-    // Only handle artifact if it has required properties (type and content)
-    if (data.artifact && data.artifact.type) {
-      this.handleArtifact(data.artifact);
+    // Only handle artifact if it has required properties
+    // IMPORTANT: LLM generates artifact_type (snake_case) but we also accept type for flexibility
+    // The artifact must have either type or artifact_type AND either html or content
+    if (data.artifact && (data.artifact.type || data.artifact.artifact_type)) {
+      // Normalize the artifact format - convert artifact_type to type if needed
+      const normalizedArtifact = {
+        ...data.artifact,
+        type: data.artifact.type || data.artifact.artifact_type,
+        content: data.artifact.content || data.artifact.html || ''
+      };
+      this.handleArtifact(normalizedArtifact);
     }
     if (data.audioUrl) {
       this.app.voiceController.playAudio(data.audioUrl);

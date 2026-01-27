@@ -381,8 +381,17 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
       }
 
       // Send artifact
-      if (structuredOutput.artifact_action && callbacks.onArtifact) {
-        callbacks.onArtifact(structuredOutput.artifact_action);
+      // LOGGING: Track artifact generation from LLM
+      if (structuredOutput.artifact_action) {
+        console.log('[LLMService] ✨ Artifact action from LLM:', {
+          action: structuredOutput.artifact_action.action,
+          artifact_type: structuredOutput.artifact_action.artifact_type,
+          has_html: !!structuredOutput.artifact_action.html,
+          html_length: structuredOutput.artifact_action.html?.length || 0
+        });
+        if (callbacks.onArtifact) {
+          callbacks.onArtifact(structuredOutput.artifact_action);
+        }
       }
 
       // Send area actions (NEW: for integration service)
