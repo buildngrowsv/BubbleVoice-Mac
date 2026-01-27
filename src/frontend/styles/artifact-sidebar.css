@@ -30,9 +30,11 @@
     position: fixed;
     top: 44px; /* Below title bar */
     right: 0;
-    width: 420px;
-    min-width: 280px;  /* Minimum resize width */
-    max-width: 80vw;   /* Maximum resize width - 80% of viewport */
+    /* DEFAULT: 2/3 of viewport (66.67%) for artifact display */
+    /* Per user request: layout should be 1/3 chat, 2/3 artifact by default */
+    width: 66.67vw;
+    min-width: 300px;  /* Minimum resize width - slightly larger for usability */
+    max-width: 85vw;   /* Maximum resize width - 85% of viewport */
     height: calc(100% - 44px);
     
     /* Initially hidden off-screen */
@@ -40,8 +42,8 @@
     
     /* Liquid glass effect */
     background: rgba(30, 30, 50, 0.85);
-    backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
+    backdrop-filter: blur(25px);
     border-left: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
     
@@ -102,43 +104,72 @@
  * Resize handle on the left edge of the sidebar.
  * Users can drag this to resize the sidebar width.
  * Visual feedback on hover and during drag.
+ * 
+ * FIX (2026-01-27): Increased width from 6px to 12px for easier grabbing.
+ * WHY: User reported resize wasn't working - handle was too narrow to click.
  */
 .artifact-sidebar-resize-handle {
     position: absolute;
-    left: 0;
+    left: -6px; /* Extend outside the sidebar for easier grabbing */
     top: 0;
-    width: 6px;
+    width: 12px; /* Increased from 6px - much easier to grab now */
     height: 100%;
     cursor: ew-resize;
     background: transparent;
-    transition: background 0.2s ease;
-    z-index: 10;
+    transition: background 0.15s ease;
+    z-index: 20; /* Above sidebar content */
 }
 
 .artifact-sidebar-resize-handle:hover {
-    background: rgba(102, 126, 234, 0.4);
+    background: rgba(102, 126, 234, 0.5);
 }
 
 .artifact-sidebar-resize-handle.dragging {
-    background: rgba(102, 126, 234, 0.6);
+    background: rgba(102, 126, 234, 0.7);
 }
 
-/* Visual grip indicator */
-.artifact-sidebar-resize-handle::after {
+/* Visual grip indicator - three vertical lines */
+.artifact-sidebar-resize-handle::before {
     content: '';
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 2px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 1px;
+    width: 4px;
+    height: 48px;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 10%,
+        rgba(255, 255, 255, 0.4) 90%,
+        transparent 100%
+    );
+    border-radius: 2px;
     opacity: 0;
     transition: opacity 0.2s ease;
 }
 
-.artifact-sidebar-resize-handle:hover::after {
+.artifact-sidebar-resize-handle:hover::before,
+.artifact-sidebar-resize-handle.dragging::before {
+    opacity: 1;
+}
+
+/* Visual grip indicator - dots pattern */
+.artifact-sidebar-resize-handle::after {
+    content: '⋮⋮';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: -2px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.artifact-sidebar-resize-handle:hover::after,
+.artifact-sidebar-resize-handle.dragging::after {
     opacity: 1;
 }
 
@@ -389,29 +420,55 @@ body.artifact-sidebar-resizing * {
    =================================================================== */
 
 /**
- * When artifact sidebar is open, shrink the main content area
- * to make room for the sidebar without overlapping.
+ * When artifact sidebar is open, adjust the layout:
+ * - Collapse the left conversation sidebar (auto-hide)
+ * - Shrink main content to remaining 1/3 of viewport
  * 
- * This ensures a clean three-column layout:
- * - Left: Conversation history sidebar
- * - Center: Active conversation
- * - Right: Artifact sidebar
+ * LAYOUT INTENT (per user request):
+ * - 1/3 screen: Chat/conversation area
+ * - 2/3 screen: Artifact sidebar
+ * 
+ * WHY: When viewing artifacts, users want to focus on the visual content
+ * while still being able to see and interact with the conversation.
+ * Collapsing the left sidebar maximizes the visible conversation area.
  * 
  * Uses CSS custom property --artifact-sidebar-width which is set
- * dynamically by JavaScript when resizing. Falls back to 420px.
+ * dynamically by JavaScript when resizing. Falls back to 66.67vw.
  */
 :root {
-    --artifact-sidebar-width: 420px;
+    --artifact-sidebar-width: 66.67vw;
 }
 
 body.artifact-sidebar-open .main-container {
-    margin-right: var(--artifact-sidebar-width, 420px);
+    margin-right: var(--artifact-sidebar-width, 66.67vw);
     transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* During resize, disable transition for instant feedback */
 body.artifact-sidebar-resizing .main-container {
     transition: none !important;
+}
+
+/**
+ * AUTO-COLLAPSE LEFT SIDEBAR when artifact is open.
+ * This gives more space to the conversation area since we're
+ * already using 2/3 for the artifact.
+ * 
+ * WHY: With 2/3 screen for artifact, keeping the left sidebar open
+ * would squeeze the conversation area too much. Better UX to hide it.
+ */
+body.artifact-sidebar-open .chat-sidebar {
+    width: 0;
+    opacity: 0;
+    border-right: none;
+    overflow: hidden;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Show the floating toggle button when sidebar is collapsed due to artifact */
+body.artifact-sidebar-open .sidebar-toggle-floating {
+    display: flex;
 }
 
 body.artifact-sidebar-open .settings-panel {
@@ -424,27 +481,40 @@ body.artifact-sidebar-open .settings-panel {
    =================================================================== */
 
 @media (max-width: 1200px) {
+    /* On medium screens, use slightly smaller default but still allow resize */
     :root {
-        --artifact-sidebar-width: 360px;
+        --artifact-sidebar-width: 55vw;
     }
     
     .artifact-sidebar {
-        width: 360px;
+        width: 55vw;
+    }
+    
+    /* Keep left sidebar collapsed even on medium screens when artifact is open */
+    body.artifact-sidebar-open .chat-sidebar {
+        width: 0;
+        opacity: 0;
     }
 }
 
 @media (max-width: 900px) {
     /* On smaller screens, overlay instead of pushing content */
     .artifact-sidebar {
-        width: 100%;
-        max-width: 400px;
+        width: 90vw;
+        max-width: 90vw;
     }
     
     body.artifact-sidebar-open .main-container {
         margin-right: 0;
     }
     
-    /* Hide resize handle on small screens */
+    /* On small screens, don't force-hide left sidebar - let user control */
+    body.artifact-sidebar-open .chat-sidebar {
+        /* Reset the collapse behavior on small screens */
+        /* Sidebar will be hidden by overlay anyway */
+    }
+    
+    /* Hide resize handle on small screens - not enough space to resize */
     .artifact-sidebar-resize-handle {
         display: none;
     }

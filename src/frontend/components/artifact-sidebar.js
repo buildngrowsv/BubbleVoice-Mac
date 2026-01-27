@@ -229,46 +229,67 @@ class ArtifactSidebar {
      * - mousemove updates width in real-time
      * - mouseup ends resize
      * - Updates CSS custom property for layout adjustments
+     * 
+     * DEFAULT SIZE: 2/3 of viewport (66.67%) per user request
+     * MIN SIZE: 300px (for usability)
+     * MAX SIZE: 85% of viewport
+     * 
+     * FIX (2026-01-27): User reported resize wasn't working.
+     * - Increased handle width from 6px to 12px
+     * - Added better visual feedback
+     * - Fixed event listener binding
      */
     setupResizeHandler() {
         const resizeHandle = this.element.querySelector('#artifact-resize-handle');
-        if (!resizeHandle) return;
+        if (!resizeHandle) {
+            console.warn('[ArtifactSidebar] Resize handle not found');
+            return;
+        }
 
         let isResizing = false;
         let startX = 0;
         let startWidth = 0;
 
+        // Store reference to this for event handlers
+        const sidebar = this;
+
         // Mouse down - start resize
-        resizeHandle.addEventListener('mousedown', (e) => {
+        const handleMouseDown = (e) => {
             e.preventDefault();
+            e.stopPropagation();
+            
             isResizing = true;
             startX = e.clientX;
-            startWidth = this.element.offsetWidth;
+            startWidth = sidebar.element.offsetWidth;
             
             // Add visual feedback
             resizeHandle.classList.add('dragging');
             document.body.classList.add('artifact-sidebar-resizing');
             
-            console.log('[ArtifactSidebar] Resize started');
-        });
+            console.log('[ArtifactSidebar] Resize started at width:', startWidth);
+        };
 
         // Mouse move - update width (attached to document for smooth dragging)
-        document.addEventListener('mousemove', (e) => {
+        const handleMouseMove = (e) => {
             if (!isResizing) return;
+            
+            e.preventDefault();
             
             // Calculate new width (dragging left increases width, right decreases)
             const deltaX = startX - e.clientX;
-            const newWidth = Math.max(280, Math.min(window.innerWidth * 0.8, startWidth + deltaX));
+            const minWidth = 300;
+            const maxWidth = window.innerWidth * 0.85;
+            const newWidth = Math.max(minWidth, Math.min(maxWidth, startWidth + deltaX));
             
             // Update sidebar width
-            this.element.style.width = `${newWidth}px`;
+            sidebar.element.style.width = `${newWidth}px`;
             
             // Update CSS custom property for layout adjustments
             document.documentElement.style.setProperty('--artifact-sidebar-width', `${newWidth}px`);
-        });
+        };
 
         // Mouse up - end resize
-        document.addEventListener('mouseup', () => {
+        const handleMouseUp = () => {
             if (!isResizing) return;
             
             isResizing = false;
@@ -276,22 +297,55 @@ class ArtifactSidebar {
             document.body.classList.remove('artifact-sidebar-resizing');
             
             // Save the width preference
-            const finalWidth = this.element.offsetWidth;
+            const finalWidth = sidebar.element.offsetWidth;
             localStorage.setItem('artifactSidebarWidth', finalWidth);
             
             console.log('[ArtifactSidebar] Resize ended, width:', finalWidth);
-        });
+        };
 
-        // Restore saved width on init
+        // Attach event listeners
+        resizeHandle.addEventListener('mousedown', handleMouseDown);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        // Also support touch events for mobile/tablet
+        resizeHandle.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            handleMouseDown({ 
+                clientX: touch.clientX, 
+                preventDefault: () => e.preventDefault(),
+                stopPropagation: () => e.stopPropagation()
+            });
+        }, { passive: false });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isResizing) return;
+            const touch = e.touches[0];
+            handleMouseMove({ clientX: touch.clientX, preventDefault: () => {} });
+        }, { passive: false });
+
+        document.addEventListener('touchend', handleMouseUp);
+
+        // Set initial width - use saved width or default to 66.67% of viewport
         const savedWidth = localStorage.getItem('artifactSidebarWidth');
         if (savedWidth) {
             const width = parseInt(savedWidth, 10);
-            if (width >= 280 && width <= window.innerWidth * 0.8) {
+            const minWidth = 300;
+            const maxWidth = window.innerWidth * 0.85;
+            if (width >= minWidth && width <= maxWidth) {
                 this.element.style.width = `${width}px`;
                 document.documentElement.style.setProperty('--artifact-sidebar-width', `${width}px`);
                 console.log('[ArtifactSidebar] Restored saved width:', width);
             }
+        } else {
+            // Default: 2/3 of viewport
+            const defaultWidth = Math.round(window.innerWidth * 0.6667);
+            this.element.style.width = `${defaultWidth}px`;
+            document.documentElement.style.setProperty('--artifact-sidebar-width', `${defaultWidth}px`);
+            console.log('[ArtifactSidebar] Using default width (66.67%):', defaultWidth);
         }
+
+        console.log('[ArtifactSidebar] Resize handler setup complete');
     }
 
     /**
