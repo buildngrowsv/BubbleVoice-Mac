@@ -568,14 +568,21 @@ class BackendServer {
       // audioUrl = await this.voicePipelineService.generateTTS(fullResponse, settings);
 
       // Send final response
+      // Only include artifact if it exists (not null/undefined)
+      const responseData = {
+        bubbles,
+        audioUrl,
+        processing_result: processingResult // NEW: includes areas/entries/artifacts created
+      };
+      
+      // Only add artifact if it's defined and not null
+      if (artifact) {
+        responseData.artifact = artifact;
+      }
+      
       this.sendMessage(ws, {
         type: 'ai_response_stream_end',
-        data: {
-          bubbles,
-          artifact,
-          audioUrl,
-          processing_result: processingResult // NEW: includes areas/entries/artifacts created
-        }
+        data: responseData
       });
 
     } catch (error) {
