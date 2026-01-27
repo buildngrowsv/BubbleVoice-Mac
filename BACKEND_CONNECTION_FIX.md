@@ -38,20 +38,26 @@ NODE_MODULE_VERSION 131.
 
 ## ✅ Solution
 
-### Step 1: Rebuild better-sqlite3 for Electron
+**CRITICAL: You need to rebuild for BOTH Node.js versions!**
+
+### Step 1: Rebuild for System Node.js (Backend Server)
 
 ```bash
 cd /Users/ak/UserRoot/Github/researching-callkit-repos/BubbleVoice-Mac
+npm rebuild better-sqlite3
+```
+
+**Why?** The backend runs as a separate Node.js process using your system Node.js.
+
+### Step 2: Rebuild for Electron (Main Process)
+
+```bash
 npx electron-rebuild -f -w better-sqlite3
 ```
 
-**Output:**
-```
-- Searching dependency tree
-✔ Rebuild Complete
-```
+**Why?** Electron bundles its own Node.js version for the main process.
 
-### Step 2: Restart the app
+### Step 3: Restart the app
 
 ```bash
 # Kill current app (if running)
@@ -59,6 +65,14 @@ pkill -f "Electron.*BubbleVoice"
 
 # Restart (in terminal 2 or new terminal)
 npm run dev
+```
+
+### Quick Fix Script
+
+Use the provided script to do both rebuilds:
+
+```bash
+./fix-native-modules.sh
 ```
 
 ---
