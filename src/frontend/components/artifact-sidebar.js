@@ -77,6 +77,12 @@ class ArtifactSidebar {
 
         // Build inner HTML with semantic structure
         this.element.innerHTML = `
+            <!-- Resize handle on left edge -->
+            <div class="artifact-sidebar-resize-handle" 
+                 id="artifact-resize-handle"
+                 title="Drag to resize"
+                 aria-label="Resize artifact panel"></div>
+            
             <!-- Header with title and controls -->
             <div class="artifact-sidebar-header">
                 <div class="artifact-sidebar-title">
@@ -174,7 +180,7 @@ class ArtifactSidebar {
     /**
      * Setup Event Listeners
      * 
-     * Attaches handlers for close, minimize, and export actions.
+     * Attaches handlers for close, minimize, export, and resize actions.
      */
     setupEventListeners() {
         // Close button - hides sidebar completely
@@ -207,6 +213,85 @@ class ArtifactSidebar {
                 this.close();
             }
         });
+
+        // Resize handle - drag to resize sidebar width
+        this.setupResizeHandler();
+    }
+
+    /**
+     * Setup Resize Handler
+     * 
+     * Implements drag-to-resize functionality for the sidebar.
+     * Users can drag the left edge to change the sidebar width.
+     * 
+     * IMPLEMENTATION:
+     * - mousedown on resize handle starts resize
+     * - mousemove updates width in real-time
+     * - mouseup ends resize
+     * - Updates CSS custom property for layout adjustments
+     */
+    setupResizeHandler() {
+        const resizeHandle = this.element.querySelector('#artifact-resize-handle');
+        if (!resizeHandle) return;
+
+        let isResizing = false;
+        let startX = 0;
+        let startWidth = 0;
+
+        // Mouse down - start resize
+        resizeHandle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isResizing = true;
+            startX = e.clientX;
+            startWidth = this.element.offsetWidth;
+            
+            // Add visual feedback
+            resizeHandle.classList.add('dragging');
+            document.body.classList.add('artifact-sidebar-resizing');
+            
+            console.log('[ArtifactSidebar] Resize started');
+        });
+
+        // Mouse move - update width (attached to document for smooth dragging)
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            
+            // Calculate new width (dragging left increases width, right decreases)
+            const deltaX = startX - e.clientX;
+            const newWidth = Math.max(280, Math.min(window.innerWidth * 0.8, startWidth + deltaX));
+            
+            // Update sidebar width
+            this.element.style.width = `${newWidth}px`;
+            
+            // Update CSS custom property for layout adjustments
+            document.documentElement.style.setProperty('--artifact-sidebar-width', `${newWidth}px`);
+        });
+
+        // Mouse up - end resize
+        document.addEventListener('mouseup', () => {
+            if (!isResizing) return;
+            
+            isResizing = false;
+            resizeHandle.classList.remove('dragging');
+            document.body.classList.remove('artifact-sidebar-resizing');
+            
+            // Save the width preference
+            const finalWidth = this.element.offsetWidth;
+            localStorage.setItem('artifactSidebarWidth', finalWidth);
+            
+            console.log('[ArtifactSidebar] Resize ended, width:', finalWidth);
+        });
+
+        // Restore saved width on init
+        const savedWidth = localStorage.getItem('artifactSidebarWidth');
+        if (savedWidth) {
+            const width = parseInt(savedWidth, 10);
+            if (width >= 280 && width <= window.innerWidth * 0.8) {
+                this.element.style.width = `${width}px`;
+                document.documentElement.style.setProperty('--artifact-sidebar-width', `${width}px`);
+                console.log('[ArtifactSidebar] Restored saved width:', width);
+            }
+        }
     }
 
     /**

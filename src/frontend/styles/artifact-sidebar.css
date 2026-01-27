@@ -31,6 +31,8 @@
     top: 44px; /* Below title bar */
     right: 0;
     width: 420px;
+    min-width: 280px;  /* Minimum resize width */
+    max-width: 80vw;   /* Maximum resize width - 80% of viewport */
     height: calc(100% - 44px);
     
     /* Initially hidden off-screen */
@@ -47,12 +49,12 @@
     display: flex;
     flex-direction: column;
     
-    /* Animation */
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Animation - only animate transform, not width (for smooth resize) */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* Layer above other content */
-    z-index: 900;
+    /* Layer ABOVE settings panel (settings is z-index: 1000) */
+    /* FIX: Previously was 900, causing settings to overlap artifact sidebar */
+    z-index: 1100;
     
     /* Prevent text selection during animations */
     user-select: none;
@@ -89,6 +91,64 @@
 
 .artifact-sidebar.minimized .artifact-sidebar-icon {
     font-size: 24px;
+}
+
+/* ===================================================================
+   RESIZE HANDLE
+   =================================================================== */
+
+/**
+ * Resize handle on the left edge of the sidebar.
+ * Users can drag this to resize the sidebar width.
+ * Visual feedback on hover and during drag.
+ */
+.artifact-sidebar-resize-handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    cursor: ew-resize;
+    background: transparent;
+    transition: background 0.2s ease;
+    z-index: 10;
+}
+
+.artifact-sidebar-resize-handle:hover {
+    background: rgba(102, 126, 234, 0.4);
+}
+
+.artifact-sidebar-resize-handle.dragging {
+    background: rgba(102, 126, 234, 0.6);
+}
+
+/* Visual grip indicator */
+.artifact-sidebar-resize-handle::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 1px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.artifact-sidebar-resize-handle:hover::after {
+    opacity: 1;
+}
+
+/* Prevent text selection while resizing */
+body.artifact-sidebar-resizing {
+    cursor: ew-resize !important;
+    user-select: none !important;
+}
+
+body.artifact-sidebar-resizing * {
+    cursor: ew-resize !important;
 }
 
 /* ===================================================================
@@ -334,15 +394,27 @@
  * - Left: Conversation history sidebar
  * - Center: Active conversation
  * - Right: Artifact sidebar
+ * 
+ * Uses CSS custom property --artifact-sidebar-width which is set
+ * dynamically by JavaScript when resizing. Falls back to 420px.
  */
+:root {
+    --artifact-sidebar-width: 420px;
+}
+
 body.artifact-sidebar-open .main-container {
-    margin-right: 420px;
+    margin-right: var(--artifact-sidebar-width, 420px);
     transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* During resize, disable transition for instant feedback */
+body.artifact-sidebar-resizing .main-container {
+    transition: none !important;
+}
+
 body.artifact-sidebar-open .settings-panel {
-    /* Move settings panel left to avoid conflict with artifact sidebar */
-    right: 420px;
+    /* Settings panel goes behind artifact sidebar now (z-index fix) */
+    /* No need to move it - artifact sidebar is above it */
 }
 
 /* ===================================================================
@@ -350,16 +422,12 @@ body.artifact-sidebar-open .settings-panel {
    =================================================================== */
 
 @media (max-width: 1200px) {
+    :root {
+        --artifact-sidebar-width: 360px;
+    }
+    
     .artifact-sidebar {
         width: 360px;
-    }
-    
-    body.artifact-sidebar-open .main-container {
-        margin-right: 360px;
-    }
-    
-    body.artifact-sidebar-open .settings-panel {
-        right: 360px;
     }
 }
 
@@ -374,8 +442,9 @@ body.artifact-sidebar-open .settings-panel {
         margin-right: 0;
     }
     
-    body.artifact-sidebar-open .settings-panel {
-        right: 0;
+    /* Hide resize handle on small screens */
+    .artifact-sidebar-resize-handle {
+        display: none;
     }
 }
 
