@@ -151,18 +151,33 @@
          aria-label="Conversation history">
       
       <!-- Sidebar Header -->
+      <!-- DESIGN FIX (2026-01-27): Added collapse button to header in addition to footer.
+           Users expect the collapse button to be near the top, next to the title.
+           The footer toggle is kept for accessibility and to match other UI patterns. -->
       <div class="sidebar-header" data-testid="sidebar-header">
         <h2 class="sidebar-title">Conversations</h2>
-        <!-- TEST ID: new-chat-button - Creates a new conversation -->
-        <button class="new-chat-button"
-                id="new-chat-button"
-                data-testid="new-chat-button"
-                title="New Conversation (⌘N)"
-                aria-label="Start new conversation">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </button>
+        <div class="sidebar-header-actions">
+          <!-- TEST ID: new-chat-button - Creates a new conversation -->
+          <button class="new-chat-button"
+                  id="new-chat-button"
+                  data-testid="new-chat-button"
+                  title="New Conversation (⌘N)"
+                  aria-label="Start new conversation">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <!-- TEST ID: collapse-sidebar-button - Collapses sidebar from header -->
+          <button class="collapse-sidebar-button"
+                  id="collapse-sidebar-button"
+                  data-testid="collapse-sidebar-button"
+                  title="Collapse Sidebar (⌘B)"
+                  aria-label="Collapse sidebar">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M10 4l-4 4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Conversations List -->
@@ -715,7 +730,10 @@
   <script src="components/artifact-viewer.js"></script>
   <script src="components/artifact-sidebar.js"></script>
   <script src="components/life-areas-sidebar.js"></script>
-  <script src="components/chat-history-sidebar.js"></script>
+  <!-- NOTE: chat-history-sidebar.js was removed - it was causing duplicate sidebars.
+       The ChatHistorySidebar component was creating its own DOM element and prepending
+       it to body, conflicting with the existing chat-sidebar HTML element.
+       Now we only use ChatSidebar which works with the #chat-sidebar element above. -->
   <script src="components/admin-panel.js"></script>
   <script src="components/web-speech-service.js"></script>
   <script src="components/conversation-manager.js"></script>

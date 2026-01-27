@@ -32,7 +32,9 @@ class BubbleVoiceApp {
     this.voiceController = null;
     this.websocketClient = null;
     this.chatSidebar = null;
-    this.chatHistorySidebar = null;
+    // NOTE: chatHistorySidebar was removed - it was a duplicate of chatSidebar
+    // that created its own DOM element, causing visual conflicts and broken toggles.
+    // Now we only use ChatSidebar which works with the existing #chat-sidebar HTML.
     this.lifeAreasSidebar = null;
     this.artifactSidebar = null;  // Sidebar for displaying artifacts (not inline)
     this.adminPanel = null;
@@ -97,24 +99,15 @@ class BubbleVoiceApp {
       this.conversationManager = new ConversationManager(this.elements.messages);
       this.voiceController = new VoiceController(this);
       this.websocketClient = new WebSocketClient(backendConfig.websocketUrl, this);
+      
+      // Initialize chat sidebar (uses existing HTML element #chat-sidebar from index.html)
+      // NOTE: We previously had BOTH ChatSidebar AND ChatHistorySidebar which caused
+      // duplicate sidebars to render. ChatHistorySidebar was creating its own DOM element
+      // and prepending it to body, causing the "messed up icons" at the bottom and the
+      // non-functional collapse button. Now we only use ChatSidebar which works with
+      // the existing HTML structure.
       this.chatSidebar = new ChatSidebar();
-      
-      // Initialize chat history sidebar
-      this.chatHistorySidebar = new ChatHistorySidebar();
-      document.body.insertBefore(this.chatHistorySidebar.element, document.body.firstChild);
-      console.log('[App] Chat history sidebar initialized');
-      
-      // Setup chat history event listeners
-      this.chatHistorySidebar.element.addEventListener('conversation-switched', async (e) => {
-        await this.loadConversation(e.detail.id);
-      });
-      
-      this.chatHistorySidebar.element.addEventListener('conversation-created', async (e) => {
-        await this.loadConversation(e.detail.id);
-      });
-      
-      // Load conversations
-      await this.chatHistorySidebar.loadConversations();
+      console.log('[App] Chat sidebar initialized');
 
       // Initialize life areas sidebar
       this.lifeAreasSidebar = new LifeAreasSidebar();
@@ -602,6 +595,10 @@ class BubbleVoiceApp {
    * LOAD CONVERSATION
    * 
    * Loads a conversation from history and displays it.
+   * Called when user clicks a conversation in the sidebar.
+   * 
+   * NOTE: This method is triggered by the 'conversation-switched' event
+   * dispatched by ChatSidebar when a user clicks on a conversation item.
    * 
    * @param {string} conversationId - Conversation ID to load
    */
@@ -609,33 +606,24 @@ class BubbleVoiceApp {
     try {
       console.log(`[App] Loading conversation: ${conversationId}`);
       
-      // Get conversation data from backend
-      const { conversation, messages } = await window.electronAPI.chatHistory.getConversation(conversationId);
-      
-      // Clear current messages
-      this.conversationManager.clearMessages();
-      
-      // Load messages into conversation manager
-      messages.forEach(msg => {
-        this.conversationManager.addMessage({
-          role: msg.role,
-          content: msg.content,
-          timestamp: msg.timestamp
-        });
-      });
-      
-      // Update state
+      // Update state immediately for responsiveness
       this.state.currentConversationId = conversationId;
-      
-      // Update chat history sidebar
-      this.chatHistorySidebar.setCurrentConversation(conversationId);
       
       // Hide welcome state
       if (this.elements.welcomeState) {
         this.elements.welcomeState.style.display = 'none';
       }
       
-      console.log(`[App] Loaded ${messages.length} messages`);
+      // Get conversation data from backend via WebSocket
+      // The WebSocket client will handle loading messages when the backend responds
+      if (this.websocketClient && this.websocketClient.isConnected) {
+        this.websocketClient.sendMessage({
+          type: 'switch_conversation',
+          data: { conversationId }
+        });
+      }
+      
+      console.log(`[App] Switched to conversation: ${conversationId}`);
       
     } catch (error) {
       console.error('[App] Failed to load conversation:', error);

@@ -45,7 +45,8 @@ class ChatSidebar {
     this.sidebar = document.getElementById('chat-sidebar');
     this.conversationsList = document.getElementById('conversations-list');
     this.newChatButton = document.getElementById('new-chat-button');
-    this.toggleButton = document.getElementById('toggle-sidebar-button');
+    this.toggleButton = document.getElementById('toggle-sidebar-button'); // Footer toggle
+    this.collapseButton = document.getElementById('collapse-sidebar-button'); // Header collapse
     this.floatingToggle = document.getElementById('sidebar-toggle-floating');
     
     // State
@@ -89,10 +90,19 @@ class ChatSidebar {
       this.newChatButton.addEventListener('click', this.handleNewChat);
     }
     
+    // Footer toggle button (arrow icon at bottom of sidebar)
     if (this.toggleButton) {
       this.toggleButton.addEventListener('click', this.handleToggleSidebar);
     }
     
+    // Header collapse button (added 2026-01-27 for better UX)
+    // WHY: Users expected the collapse button to be in the header area
+    // BECAUSE: Common UI pattern - collapse toggle near the title
+    if (this.collapseButton) {
+      this.collapseButton.addEventListener('click', this.handleToggleSidebar);
+    }
+    
+    // Floating toggle button (visible when sidebar is collapsed)
     if (this.floatingToggle) {
       this.floatingToggle.addEventListener('click', this.handleToggleSidebar);
     }
@@ -559,22 +569,31 @@ class ChatSidebar {
     
     // Show/hide floating toggle button
     // WHY: Floating button should only be visible when sidebar is collapsed
-    // BECAUSE: When sidebar is open, the toggle is in the sidebar footer
+    // BECAUSE: When sidebar is open, the toggle is in the sidebar header/footer
     if (this.floatingToggle) {
       this.floatingToggle.style.display = this.isExpanded ? 'none' : 'flex';
     }
     
-    // Update button aria-expanded
+    // Update button aria-expanded for accessibility
     if (this.toggleButton) {
       this.toggleButton.setAttribute('aria-expanded', this.isExpanded.toString());
     }
+    if (this.collapseButton) {
+      this.collapseButton.setAttribute('aria-expanded', this.isExpanded.toString());
+    }
     
-    // Rotate arrow icon
+    // Rotate arrow icons on both toggle buttons
     // WHY: Visual feedback for collapsed state
     // BECAUSE: User needs to know if sidebar is collapsed or expanded
-    const icon = this.toggleButton?.querySelector('svg');
-    if (icon) {
-      icon.style.transform = this.isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    // The arrow points left when expanded, right when collapsed
+    const footerIcon = this.toggleButton?.querySelector('svg');
+    if (footerIcon) {
+      footerIcon.style.transform = this.isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+    
+    const headerIcon = this.collapseButton?.querySelector('svg');
+    if (headerIcon) {
+      headerIcon.style.transform = this.isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
     }
   }
   

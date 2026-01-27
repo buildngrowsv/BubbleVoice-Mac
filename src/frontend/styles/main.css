@@ -1112,6 +1112,47 @@ input[type="range"]::-webkit-slider-thumb:hover {
   flex-shrink: 0;
 }
 
+/* Sidebar Header Actions Container */
+/* DESIGN FIX (2026-01-27): Added container for new chat and collapse buttons */
+/* WHY: Users expected the collapse button in the header, not just footer */
+/* BECAUSE: Common UI pattern places collapse toggle near the sidebar title */
+.sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Collapse Sidebar Button (in header) */
+/* WHY: Provides a visible, accessible collapse button in the header */
+/* BECAUSE: Users were confused when the collapse button was only in the footer */
+.collapse-sidebar-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.collapse-sidebar-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.collapse-sidebar-button:active {
+  transform: scale(0.95);
+}
+
+.collapse-sidebar-button svg {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .sidebar-title {
   font-size: 14px;
   font-weight: 600;
