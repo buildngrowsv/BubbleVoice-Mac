@@ -130,6 +130,14 @@ class ConversationManager {
    * Creates the DOM element for a message.
    * Handles different message types and roles.
    * 
+   * FEATURES (2026-01-28):
+   * - Message bubble with formatted content
+   * - Timestamp showing when message was sent
+   * - Copy button to copy message text to clipboard
+   * 
+   * WHY COPY BUTTON: Users need to easily copy AI responses to use elsewhere
+   * (emails, documents, etc). Text is selectable but copy button is faster.
+   * 
    * @param {Object} message - Message object
    * @returns {HTMLElement} Message DOM element
    */
@@ -146,14 +154,68 @@ class ConversationManager {
     // Format content (handle markdown, links, etc.)
     bubbleDiv.innerHTML = this.formatMessageContent(message.content);
 
+    // Message footer (timestamp + copy button)
+    // WHY: Groups timestamp and copy button together for clean layout
+    const footerDiv = document.createElement('div');
+    footerDiv.className = 'message-footer';
+
     // Timestamp
     const timestampDiv = document.createElement('div');
     timestampDiv.className = 'message-timestamp';
     timestampDiv.textContent = this.formatTimestamp(message.timestamp);
 
+    // Copy button
+    // WHY: Users requested ability to easily copy message content
+    // BECAUSE: While text is now selectable, a copy button is faster
+    const copyButton = document.createElement('button');
+    copyButton.className = 'message-copy-button';
+    copyButton.title = 'Copy to clipboard';
+    copyButton.setAttribute('aria-label', 'Copy message to clipboard');
+    copyButton.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M10 4V2.5A1.5 1.5 0 008.5 1h-6A1.5 1.5 0 001 2.5v6A1.5 1.5 0 002.5 10H4" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <span class="copy-text">Copy</span>
+    `;
+    
+    // Store the original message content for copying (without HTML formatting)
+    copyButton.addEventListener('click', async () => {
+      try {
+        // Copy the original plain text content (not the HTML-formatted version)
+        await navigator.clipboard.writeText(message.content);
+        
+        // Show success feedback
+        copyButton.classList.add('copied');
+        const textSpan = copyButton.querySelector('.copy-text');
+        const originalText = textSpan.textContent;
+        textSpan.textContent = 'Copied!';
+        
+        // Reset after 2 seconds
+        setTimeout(() => {
+          copyButton.classList.remove('copied');
+          textSpan.textContent = originalText;
+        }, 2000);
+        
+        console.log('[ConversationManager] Message copied to clipboard');
+      } catch (error) {
+        console.error('[ConversationManager] Failed to copy message:', error);
+        // Fallback: select text for manual copy
+        const range = document.createRange();
+        range.selectNodeContents(bubbleDiv);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    });
+
+    // Assemble footer
+    footerDiv.appendChild(timestampDiv);
+    footerDiv.appendChild(copyButton);
+
     // Assemble message
     messageDiv.appendChild(bubbleDiv);
-    messageDiv.appendChild(timestampDiv);
+    messageDiv.appendChild(footerDiv);
 
     return messageDiv;
   }

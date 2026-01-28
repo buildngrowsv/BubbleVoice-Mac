@@ -426,14 +426,15 @@ class WebSocketClient {
     // Clear the input field if it contains the transcription
     // This prevents the user from seeing duplicate text
     // Handle both input elements and contenteditable divs
+    // FIX (2026-01-28): Use innerText instead of textContent to properly handle line breaks
     const inputField = this.app.elements.inputField;
     if (inputField) {
-      const currentText = inputField.value || inputField.textContent || '';
+      const currentText = inputField.value || inputField.innerText || '';
       if (currentText.trim() === data.text.trim()) {
         if (inputField.value !== undefined) {
           inputField.value = '';
         } else {
-          inputField.textContent = '';
+          inputField.textContent = '';  // OK to use textContent for clearing
         }
       }
     }

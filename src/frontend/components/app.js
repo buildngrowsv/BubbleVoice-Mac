@@ -427,7 +427,8 @@ class BubbleVoiceApp {
     this.voiceController.stopListening();
 
     // Auto-send if enabled and there's text
-    if (this.state.settings.autoSend && this.elements.inputField.textContent.trim()) {
+    // FIX (2026-01-28): Use innerText to properly capture text with line breaks
+    if (this.state.settings.autoSend && this.elements.inputField.innerText.trim()) {
       this.sendMessage();
     }
   }
@@ -439,7 +440,12 @@ class BubbleVoiceApp {
    * Clears input and adds message to conversation.
    */
   async sendMessage() {
-    const text = this.elements.inputField.textContent.trim();
+    // CRITICAL FIX (2026-01-28): Use innerText instead of textContent
+    // WHY: textContent doesn't preserve line breaks from contenteditable elements
+    // BECAUSE: When user presses Shift+Enter, contenteditable creates <br> tags
+    // but textContent ignores them. innerText converts <br> to \n properly.
+    // HISTORY: User reported that new lines weren't appearing in sent messages
+    const text = this.elements.inputField.innerText.trim();
     
     if (!text) {
       console.log('[App] No text to send');
@@ -494,7 +500,8 @@ class BubbleVoiceApp {
    * Enables/disables send button based on input content.
    */
   updateSendButtonState() {
-    const hasText = this.elements.inputField.textContent.trim().length > 0;
+    // FIX (2026-01-28): Use innerText to properly capture text with line breaks
+    const hasText = this.elements.inputField.innerText.trim().length > 0;
     this.elements.sendButton.disabled = !hasText;
   }
 

@@ -150,7 +150,8 @@ class VoiceController {
     const inputField = this.app.elements.inputField;
     
     // Get current text content (without HTML)
-    const currentText = inputField.textContent || '';
+    // FIX (2026-01-28): Use innerText instead of textContent to properly handle line breaks
+    const currentText = inputField.innerText || '';
     
     // Only update if text actually changed
     // This prevents unnecessary DOM manipulation and DOMExceptions

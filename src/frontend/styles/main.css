@@ -338,6 +338,11 @@ button, input, select, textarea, [contenteditable] {
  * Chat bubble styling for user and AI messages.
  * User messages are right-aligned with blue gradient.
  * AI messages are left-aligned with gray glass effect.
+ * 
+ * FIX (2026-01-28): Added user-select and -webkit-app-region
+ * WHY: Users couldn't select and copy text from message bubbles
+ * BECAUSE: Body has user-select: none and -webkit-app-region: drag
+ * which propagates to all children unless explicitly overridden
  */
 .message-bubble {
   max-width: 70%;
@@ -346,6 +351,13 @@ button, input, select, textarea, [contenteditable] {
   word-wrap: break-word;
   line-height: 1.5;
   font-size: 15px;
+  /* Enable text selection for copying message content */
+  -webkit-user-select: text;
+  user-select: text;
+  /* Must be no-drag for text selection to work in Electron */
+  -webkit-app-region: no-drag;
+  /* Allow cursor to show text selection cursor */
+  cursor: text;
 }
 
 /* User message bubbles - blue gradient, right-aligned */
@@ -391,10 +403,99 @@ button, input, select, textarea, [contenteditable] {
   opacity: 0.8;
 }
 
+/**
+ * MESSAGE FOOTER
+ * 
+ * Container for timestamp and copy button below each message bubble.
+ * Aligns items appropriately based on message role (user vs assistant).
+ */
+.message-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-sm);
+  /* Make non-draggable so buttons work in Electron */
+  -webkit-app-region: no-drag;
+}
+
+/* User messages: align footer to the right */
+.message.user .message-footer {
+  justify-content: flex-end;
+}
+
+/* Assistant messages: align footer to the left */
+.message.assistant .message-footer,
+.message.ai .message-footer {
+  justify-content: flex-start;
+}
+
 .message-timestamp {
   font-size: 11px;
   opacity: 0.5;
-  padding: 0 var(--spacing-sm);
+}
+
+/**
+ * MESSAGE COPY BUTTON
+ * 
+ * Small button to copy message content to clipboard.
+ * Appears below each message bubble for quick access.
+ * 
+ * DESIGN (2026-01-28):
+ * - Subtle appearance that doesn't distract from conversation
+ * - Hover/active states for clear interaction feedback
+ * - "Copied!" feedback state when content is copied
+ */
+.message-copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  /* Make non-draggable so button works in Electron */
+  -webkit-app-region: no-drag;
+}
+
+.message-copy-button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.message-copy-button:active {
+  transform: scale(0.95);
+}
+
+/* Copied state - shows green success feedback */
+.message-copy-button.copied {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.message-copy-button .copy-text {
+  /* Hide text by default on small screens, show on hover/copied */
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.message-copy-button:hover .copy-text,
+.message-copy-button.copied .copy-text {
+  opacity: 1;
+  max-width: 60px;
+  margin-left: 2px;
+}
+
+.message-copy-button svg {
+  flex-shrink: 0;
 }
 
 /**
