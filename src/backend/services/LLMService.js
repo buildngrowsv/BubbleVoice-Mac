@@ -150,7 +150,26 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
 - Tag sentiment: hopeful, concerned, anxious, excited, neutral
 
 **Artifact Guidelines:**
-- **HTML Toggle System**: Control when to generate expensive HTML vs fast data-only responses
+
+**CRITICAL - EDIT vs CREATE Decision (prevents duplicates):**
+- **UPDATE (action: "update")** - Use when modifying EXISTING artifact:
+  - User says "change X to Y" on the displayed artifact
+  - User says "add X" or "remove Y" from artifact
+  - User says "update the checklist" or similar modification request
+  - User is refining/iterating on what they already see
+  - **MUST use the SAME artifact_id from [CURRENT ARTIFACT DISPLAYED] context**
+  - **MUST regenerate complete HTML with the modification applied**
+- **CREATE (action: "create")** - Use ONLY when making NEW artifact:
+  - User explicitly asks for something NEW ("make me a timeline", "create a checklist")
+  - User wants a DIFFERENT artifact type ("show this as a mindmap instead")
+  - No artifact is currently displayed
+  - User explicitly says "new" or "create" or requests a different format
+  - Generate a new unique artifact_id (format: type_timestamp)
+- **NONE (action: "none")** - Use when no artifact work needed:
+  - User is just chatting/asking questions
+  - No visual output is appropriate
+
+**HTML Toggle System**: Control when to generate expensive HTML vs fast data-only responses
   - **HTML OFF (default)**: Fast mode for simple updates, questions, minor corrections
   - **HTML ON**: Visual mode for complex decisions, new artifacts, redesign requests
 - **When to Toggle HTML ON**:
@@ -159,12 +178,11 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
   - First time creating artifact (user hasn't seen it yet)
   - User requests redesign ("change layout", "show as pros/cons")
   - High-stakes personal decision deserves beautiful visual
+  - **ANY artifact action (create or update) that changes content**
 - **When to Keep HTML OFF**:
-  - Simple data update ("change deadline to Thursday")
   - User just asking questions (no artifact change)
-  - Minor corrections (user already has visual, just update data)
   - Casual conversation (no artifact needed)
-  - Follow-up turns (don't regenerate HTML for tiny changes)
+  - ONLY when artifact_action.action is "none"
 - **Artifact Quality Standards**:
   - Standalone HTML with ALL CSS inline (no external deps)
   - Liquid glass styling (backdrop-filter: blur(15-20px), modern gradients)
@@ -576,22 +594,41 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
     // BECAUSE: Passing it twice wastes tokens and could confuse the model
     // HISTORY: Bug discovered 2026-01-24 - system prompt was being sent twice
     
-    // ARTIFACT CONTEXT INJECTION (2026-01-27)
+    // ARTIFACT CONTEXT INJECTION (2026-01-27, improved 2026-01-28)
     // If there's a current artifact displayed, prepend context so AI knows
     // what artifact exists and can decide to edit vs create
+    // 
+    // FIX (2026-01-28): Made instructions more explicit to prevent the AI from:
+    // 1. Creating duplicate artifacts when it should update
+    // 2. Using a different artifact_id when modifying existing content
+    // 3. Generating blank/malformed HTML on updates
     if (conversation.currentArtifact) {
       const artifact = conversation.currentArtifact;
       const artifactContext = `[CURRENT ARTIFACT DISPLAYED]
-Artifact ID: ${artifact.artifact_id}
-Type: ${artifact.artifact_type}
-Content Summary: ${artifact.html_summary || 'No content summary'}
-${artifact.data ? `Data: ${JSON.stringify(artifact.data)}` : ''}
+================================
+ARTIFACT ID TO REUSE: ${artifact.artifact_id}
+TYPE: ${artifact.artifact_type}
+CONTENT: ${artifact.html_summary || 'Visual artifact is displayed'}
+${artifact.data ? `DATA: ${JSON.stringify(artifact.data)}` : ''}
+================================
 
-IMPORTANT: When the user asks to modify, change, update, or edit something about this artifact:
-- Use action: "update" with the SAME artifact_id
-- Only regenerate the parts that need to change
-- Preserve the overall structure and other content
-- Do NOT create a new artifact unless user explicitly asks for something completely different
+EDITING RULES (FOLLOW STRICTLY):
+1. If user wants to MODIFY this artifact (change, update, add, remove, fix):
+   - action: "update"
+   - artifact_id: "${artifact.artifact_id}" (COPY THIS EXACT ID)
+   - html: Complete regenerated HTML with the change applied
+   - html_toggle.generate_html: true
+
+2. If user wants a DIFFERENT/NEW artifact:
+   - action: "create"
+   - artifact_id: new unique id (e.g., "checklist_${Date.now()}")
+   - html: Complete new HTML
+
+3. If no artifact changes needed:
+   - action: "none"
+   - html_toggle.generate_html: false
+
+COMMON MISTAKE TO AVOID: Creating a new artifact when user says "change X to Y" - this should UPDATE with the same ID, not CREATE new.
 
 [END ARTIFACT CONTEXT]
 
@@ -604,7 +641,7 @@ IMPORTANT: When the user asks to modify, change, update, or edit something about
       // Add a model acknowledgment to maintain alternation
       contents.push({
         role: 'model',
-        parts: [{ text: 'I see the current artifact. I will edit it if the user wants modifications, rather than creating a new one.' }]
+        parts: [{ text: `I see the ${artifact.artifact_type} artifact (ID: ${artifact.artifact_id}). For modifications, I will use action "update" with that same ID. For new artifacts, I will use action "create" with a new ID.` }]
       });
       
       console.log('[LLMService] Injected artifact context:', artifact.artifact_id, artifact.artifact_type);

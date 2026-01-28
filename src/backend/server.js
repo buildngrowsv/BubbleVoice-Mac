@@ -578,6 +578,35 @@ class BackendServer {
       // Only add artifact if it's defined and not null
       // LOGGING: Track when artifacts are sent to frontend
       if (artifact) {
+        // DUPLICATE PREVENTION FIX (2026-01-28):
+        // Detect when AI creates a new artifact when it should have updated existing one.
+        // This happens when:
+        // 1. There's already a currentArtifact displayed
+        // 2. AI used action "create" instead of "update"
+        // 3. The new artifact has a different artifact_id
+        // 4. The artifact types are the same (not switching format)
+        // 
+        // Auto-correct by preserving the original artifact_id to prevent duplicates
+        // This is a safety net - the prompt should prevent this, but models sometimes ignore it
+        const currentArtifact = await this.conversationService.getCurrentArtifact(conversation.id);
+        
+        if (currentArtifact && artifact.action === 'create' && 
+            artifact.artifact_id !== currentArtifact.artifact_id &&
+            artifact.artifact_type === currentArtifact.artifact_type) {
+          
+          console.log('[Backend] ⚠️  DUPLICATE PREVENTION: AI created new artifact when update expected');
+          console.log(`  Current ID: ${currentArtifact.artifact_id}`);
+          console.log(`  New ID: ${artifact.artifact_id}`);
+          console.log(`  Same type: ${artifact.artifact_type}`);
+          
+          // Auto-correct: Change action to update and preserve original ID
+          // WHY: Prevents UI from showing duplicate artifacts in history
+          // BECAUSE: User likely wanted to edit, not create a new one
+          console.log('[Backend] 🔧 Auto-correcting: Using existing artifact_id');
+          artifact.artifact_id = currentArtifact.artifact_id;
+          artifact.action = 'update';
+        }
+        
         console.log('[Backend] ✨ Artifact to send:', {
           artifact_type: artifact.artifact_type,
           has_html: !!artifact.html,

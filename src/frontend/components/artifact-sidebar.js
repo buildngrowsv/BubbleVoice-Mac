@@ -380,6 +380,14 @@ class ArtifactSidebar {
      * Opens the sidebar and displays the given artifact.
      * This is the main entry point for showing artifacts.
      * 
+     * BLANK SCREEN FIX (2026-01-28):
+     * Added validation to prevent blank screens when AI returns malformed
+     * or empty HTML. Previously, empty htmlContent would clear the iframe
+     * and show nothing, leaving users confused. Now we:
+     * 1. Validate HTML content exists and has meaningful content
+     * 2. Fall back to error state if HTML is missing/invalid
+     * 3. Keep previous artifact visible if update fails
+     * 
      * @param {Object} artifact - Artifact data from backend
      * @param {string} artifact.artifact_id - Unique ID
      * @param {string} artifact.artifact_type - Type (mindmap, stress_map, etc.)
@@ -389,7 +397,36 @@ class ArtifactSidebar {
     showArtifact(artifact) {
         console.log('[ArtifactSidebar] Showing artifact:', artifact.artifact_type || artifact.type);
 
-        // Store current artifact
+        // Get HTML content (normalize from multiple possible field names)
+        const htmlContent = artifact.html || artifact.content || '';
+        const artifactType = artifact.artifact_type || artifact.type || 'artifact';
+        
+        // VALIDATION: Prevent blank screen from empty/malformed HTML
+        // WHY: AI sometimes returns empty html field or malformed content
+        // BECAUSE: Without this check, the iframe would go blank and confuse users
+        // User experience should NEVER degrade to a blank white screen
+        if (!this.isValidHtml(htmlContent)) {
+            console.error('[ArtifactSidebar] ❌ Invalid/empty HTML received for artifact:', {
+                type: artifactType,
+                artifact_id: artifact.artifact_id,
+                htmlLength: htmlContent.length,
+                htmlPreview: htmlContent.substring(0, 100)
+            });
+            
+            // If we have a previous artifact, keep it displayed with an error toast
+            // This prevents the jarring blank screen experience
+            if (this.currentArtifact && this.currentArtifact.html) {
+                console.log('[ArtifactSidebar] Keeping previous artifact displayed due to invalid update');
+                this.showErrorToast('Failed to update artifact - keeping previous version');
+                return; // Don't replace current artifact with broken one
+            }
+            
+            // No previous artifact - show error state in iframe instead of blank
+            this.showErrorState(artifactType, artifact.artifact_id);
+            return;
+        }
+
+        // Store current artifact (only after validation passes)
         this.currentArtifact = artifact;
 
         // Add to history
@@ -397,7 +434,6 @@ class ArtifactSidebar {
 
         // Update type badge
         const typeBadge = this.element.querySelector('#artifact-type-badge');
-        const artifactType = artifact.artifact_type || artifact.type || 'artifact';
         if (typeBadge) {
             typeBadge.textContent = this.getReadableName(artifactType);
         }
@@ -411,19 +447,204 @@ class ArtifactSidebar {
         // Load content into iframe
         const iframe = this.element.querySelector('#artifact-sidebar-iframe');
         const emptyState = this.element.querySelector('#artifact-empty-state');
-        const htmlContent = artifact.html || artifact.content || '';
 
-        if (iframe && htmlContent) {
+        if (iframe) {
             // Hide empty state, show iframe
             if (emptyState) emptyState.style.display = 'none';
             iframe.style.display = 'block';
 
-            // Load HTML into iframe
+            // Load HTML into iframe with error handling
             this.loadIframeContent(iframe, htmlContent);
         }
 
         // Open the sidebar
         this.open();
+    }
+    
+    /**
+     * Validate HTML Content
+     * 
+     * Checks if HTML content is valid and meaningful enough to display.
+     * Prevents blank screens from malformed AI outputs.
+     * 
+     * VALIDATION CRITERIA (2026-01-28):
+     * - Must have content (not empty or whitespace only)
+     * - Must contain at least some HTML structure (<html>, <body>, or <div>)
+     * - Must be at least 50 characters (minimal meaningful HTML)
+     * 
+     * @param {string} html - HTML content to validate
+     * @returns {boolean} True if HTML is valid
+     */
+    isValidHtml(html) {
+        // Must be a string
+        if (typeof html !== 'string') {
+            return false;
+        }
+        
+        // Must have content (not empty or whitespace)
+        const trimmed = html.trim();
+        if (trimmed.length === 0) {
+            return false;
+        }
+        
+        // Must be at least 50 characters (bare minimum for meaningful HTML)
+        // Even "<html><body>X</body></html>" is 31 chars, so 50 is reasonable
+        if (trimmed.length < 50) {
+            console.warn('[ArtifactSidebar] HTML too short:', trimmed.length, 'chars');
+            return false;
+        }
+        
+        // Must contain some HTML structure (tags)
+        // Looking for common structural elements
+        const hasHtmlStructure = /<(html|body|div|section|article|main|head)/i.test(trimmed);
+        if (!hasHtmlStructure) {
+            console.warn('[ArtifactSidebar] HTML missing structural elements');
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Show Error State
+     * 
+     * Displays a friendly error message in the artifact sidebar instead of
+     * a blank screen when HTML is invalid.
+     * 
+     * WHY THIS APPROACH:
+     * - Users should never see a blank white panel
+     * - Error messages should be helpful and suggest actions
+     * - Matches the liquid glass aesthetic
+     * 
+     * @param {string} artifactType - Type of artifact that failed
+     * @param {string} artifactId - ID of artifact that failed (if available)
+     */
+    showErrorState(artifactType, artifactId) {
+        const iframe = this.element.querySelector('#artifact-sidebar-iframe');
+        const emptyState = this.element.querySelector('#artifact-empty-state');
+        
+        if (!iframe) return;
+        
+        // Hide empty state, show iframe with error content
+        if (emptyState) emptyState.style.display = 'none';
+        iframe.style.display = 'block';
+        
+        // Create a nice-looking error page that matches our design
+        const errorHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artifact Error</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .error-container {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            color: white;
+        }
+        .error-icon { font-size: 48px; margin-bottom: 16px; }
+        .error-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+        .error-message {
+            font-size: 15px;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+        .error-suggestion {
+            font-size: 14px;
+            opacity: 0.8;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <div class="error-title">Artifact Generation Issue</div>
+        <div class="error-message">
+            The ${this.getReadableName(artifactType || 'artifact')} couldn't be displayed properly.
+            This sometimes happens when the AI response is incomplete.
+        </div>
+        <div class="error-suggestion">
+            <strong>Try:</strong> Ask me to "regenerate the artifact" or
+            describe what you'd like to see differently.
+        </div>
+    </div>
+</body>
+</html>`;
+        
+        this.loadIframeContent(iframe, errorHtml);
+        this.open();
+        
+        console.log('[ArtifactSidebar] Displayed error state for failed artifact');
+    }
+    
+    /**
+     * Show Error Toast
+     * 
+     * Displays a small toast notification when an artifact update fails
+     * but we're keeping the previous version visible.
+     * 
+     * @param {string} message - Error message to display
+     */
+    showErrorToast(message) {
+        // Create toast element if it doesn't exist
+        let toast = document.getElementById('artifact-error-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'artifact-error-toast';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                right: 40px;
+                background: rgba(239, 68, 68, 0.9);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 12px;
+                font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+                font-size: 14px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                opacity: 0;
+                transform: translateY(10px);
+                transition: all 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+        }
+        
+        // Show toast with message
+        toast.textContent = message;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+        
+        // Hide after 4 seconds
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(10px)';
+        }, 4000);
     }
 
     /**
