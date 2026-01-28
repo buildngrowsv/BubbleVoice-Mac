@@ -32,7 +32,21 @@ const express = require('express');
 const WebSocket = require('ws');
 const http = require('http');
 const path = require('path');
-require('dotenv').config();
+
+// Load environment variables from .env file
+// WHY: We specify the path explicitly because when Electron spawns this process,
+// the current working directory may not be the project root where .env lives.
+// The .env file is at the root of BubbleVoice-Mac, two directories up from server.js
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+
+// Log API key status at startup (for debugging)
+// WHY: Users need to know if their .env keys are being loaded correctly
+console.log('[Backend] Environment check:', {
+  hasGoogleKey: !!process.env.GOOGLE_API_KEY,
+  hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+  hasOpenAIKey: !!process.env.OPENAI_API_KEY,
+  googleKeyLength: process.env.GOOGLE_API_KEY ? process.env.GOOGLE_API_KEY.length : 0
+});
 
 // Import services
 // These will be created in separate files for modularity
