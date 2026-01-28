@@ -52,8 +52,8 @@ class LLMService {
       'gemini-2.5-flash-lite': 'gemini',
       'gemini-2.0-flash': 'gemini',
       'gemini-2.0-flash-exp': 'gemini',
-      'gemini-3.0-flash': 'gemini',      // New: Gemini 3 Flash
-      'gemini-3.0-pro': 'gemini',        // New: Gemini 3 Pro
+      'gemini-3-flash-preview': 'gemini',      // New: Gemini 3 Flash (preview)
+      'gemini-3-pro-preview': 'gemini',        // New: Gemini 3 Pro (preview)
       // Claude models (Anthropic)
       'claude-sonnet-4.5': 'anthropic',
       'claude-sonnet-4': 'anthropic',
@@ -67,8 +67,8 @@ class LLMService {
     this.modelDisplayNames = {
       'gemini-2.5-flash-lite': 'Gemini 2.5 Flash-Lite',
       'gemini-2.0-flash': 'Gemini 2.0 Flash',
-      'gemini-3.0-flash': 'Gemini 3 Flash',
-      'gemini-3.0-pro': 'Gemini 3 Pro',
+      'gemini-3-flash-preview': 'Gemini 3 Flash',
+      'gemini-3-pro-preview': 'Gemini 3 Pro',
       'claude-sonnet-4.5': 'Claude Sonnet 4.5',
       'claude-opus-4.5': 'Claude Opus 4.5',
       'gpt-5.2-turbo': 'GPT-5.2 Turbo',

@@ -329,6 +329,18 @@ class BackendServer {
           await this.handleUpdateConversationTitle(ws, message, connectionState);
           break;
 
+        case 'change_model':
+          // MODEL CHANGE HANDLER
+          // WHY: Frontend sends this when user selects a different AI model
+          // BECAUSE: Settings are passed with each message, this is just an acknowledgment
+          // NOTE: The actual model is used from message.settings in handleUserMessage
+          console.log(`[Backend] Model changed to: ${message.data?.model}`);
+          this.sendMessage(ws, {
+            type: 'model_changed',
+            data: { model: message.data?.model, success: true }
+          });
+          break;
+
         default:
           console.warn(`[Backend] Unknown message type: ${message.type}`);
           this.sendMessage(ws, {

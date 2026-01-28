@@ -236,11 +236,18 @@ function startBackendServer() {
   
   console.log('[Main] Starting backend server...');
   
-  // IMPORTANT: In development mode, we skip the database to avoid
-  // native module version conflicts between Electron's Node.js and
-  // system Node.js. Both need different versions of better-sqlite3.
-  // In production, the app is packaged with the correct version.
-  const skipDatabase = isDev || process.env.SKIP_DATABASE === 'true';
+  // DATABASE MODE (2026-01-28): Use real SQLite database even in dev mode
+  // WHY: User wants artifacts and documents to persist to user_data folder
+  // BECAUSE: SQLite is local (not web-based), no reason to skip it
+  // PREVIOUS: Was skipping in dev mode due to better-sqlite3 version concerns
+  // NOW: Only skip if explicitly set via SKIP_DATABASE=true environment variable
+  const skipDatabase = process.env.SKIP_DATABASE === 'true';
+  
+  if (!skipDatabase) {
+    console.log('[Main] ✅ Using REAL database and file storage (user_data folder)');
+  } else {
+    console.log('[Main] ⚠️ SKIP_DATABASE=true - Using mock storage (no files created)');
+  }
   
   backendProcess = spawn('node', [backendPath], {
     env: {
@@ -248,7 +255,7 @@ function startBackendServer() {
       PORT: BACKEND_PORT,
       WEBSOCKET_PORT: WEBSOCKET_PORT,
       NODE_ENV: isDev ? 'development' : 'production',
-      // Skip database in dev mode to avoid native module conflicts
+      // Only skip database if explicitly requested
       SKIP_DATABASE: skipDatabase ? 'true' : 'false'
     },
     stdio: isDev ? 'inherit' : 'pipe'
@@ -686,15 +693,15 @@ let conversationStorageService = null;
 
 function getChatHistoryServices() {
     if (!databaseService) {
-        // IMPORTANT: In development mode, we skip the real database to avoid
-        // native module version conflicts. Electron uses its own Node.js version
-        // which is different from system Node.js. The better-sqlite3 native module
-        // can only be compiled for ONE version at a time, causing conflicts.
-        // In production, the app is packaged with the correct version.
-        const skipDatabase = isDev || process.env.SKIP_DATABASE === 'true';
+        // DATABASE MODE (2026-01-28): Use real SQLite database even in dev mode
+        // WHY: User wants artifacts and documents to persist to user_data folder
+        // BECAUSE: SQLite is local (not web-based), no reason to skip it
+        // PREVIOUS: Was skipping in dev mode due to better-sqlite3 version concerns
+        // NOW: Only skip if explicitly set via SKIP_DATABASE=true environment variable
+        const skipDatabase = process.env.SKIP_DATABASE === 'true';
         
         if (skipDatabase) {
-            console.log('[Main] ⚠️  DEV MODE or SKIP_DATABASE=true - Using mock storage');
+            console.log('[Main] ⚠️  SKIP_DATABASE=true - Using mock storage (no persistence)');
             
             // Import IntegrationService to access MOCK_STORAGE
             const IntegrationService = require('../backend/services/IntegrationService');
@@ -774,12 +781,20 @@ function getChatHistoryServices() {
             
         } else {
             // Normal initialization with real database
+            // CRITICAL FIX (2026-01-28): Use the SAME user_data folder as the backend server
+            // WHY: Previously this was using app.getPath('userData') which goes to ~/Library/Application Support
+            // BECAUSE: Backend uses __dirname/../../user_data (project folder)
+            // RESULT: Electron IPC and backend server were using different databases!
+            // NOW: Both use the project's user_data folder for consistency
             const DatabaseService = require('../backend/services/DatabaseService');
             const ConversationStorageService = require('../backend/services/ConversationStorageService');
             
-            const userDataPath = path.join(app.getPath('userData'), 'user_data');
+            // Use same path as backend server (server.js line ~96)
+            const userDataPath = path.join(__dirname, '../backend/../../user_data');
             const dbPath = path.join(userDataPath, 'bubblevoice.db');
             const conversationsDir = path.join(userDataPath, 'conversations');
+            
+            console.log(`[Main] Using database at: ${dbPath}`);
             
             databaseService = new DatabaseService(dbPath);
             databaseService.initialize();

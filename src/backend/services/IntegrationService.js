@@ -151,6 +151,52 @@ class IntegrationService {
                     }
                     console.log(`[MockStorage] ERROR: Cannot get messages, conversation ${conversationId} not found`);
                     return [];
+                },
+                
+                // CRITICAL FIX (2026-01-28): Add missing methods that processTurn() requires
+                // WHY: These methods were missing from the mock, causing "not a function" errors
+                // BECAUSE: processTurn() calls these methods to save conversation turn data
+                // The error manifested as: "this.convStorage.saveConversationTurn is not a function"
+                
+                // Save conversation turn to 4-file structure (in mock, we just log it)
+                saveConversationTurn: async (conversationId, userInput, aiResponse, aiNotes, operations) => {
+                    console.log(`[MockStorage] 📝 Saving conversation turn for ${conversationId}`);
+                    console.log(`  User input length: ${userInput?.length || 0}`);
+                    console.log(`  AI response length: ${aiResponse?.length || 0}`);
+                    console.log(`  Operations: ${operations?.length || 0}`);
+                    
+                    // In mock mode, we just add to messages (the 4-file structure is skipped)
+                    // Real implementation writes to conversation.md, user_inputs.md, etc.
+                    const conv = MOCK_STORAGE.conversations.get(conversationId);
+                    if (conv) {
+                        // Track turn count
+                        if (!conv.turnCount) conv.turnCount = 0;
+                        conv.turnCount++;
+                        console.log(`[MockStorage] Turn ${conv.turnCount} saved (mock mode - files not created)`);
+                    }
+                    return true;
+                },
+                
+                // Get turn count for a conversation
+                getTurnCount: async (conversationId) => {
+                    const conv = MOCK_STORAGE.conversations.get(conversationId);
+                    const count = conv?.turnCount || conv?.messages?.length || 0;
+                    console.log(`[MockStorage] Turn count for ${conversationId}: ${count}`);
+                    return count;
+                },
+                
+                // Update conversation summary (in mock, we just log it)
+                updateConversationSummary: async (conversationId, updates) => {
+                    console.log(`[MockStorage] 📊 Updating conversation summary for ${conversationId}`);
+                    console.log(`  Updates:`, updates);
+                    
+                    // In mock mode, we store summary in the conversation object
+                    const conv = MOCK_STORAGE.conversations.get(conversationId);
+                    if (conv) {
+                        conv.summary = updates;
+                        console.log(`[MockStorage] Summary updated (mock mode - file not created)`);
+                    }
+                    return true;
                 }
             };
             

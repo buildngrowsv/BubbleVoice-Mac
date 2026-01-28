@@ -1140,8 +1140,8 @@ class BubbleVoiceApp {
     const modelProviders = {
       'gemini-2.5-flash-lite': 'google',
       'gemini-2.0-flash': 'google',
-      'gemini-3.0-flash': 'google',
-      'gemini-3.0-pro': 'google',
+      'gemini-3-flash-preview': 'google',
+      'gemini-3-pro-preview': 'google',
       'claude-sonnet-4.5': 'anthropic',
       'claude-opus-4.5': 'anthropic',
       'gpt-5.2-turbo': 'openai',
