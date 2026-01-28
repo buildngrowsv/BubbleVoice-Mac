@@ -619,12 +619,24 @@ class BackendServer {
           artifact.action = 'update';
         }
         
-        console.log('[Backend] ✨ Artifact to send:', {
-          artifact_type: artifact.artifact_type,
-          has_html: !!artifact.html,
-          html_length: artifact.html ? artifact.html.length : 0,
-          action: artifact.action
-        });
+        // Log artifact details based on action type
+        // PATCH actions don't have HTML, they have patches array instead
+        if (artifact.action === 'patch') {
+          console.log('[Backend] 🔧 Patch artifact to send:', {
+            artifact_id: artifact.artifact_id,
+            patches_count: artifact.patches?.length || 0,
+            patches_preview: (artifact.patches || []).slice(0, 2).map(p => 
+              `"${(p.old_string || '').substring(0, 20)}..." → "${(p.new_string || '').substring(0, 20)}..."`
+            )
+          });
+        } else {
+          console.log('[Backend] ✨ Artifact to send:', {
+            artifact_type: artifact.artifact_type,
+            has_html: !!artifact.html,
+            html_length: artifact.html ? artifact.html.length : 0,
+            action: artifact.action
+          });
+        }
         responseData.artifact = artifact;
         
         // CRITICAL FIX (2026-01-27): Track artifact in conversation state

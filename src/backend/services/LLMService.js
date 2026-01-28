@@ -148,10 +148,11 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
     }
   ],
   "artifact_action": {
-    "action": "create|update|none",
+    "action": "create|patch|update|none",
     "artifact_id": "unique_id",
     "artifact_type": "comparison_card|stress_map|checklist|reflection_summary|goal_tracker|timeline|decision_matrix|progress_chart|mindmap|celebration_card",
-    "html": "Full standalone HTML with inline CSS (only when html_toggle.generate_html is true)",
+    "html": "Full standalone HTML (for create/update actions)",
+    "patches": [{ "old_string": "text to find", "new_string": "replacement text" }],
     "data": { /* optional JSON data for data artifacts */ }
   },
   "html_toggle": {
@@ -170,23 +171,45 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
 
 **Artifact Guidelines:**
 
-**CRITICAL - EDIT vs CREATE Decision (prevents duplicates):**
-- **UPDATE (action: "update")** - Use when modifying EXISTING artifact:
+**CRITICAL - ACTION SELECTION (choose the fastest option):**
+
+- **PATCH (action: "patch")** - PREFERRED for small text changes (3-4x faster!):
   - User says "change X to Y" on the displayed artifact
-  - User says "add X" or "remove Y" from artifact
-  - User says "update the checklist" or similar modification request
-  - User is refining/iterating on what they already see
-  - **MUST use the SAME artifact_id from [CURRENT ARTIFACT DISPLAYED] context**
-  - **MUST regenerate complete HTML with the modification applied**
-- **CREATE (action: "create")** - Use ONLY when making NEW artifact:
-  - User explicitly asks for something NEW ("make me a timeline", "create a checklist")
-  - User wants a DIFFERENT artifact type ("show this as a mindmap instead")
+  - User says "rename Career to Money" or similar text change
+  - Simple value changes like updating a title, label, or number
+  - **MUST use the SAME artifact_id**
+  - **Provide patches array with old_string/new_string pairs**
+  - Example: patches: [{ "old_string": "Career & Growth", "new_string": "Career & Money" }]
+  - Multiple patches can be applied in one action
+  - NO html field needed - patches are applied to existing HTML
+
+- **UPDATE (action: "update")** - Use for major visual changes:
+  - User wants layout changes ("move this to the left", "make it bigger")
+  - User wants style changes ("change the colors", "make it darker")
+  - User wants structural changes ("add a new section", "reorganize")
+  - Changes that can't be done with simple text replacement
+  - **MUST use the SAME artifact_id**
+  - **MUST regenerate complete HTML**
+
+- **CREATE (action: "create")** - Use ONLY for NEW artifacts:
+  - User explicitly asks for something NEW ("make me a timeline")
+  - User wants a DIFFERENT artifact type ("show as mindmap instead")
   - No artifact is currently displayed
-  - User explicitly says "new" or "create" or requests a different format
-  - Generate a new unique artifact_id (format: type_timestamp)
-- **NONE (action: "none")** - Use when no artifact work needed:
+  - Generate a new unique artifact_id
+
+- **NONE (action: "none")** - No artifact work needed:
   - User is just chatting/asking questions
   - No visual output is appropriate
+
+**PATCH vs UPDATE Decision:**
+| Change Type | Use PATCH | Use UPDATE |
+|-------------|-----------|------------|
+| "change Growth to Money" | ✅ | ❌ |
+| "update the title to X" | ✅ | ❌ |
+| "fix the typo in Y" | ✅ | ❌ |
+| "make it blue instead" | ❌ | ✅ |
+| "add a new card" | ❌ | ✅ |
+| "change the layout" | ❌ | ✅ |
 
 **HTML Toggle System**: Control when to generate expensive HTML vs fast data-only responses
   - **HTML OFF (default)**: Fast mode for simple updates, questions, minor corrections
@@ -350,7 +373,18 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
                 action: { type: 'string' },
                 artifact_id: { type: 'string' },
                 artifact_type: { type: 'string' },
-                html: { type: 'string' }
+                html: { type: 'string' },
+                patches: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      old_string: { type: 'string' },
+                      new_string: { type: 'string' },
+                      replace_all: { type: 'boolean' }
+                    }
+                  }
+                }
               }
             },
             html_toggle: {

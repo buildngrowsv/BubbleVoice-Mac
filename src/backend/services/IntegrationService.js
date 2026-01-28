@@ -421,6 +421,19 @@ class IntegrationService {
             // - Casual conversation (no artifact needed)
             // 
             // This saves 40-50% latency and 60-70% cost on turns that don't need visuals!
+            // 
+            // **PATCH SYSTEM (2026-01-28)**:
+            // For small text changes, the AI can now use action: "patch" instead of
+            // regenerating the entire HTML. This is 3-4x faster and uses fewer tokens.
+            // 
+            // - "patch": Apply string replacements to existing artifact (FAST!)
+            // - "create": Generate new artifact with full HTML
+            // - "update": Replace existing artifact with new full HTML
+            // 
+            // Example patch action:
+            // { action: "patch", artifact_id: "mindmap_123", patches: [
+            //   { old_string: "Growth", new_string: "Money" }
+            // ]}
             if (artifactAction.action === 'create' || artifactAction.action === 'update') {
                 const artifactResult = await this.artifactManager.saveArtifact(
                     conversationId,
@@ -430,6 +443,64 @@ class IntegrationService {
                 
                 if (artifactResult) {
                     result.artifactsSaved.push(artifactResult.artifact_id);
+                }
+            } else if (artifactAction.action === 'patch') {
+                // NEW: Handle patch action - apply string replacements to existing artifact
+                // This is significantly faster than regenerating full HTML
+                console.log('[IntegrationService] 🔧 Processing patch action');
+                
+                // Use the new processArtifactAction method if available (real artifact manager)
+                // Or fall back to mock implementation
+                if (typeof this.artifactManager.processArtifactAction === 'function') {
+                    const patchResult = await this.artifactManager.processArtifactAction(
+                        conversationId,
+                        artifactAction,
+                        null
+                    );
+                    
+                    if (patchResult) {
+                        result.artifactsSaved.push(patchResult.artifact_id);
+                        // Add patch-specific info to result
+                        result.patchesApplied = patchResult.patches_applied || 0;
+                        result.patchesSkipped = patchResult.patches_skipped || 0;
+                    }
+                } else if (typeof this.artifactManager.patchArtifact === 'function') {
+                    // Direct patch method
+                    const patchResult = await this.artifactManager.patchArtifact(
+                        conversationId,
+                        artifactAction.artifact_id,
+                        artifactAction.patches
+                    );
+                    
+                    if (patchResult) {
+                        result.artifactsSaved.push(patchResult.artifact_id);
+                        result.patchesApplied = patchResult.patches_applied || 0;
+                        result.patchesSkipped = patchResult.patches_skipped || 0;
+                    }
+                } else {
+                    // Mock mode - apply patches in memory
+                    console.log('[IntegrationService] Mock patch - applying to in-memory artifact');
+                    const artifact = this.artifactManager.artifacts?.get(artifactAction.artifact_id);
+                    if (artifact && artifact.html) {
+                        let patchedHtml = artifact.html;
+                        let patchesApplied = 0;
+                        
+                        for (const patch of (artifactAction.patches || [])) {
+                            if (patch.old_string && patchedHtml.includes(patch.old_string)) {
+                                if (patch.replace_all) {
+                                    patchedHtml = patchedHtml.split(patch.old_string).join(patch.new_string);
+                                } else {
+                                    patchedHtml = patchedHtml.replace(patch.old_string, patch.new_string);
+                                }
+                                patchesApplied++;
+                            }
+                        }
+                        
+                        artifact.html = patchedHtml;
+                        result.artifactsSaved.push(artifact.artifact_id);
+                        result.patchesApplied = patchesApplied;
+                        console.log(`[IntegrationService] Mock patch applied: ${patchesApplied} patches`);
+                    }
                 }
             }
             

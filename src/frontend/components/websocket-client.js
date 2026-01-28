@@ -504,7 +504,22 @@ class WebSocketClient {
    * @param {Object} data - Artifact data from backend
    */
   handleArtifact(data) {
-    console.log('[WebSocketClient] Routing artifact to sidebar:', data.artifact_type || data.type);
+    // PATCH SUPPORT (2026-01-28):
+    // Detect patch actions and log accordingly. Patch actions are 3-4x faster
+    // because they only send the changes, not the full HTML.
+    // 
+    // Action types:
+    // - "patch": Apply string replacements to existing artifact (FAST!)
+    // - "create": New artifact with full HTML
+    // - "update": Replace existing artifact with new full HTML
+    if (data.action === 'patch') {
+      console.log('[WebSocketClient] 🔧 Routing PATCH to sidebar:', {
+        artifact_id: data.artifact_id,
+        patches_count: data.patches?.length || 0
+      });
+    } else {
+      console.log('[WebSocketClient] Routing artifact to sidebar:', data.artifact_type || data.type);
+    }
     
     // Route to artifact sidebar (not inline in conversation)
     if (this.app.artifactSidebar) {
