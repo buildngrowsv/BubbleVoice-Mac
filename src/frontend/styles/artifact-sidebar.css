@@ -531,6 +531,130 @@ body.artifact-sidebar-open .settings-panel {
         flex-wrap: wrap;
         justify-content: center;
     }
+    
+    /* Floating toggle adjustments for mobile */
+    .artifact-toggle-floating {
+        /* Smaller padding on mobile */
+        padding: 10px 8px;
+    }
+    
+    .artifact-toggle-icon {
+        font-size: 20px;
+    }
+    
+    .artifact-toggle-label {
+        font-size: 9px;
+    }
+}
+
+/* ===================================================================
+   FLOATING TOGGLE BUTTON
+   =================================================================== */
+
+/**
+ * Floating toggle button that appears when artifact sidebar is closed.
+ * Allows users to reopen the artifact sidebar to view previous artifacts.
+ * 
+ * FEATURE (2026-01-27): User requested a way to reopen the sidebar after closing.
+ * 
+ * DESIGN:
+ * - Fixed position on the right edge of the screen
+ * - Slides in slightly from the right to draw attention
+ * - Shows icon representing the artifact type
+ * - Liquid glass styling consistent with app aesthetic
+ * - Only visible when sidebar is closed AND has artifact content
+ */
+.artifact-toggle-floating {
+    /* Fixed position on right edge, vertically centered */
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    
+    /* Layout - vertical stack of icon and label */
+    display: none; /* Hidden by default, shown via JS when needed */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    
+    /* Size and padding */
+    padding: 12px 10px;
+    min-width: 48px;
+    
+    /* Liquid glass styling */
+    background: rgba(102, 126, 234, 0.25);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(102, 126, 234, 0.4);
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3),
+                0 4px 15px rgba(102, 126, 234, 0.2);
+    
+    /* Typography */
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    /* Interaction */
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Layer above most content but below modals */
+    z-index: 900;
+}
+
+.artifact-toggle-floating:hover {
+    /* Slide out more on hover to be more visible */
+    padding-right: 16px;
+    background: rgba(102, 126, 234, 0.35);
+    border-color: rgba(102, 126, 234, 0.6);
+    box-shadow: -6px 0 25px rgba(0, 0, 0, 0.4),
+                0 4px 20px rgba(102, 126, 234, 0.35);
+}
+
+.artifact-toggle-floating:active {
+    transform: translateY(-50%) scale(0.98);
+}
+
+/* Icon inside the toggle button */
+.artifact-toggle-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+/* Label text below icon */
+.artifact-toggle-label {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-size: 10px;
+    opacity: 0.9;
+}
+
+/* Animation: subtle pulse to draw attention when first shown */
+@keyframes artifactTogglePulse {
+    0%, 100% {
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3),
+                    0 4px 15px rgba(102, 126, 234, 0.2);
+    }
+    50% {
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3),
+                    0 4px 25px rgba(102, 126, 234, 0.5);
+    }
+}
+
+/* Pulse animation when first displayed */
+.artifact-toggle-floating {
+    animation: artifactTogglePulse 2s ease-in-out 3;
+}
+
+/* Stop animation on hover (user has noticed it) */
+.artifact-toggle-floating:hover {
+    animation: none;
 }
 
 /* ===================================================================
@@ -570,7 +694,8 @@ body.artifact-sidebar-open .settings-panel {
 
 .artifact-sidebar-button:focus,
 .artifact-toolbar-btn:focus,
-.history-item:focus {
+.history-item:focus,
+.artifact-toggle-floating:focus {
     outline: 2px solid rgba(102, 126, 234, 0.6);
     outline-offset: 2px;
 }
@@ -582,6 +707,11 @@ body.artifact-sidebar-open .settings-panel {
     }
     
     body.artifact-sidebar-open .main-container {
+        transition: none;
+    }
+    
+    .artifact-toggle-floating {
+        animation: none;
         transition: none;
     }
 }
@@ -601,7 +731,8 @@ body.artifact-sidebar-open .settings-panel {
     
     .artifact-sidebar-header,
     .artifact-sidebar-toolbar,
-    .artifact-sidebar-history {
+    .artifact-sidebar-history,
+    .artifact-toggle-floating {
         display: none;
     }
     

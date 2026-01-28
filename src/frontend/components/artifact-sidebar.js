@@ -171,10 +171,36 @@ class ArtifactSidebar {
      * 
      * Adds the sidebar to the DOM in the correct location.
      * Should be a sibling of the main content, positioned on the right.
+     * Also creates the floating toggle button for reopening closed sidebar.
      */
     injectIntoPage() {
         // Insert at end of body, will be positioned with CSS
         document.body.appendChild(this.element);
+
+        // Create floating toggle button for reopening closed sidebar
+        // WHY: User needs a way to reopen the artifact sidebar after closing it
+        // DESIGN: Similar to the chat sidebar's floating toggle button
+        this.floatingToggle = document.createElement('button');
+        this.floatingToggle.className = 'artifact-toggle-floating';
+        this.floatingToggle.id = 'artifact-toggle-floating';
+        this.floatingToggle.setAttribute('title', 'Show Artifact Panel');
+        this.floatingToggle.setAttribute('aria-label', 'Show artifact panel');
+        this.floatingToggle.innerHTML = `
+            <span class="artifact-toggle-icon">📊</span>
+            <span class="artifact-toggle-label">Artifact</span>
+        `;
+        
+        // Add click handler to open sidebar
+        this.floatingToggle.addEventListener('click', () => {
+            if (this.currentArtifact || this.artifactHistory.length > 0) {
+                this.open();
+            }
+        });
+        
+        // Initially hidden (shown only when sidebar closed and has content)
+        this.floatingToggle.style.display = 'none';
+        
+        document.body.appendChild(this.floatingToggle);
     }
 
     /**
@@ -433,6 +459,7 @@ class ArtifactSidebar {
      * Open Sidebar
      * 
      * Makes the sidebar visible with animation.
+     * Also hides the floating toggle button since sidebar is now visible.
      */
     open() {
         this.isOpen = true;
@@ -443,6 +470,12 @@ class ArtifactSidebar {
         // Add class to body for layout adjustment
         document.body.classList.add('artifact-sidebar-open');
         
+        // Hide the floating toggle when sidebar is open
+        // WHY: Toggle is only needed when sidebar is closed
+        if (this.floatingToggle) {
+            this.floatingToggle.style.display = 'none';
+        }
+        
         console.log('[ArtifactSidebar] Opened');
     }
 
@@ -450,6 +483,10 @@ class ArtifactSidebar {
      * Close Sidebar
      * 
      * Hides the sidebar completely.
+     * Shows the floating toggle button if there's artifact content to view.
+     * 
+     * FEATURE (2026-01-27): User requested a way to reopen the sidebar after closing.
+     * The floating toggle appears on the right edge when artifacts are available.
      */
     close() {
         this.isOpen = false;
@@ -458,6 +495,24 @@ class ArtifactSidebar {
         
         // Remove body class
         document.body.classList.remove('artifact-sidebar-open');
+        
+        // Show the floating toggle if there's artifact content to view
+        // WHY: User needs a way to reopen the sidebar to view artifacts again
+        // ONLY show if there's actual artifact content (current or history)
+        if (this.floatingToggle) {
+            const hasContent = this.currentArtifact || this.artifactHistory.length > 0;
+            this.floatingToggle.style.display = hasContent ? 'flex' : 'none';
+            
+            // Update the icon to match the current/last artifact type
+            if (hasContent) {
+                const artifact = this.currentArtifact || this.artifactHistory[0];
+                const type = artifact.artifact_type || artifact.type || 'artifact';
+                const iconSpan = this.floatingToggle.querySelector('.artifact-toggle-icon');
+                if (iconSpan) {
+                    iconSpan.textContent = this.getIconForType(type);
+                }
+            }
+        }
         
         console.log('[ArtifactSidebar] Closed');
     }
@@ -690,6 +745,7 @@ class ArtifactSidebar {
      * 
      * Clears current artifact and history.
      * Called when switching conversations.
+     * Also hides the floating toggle since there's no content to show.
      */
     clearAll() {
         this.currentArtifact = null;
@@ -708,7 +764,17 @@ class ArtifactSidebar {
         }
         
         this.updateHistoryUI();
-        this.close();
+        
+        // Close sidebar (don't show floating toggle since there's no content)
+        this.isOpen = false;
+        this.element.classList.remove('open', 'minimized');
+        this.element.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('artifact-sidebar-open');
+        
+        // Hide floating toggle - no content to show
+        if (this.floatingToggle) {
+            this.floatingToggle.style.display = 'none';
+        }
         
         console.log('[ArtifactSidebar] Cleared all');
     }
