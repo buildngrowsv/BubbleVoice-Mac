@@ -236,9 +236,12 @@ class BubbleVoiceApp {
       });
     });
 
-    // Settings button - open settings panel
+    // Settings button - TOGGLE settings panel (open if closed, close if open)
+    // FIX (2026-01-28): Changed from openSettings() to toggleSettings()
+    // WHY: User reported clicking settings icon should close the panel if already open
+    // BECAUSE: Standard UX pattern - clicking a toggle button should toggle state
     this.elements.settingsButton.addEventListener('click', () => {
-      this.openSettings();
+      this.toggleSettings();
     });
 
     // Close settings button
@@ -650,6 +653,23 @@ class BubbleVoiceApp {
   /**
    * SETTINGS MANAGEMENT
    */
+
+  /**
+   * TOGGLE SETTINGS PANEL
+   * 
+   * Opens the settings panel if closed, closes it if open.
+   * Added 2026-01-28 to fix toggle behavior when clicking settings icon.
+   * 
+   * WHY: Standard UX pattern - clicking a toggle button should toggle state
+   * BECAUSE: User expected clicking settings icon to close panel if already open
+   */
+  toggleSettings() {
+    if (this.elements.settingsPanel.classList.contains('open')) {
+      this.closeSettings();
+    } else {
+      this.openSettings();
+    }
+  }
 
   openSettings() {
     this.elements.settingsPanel.classList.add('open');

@@ -54,8 +54,10 @@
     /* Animation - only animate transform, not width (for smooth resize) */
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* Layer ABOVE settings panel (settings is z-index: 1000) */
-    /* FIX: Previously was 900, causing settings to overlap artifact sidebar */
+    /* Layer BELOW settings panel (settings is z-index: 1200) */
+    /* NOTE: Settings panel was raised to 1200 so users can access settings while artifact is open */
+    /* FIX (2026-01-27): Previously was 900, causing settings to overlap artifact sidebar */
+    /* FIX (2026-01-28): Settings raised to 1200 to appear ABOVE artifact per user request */
     z-index: 1100;
     
     /* Prevent text selection during animations */
@@ -472,8 +474,9 @@ body.artifact-sidebar-open .sidebar-toggle-floating {
 }
 
 body.artifact-sidebar-open .settings-panel {
-    /* Settings panel goes behind artifact sidebar now (z-index fix) */
-    /* No need to move it - artifact sidebar is above it */
+    /* FIX (2026-01-28): Settings panel now appears ABOVE artifact sidebar (z-index 1200 vs 1100) */
+    /* This allows users to access settings while viewing an artifact */
+    /* Previous behavior had settings appearing behind artifact, which was confusing */
 }
 
 /* ===================================================================

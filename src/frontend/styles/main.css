@@ -662,7 +662,10 @@ button, input, select, textarea, [contenteditable] {
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.3);
   transform: translateX(100%);
   transition: transform var(--transition-slow);
-  z-index: 1000;
+  /* FIX (2026-01-28): Increased z-index to appear ABOVE artifact sidebar (z-index 1100)
+   * WHY: User reported settings panel appearing behind artifact when both are open
+   * BECAUSE: Settings panel needs to be the top-most slide-in panel for user access */
+  z-index: 1200;
   overflow-y: scroll; /* Force scrollbar to always show */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on webkit */
   display: flex;
