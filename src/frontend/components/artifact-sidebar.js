@@ -122,9 +122,11 @@ class ArtifactSidebar {
                 </div>
                 
                 <!-- Artifact iframe - hidden until artifact is loaded -->
+                <!-- FIX (2026-01-28): Added scrolling="yes" to allow scrolling in artifact content -->
                 <iframe class="artifact-sidebar-iframe"
                         id="artifact-sidebar-iframe"
                         sandbox="allow-same-origin"
+                        scrolling="yes"
                         title="Artifact content"
                         style="display: none;">
                 </iframe>

@@ -266,7 +266,10 @@ body.artifact-sidebar-resizing * {
 
 .artifact-sidebar-content {
     flex: 1;
-    overflow: hidden;
+    /* FIX (2026-01-28): Changed from overflow: hidden to overflow: auto
+       WHY: User reported scrolling wasn't working in artifacts
+       BECAUSE: hidden prevents all scrolling, auto allows scrolling when content overflows */
+    overflow: auto;
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -311,6 +314,10 @@ body.artifact-sidebar-resizing * {
     background: white;
     border-radius: 0;
     min-height: 300px;
+    /* FIX (2026-01-28): Ensure iframe content can scroll
+       The iframe renders HTML content that may be taller than the visible area
+       Scrolling should be enabled so users can view all artifact content */
+    overflow: auto;
 }
 
 /* ===================================================================

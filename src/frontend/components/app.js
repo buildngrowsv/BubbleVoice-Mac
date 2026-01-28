@@ -671,12 +671,31 @@ class BubbleVoiceApp {
     }
   }
 
+  /**
+   * OPEN SETTINGS PANEL
+   * 
+   * Opens the settings panel and manages accessibility attributes.
+   * 
+   * FIX (2026-01-28): Added aria-hidden management to fix browser warning
+   * about aria-hidden on element with focused descendants.
+   */
   openSettings() {
     this.elements.settingsPanel.classList.add('open');
+    // Remove aria-hidden when panel is open so screen readers can access it
+    this.elements.settingsPanel.removeAttribute('aria-hidden');
   }
 
+  /**
+   * CLOSE SETTINGS PANEL
+   * 
+   * Closes the settings panel and manages accessibility attributes.
+   * 
+   * FIX (2026-01-28): Added aria-hidden management for accessibility.
+   */
   closeSettings() {
     this.elements.settingsPanel.classList.remove('open');
+    // Add aria-hidden when panel is closed to hide from screen readers
+    this.elements.settingsPanel.setAttribute('aria-hidden', 'true');
   }
 
   setupSettingsListeners() {
@@ -738,9 +757,19 @@ class BubbleVoiceApp {
     // (e.g., Dropbox, iCloud Drive, specific project folder)
     const targetFolderPath = document.getElementById('target-folder-path');
     const selectFolderButton = document.getElementById('select-folder-button');
+    const openFolderButton = document.getElementById('open-folder-button');
     
     // Display current target folder if set
-    targetFolderPath.value = this.state.settings.targetFolder || '';
+    // FIX (2026-01-28): Make sure this persists across page reloads
+    const savedFolder = this.state.settings.targetFolder;
+    console.log('[App] Loading saved target folder:', savedFolder);
+    if (savedFolder) {
+      targetFolderPath.value = savedFolder;
+      openFolderButton.style.display = 'inline-block';
+    } else {
+      targetFolderPath.value = '';
+      openFolderButton.style.display = 'none';
+    }
     
     // Handle folder selection button click
     selectFolderButton.addEventListener('click', async () => {
@@ -754,6 +783,9 @@ class BubbleVoiceApp {
           targetFolderPath.value = result.path;
           this.saveSettings();
           
+          // Show the Open button now that a folder is selected
+          openFolderButton.style.display = 'inline-block';
+          
           // Show success feedback
           selectFolderButton.textContent = 'Folder Selected ✓';
           setTimeout(() => {
@@ -766,6 +798,24 @@ class BubbleVoiceApp {
       } catch (error) {
         console.error('[App] Error in folder selection:', error);
         this.showError('Failed to open folder selection dialog');
+      }
+    });
+    
+    // Handle open folder button click
+    // This opens the selected folder in Finder so users can see their data
+    openFolderButton.addEventListener('click', async () => {
+      const folderPath = this.state.settings.targetFolder;
+      if (!folderPath) {
+        console.warn('[App] No folder selected to open');
+        return;
+      }
+      
+      try {
+        console.log('[App] Opening folder in Finder:', folderPath);
+        await window.electronAPI.openFolder(folderPath);
+      } catch (error) {
+        console.error('[App] Error opening folder:', error);
+        this.showError('Failed to open folder');
       }
     });
 

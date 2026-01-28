@@ -452,6 +452,41 @@ ipcMain.handle('select-target-folder', async () => {
   }
 });
 
+/**
+ * Open folder in Finder
+ * 
+ * Opens the specified folder in the native file browser (Finder on macOS).
+ * This allows users to quickly access their data folder to see files,
+ * back them up, or manage them manually.
+ * 
+ * Added 2026-01-28 to complement folder selection.
+ * 
+ * @param {string} folderPath - Absolute path to the folder to open
+ */
+ipcMain.handle('open-folder', async (event, folderPath) => {
+  try {
+    if (!folderPath) {
+      return { success: false, error: 'No folder path provided' };
+    }
+    
+    console.log('[Main] Opening folder in Finder:', folderPath);
+    
+    // Use shell.openPath to open the folder in Finder
+    const { shell } = require('electron');
+    const result = await shell.openPath(folderPath);
+    
+    // shell.openPath returns an empty string on success, or an error message
+    if (result === '') {
+      return { success: true };
+    } else {
+      return { success: false, error: result };
+    }
+  } catch (error) {
+    console.error('[Main] Error opening folder:', error);
+    return { success: false, error: error.message };
+  }
+});
+
 // Get current storage folder
 ipcMain.handle('storage:get-folder', async () => {
   try {

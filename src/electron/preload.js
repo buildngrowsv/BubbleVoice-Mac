@@ -61,6 +61,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectTargetFolder: () => ipcRenderer.invoke('select-target-folder'),
 
   /**
+   * OPEN FOLDER IN FINDER
+   * 
+   * Opens the specified folder in Finder (macOS file browser).
+   * Allows users to quickly access their data folder.
+   * 
+   * Added 2026-01-28 to complement folder selection.
+   * 
+   * @param {string} folderPath - Absolute path to the folder to open
+   * RETURNS: { success: boolean, error?: string }
+   */
+  openFolder: (folderPath) => ipcRenderer.invoke('open-folder', folderPath),
+
+  /**
    * STORAGE MANAGEMENT API
    * 
    * Methods for managing the user-selected storage folder.

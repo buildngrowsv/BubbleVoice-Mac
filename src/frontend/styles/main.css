@@ -952,6 +952,37 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 /**
+ * SETTINGS BUTTON SECONDARY
+ * 
+ * A smaller, less prominent button for secondary actions.
+ * Used for the "Open" folder button next to "Choose Folder".
+ * 
+ * Added 2026-01-28 for the Open Folder button.
+ */
+.settings-button-secondary {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.settings-button-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+.settings-button-secondary:active {
+  transform: translateY(0);
+}
+
+/**
  * SETTINGS HINT
  * 
  * Small helper text below settings inputs.
