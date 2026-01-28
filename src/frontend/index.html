@@ -307,9 +307,16 @@
 
       <!-- INPUT FIELD -->
       <!-- TEST ID: input-wrapper - Wrapper around the text input and action buttons -->
-      <div class="input-wrapper" data-testid="input-wrapper">
+      <!-- 
+        UPDATED (2026-01-28): Made input wrapper larger and added inline model selector.
+        WHY: User requested model switching directly in the message area for convenience.
+        The model dropdown appears at the bottom-left of the input area.
+      -->
+      <div class="input-wrapper input-wrapper-expanded" data-testid="input-wrapper">
+        
+        <!-- TEXT INPUT AREA -->
         <!-- TEST ID: message-input - The main text input field for typing messages -->
-        <div class="input-field"
+        <div class="input-field input-field-expanded"
              id="input-field"
              data-testid="message-input"
              contenteditable="true"
@@ -319,40 +326,77 @@
              aria-multiline="true">
         </div>
 
-        <!-- INPUT ACTIONS -->
-        <!-- TEST ID: input-actions - Container for voice and send buttons -->
-        <div class="input-actions" data-testid="input-actions" role="group" aria-label="Message actions">
+        <!-- INPUT FOOTER - Model selector and action buttons -->
+        <!-- TEST ID: input-footer - Bottom bar with model selector and send buttons -->
+        <div class="input-footer" data-testid="input-footer">
+          
+          <!-- INLINE MODEL SELECTOR -->
+          <!-- TEST ID: inline-model-selector - Quick model switch dropdown -->
+          <!-- 
+            WHY: Users want to change models on-the-fly without opening settings.
+            Unavailable models (no API key) are grayed out but still visible.
+          -->
+          <div class="inline-model-selector" data-testid="inline-model-selector">
+            <select class="inline-model-dropdown"
+                    id="inline-model-select"
+                    data-testid="inline-model-select"
+                    aria-label="Select AI model">
+              <!-- Gemini models (free tier available) -->
+              <optgroup label="Gemini (Google)">
+                <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                <option value="gemini-3.0-flash">Gemini 3 Flash</option>
+                <option value="gemini-3.0-pro">Gemini 3 Pro</option>
+              </optgroup>
+              <!-- Claude models (requires API key) -->
+              <optgroup label="Claude (Anthropic)">
+                <option value="claude-sonnet-4.5">Claude Sonnet 4.5</option>
+                <option value="claude-opus-4.5">Claude Opus 4.5</option>
+              </optgroup>
+              <!-- OpenAI models (requires API key) -->
+              <optgroup label="GPT (OpenAI)">
+                <option value="gpt-5.2-turbo">GPT-5.2 Turbo</option>
+                <option value="gpt-5.1">GPT-5.1</option>
+              </optgroup>
+            </select>
+            <span class="model-indicator" id="model-indicator" data-testid="model-indicator"></span>
+          </div>
 
-          <!-- VOICE BUTTON (primary action) -->
-          <!-- TEST ID: voice-button - Primary button to start/stop voice recording -->
-          <button class="action-button voice-button"
-                  id="voice-button"
-                  data-testid="voice-button"
-                  title="Hold to speak (⌘⇧Space)"
-                  aria-label="Voice input - hold to speak"
-                  aria-pressed="false">
-            <svg class="voice-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" fill="currentColor"/>
-              <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <svg class="stop-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;" aria-hidden="true">
-              <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/>
-            </svg>
-          </button>
+          <!-- INPUT ACTIONS -->
+          <!-- TEST ID: input-actions - Container for voice and send buttons -->
+          <div class="input-actions" data-testid="input-actions" role="group" aria-label="Message actions">
 
-          <!-- SEND BUTTON -->
-          <!-- TEST ID: send-button - Button to send the current message -->
-          <button class="action-button send-button"
-                  id="send-button"
-                  data-testid="send-button"
-                  title="Send message (Enter)"
-                  aria-label="Send message"
-                  disabled>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
+            <!-- VOICE BUTTON (primary action) -->
+            <!-- TEST ID: voice-button - Primary button to start/stop voice recording -->
+            <button class="action-button voice-button"
+                    id="voice-button"
+                    data-testid="voice-button"
+                    title="Hold to speak (⌘⇧Space)"
+                    aria-label="Voice input - hold to speak"
+                    aria-pressed="false">
+              <svg class="voice-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" fill="currentColor"/>
+                <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <svg class="stop-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;" aria-hidden="true">
+                <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"/>
+              </svg>
+            </button>
 
+            <!-- SEND BUTTON -->
+            <!-- TEST ID: send-button - Button to send the current message -->
+            <button class="action-button send-button"
+                    id="send-button"
+                    data-testid="send-button"
+                    title="Send message (Enter)"
+                    aria-label="Send message"
+                    disabled>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+          </div>
         </div>
       </div>
 
@@ -419,14 +463,25 @@
       <div class="settings-section" data-testid="settings-section-model">
         <h3 id="model-section-heading">AI Model</h3>
         <!-- TEST ID: model-select - Dropdown to select AI model -->
+        <!-- UPDATED (2026-01-28): Added Gemini 3 Pro, Gemini 3 Flash, Opus 4.5 -->
         <select class="settings-select"
                 id="model-select"
                 data-testid="model-select"
                 aria-labelledby="model-section-heading">
-          <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Recommended)</option>
-          <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-          <option value="claude-sonnet-4.5">Claude Sonnet 4.5 (Requires API Key)</option>
-          <option value="gpt-5.2-turbo">GPT-5.2 Turbo (Requires API Key)</option>
+          <optgroup label="Gemini (Google)">
+            <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Recommended)</option>
+            <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+            <option value="gemini-3.0-flash">Gemini 3 Flash (New)</option>
+            <option value="gemini-3.0-pro">Gemini 3 Pro (New)</option>
+          </optgroup>
+          <optgroup label="Claude (Anthropic)">
+            <option value="claude-sonnet-4.5">Claude Sonnet 4.5</option>
+            <option value="claude-opus-4.5">Claude Opus 4.5 (New)</option>
+          </optgroup>
+          <optgroup label="GPT (OpenAI)">
+            <option value="gpt-5.2-turbo">GPT-5.2 Turbo</option>
+            <option value="gpt-5.1">GPT-5.1</option>
+          </optgroup>
         </select>
         <small class="settings-hint">
           Gemini models require Google API Key. Claude requires Anthropic API Key. GPT requires OpenAI API Key.

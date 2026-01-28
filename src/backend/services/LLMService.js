@@ -46,14 +46,33 @@ class LLMService {
 
     // Provider configuration
     // Maps model names to provider implementations
+    // UPDATED (2026-01-28): Added Gemini 3 Pro, Gemini 3 Flash, Opus 4.5
     this.providers = {
+      // Gemini models (Google)
       'gemini-2.5-flash-lite': 'gemini',
       'gemini-2.0-flash': 'gemini',
       'gemini-2.0-flash-exp': 'gemini',
+      'gemini-3.0-flash': 'gemini',      // New: Gemini 3 Flash
+      'gemini-3.0-pro': 'gemini',        // New: Gemini 3 Pro
+      // Claude models (Anthropic)
       'claude-sonnet-4.5': 'anthropic',
       'claude-sonnet-4': 'anthropic',
+      'claude-opus-4.5': 'anthropic',    // New: Opus 4.5
+      // GPT models (OpenAI)
       'gpt-5.2-turbo': 'openai',
       'gpt-5.1': 'openai'
+    };
+    
+    // Model display names for logging and UI
+    this.modelDisplayNames = {
+      'gemini-2.5-flash-lite': 'Gemini 2.5 Flash-Lite',
+      'gemini-2.0-flash': 'Gemini 2.0 Flash',
+      'gemini-3.0-flash': 'Gemini 3 Flash',
+      'gemini-3.0-pro': 'Gemini 3 Pro',
+      'claude-sonnet-4.5': 'Claude Sonnet 4.5',
+      'claude-opus-4.5': 'Claude Opus 4.5',
+      'gpt-5.2-turbo': 'GPT-5.2 Turbo',
+      'gpt-5.1': 'GPT-5.1'
     };
 
     // System prompt

@@ -533,6 +533,125 @@ button, input, select, textarea, [contenteditable] {
 }
 
 /**
+ * INPUT WRAPPER EXPANDED
+ * 
+ * Larger message input area with inline model selector.
+ * ADDED (2026-01-28): User requested bigger input with model dropdown.
+ */
+.input-wrapper-expanded {
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 120px;
+  padding: var(--spacing-md);
+}
+
+.input-field-expanded {
+  min-height: 60px;
+  max-height: 200px;
+  flex: 1;
+  margin-bottom: var(--spacing-sm);
+}
+
+/**
+ * INPUT FOOTER
+ * 
+ * Bottom bar containing model selector and action buttons.
+ * Provides quick access to model switching without opening settings.
+ */
+.input-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/**
+ * INLINE MODEL SELECTOR
+ * 
+ * Compact dropdown for quick model switching in the input area.
+ * Models without API keys are grayed out but still selectable
+ * (will prompt user to add API key).
+ */
+.inline-model-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.inline-model-dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 28px 6px 10px;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  max-width: 180px;
+  
+  /* Custom dropdown arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='rgba(255,255,255,0.5)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.inline-model-dropdown:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.inline-model-dropdown:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Style option groups */
+.inline-model-dropdown optgroup {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  background: #1a1a2e;
+}
+
+.inline-model-dropdown option {
+  padding: 8px 12px;
+  background: #1a1a2e;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Grayed out unavailable models */
+.inline-model-dropdown option.model-unavailable {
+  color: rgba(255, 255, 255, 0.35);
+  font-style: italic;
+}
+
+.inline-model-dropdown option:disabled {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Model indicator (shows availability status) */
+.model-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80; /* Green = available */
+  flex-shrink: 0;
+}
+
+.model-indicator.unavailable {
+  background: #f87171; /* Red = needs API key */
+}
+
+.model-indicator.warning {
+  background: #fbbf24; /* Yellow = limited */
+}
+
+/**
  * INPUT ACTIONS
  * 
  * Voice and send buttons.

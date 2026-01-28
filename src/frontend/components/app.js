@@ -699,13 +699,19 @@ class BubbleVoiceApp {
   }
 
   setupSettingsListeners() {
-    // Model selection
+    // Model selection - Settings panel dropdown
     const modelSelect = document.getElementById('model-select');
     modelSelect.value = this.state.settings.model;
     modelSelect.addEventListener('change', (e) => {
       this.state.settings.model = e.target.value;
       this.saveSettings();
+      // Sync with inline model selector
+      this.syncInlineModelSelector();
     });
+    
+    // Inline model selector - Quick access in message input area
+    // ADDED (2026-01-28): User requested model switching directly in message area
+    this.setupInlineModelSelector();
 
     // Microphone selection
     const microphoneSelect = document.getElementById('microphone-select');
@@ -856,6 +862,12 @@ class BubbleVoiceApp {
       
       // Send to backend
       this.sendApiKeysToBackend();
+      
+      // Update model availability display
+      // FIX (2026-01-28): Refresh model availability after API keys change
+      // WHY: Models that were grayed out may now be available
+      this.updateModelAvailability();
+      this.updateModelIndicator(this.state.settings.model);
       
       // Show success feedback
       const originalText = saveApiKeysButton.textContent;
@@ -1026,6 +1038,196 @@ class BubbleVoiceApp {
     } catch (error) {
       console.error('[App] Error loading settings:', error);
       return defaultSettings;
+    }
+  }
+
+  /**
+   * SETUP INLINE MODEL SELECTOR
+   * 
+   * Initializes the inline model dropdown in the message input area.
+   * 
+   * ADDED (2026-01-28): User requested quick model switching without opening settings.
+   * 
+   * FUNCTIONALITY:
+   * - Syncs with settings panel model selector
+   * - Grays out models that require API keys (but don't have them)
+   * - Updates model indicator (green = available, red = needs key)
+   * - Sends model change to backend
+   */
+  setupInlineModelSelector() {
+    const inlineModelSelect = document.getElementById('inline-model-select');
+    const modelIndicator = document.getElementById('model-indicator');
+    
+    if (!inlineModelSelect) {
+      console.warn('[App] Inline model selector not found');
+      return;
+    }
+    
+    // Set initial value from settings
+    inlineModelSelect.value = this.state.settings.model;
+    
+    // Update model availability display
+    this.updateModelAvailability();
+    
+    // Handle model change
+    inlineModelSelect.addEventListener('change', (e) => {
+      const newModel = e.target.value;
+      const availability = this.checkModelAvailability(newModel);
+      
+      // Warn user if model needs API key
+      if (!availability.available) {
+        console.log(`[App] Model ${newModel} requires ${availability.provider} API key`);
+        // Still allow selection - backend will handle gracefully
+        // Could show a toast/notification here
+      }
+      
+      this.state.settings.model = newModel;
+      this.saveSettings();
+      
+      // Sync with settings panel
+      const modelSelect = document.getElementById('model-select');
+      if (modelSelect) {
+        modelSelect.value = newModel;
+      }
+      
+      // Update indicator
+      this.updateModelIndicator(newModel);
+      
+      // Notify backend of model change
+      this.websocketClient.sendMessage({
+        type: 'change_model',
+        data: { model: newModel }
+      });
+      
+      console.log(`[App] Model changed to: ${newModel}`);
+    });
+    
+    // Initial indicator update
+    this.updateModelIndicator(this.state.settings.model);
+  }
+
+  /**
+   * SYNC INLINE MODEL SELECTOR
+   * 
+   * Syncs the inline model selector with the current settings.
+   * Called when model is changed from settings panel.
+   */
+  syncInlineModelSelector() {
+    const inlineModelSelect = document.getElementById('inline-model-select');
+    if (inlineModelSelect) {
+      inlineModelSelect.value = this.state.settings.model;
+      this.updateModelIndicator(this.state.settings.model);
+    }
+  }
+
+  /**
+   * CHECK MODEL AVAILABILITY
+   * 
+   * Checks if a model can be used based on available API keys.
+   * 
+   * @param {string} model - The model identifier
+   * @returns {Object} { available: boolean, provider: string, reason: string }
+   * 
+   * MODEL PROVIDERS:
+   * - gemini-*: Requires Google API key (free tier available)
+   * - claude-*: Requires Anthropic API key
+   * - gpt-*: Requires OpenAI API key
+   */
+  checkModelAvailability(model) {
+    const settings = this.state.settings;
+    
+    // Model to provider mapping
+    const modelProviders = {
+      'gemini-2.5-flash-lite': 'google',
+      'gemini-2.0-flash': 'google',
+      'gemini-3.0-flash': 'google',
+      'gemini-3.0-pro': 'google',
+      'claude-sonnet-4.5': 'anthropic',
+      'claude-opus-4.5': 'anthropic',
+      'gpt-5.2-turbo': 'openai',
+      'gpt-5.1': 'openai'
+    };
+    
+    const provider = modelProviders[model] || 'unknown';
+    
+    // Check API key availability
+    let hasKey = false;
+    switch (provider) {
+      case 'google':
+        hasKey = !!settings.googleApiKey;
+        break;
+      case 'anthropic':
+        hasKey = !!settings.anthropicApiKey;
+        break;
+      case 'openai':
+        hasKey = !!settings.openaiApiKey;
+        break;
+    }
+    
+    return {
+      available: hasKey,
+      provider: provider,
+      reason: hasKey ? 'API key configured' : `Requires ${provider} API key`
+    };
+  }
+
+  /**
+   * UPDATE MODEL AVAILABILITY
+   * 
+   * Updates the visual appearance of model options based on API key availability.
+   * Models without API keys are grayed out but still selectable.
+   * 
+   * DESIGN DECISION: We gray out but don't disable options because:
+   * 1. User might want to select then add key
+   * 2. Backend can provide helpful error message
+   * 3. Better UX than completely hiding options
+   */
+  updateModelAvailability() {
+    const inlineModelSelect = document.getElementById('inline-model-select');
+    const settingsModelSelect = document.getElementById('model-select');
+    
+    const selects = [inlineModelSelect, settingsModelSelect].filter(Boolean);
+    
+    selects.forEach(select => {
+      Array.from(select.options).forEach(option => {
+        const availability = this.checkModelAvailability(option.value);
+        
+        if (!availability.available) {
+          option.classList.add('model-unavailable');
+          // Add visual indicator to option text
+          if (!option.textContent.includes('(needs key)')) {
+            option.textContent = option.textContent.replace(' (New)', '') + ' (needs key)';
+          }
+        } else {
+          option.classList.remove('model-unavailable');
+          // Remove "needs key" indicator if present
+          option.textContent = option.textContent.replace(' (needs key)', '');
+        }
+      });
+    });
+  }
+
+  /**
+   * UPDATE MODEL INDICATOR
+   * 
+   * Updates the small colored dot next to the model selector.
+   * Green = model available, Red = needs API key, Yellow = limited.
+   * 
+   * @param {string} model - Current selected model
+   */
+  updateModelIndicator(model) {
+    const indicator = document.getElementById('model-indicator');
+    if (!indicator) return;
+    
+    const availability = this.checkModelAvailability(model);
+    
+    indicator.classList.remove('unavailable', 'warning');
+    
+    if (!availability.available) {
+      indicator.classList.add('unavailable');
+      indicator.title = availability.reason;
+    } else {
+      indicator.title = 'Model available';
     }
   }
 
