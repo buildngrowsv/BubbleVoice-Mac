@@ -322,7 +322,15 @@ class ConversationService {
    * TECHNICAL APPROACH:
    * - Extract text content (removes CSS/JS)
    * - Extract key structural elements (headers, sections)
-   * - Truncate to ~500 chars if still too long
+   * - Truncate to ~4000 chars if still too long
+   * 
+   * WHY 4000 CHARS (2026-01-28 FIX):
+   * Previous 500 char limit was WAY too short. When user asked to edit
+   * an artifact, the AI only saw a tiny snippet and generated generic
+   * placeholder content instead of preserving the actual context.
+   * The text-only content (no HTML/CSS) is much smaller than raw HTML,
+   * so 4000 chars gives AI enough context to understand the artifact
+   * while not bloating the prompt excessively.
    * 
    * @param {string} html - Full HTML content
    * @returns {string} Summarized HTML content
@@ -341,9 +349,11 @@ class ConversationService {
     // Collapse whitespace
     summary = summary.replace(/\s+/g, ' ').trim();
     
-    // Truncate if too long (500 chars is enough for AI to understand content)
-    if (summary.length > 500) {
-      summary = summary.substring(0, 500) + '...';
+    // Truncate if too long (4000 chars gives AI enough context while not bloating prompt)
+    // PREVIOUS BUG (2026-01-28): 500 chars caused AI to lose all artifact context
+    // and generate generic placeholder content instead of preserving user's data
+    if (summary.length > 4000) {
+      summary = summary.substring(0, 4000) + '...';
     }
     
     return summary;
