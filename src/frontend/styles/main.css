@@ -834,6 +834,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
  */
 .folder-selector {
   display: flex;
+  flex-wrap: wrap; /* Allow wrapping on narrow screens */
   gap: var(--spacing-sm);
   width: 100%;
   margin-top: var(--spacing-xs);
@@ -843,6 +844,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
   flex: 1;
   background: rgba(255, 255, 255, 0.03);
   cursor: default;
+  /* FIX (2026-01-28): Ensure text is visible in readonly input */
+  /* WHY: User reported folder path not visible after selection */
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  /* Allow text to scroll if path is long */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 100px;
 }
 
 .folder-selector .settings-button {
