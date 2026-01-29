@@ -523,13 +523,38 @@ class ArtifactSidebar {
         let skippedCount = 0;
         
         // Apply each patch
+        // FIX (2026-01-28): Added null/undefined guards for old_string and new_string
+        // to prevent TypeError: Cannot read properties of undefined (reading 'substring')
+        // BECAUSE: AI sometimes sends malformed patches with missing fields
         for (const patch of patches) {
             const { old_string, new_string, replace_all } = patch;
+            
+            // GUARD: Skip if old_string is missing or undefined
+            // WHY: AI may send incomplete patch objects
+            if (old_string === undefined || old_string === null) {
+                console.warn('[ArtifactSidebar] ⚠️ Skipping patch with undefined old_string');
+                skippedCount++;
+                continue;
+            }
+            
+            // GUARD: Skip if new_string is missing - can't apply patch without it
+            // Note: Empty string '' is valid (for deletions), so only check undefined/null
+            if (new_string === undefined || new_string === null) {
+                console.warn('[ArtifactSidebar] ⚠️ Skipping patch with undefined new_string');
+                skippedCount++;
+                continue;
+            }
             
             if (!old_string || old_string === new_string) {
                 skippedCount++;
                 continue;
             }
+            
+            // Safe substring helper to avoid errors on very short strings
+            const safeSubstring = (str, maxLen) => {
+                if (typeof str !== 'string') return String(str);
+                return str.length > maxLen ? str.substring(0, maxLen) + '...' : str;
+            };
             
             if (!currentHtml.includes(old_string)) {
                 // Try trimmed match
@@ -541,10 +566,10 @@ class ArtifactSidebar {
                         currentHtml = currentHtml.replace(trimmed, new_string);
                     }
                     appliedCount++;
-                    console.log(`[ArtifactSidebar] ✅ Applied (trimmed): "${old_string.substring(0, 30)}..." → "${new_string.substring(0, 30)}..."`);
+                    console.log(`[ArtifactSidebar] ✅ Applied (trimmed): "${safeSubstring(old_string, 30)}" → "${safeSubstring(new_string, 30)}"`);
                 } else {
                     skippedCount++;
-                    console.warn(`[ArtifactSidebar] ⚠️ Patch not found: "${old_string.substring(0, 50)}..."`);
+                    console.warn(`[ArtifactSidebar] ⚠️ Patch not found: "${safeSubstring(old_string, 50)}"`);
                 }
                 continue;
             }
@@ -557,7 +582,7 @@ class ArtifactSidebar {
             }
             
             appliedCount++;
-            console.log(`[ArtifactSidebar] ✅ Applied: "${old_string.substring(0, 30)}..." → "${new_string.substring(0, 30)}..."`);
+            console.log(`[ArtifactSidebar] ✅ Applied: "${safeSubstring(old_string, 30)}" → "${safeSubstring(new_string, 30)}"`);
         }
         
         console.log(`[ArtifactSidebar] 📊 Patch results: ${appliedCount} applied, ${skippedCount} skipped`);
