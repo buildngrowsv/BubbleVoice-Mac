@@ -344,6 +344,11 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
         topK: 40,
         maxOutputTokens: 8192, // Increased for HTML artifacts (was 2048)
         responseMimeType: 'application/json',
+        // CRITICAL: Schema with enum constraints to prevent runaway generation
+        // (2026-01-28) ROOT CAUSE IDENTIFIED: Without enum constraints, Gemini can generate
+        // absurdly long strings for fields like sentiment (e.g., 50,000+ character gibberish).
+        // Gemini RESPECTS: type, required, enum
+        // Gemini IGNORES: maxLength, description, pattern (see SCHEMA_ENFORCEMENT_FINDINGS.md)
         responseSchema: {
           type: 'object',
           properties: {
@@ -357,22 +362,46 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
               items: {
                 type: 'object',
                 properties: {
-                  action: { type: 'string' },
+                  // ENUM: Constrain action to valid values only
+                  action: { 
+                    type: 'string',
+                    enum: ['create_area', 'append_entry', 'update_summary']
+                  },
                   area_path: { type: 'string' },
                   name: { type: 'string' },
                   description: { type: 'string' },
                   document: { type: 'string' },
                   content: { type: 'string' },
-                  sentiment: { type: 'string' }
+                  user_quote: { type: 'string' },
+                  ai_observation: { type: 'string' },
+                  // ENUM: Constrain sentiment to prevent runaway generation
+                  // This was the root cause of the 50K+ character bug!
+                  sentiment: { 
+                    type: 'string',
+                    enum: ['hopeful', 'concerned', 'anxious', 'excited', 'neutral']
+                  }
                 }
               }
             },
             artifact_action: {
               type: 'object',
               properties: {
-                action: { type: 'string' },
+                // ENUM: Constrain artifact action types
+                action: { 
+                  type: 'string',
+                  enum: ['create', 'patch', 'update', 'none']
+                },
                 artifact_id: { type: 'string' },
-                artifact_type: { type: 'string' },
+                // ENUM: Constrain artifact types to valid values
+                artifact_type: { 
+                  type: 'string',
+                  enum: [
+                    'comparison_card', 'stress_map', 'checklist', 
+                    'reflection_summary', 'goal_tracker', 'timeline',
+                    'decision_matrix', 'progress_chart', 'mindmap', 
+                    'celebration_card'
+                  ]
+                },
                 html: { type: 'string' },
                 patches: {
                   type: 'array',
