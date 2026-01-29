@@ -486,15 +486,22 @@ class ArtifactSidebar {
      * 
      * HOW IT WORKS:
      * 1. Get the current HTML from the iframe
-     * 2. Apply each patch (old_string → new_string)
+     * 2. Apply each patch (old_string → new_string) using cascade of fuzzy matchers
      * 3. Reload the iframe with patched HTML
      * 
-     * WHY THIS APPROACH (Claude's technique):
+     * WHY THIS APPROACH (Claude's technique + OpenCode's fuzzy matching):
      * - String replacement is simple and reliable
      * - Works on any artifact type (HTML, SVG, etc.)
      * - 3-4x faster than full regeneration
      * - Lower token cost (patches are smaller than full HTML)
      * - Preserves styling and structure
+     * - Fuzzy matching handles whitespace/formatting differences from AI
+     * 
+     * FUZZY MATCHING CASCADE (from opencode):
+     * 1. Exact match
+     * 2. Trimmed match (leading/trailing whitespace)
+     * 3. Whitespace-normalized match (collapse spaces)
+     * 4. Case-insensitive match (last resort for text content)
      * 
      * @param {string} artifactId - ID of artifact to patch (must match current)
      * @param {Array} patches - Array of {old_string, new_string, replace_all?}
@@ -522,23 +529,108 @@ class ArtifactSidebar {
         let appliedCount = 0;
         let skippedCount = 0;
         
+        // Safe substring helper to avoid errors on very short strings
+        const safeSubstring = (str, maxLen) => {
+            if (typeof str !== 'string') return String(str);
+            return str.length > maxLen ? str.substring(0, maxLen) + '...' : str;
+        };
+        
+        /**
+         * FUZZY MATCH CASCADE
+         * Inspired by opencode's edit.ts - tries multiple matching strategies
+         * to handle whitespace/formatting differences from AI responses
+         * 
+         * @param {string} content - The HTML content to search
+         * @param {string} find - The string to find
+         * @returns {string|null} The actual string found (may differ from find), or null
+         */
+        const findFuzzyMatch = (content, find) => {
+            // Strategy 1: Exact match
+            if (content.includes(find)) {
+                return find;
+            }
+            
+            // Strategy 2: Trimmed match (leading/trailing whitespace)
+            const trimmed = find.trim();
+            if (trimmed !== find && content.includes(trimmed)) {
+                console.log('[ArtifactSidebar] 🔍 Fuzzy: trimmed match');
+                return trimmed;
+            }
+            
+            // Strategy 3: Whitespace-normalized match (collapse multiple spaces)
+            const normalizedFind = find.replace(/\s+/g, ' ').trim();
+            // Search for normalized version in a line-by-line manner
+            const lines = content.split('\n');
+            for (const line of lines) {
+                const normalizedLine = line.replace(/\s+/g, ' ').trim();
+                if (normalizedLine === normalizedFind) {
+                    console.log('[ArtifactSidebar] 🔍 Fuzzy: whitespace-normalized match');
+                    return line.trim(); // Return the actual line content
+                }
+                // Also check if the normalized find is a substring of normalized line
+                if (normalizedLine.includes(normalizedFind)) {
+                    // Find the actual substring in original line
+                    const words = normalizedFind.split(' ');
+                    if (words.length > 0) {
+                        const pattern = words.map(w => 
+                            w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                        ).join('\\s+');
+                        try {
+                            const regex = new RegExp(pattern, 'i');
+                            const match = line.match(regex);
+                            if (match) {
+                                console.log('[ArtifactSidebar] 🔍 Fuzzy: substring whitespace match');
+                                return match[0];
+                            }
+                        } catch (e) { /* ignore regex errors */ }
+                    }
+                }
+            }
+            
+            // Strategy 4: Case-insensitive (for text content, not HTML tags)
+            // Only use this for plain text without HTML tags
+            if (!find.includes('<') && !find.includes('>')) {
+                const lowerFind = find.toLowerCase();
+                const lowerContent = content.toLowerCase();
+                const index = lowerContent.indexOf(lowerFind);
+                if (index !== -1) {
+                    // Return the actual case from content
+                    const actualMatch = content.substring(index, index + find.length);
+                    console.log('[ArtifactSidebar] 🔍 Fuzzy: case-insensitive match');
+                    return actualMatch;
+                }
+            }
+            
+            // Strategy 5: Try to find HTML-decoded versions
+            // AI sometimes sends &gt; when looking for > etc.
+            const htmlDecoded = find
+                .replace(/&gt;/g, '>')
+                .replace(/&lt;/g, '<')
+                .replace(/&amp;/g, '&')
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'");
+            if (htmlDecoded !== find && content.includes(htmlDecoded)) {
+                console.log('[ArtifactSidebar] 🔍 Fuzzy: HTML-decoded match');
+                return htmlDecoded;
+            }
+            
+            return null; // No match found
+        };
+        
         // Apply each patch
         // FIX (2026-01-28): Added null/undefined guards for old_string and new_string
-        // to prevent TypeError: Cannot read properties of undefined (reading 'substring')
-        // BECAUSE: AI sometimes sends malformed patches with missing fields
+        // ENHANCED (2026-01-29): Added fuzzy matching cascade from opencode
         for (const patch of patches) {
             const { old_string, new_string, replace_all } = patch;
             
             // GUARD: Skip if old_string is missing or undefined
-            // WHY: AI may send incomplete patch objects
             if (old_string === undefined || old_string === null) {
                 console.warn('[ArtifactSidebar] ⚠️ Skipping patch with undefined old_string');
                 skippedCount++;
                 continue;
             }
             
-            // GUARD: Skip if new_string is missing - can't apply patch without it
-            // Note: Empty string '' is valid (for deletions), so only check undefined/null
+            // GUARD: Skip if new_string is missing
             if (new_string === undefined || new_string === null) {
                 console.warn('[ArtifactSidebar] ⚠️ Skipping patch with undefined new_string');
                 skippedCount++;
@@ -550,35 +642,31 @@ class ArtifactSidebar {
                 continue;
             }
             
-            // Safe substring helper to avoid errors on very short strings
-            const safeSubstring = (str, maxLen) => {
-                if (typeof str !== 'string') return String(str);
-                return str.length > maxLen ? str.substring(0, maxLen) + '...' : str;
-            };
+            // Try to find a match using the fuzzy cascade
+            const actualMatch = findFuzzyMatch(currentHtml, old_string);
             
-            if (!currentHtml.includes(old_string)) {
-                // Try trimmed match
-                const trimmed = old_string.trim();
-                if (trimmed !== old_string && currentHtml.includes(trimmed)) {
-                    if (replace_all) {
-                        currentHtml = currentHtml.split(trimmed).join(new_string);
-                    } else {
-                        currentHtml = currentHtml.replace(trimmed, new_string);
+            if (actualMatch === null) {
+                skippedCount++;
+                console.warn(`[ArtifactSidebar] ⚠️ Patch not found (tried 5 strategies): "${safeSubstring(old_string, 50)}"`);
+                // Log a snippet of the HTML around where we expect to find it
+                // This helps debug why the match failed
+                if (old_string.length > 5) {
+                    const shortSearch = old_string.substring(0, 10);
+                    const pos = currentHtml.toLowerCase().indexOf(shortSearch.toLowerCase());
+                    if (pos !== -1) {
+                        console.log(`[ArtifactSidebar] 📍 Possible location found at position ${pos}:`);
+                        console.log(`  Expected: "${safeSubstring(old_string, 60)}"`);
+                        console.log(`  Found: "${safeSubstring(currentHtml.substring(pos, pos + old_string.length + 20), 60)}"`);
                     }
-                    appliedCount++;
-                    console.log(`[ArtifactSidebar] ✅ Applied (trimmed): "${safeSubstring(old_string, 30)}" → "${safeSubstring(new_string, 30)}"`);
-                } else {
-                    skippedCount++;
-                    console.warn(`[ArtifactSidebar] ⚠️ Patch not found: "${safeSubstring(old_string, 50)}"`);
                 }
                 continue;
             }
             
-            // Apply the patch
+            // Apply the patch using the actual matched string
             if (replace_all) {
-                currentHtml = currentHtml.split(old_string).join(new_string);
+                currentHtml = currentHtml.split(actualMatch).join(new_string);
             } else {
-                currentHtml = currentHtml.replace(old_string, new_string);
+                currentHtml = currentHtml.replace(actualMatch, new_string);
             }
             
             appliedCount++;

@@ -530,14 +530,41 @@ All artifacts must look like they came from a premium design agency:
       }
 
       // Send artifact
-      // LOGGING: Track artifact generation from LLM
+      // LOGGING (2026-01-29): Enhanced artifact logging to debug patch failures
+      // This helps identify when AI says it made a change but sends wrong action
       if (structuredOutput.artifact_action) {
+        const artifactAction = structuredOutput.artifact_action;
         console.log('[LLMService] ✨ Artifact action from LLM:', {
-          action: structuredOutput.artifact_action.action,
-          artifact_type: structuredOutput.artifact_action.artifact_type,
-          has_html: !!structuredOutput.artifact_action.html,
-          html_length: structuredOutput.artifact_action.html?.length || 0
+          action: artifactAction.action,
+          artifact_type: artifactAction.artifact_type,
+          artifact_id: artifactAction.artifact_id || '(none)',
+          has_html: !!artifactAction.html,
+          html_length: artifactAction.html?.length || 0,
+          has_patches: !!(artifactAction.patches && artifactAction.patches.length > 0),
+          patches_count: artifactAction.patches?.length || 0
         });
+        
+        // Log patch details for debugging
+        if (artifactAction.action === 'patch' && artifactAction.patches) {
+          console.log('[LLMService] 🔧 Patch details:');
+          artifactAction.patches.forEach((p, i) => {
+            console.log(`  Patch ${i + 1}:`);
+            console.log(`    old: "${(p.old_string || '').substring(0, 50)}..."`);
+            console.log(`    new: "${(p.new_string || '').substring(0, 50)}..."`);
+          });
+        }
+        
+        // WARN if AI says it made a change but sent action: "none"
+        // This is a common failure mode where AI claims success but doesn't act
+        if (artifactAction.action === 'none') {
+          const responseText = structuredOutput.response || '';
+          const suggestsChange = /\b(changed|updated|renamed|modified|replaced|made the change|done|applied)\b/i.test(responseText);
+          if (suggestsChange) {
+            console.warn('[LLMService] ⚠️ POTENTIAL BUG: AI response suggests a change was made, but artifact_action is "none"');
+            console.warn(`  Response: "${responseText.substring(0, 100)}..."`);
+          }
+        }
+        
         if (callbacks.onArtifact) {
           callbacks.onArtifact(structuredOutput.artifact_action);
         }
