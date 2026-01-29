@@ -462,6 +462,9 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
     }
 
     // Parse structured output
+    // (2026-01-28) Added truncation recovery for MAX_TOKENS errors
+    // When Gemini hits the token limit, JSON is cut off mid-generation.
+    // We attempt to recover what we can from the partial response.
     try {
       structuredOutput = JSON.parse(fullResponse);
       
@@ -506,11 +509,42 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
       };
     } catch (error) {
       console.error('[LLMService] Error parsing structured output:', error);
-      // Fallback to raw response
-      if (callbacks.onChunk) {
-        callbacks.onChunk(fullResponse);
+      console.log('[LLMService] Attempting truncation recovery...');
+      
+      // TRUNCATION RECOVERY (2026-01-28)
+      // When MAX_TOKENS is hit, try to extract what we can from the partial JSON
+      const recovered = this.attemptTruncationRecovery(fullResponse);
+      
+      if (recovered) {
+        console.log('[LLMService] ✅ Recovered partial response');
+        
+        // Send recovered response
+        if (recovered.response && callbacks.onChunk) {
+          const words = recovered.response.split(' ');
+          for (let i = 0; i < words.length; i++) {
+            callbacks.onChunk(words[i] + (i < words.length - 1 ? ' ' : ''));
+            await new Promise(resolve => setTimeout(resolve, 30));
+          }
+        }
+        
+        // Send bubbles if we have them
+        if (recovered.bubbles && callbacks.onBubbles) {
+          callbacks.onBubbles(recovered.bubbles);
+        }
+        
+        return {
+          text: recovered.response || '[Response truncated due to length]',
+          structured: recovered
+        };
       }
-      return fullResponse;
+      
+      // Last resort: extract any text that looks like a response
+      console.log('[LLMService] ❌ Recovery failed, using raw fallback');
+      const rawText = this.extractRawResponseText(fullResponse);
+      if (callbacks.onChunk) {
+        callbacks.onChunk(rawText || '[Error: Response was truncated and could not be recovered]');
+      }
+      return rawText || fullResponse;
     }
   }
 
@@ -827,6 +861,115 @@ COMMON MISTAKE TO AVOID: Creating a new artifact when user says "change X to Y" 
     }
 
     return messages;
+  }
+
+  /**
+   * ATTEMPT TRUNCATION RECOVERY
+   * 
+   * When Gemini hits MAX_TOKENS, the JSON response is cut off mid-generation.
+   * This method attempts to recover usable data from the partial response.
+   * 
+   * STRATEGY:
+   * 1. Try to find and extract the "response" field (most important)
+   * 2. Try to extract "bubbles" array if present
+   * 3. Skip artifact_action and area_actions (likely truncated anyway)
+   * 
+   * HISTORY (2026-01-28):
+   * Added after observing truncation errors like "Unterminated string in JSON at position 20341"
+   * This provides graceful degradation instead of complete failure.
+   * 
+   * @param {string} partialJson - The truncated JSON response
+   * @returns {object|null} Recovered partial response or null if unrecoverable
+   */
+  attemptTruncationRecovery(partialJson) {
+    try {
+      // Strategy 1: Try to find the response field using regex
+      // Match "response": "..." pattern, handling escaped quotes
+      const responseMatch = partialJson.match(/"response"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      
+      if (responseMatch && responseMatch[1]) {
+        const recoveredResponse = responseMatch[1]
+          .replace(/\\n/g, '\n')
+          .replace(/\\"/g, '"')
+          .replace(/\\\\/g, '\\');
+        
+        // Try to also get bubbles
+        let bubbles = [];
+        const bubblesMatch = partialJson.match(/"bubbles"\s*:\s*\[([\s\S]*?)\]/);
+        if (bubblesMatch && bubblesMatch[1]) {
+          // Extract individual bubble strings
+          const bubbleMatches = bubblesMatch[1].match(/"((?:[^"\\]|\\.)*)"/g);
+          if (bubbleMatches) {
+            bubbles = bubbleMatches.map(b => 
+              b.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\')
+            );
+          }
+        }
+        
+        console.log('[LLMService] Truncation recovery extracted:', {
+          responseLength: recoveredResponse.length,
+          bubblesCount: bubbles.length
+        });
+        
+        return {
+          response: recoveredResponse,
+          bubbles: bubbles.length > 0 ? bubbles : ['tell me more', 'what else?'],
+          area_actions: [], // Skip - likely truncated
+          artifact_action: { action: 'none' }, // Skip - likely truncated
+          _recovered: true, // Flag for debugging
+          _truncated: true
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('[LLMService] Truncation recovery failed:', error);
+      return null;
+    }
+  }
+
+  /**
+   * EXTRACT RAW RESPONSE TEXT
+   * 
+   * Last-resort fallback when truncation recovery fails.
+   * Tries to extract any readable text from the malformed response.
+   * 
+   * @param {string} partialJson - The truncated JSON
+   * @returns {string} Any extractable text or empty string
+   */
+  extractRawResponseText(partialJson) {
+    try {
+      // Try to find any substantial text content
+      // Look for the "response": " pattern and grab what follows
+      const startIndex = partialJson.indexOf('"response"');
+      if (startIndex !== -1) {
+        const valueStart = partialJson.indexOf('"', startIndex + 10) + 1;
+        if (valueStart > 0) {
+          // Find where the string ends (might be truncated)
+          let endIndex = partialJson.length;
+          for (let i = valueStart; i < partialJson.length; i++) {
+            if (partialJson[i] === '"' && partialJson[i-1] !== '\\') {
+              endIndex = i;
+              break;
+            }
+          }
+          
+          const text = partialJson.substring(valueStart, endIndex)
+            .replace(/\\n/g, '\n')
+            .replace(/\\"/g, '"')
+            .replace(/\\\\/g, '\\');
+          
+          // Return if we got something meaningful (more than 50 chars)
+          if (text.length > 50) {
+            return text + '... [truncated]';
+          }
+        }
+      }
+      
+      return '';
+    } catch (error) {
+      return '';
+    }
   }
 }
 
