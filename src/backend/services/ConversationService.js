@@ -1,78 +1,202 @@
 /**
- * BUBBLEVOICE MAC - CONVERSATION SERVICE
+ * BUBBLEVOICE MAC - CONVERSATION SERVICE (PERSISTENT)
  * 
- * Manages conversation state and history.
- * Handles conversation creation, message storage, and retrieval.
+ * Manages conversation state with write-through caching:
+ * - In-memory Map for fast runtime access (sub-millisecond reads)
+ * - SQLite database for persistence across app restarts
  * 
- * RESPONSIBILITIES:
- * - Create and manage conversation sessions
- * - Store conversation messages
- * - Retrieve conversation history
- * - Manage conversation metadata
+ * ARCHITECTURE (2026-02-06 REWRITE):
+ * Previously this was a pure in-memory service — all conversations were
+ * lost on restart, which fundamentally broke the "AI remembers your life"
+ * promise. The persistent ConversationStorageService existed but was only
+ * used by IntegrationService, creating two divergent conversation systems.
+ * 
+ * Now ConversationService is the SINGLE SOURCE OF TRUTH. It:
+ * 1. Keeps the in-memory Map as a fast cache (voice pipeline needs <1ms reads)
+ * 2. Writes through to DatabaseService for every mutation (create, addMessage, delete)
+ * 3. On startup, loads existing conversations from the database into cache
+ * 4. Preserves all existing APIs so server.js needs zero changes
+ * 
+ * WHY WRITE-THROUGH CACHE (not pure database):
+ * The voice pipeline's three-timer system (VoicePipelineService) accesses
+ * conversation state in timer callbacks that fire at 0.5s/1.5s/2.0s intervals.
+ * Database queries in these hot paths would add latency. The in-memory Map
+ * provides O(1) access while the database ensures persistence.
+ * 
+ * BACKWARDS COMPATIBILITY:
+ * All existing callers (server.js, VoicePipelineService) use the same API.
+ * If DatabaseService is not provided (e.g., in tests), falls back to
+ * pure in-memory behavior exactly like the old implementation.
  * 
  * PRODUCT CONTEXT:
- * Conversations are the core unit of interaction in BubbleVoice.
- * Each conversation represents a session where the user discusses
- * personal topics with the AI. Conversations persist across app
- * restarts and can be searched/retrieved later.
- * 
- * TECHNICAL NOTES:
- * - Currently uses in-memory storage (Map)
- * - TODO: Integrate with persistent storage (SQLite/ObjectBox)
- * - TODO: Integrate with vector search for RAG
- * - Conversations are identified by UUID
+ * Conversations are the core unit of interaction in BubbleVoice. Each one
+ * represents a session where the user discusses personal topics with the AI.
+ * They MUST persist across restarts — a user who pours their heart out about
+ * their kids or career should find that conversation there the next day.
  */
 
 const { v4: uuidv4 } = require('uuid');
 
 class ConversationService {
-  constructor() {
-    // In-memory conversation storage
-    // Maps conversation ID to conversation object
-    // TODO: Replace with persistent storage (SQLite)
+  /**
+   * Constructor
+   * 
+   * @param {DatabaseService} databaseService - Optional. If provided, enables
+   *   persistence. If null/undefined, falls back to pure in-memory (for tests).
+   * 
+   * WHY OPTIONAL: Some test scenarios and the SKIP_DATABASE dev mode don't
+   * have a real database. Making it optional preserves backward compatibility
+   * while enabling persistence when available.
+   */
+  constructor(databaseService = null) {
+    // In-memory conversation cache
+    // Fast O(1) access for the voice pipeline's timer callbacks
     this.conversations = new Map();
+    
+    // Database service for persistence (optional)
+    // When present, every mutation writes through to SQLite
+    this.db = databaseService;
+    
+    // Track if we've loaded from database yet
+    // Prevents double-loading on multiple init calls
+    this._loaded = false;
+    
+    if (this.db) {
+      console.log('[ConversationService] Initialized with persistent storage (SQLite)');
+    } else {
+      console.log('[ConversationService] Initialized in-memory only (no database)');
+    }
+  }
+
+  /**
+   * LOAD FROM DATABASE
+   * 
+   * Populates the in-memory cache from the SQLite database on startup.
+   * Called once during server initialization to restore conversations
+   * from previous sessions.
+   * 
+   * WHY: On app restart, the in-memory Map is empty. Without loading
+   * from the database, the user would see no conversations in the sidebar
+   * and the AI would have no conversation history.
+   * 
+   * BECAUSE: The old pure in-memory ConversationService had this exact bug —
+   * conversations vanished on every restart.
+   * 
+   * @returns {number} Number of conversations loaded
+   */
+  async loadFromDatabase() {
+    if (!this.db || !this.db.db) {
+      console.log('[ConversationService] No database available, skipping load');
+      return 0;
+    }
+    
+    if (this._loaded) {
+      console.log('[ConversationService] Already loaded from database, skipping');
+      return this.conversations.size;
+    }
+    
+    try {
+      // Get all conversations from database
+      const dbConversations = this.db.getAllConversations(500, 0);
+      
+      for (const dbConv of dbConversations) {
+        // Get messages for this conversation from database
+        const dbMessages = this.db.getMessages(dbConv.id, 1000);
+        
+        // Build the in-memory conversation object matching the expected shape
+        // server.js and other callers expect: { id, messages[], currentArtifact, 
+        // artifactHistory[], metadata: { createdAt, updatedAt, title } }
+        const conversation = {
+          id: dbConv.id,
+          // Reconstruct messages array from database rows
+          messages: dbMessages.map(msg => ({
+            id: msg.id,
+            role: msg.role,
+            content: msg.content,
+            timestamp: new Date(msg.timestamp).getTime()
+          })),
+          // Runtime-only state (not persisted — artifacts are tracked per-session)
+          // These will be repopulated when the user interacts with artifacts
+          currentArtifact: null,
+          artifactHistory: [],
+          // Title and timestamps from database
+          title: dbConv.title,
+          createdAt: dbConv.created_at,
+          updatedAt: dbConv.updated_at,
+          metadata: {
+            createdAt: new Date(dbConv.created_at).getTime(),
+            updatedAt: new Date(dbConv.updated_at).getTime(),
+            title: dbConv.title,
+            messageCount: dbMessages.length,
+            ...(dbConv.metadata || {})
+          }
+        };
+        
+        this.conversations.set(conversation.id, conversation);
+      }
+      
+      this._loaded = true;
+      console.log(`[ConversationService] Loaded ${dbConversations.length} conversations from database`);
+      return dbConversations.length;
+    } catch (error) {
+      console.error('[ConversationService] Failed to load from database:', error);
+      // Non-fatal: continue with empty cache
+      return 0;
+    }
   }
 
   /**
    * CREATE CONVERSATION
    * 
-   * Creates a new conversation session.
+   * Creates a new conversation session. Writes to both in-memory cache
+   * and database (if available) for persistence.
    * 
    * ARTIFACT CONTEXT (2026-01-27):
-   * Each conversation now tracks its current artifact state.
-   * This allows the AI to know what artifact is displayed and decide
-   * whether to update it vs create a new one.
-   * 
-   * WHY: Without artifact context, AI always creates new artifacts instead
-   * of editing existing ones. User asks "change dreams to potatoes" and
-   * AI creates entirely new diagram instead of modifying existing.
-   * 
-   * BECAUSE: The COMPREHENSIVE_EVALUATION.md documented 0% update rate -
-   * "No artifact updates observed" - because AI had no visibility into
-   * what artifact was currently displayed.
+   * Each conversation tracks its current artifact state so the AI can
+   * decide whether to update vs create new artifacts.
    * 
    * @param {Object} metadata - Optional metadata for the conversation
    * @returns {Promise<Object>} Conversation object
    */
   async createConversation(metadata = {}) {
+    const id = uuidv4();
+    const now = Date.now();
+    const title = metadata.title || 'New Conversation';
+    
     const conversation = {
-      id: uuidv4(),
+      id,
       messages: [],
       // ARTIFACT CONTEXT: Track current artifact for editing support
-      // This is sent to LLM so it knows what artifact is displayed
       currentArtifact: null,
-      // Track artifact history for this conversation
       artifactHistory: [],
+      title,
+      createdAt: new Date(now).toISOString(),
+      updatedAt: new Date(now).toISOString(),
       metadata: {
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
+        createdAt: now,
+        updatedAt: now,
+        title,
         ...metadata
       }
     };
 
-    this.conversations.set(conversation.id, conversation);
+    // Write to in-memory cache (fast access for voice pipeline)
+    this.conversations.set(id, conversation);
     
-    console.log(`[ConversationService] Created conversation: ${conversation.id}`);
+    // Write through to database (persistence across restarts)
+    // WHY: If we only wrote to memory, conversations would vanish on restart.
+    // The database write adds ~1ms which is negligible for conversation creation.
+    if (this.db && this.db.db) {
+      try {
+        this.db.createConversation(id, title, metadata);
+        console.log(`[ConversationService] Created conversation: ${id} (persisted)`);
+      } catch (dbError) {
+        // Non-fatal: conversation exists in memory, just won't persist
+        console.error(`[ConversationService] DB write failed for create: ${dbError.message}`);
+      }
+    } else {
+      console.log(`[ConversationService] Created conversation: ${id} (in-memory only)`);
+    }
     
     return conversation;
   }
@@ -80,7 +204,8 @@ class ConversationService {
   /**
    * GET CONVERSATION
    * 
-   * Retrieves a conversation by ID.
+   * Retrieves a conversation by ID from the in-memory cache.
+   * Fast O(1) lookup — no database query needed.
    * 
    * @param {string} conversationId - Conversation ID
    * @returns {Promise<Object>} Conversation object
@@ -99,7 +224,8 @@ class ConversationService {
   /**
    * ADD MESSAGE
    * 
-   * Adds a message to a conversation.
+   * Adds a message to a conversation. Writes to both in-memory cache
+   * and database for persistence.
    * 
    * @param {string} conversationId - Conversation ID
    * @param {Object} message - Message object
@@ -111,9 +237,12 @@ class ConversationService {
   async addMessage(conversationId, message) {
     const conversation = await this.getConversation(conversationId);
 
-    // Add message to conversation
+    // Generate a unique message ID
+    const messageId = uuidv4();
+    
+    // Add message to in-memory cache (fast access)
     conversation.messages.push({
-      id: uuidv4(),
+      id: messageId,
       ...message
     });
 
@@ -121,15 +250,33 @@ class ConversationService {
     conversation.metadata.updatedAt = Date.now();
     conversation.metadata.messageCount = conversation.messages.length;
 
-    console.log(`[ConversationService] Added message to ${conversationId}: ${message.role}`);
+    // Write through to database (persistence)
+    // WHY: Messages are the most critical data to persist. A user's
+    // heartfelt conversation about their kids must survive restart.
+    if (this.db && this.db.db) {
+      try {
+        this.db.addMessage(
+          conversationId,
+          message.role,
+          message.content,
+          { timestamp: message.timestamp || Date.now() }
+        );
+      } catch (dbError) {
+        // Non-fatal: message exists in memory, just won't persist
+        // This can happen if the conversation wasn't created in DB
+        // (e.g., created before DB was connected)
+        console.error(`[ConversationService] DB write failed for message: ${dbError.message}`);
+      }
+    }
 
+    console.log(`[ConversationService] Added message to ${conversationId}: ${message.role}`);
     return conversation;
   }
 
   /**
    * GET MESSAGES
    * 
-   * Retrieves messages from a conversation.
+   * Retrieves messages from a conversation (from in-memory cache).
    * 
    * @param {string} conversationId - Conversation ID
    * @param {Object} options - Query options
@@ -143,12 +290,10 @@ class ConversationService {
 
     let messages = conversation.messages;
 
-    // Apply offset
     if (offset > 0) {
       messages = messages.slice(offset);
     }
 
-    // Apply limit
     if (limit) {
       messages = messages.slice(0, limit);
     }
@@ -159,13 +304,23 @@ class ConversationService {
   /**
    * DELETE CONVERSATION
    * 
-   * Deletes a conversation.
+   * Deletes a conversation from both cache and database.
+   * Database cascade-deletes associated messages and artifacts.
    * 
    * @param {string} conversationId - Conversation ID
    * @returns {Promise<boolean>} True if deleted
    */
   async deleteConversation(conversationId) {
     const deleted = this.conversations.delete(conversationId);
+    
+    // Delete from database too (cascade deletes messages, artifacts)
+    if (this.db && this.db.db) {
+      try {
+        this.db.deleteConversation(conversationId);
+      } catch (dbError) {
+        console.error(`[ConversationService] DB delete failed: ${dbError.message}`);
+      }
+    }
     
     if (deleted) {
       console.log(`[ConversationService] Deleted conversation: ${conversationId}`);
@@ -177,7 +332,7 @@ class ConversationService {
   /**
    * LIST CONVERSATIONS
    * 
-   * Lists all conversations.
+   * Lists all conversations sorted by most recent first.
    * 
    * @param {Object} options - Query options
    * @param {number} options.limit - Max conversations to return
@@ -192,12 +347,10 @@ class ConversationService {
     // Sort by most recent first
     conversations.sort((a, b) => b.metadata.updatedAt - a.metadata.updatedAt);
 
-    // Apply offset
     if (offset > 0) {
       conversations = conversations.slice(offset);
     }
 
-    // Apply limit
     if (limit) {
       conversations = conversations.slice(0, limit);
     }
@@ -207,8 +360,6 @@ class ConversationService {
 
   /**
    * GET CONVERSATION COUNT
-   * 
-   * Returns the total number of conversations.
    * 
    * @returns {Promise<number>} Conversation count
    */
@@ -232,12 +383,9 @@ class ConversationService {
    * SET CURRENT ARTIFACT
    * 
    * Updates the current artifact for a conversation.
-   * Called when AI generates an artifact (create or update action).
-   * 
-   * CRITICAL FOR ARTIFACT EDITING (2026-01-27):
-   * This method tracks what artifact is currently displayed so the AI
-   * can decide whether to edit vs create. Without this tracking, the
-   * AI always creates new artifacts because it has no visibility.
+   * This is runtime-only state (not persisted to DB) because artifacts
+   * are a session concern — they're tracked in the database separately
+   * by ArtifactManagerService.
    * 
    * @param {string} conversationId - Conversation ID
    * @param {Object} artifact - Artifact object with id, type, html, data
@@ -250,20 +398,16 @@ class ConversationService {
     if (conversation.currentArtifact && 
         conversation.currentArtifact.artifact_id !== artifact.artifact_id) {
       conversation.artifactHistory.push(conversation.currentArtifact);
-      // Keep only last 5 artifacts in history to avoid unbounded growth
       if (conversation.artifactHistory.length > 5) {
         conversation.artifactHistory.shift();
       }
     }
     
-    // Set current artifact
+    // Set current artifact (runtime state for LLM context injection)
     conversation.currentArtifact = {
       artifact_id: artifact.artifact_id,
       artifact_type: artifact.artifact_type,
-      // Store HTML (for context) - truncate if very long to avoid bloating context
-      // AI doesn't need full HTML to know what to edit, just the structure
       html_summary: artifact.html ? this.summarizeArtifactHtml(artifact.html) : null,
-      // Store full data (for editing data artifacts)
       data: artifact.data || null,
       created_at: artifact.created_at || Date.now(),
       turn_number: artifact.turn_number || conversation.messages.length
@@ -279,8 +423,6 @@ class ConversationService {
   /**
    * GET CURRENT ARTIFACT
    * 
-   * Returns the current artifact for a conversation.
-   * 
    * @param {string} conversationId - Conversation ID
    * @returns {Promise<Object|null>} Current artifact or null
    */
@@ -291,8 +433,6 @@ class ConversationService {
 
   /**
    * CLEAR CURRENT ARTIFACT
-   * 
-   * Clears the current artifact (e.g., user closed artifact panel).
    * 
    * @param {string} conversationId - Conversation ID
    * @returns {Promise<Object>} Updated conversation
@@ -315,43 +455,22 @@ class ConversationService {
   /**
    * SUMMARIZE ARTIFACT HTML
    * 
-   * Creates a compact summary of artifact HTML for context.
-   * Full HTML can be very large (8K+). AI only needs key content
-   * to understand what's displayed, not every CSS rule.
-   * 
-   * TECHNICAL APPROACH:
-   * - Extract text content (removes CSS/JS)
-   * - Extract key structural elements (headers, sections)
-   * - Truncate to ~4000 chars if still too long
-   * 
-   * WHY 4000 CHARS (2026-01-28 FIX):
-   * Previous 500 char limit was WAY too short. When user asked to edit
-   * an artifact, the AI only saw a tiny snippet and generated generic
-   * placeholder content instead of preserving the actual context.
-   * The text-only content (no HTML/CSS) is much smaller than raw HTML,
-   * so 4000 chars gives AI enough context to understand the artifact
-   * while not bloating the prompt excessively.
+   * Creates a compact text summary of artifact HTML for LLM context.
+   * Strips CSS/JS, keeps text content, truncates to 4000 chars.
    * 
    * @param {string} html - Full HTML content
-   * @returns {string} Summarized HTML content
+   * @returns {string} Summarized text content
    */
   summarizeArtifactHtml(html) {
     if (!html) return null;
     
-    // Remove style and script tags entirely
     let summary = html
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
     
-    // Remove all HTML tags, keep text
     summary = summary.replace(/<[^>]+>/g, ' ');
-    
-    // Collapse whitespace
     summary = summary.replace(/\s+/g, ' ').trim();
     
-    // Truncate if too long (4000 chars gives AI enough context while not bloating prompt)
-    // PREVIOUS BUG (2026-01-28): 500 chars caused AI to lose all artifact context
-    // and generate generic placeholder content instead of preserving user's data
     if (summary.length > 4000) {
       summary = summary.substring(0, 4000) + '...';
     }

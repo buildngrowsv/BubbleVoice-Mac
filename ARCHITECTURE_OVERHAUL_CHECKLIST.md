@@ -9,13 +9,14 @@
 ## Critical Issues (App-Breaking)
 
 ### 1. Conversations Are In-Memory Only
-- [ ] **ConversationService uses `new Map()` — all conversations lost on restart**
-- The product's core promise is "the AI actually remembers your life"
-- `ConversationService.js` stores everything in a JS Map that dies with the process
-- `ConversationStorageService.js` exists with persistent SQLite storage but is NOT used by `server.js`
-- `server.js:handleUserMessage()` calls `this.conversationService` (in-memory) not `this.integrationService.convStorage` (persistent)
-- **Fix:** Merge the two systems — make ConversationService a facade over ConversationStorageService, or replace it entirely
-- **Risk:** High — this is the #1 user-facing bug (conversations vanish on restart)
+- [x] **ConversationService uses `new Map()` — all conversations lost on restart** ✅ FIXED 2026-02-06
+- ConversationService rewritten as write-through cache: in-memory Map for fast access + SQLite for persistence
+- On startup, `loadFromDatabase()` restores conversations from SQLite into cache
+- Every create/addMessage/delete writes through to database
+- server.js wires IntegrationService's DatabaseService into ConversationService in `init()`
+- Also fixed 3 missing `await` bugs in server.js (handleSwitchConversation, handleDeleteConversation, handleUpdateConversationTitle)
+- Added title persistence to database on rename
+- **Risk:** Resolved — conversations now survive restart
 
 ### 2. RAG Is Built But Not Connected
 - [x] **ContextAssemblyService exists but is never called in the main message flow** ✅ FIXED 2026-02-06
@@ -27,13 +28,12 @@
 - **Risk:** High — without this, the product literally doesn't deliver its primary feature
 
 ### 3. Two Parallel Conversation Systems (Unsynchronized)
-- [ ] **ConversationService (in-memory) and ConversationStorageService (persistent) exist side by side**
-- `server.js` uses ConversationService for message management
-- `IntegrationService` uses ConversationStorageService for structured data (area actions, artifacts)
-- They don't share state — messages saved in one are invisible to the other
-- Area actions and artifacts get saved to disk, but the conversation messages they came from don't persist
-- **Fix:** Unify into a single conversation system backed by persistent storage
-- **Risk:** Medium — causes data inconsistency and ghost conversations
+- [x] **ConversationService (in-memory) and ConversationStorageService (persistent) exist side by side** ✅ FIXED 2026-02-06
+- ConversationService is now the SINGLE SOURCE OF TRUTH with write-through to the same SQLite database
+- Both server.js and IntegrationService share the same DatabaseService instance
+- ConversationStorageService still exists for the 4-file structure (conversation.md, user_inputs.md, etc.) used by IntegrationService.processTurn()
+- Future: ConversationStorageService could be simplified since message persistence is now handled by ConversationService
+- **Risk:** Resolved — no more ghost conversations or data inconsistency
 
 ---
 
@@ -60,16 +60,54 @@
 
 ### 6. Vercel AI SDK Migration (Provider Unification)
 - [ ] **Replace 3 separate provider implementations with unified Vercel AI SDK**
-- Current: `generateGeminiResponse()`, `generateAnthropicResponse()`, `generateOpenAIResponse()` — 3 separate streaming implementations (~700 lines)
+- Current: `generateGeminiResponse()`, `generateAnthropicResponse()`, `generateOpenAIResponse()` — 3 separate streaming implementations (LLMService.js is 1053 lines)
 - OpenCode pattern: Uses `streamText()` from `ai` package with provider-specific model constructors
 - Benefits: Unified streaming, built-in tool calling, structured output, retry logic, abort signals
-- **Plan:**
-  1. `npm install ai @ai-sdk/google @ai-sdk/anthropic @ai-sdk/openai`
-  2. Replace `generateResponse()` with single `streamText()` call
-  3. Convert structured JSON output to tool-calling pattern
-  4. Remove individual SDK dependencies (`@google/generative-ai`, `@anthropic-ai/sdk`, `openai`)
+
+**DETAILED MIGRATION PLAN (2026-02-06):**
+
+**Step 1: Install dependencies**
+```
+npm install ai @ai-sdk/google @ai-sdk/anthropic @ai-sdk/openai
+```
+
+**Step 2: Create new UnifiedLLMService.js alongside existing LLMService.js**
+- Keep LLMService.js working as fallback during migration
+- New file uses Vercel AI SDK's `streamText()` with provider-specific model constructors
+- Map existing model names to SDK model constructors:
+  - `gemini-2.5-flash-lite` → `google('gemini-2.5-flash-lite')`
+  - `claude-sonnet-4.5` → `anthropic('claude-sonnet-4.5')`
+  - `gpt-5.2-turbo` → `openai('gpt-5.2-turbo')`
+
+**Step 3: Migrate core generate flow**
+- Replace 3x `generateXxxResponse()` methods (~400 lines) with single `streamText()` call (~50 lines)
+- Port `buildSystemPrompt()`, `buildSharedContextPrefix()`, `getArtifactDesignPrompt()` as-is
+- Message format conversion becomes trivial — Vercel AI SDK handles role mapping
+- Streaming: Use `for await (const chunk of result.textStream)` instead of 3 different streaming APIs
+- Structured output: Use `generateObject()` with Zod schema instead of manual JSON.parse
+
+**Step 4: Migrate callbacks**
+- `onChunk` → iterate textStream
+- `onBubbles`/`onArtifact`/`onAreaActions` → extract from structured output after stream completes
+- OR use tool-calling pattern (Step 5) to handle these mid-stream
+
+**Step 5 (Future - item #7): Convert to tool-calling**
+- Define tools with Zod schemas using `tool()` helper
+- Let the model call `create_life_area`, `append_memory_entry`, `create_artifact` etc. naturally
+- Eliminates the complex JSON structured output parsing
+
+**What gets deleted:** ~700 lines (3 provider-specific generate methods, 3 message builder methods)
+**What gets added:** ~200 lines (unified generate, model registry, Zod schemas)
+**Net reduction:** ~500 lines in LLMService
+
+**Step 6: Remove old SDKs**
+```
+npm uninstall @google/generative-ai @anthropic-ai/sdk openai
+```
+
 - **Risk:** Medium — significant refactor but clear migration path
 - **Dependency:** This enables item #7 (tool-calling pattern)
+- **Estimated effort:** 2-3 focused sessions
 
 ### 7. Convert Structured JSON to Tool-Calling Pattern
 - [ ] **Define BubbleVoice actions as LLM tools instead of monolithic JSON schema**
@@ -148,11 +186,12 @@
 - **Risk:** Medium — causes silent bugs where voice and text paths behave differently
 
 ### 13. Bubbles Are Defined but Not Connected to Anything
-- [ ] **`BubbleGeneratorService.js` is instantiated but never called**
-- `server.js` creates `this.bubbleGeneratorService` but never uses it
-- Bubbles come from LLM structured output, not from BubbleGeneratorService
-- **Fix:** Either integrate it (for proactive bubble generation independent of LLM) or remove it to reduce confusion
-- **Risk:** None — dead code
+- [x] **`BubbleGeneratorService.js` is instantiated but never called** ✅ FIXED 2026-02-06
+- Removed import and instantiation from server.js (service file preserved for future use)
+- Also moved 24 stale test files and 5 test data directories from root into tests/archive/
+- Moved benchmark-artifacts/ into docs/
+- Cleaned tmp/ of stale agent logs and test outputs
+- **Risk:** None — dead code removed, root decluttered from 46→13 files
 
 ---
 
@@ -192,10 +231,10 @@
 5. ~~Fix VoicePipelineService separate instances (#12)~~ ✅ Now uses server's shared services
 6. ~~Slim system prompt (#5)~~ ✅ 56% reduction, design prompt only with artifacts
 
-**Phase 2 — Strengthen Foundation (Next Session)**
-6. Merge conversation systems (#1, #3)
-7. Slim system prompt (#5)
-8. Remove dead code (#13)
+**Phase 2 — Strengthen Foundation** ✅ IN PROGRESS
+6. ~~Merge conversation systems (#1, #3)~~ ✅ Write-through cache with SQLite persistence, 3 await bugfixes
+7. ~~Slim system prompt (#5)~~ ✅ Already done in Phase 1
+8. ~~Remove dead code (#13)~~ ✅ BubbleGeneratorService removed from server.js, 24 test files archived, test data dirs moved
 9. Consolidate archived docs (#10)
 
 **Phase 3 — Architecture Evolution (Future Sessions)**
@@ -207,5 +246,5 @@
 
 ---
 
-**Last Updated:** February 6, 2026  
-**Next Review:** After Phase 1 completion
+**Last Updated:** February 6, 2026 (Phase 2 in progress)  
+**Next Review:** After Phase 2 completion
