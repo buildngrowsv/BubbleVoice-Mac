@@ -241,15 +241,17 @@ npm uninstall @google/generative-ai @anthropic-ai/sdk openai
 
 **Phase 3 — Architecture Evolution** ✅ COMPLETE
 10. ~~Install Vercel AI SDK (#6)~~ ✅ UnifiedLLMService.js replaces 3 provider implementations with single generateObject() call
-11. Convert to tool-calling pattern (#7) — deferred to Phase 4
+11. ~~Convert to tool-calling pattern (#7)~~ ✅ DONE — UnifiedLLMService uses generateText + 4 tools
 12. ~~Add context compaction (#8)~~ ✅ ContextCompactionService summarizes older messages, keeps recent 20 intact
 
-**Phase 4 — Polish & Production (Future Sessions)**
-13. Convert to tool-calling pattern (#7)
-14. WebSocket session recovery (#14)
-15. Swift helper distribution (#16)
+**Phase 4 — Tool Calling & Production ✅ IN PROGRESS**
+13. ~~Convert to tool-calling pattern (#7)~~ ✅ UnifiedLLMService now uses generateText() + tools instead of generateObject(). 4 tools defined: suggest_bubbles, remember_info, create_artifact, update_artifact. Old monolithic BubbleVoiceResponseSchema removed. Backwards-compatible structured output preserved.
+14. ~~Clean up old provider SDKs~~ ✅ Removed @google/generative-ai, @anthropic-ai/sdk, openai. Archived LLMService.js and BubbleGeneratorService.js.
+15. ~~Added gemini-2.5-flash, gemini-2.5-pro~~ ✅ to model registry (now 12 models)
+16. WebSocket session recovery (#14) — deferred
+17. Swift helper distribution (#16) — deferred
 
 ---
 
-**Last Updated:** February 6, 2026 (Phase 3 complete)  
-**Next Review:** After Phase 4 (tool-calling pattern)
+**Last Updated:** February 6, 2026 (Phase 4 — tool-calling pattern complete)  
+**Next Review:** After WebSocket session recovery and Swift helper distribution
