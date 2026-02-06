@@ -340,6 +340,28 @@ class VoicePipelineService extends EventEmitter {
         console.log('[VoicePipelineService] Transcription state reset and Swift recognition restarted after TTS ended');
         break;
 
+      case 'recognition_restarted':
+        // INFORMATIONAL: The Swift helper proactively restarted recognition.
+        // This happens when:
+        //   - Session aged out (ran for >30s, accuracy degradation prevention)
+        //   - Hang detected (no results for >5s, recovery from silent failure)
+        //
+        // WHY WE LOG THIS:
+        // This helps diagnose performance issues. If we see frequent restarts
+        // due to hang detection, it may indicate a microphone or audio issue.
+        // If we see restarts due to session aging, that's normal and expected.
+        //
+        // WE DO NOT NEED TO DO ANYTHING:
+        // The Swift helper handles the restart internally. The transcription
+        // state on the backend side doesn't need to change because the Swift
+        // restart gives us a fresh recognition session that starts accumulating
+        // new text from scratch (which is what we want).
+        console.log(`[VoicePipelineService] 🔄 Swift recognition restarted: reason=${response.data?.reason}, restartCount=${response.data?.restartCount}`);
+        if (response.data?.reason === 'hang_detected') {
+          console.warn(`[VoicePipelineService] ⚠️ Recognition hang detected and recovered (${response.data?.timeSinceLastResult?.toFixed(1)}s without results)`);
+        }
+        break;
+
       case 'voices_list':
         console.log('[VoicePipelineService] Received voices list:', response.data.voices.length);
         break;
@@ -640,6 +662,29 @@ class VoicePipelineService extends EventEmitter {
         // Mark TTS as playing
         session.isTTSPlaying = true;
         
+        // CRITICAL (2026-02-06): Reset recognition at turn completion
+        //
+        // WHY: This is a natural conversation boundary — the user finished
+        // speaking, the LLM responded, and we're about to play TTS. The
+        // recognition session has been running since the user started speaking
+        // (or since the last restart). Resetting here ensures that:
+        //   1. Any speech during AI playback starts from a fresh session
+        //   2. Interruption detection is maximally accurate
+        //   3. The recognizer doesn't accumulate stale state across turns
+        //
+        // TOGETHER WITH speech_ended reset:
+        // This creates a double-restart pattern at turn boundaries:
+        //   Turn start → user speaks → turn complete → RESET HERE (before TTS)
+        //   → AI speaks → speech_ended → RESET AGAIN (after TTS)
+        // Both resets are intentional and safe. The first ensures clean
+        // interruption detection during playback. The second ensures clean
+        // recognition for the next user turn.
+        this.sendSwiftCommand(session, {
+          type: 'reset_recognition',
+          data: null
+        });
+        console.log('[VoicePipelineService] Sent reset_recognition at turn completion (before TTS playback)');
+        
         // Generate and play TTS
         this.generateTTS(session.cachedResponses.llm.text, session.settings, session);
       } else {
@@ -694,6 +739,29 @@ class VoicePipelineService extends EventEmitter {
       this.stopSpeaking(session);
       session.isTTSPlaying = false;
     }
+    
+    // CRITICAL (2026-02-06): Reset recognition on interruption for accuracy
+    //
+    // WHY: When the user interrupts the AI, the recognition session may have
+    // been running for a while (the entire AI response duration). The accumulated
+    // internal state in SFSpeechRecognizer can cause the interrupting speech
+    // to be transcribed less accurately.
+    //
+    // WHAT THIS DOES: Tells the Swift helper to tear down the current
+    // recognition task and create a fresh one. This ensures the interrupting
+    // user's speech is recognized with a clean slate.
+    //
+    // TIMING: We do this AFTER stopping TTS so the restart doesn't race
+    // with the audio pipeline changes from stopping playback.
+    //
+    // PRODUCT CONTEXT: If a user interrupts mid-AI-response with "wait, actually..."
+    // we want "wait, actually" to be captured with maximum accuracy. A fresh
+    // recognition session helps ensure that.
+    this.sendSwiftCommand(session, {
+      type: 'reset_recognition',
+      data: null
+    });
+    console.log('[VoicePipelineService] Sent reset_recognition to Swift after interruption');
   }
 
   /**

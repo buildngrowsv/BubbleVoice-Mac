@@ -126,6 +126,73 @@ class SpeechHelper {
     // We send this state with every transcription update
     private var hasActiveTimersOrPlayback = false
     
+    // ============================================================
+    // SESSION LIFECYCLE TRACKING
+    // ============================================================
+    //
+    // WHY: Apple's SFSpeechRecognizer degrades in accuracy over long
+    // sessions and can silently hang (no more results, no error).
+    // Community experience on Apple Developer Forums and Stack Overflow
+    // confirms that periodically restarting the recognition task
+    // significantly improves accuracy and prevents hangs.
+    //
+    // WHAT WE TRACK:
+    // - recognitionSessionStartTime: When the current recognition session started.
+    //   Used to trigger a proactive restart after maxSessionDuration seconds.
+    // - lastTranscriptionTime: When we last received ANY transcription result.
+    //   Used to detect hangs — if we're "listening" but get no results for
+    //   hangDetectionTimeout seconds, the recognizer is probably stuck.
+    // - restartCount: How many times we've restarted in this listening session.
+    //   Logged for debugging; helps diagnose performance issues.
+    //
+    // PRODUCT CONTEXT:
+    // BubbleVoice runs speech recognition continuously (even while AI speaks,
+    // for interruption detection). Long sessions are the norm, not the exception.
+    // Without periodic restarts, users experience worsening accuracy and
+    // occasional complete recognition freezes after 30-60 seconds.
+    // ============================================================
+    private var recognitionSessionStartTime: Date?
+    private var lastTranscriptionTime: Date?
+    private var restartCount: Int = 0
+    
+    // PERIODIC RESTART TIMER
+    // This is a repeating timer that fires every few seconds to check
+    // if the recognition session needs a proactive restart.
+    // It checks two conditions:
+    //   1. Session duration exceeded maxSessionDuration (proactive refresh)
+    //   2. No transcription results for hangDetectionTimeout (hang recovery)
+    //
+    // WHY A TIMER INSTEAD OF INLINE CHECKS:
+    // We can't rely on transcription callbacks to trigger checks because
+    // the whole point of hang detection is that callbacks STOP coming.
+    // A separate timer ensures we can detect and recover from silent hangs.
+    private var periodicRestartTimer: Timer?
+    
+    // CONFIGURATION CONSTANTS
+    // These values are tuned based on observed SFSpeechRecognizer behavior
+    // on macOS. Apple's recognizer tends to degrade around 30-60 seconds
+    // and can hang silently. These are conservative values that balance
+    // accuracy improvement vs. the brief gap during restart.
+    //
+    // maxSessionDuration: 30 seconds.
+    //   After 30s of continuous recognition, force a restart.
+    //   This is well within the ~60s limit Apple imposes on some devices
+    //   and catches accuracy degradation before it becomes noticeable.
+    //
+    // hangDetectionTimeout: 5 seconds.
+    //   If we're "listening" and haven't received any result (not even
+    //   partial) for 5 seconds, something is wrong. Restart immediately.
+    //   Normal speech produces partial results every ~100-300ms.
+    //   Even silence should produce empty partials within a few seconds.
+    //
+    // periodicCheckInterval: 3 seconds.
+    //   How often the watchdog timer fires. Frequent enough to catch
+    //   hangs within ~3s of the hangDetectionTimeout, but not so frequent
+    //   that it wastes CPU checking constantly.
+    private let maxSessionDuration: TimeInterval = 30.0
+    private let hangDetectionTimeout: TimeInterval = 5.0
+    private let periodicCheckInterval: TimeInterval = 3.0
+    
     init() {
         // Initialize speech recognizer for US English
         self.speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
@@ -243,6 +310,14 @@ class SpeechHelper {
             
             let inputNode = audioEngine.inputNode
             
+            // LIFECYCLE TRACKING: Record when this recognition session started
+            // and initialize the "last transcription" time so the hang detector
+            // doesn't immediately fire on a fresh session (it would see zero
+            // time since last transcription and think we're hung).
+            recognitionSessionStartTime = Date()
+            lastTranscriptionTime = Date()
+            restartCount = 0
+            
             // Start recognition task
             // CRITICAL CHANGE (2026-01-21): Keep recognition running continuously
             // This enables interruption detection - if user speaks while AI is responding,
@@ -254,8 +329,31 @@ class SpeechHelper {
                     // Only stop on actual errors, not on normal completion
                     let nsError = error as NSError
                     // Error code 216 is "speech recognition cancelled" - this is normal
+                    // when we cancel the task ourselves (e.g., during restart)
                     if nsError.domain == "kAFAssistantErrorDomain" && nsError.code == 216 {
                         self.logError("Recognition task cancelled (normal)")
+                        return
+                    }
+                    
+                    // Error 301 = "speech recognition request was canceled" (also normal during restart)
+                    // Error 203 = "Retry" from Apple's server-side recognition
+                    // Error 209 = "No speech detected" (normal during silence)
+                    // These are transient errors that should NOT stop listening entirely.
+                    // Instead of tearing down the whole pipeline, we restart recognition.
+                    //
+                    // WHY: Previously, ANY recognition error called stopListening(), which
+                    // killed the audio engine and required a full re-initialization from
+                    // the backend. This caused the voice pipeline to "die" on transient
+                    // errors that could have been recovered by simply restarting the
+                    // recognition task.
+                    //
+                    // BECAUSE: Apple's speech recognition sends various transient errors
+                    // (network glitches, temporary server issues, etc.) that resolve on
+                    // their own. We should only fully stop on unrecoverable errors.
+                    let recoverableCodes = [301, 203, 209, 1110]
+                    if nsError.domain == "kAFAssistantErrorDomain" && recoverableCodes.contains(nsError.code) {
+                        self.logError("Recoverable recognition error (code \(nsError.code)): \(error.localizedDescription) — restarting recognition")
+                        self.restartRecognition()
                         return
                     }
                     
@@ -267,6 +365,12 @@ class SpeechHelper {
                 if let result = result {
                     let transcription = result.bestTranscription.formattedString
                     let isFinal = result.isFinal
+                    
+                    // LIFECYCLE TRACKING: Update the last transcription time
+                    // This is used by the hang detector to know we're still
+                    // receiving results. ANY result (partial or final) resets
+                    // the hang detection clock.
+                    self.lastTranscriptionTime = Date()
                     
                     // Send transcription with current speaking state
                     // This allows backend to detect interruptions
@@ -298,8 +402,156 @@ class SpeechHelper {
             isListening = true
             logError("Started listening")
             
+            // START THE PERIODIC RESTART WATCHDOG TIMER
+            // This timer runs every periodicCheckInterval seconds and checks:
+            //   1. Has the session been running too long? (maxSessionDuration)
+            //   2. Has recognition gone silent / hung? (hangDetectionTimeout)
+            // If either condition is met, it proactively restarts recognition.
+            //
+            // WHY: We can't rely solely on isFinal to trigger restarts because:
+            //   - SFSpeechRecognizer may never produce isFinal if it hangs
+            //   - Long sessions degrade accuracy even if results keep coming
+            //   - Some edge cases (background noise, etc.) can keep the
+            //     recognizer "alive" but producing garbage results
+            //
+            // IMPORTANT: Must be scheduled on RunLoop.main because Timer
+            // requires a run loop, and our main.swift uses RunLoop.main.run()
+            startPeriodicRestartTimer()
+            
         } catch {
             sendError("Failed to start listening: \(error.localizedDescription)")
+        }
+    }
+    
+    // ============================================================
+    // PERIODIC RESTART TIMER (WATCHDOG)
+    // ============================================================
+    //
+    // This timer is the core of the "restart after each step" strategy.
+    // It fires every periodicCheckInterval seconds and checks two conditions:
+    //
+    // CONDITION 1 — SESSION TOO OLD (proactive accuracy refresh):
+    //   If recognitionSessionStartTime is older than maxSessionDuration,
+    //   restart to get a fresh session. This is the primary mechanism for
+    //   improving accuracy: Apple's recognizer builds up internal state
+    //   that degrades over time. A fresh session starts clean.
+    //
+    // CONDITION 2 — HANG DETECTION (recovery from silent failure):
+    //   If lastTranscriptionTime is older than hangDetectionTimeout,
+    //   the recognizer is probably stuck. This happens in practice when:
+    //   - The audio engine disconnects silently (rare but observed)
+    //   - Apple's server-side recognition fails without error callback
+    //   - The recognition task enters a bad state after an error
+    //
+    // Both conditions trigger restartRecognition(), which cleanly tears
+    // down the old session and creates a fresh one, keeping the audio
+    // engine running so there's minimal gap.
+    //
+    // PRODUCT CONTEXT:
+    // Users of BubbleVoice have reported that after ~30-60 seconds of
+    // continuous listening, the recognizer "stops working" or produces
+    // increasingly inaccurate results. This watchdog prevents both issues.
+    // ============================================================
+    
+    /**
+     * START PERIODIC RESTART TIMER
+     *
+     * Creates and schedules the watchdog timer on the main run loop.
+     * Called once when listening starts. Automatically invalidated
+     * when listening stops.
+     */
+    private func startPeriodicRestartTimer() {
+        // Invalidate any existing timer first (safety)
+        stopPeriodicRestartTimer()
+        
+        logError("Starting periodic restart watchdog (check every \(periodicCheckInterval)s, max session \(maxSessionDuration)s, hang detect \(hangDetectionTimeout)s)")
+        
+        // Create a repeating timer on the main run loop
+        // WHY main run loop: Our Swift helper uses RunLoop.main.run()
+        // as its event loop. Timers must be on an active run loop to fire.
+        periodicRestartTimer = Timer.scheduledTimer(withTimeInterval: periodicCheckInterval, repeats: true) { [weak self] _ in
+            self?.checkAndRestartIfNeeded()
+        }
+    }
+    
+    /**
+     * STOP PERIODIC RESTART TIMER
+     *
+     * Invalidates and clears the watchdog timer.
+     * Called when listening stops or before creating a new timer.
+     */
+    private func stopPeriodicRestartTimer() {
+        periodicRestartTimer?.invalidate()
+        periodicRestartTimer = nil
+    }
+    
+    /**
+     * CHECK AND RESTART IF NEEDED
+     *
+     * The watchdog check that runs every periodicCheckInterval seconds.
+     * Evaluates both conditions (session age and hang detection) and
+     * restarts recognition if either is met.
+     *
+     * CRITICAL: This method must be safe to call repeatedly and must
+     * handle the case where a restart is already in progress (the
+     * restartRecognition method handles this via the isListening guard).
+     *
+     * LOGGING: We log every check at debug level and every restart at
+     * info level so we can diagnose issues from the Swift stderr logs.
+     */
+    private func checkAndRestartIfNeeded() {
+        guard isListening else { return }
+        
+        let now = Date()
+        
+        // CONDITION 1: Session too old — proactive accuracy refresh
+        // WHY 30 seconds: Apple's recognizer starts losing accuracy
+        // around 30-60 seconds. 30s is conservative and catches the
+        // problem before users notice degraded results.
+        if let sessionStart = recognitionSessionStartTime {
+            let sessionAge = now.timeIntervalSince(sessionStart)
+            if sessionAge >= maxSessionDuration {
+                logError("⏰ Periodic restart: Session aged out at \(String(format: "%.1f", sessionAge))s (max \(maxSessionDuration)s) — restarting for accuracy (restart #\(restartCount + 1))")
+                
+                // Notify the backend that we're proactively restarting
+                // This is informational — the backend doesn't need to do anything,
+                // but it helps with debugging and logging on the Node.js side
+                sendResponse(type: "recognition_restarted", data: [
+                    "reason": AnyCodable("session_aged_out"),
+                    "sessionAge": AnyCodable(sessionAge),
+                    "restartCount": AnyCodable(restartCount + 1)
+                ])
+                
+                restartRecognition()
+                return
+            }
+        }
+        
+        // CONDITION 2: Hang detection — no results for too long
+        // WHY 5 seconds: Normal speech produces partial results every
+        // ~100-300ms. Even during silence, the recognizer typically
+        // sends empty partials within 1-2 seconds. 5 seconds of complete
+        // silence from the recognizer strongly suggests it's hung.
+        //
+        // NOTE: We only check this if we have a lastTranscriptionTime.
+        // On a fresh session that hasn't received any results yet, we
+        // rely on the session age check instead (which will catch it
+        // at maxSessionDuration).
+        if let lastTranscription = lastTranscriptionTime {
+            let timeSinceLastResult = now.timeIntervalSince(lastTranscription)
+            if timeSinceLastResult >= hangDetectionTimeout {
+                logError("🔄 Hang detection: No results for \(String(format: "%.1f", timeSinceLastResult))s (threshold \(hangDetectionTimeout)s) — restarting recognition (restart #\(restartCount + 1))")
+                
+                // Notify the backend about the hang recovery
+                sendResponse(type: "recognition_restarted", data: [
+                    "reason": AnyCodable("hang_detected"),
+                    "timeSinceLastResult": AnyCodable(timeSinceLastResult),
+                    "restartCount": AnyCodable(restartCount + 1)
+                ])
+                
+                restartRecognition()
+                return
+            }
         }
     }
     
@@ -330,11 +582,57 @@ class SpeechHelper {
      * the AI is speaking. This allows immediate detection of user interruptions.
      * We restart the recognition task AND the audio tap to get a fresh session.
      */
+    /**
+     * RESTART RECOGNITION
+     *
+     * Tears down the current recognition task and audio tap, then creates
+     * a fresh session after a brief pipeline flush delay.
+     *
+     * This is the CORE method for the periodic restart strategy. It's called:
+     *   1. After every isFinal result (natural utterance boundary)
+     *   2. By the periodic watchdog timer (session age / hang detection)
+     *   3. By the backend's reset_recognition command (after AI finishes speaking)
+     *   4. On recoverable recognition errors (transient server issues)
+     *
+     * CRITICAL FIX (2026-01-23):
+     * The audio tap captures the recognitionRequest variable at install time.
+     * When we create a new recognitionRequest, the tap is still appending to the OLD one!
+     * This causes transcription accumulation across restarts.
+     *
+     * SOLUTION: Remove and reinstall the audio tap with the new request.
+     * This is what Accountability AI does - it stops and restarts the entire recording.
+     *
+     * ADDITIONAL FIX (2026-01-23):
+     * Apple's SFSpeechRecognizer returns the FULL transcription from the start of
+     * the recognition session, not incremental text. Even with a fresh request,
+     * we need to ensure we're not getting accumulated text from the audio buffer.
+     *
+     * The solution is to add a small delay after removing the tap to let the
+     * audio pipeline flush, then reinstall with a completely fresh request.
+     *
+     * ROBUSTNESS IMPROVEMENTS (2026-02-06):
+     * - Tracks restart count and session start time for lifecycle monitoring
+     * - Handles errors in the new recognition task with the same recoverable
+     *   error logic as the initial task (prevents cascading failures)
+     * - Resets lastTranscriptionTime so the hang detector doesn't immediately
+     *   fire on the fresh session
+     * - Logs the restart reason trail for debugging
+     *
+     * PRODUCT CONTEXT:
+     * In the Accountability app, speech recognition runs continuously even while
+     * the AI is speaking. This allows immediate detection of user interruptions.
+     * We restart the recognition task AND the audio tap to get a fresh session.
+     */
     private func restartRecognition() {
         guard isListening else { return }
         guard let audioEngine = audioEngine else { return }
         
-        logError("Restarting recognition task for continuous listening")
+        // INCREMENT RESTART COUNTER
+        // This counter tracks total restarts in the current listening session.
+        // Useful for debugging: if restartCount is unusually high, it may
+        // indicate a problem (e.g., recognizer immediately failing after restart).
+        restartCount += 1
+        logError("Restarting recognition task (restart #\(restartCount)) for continuous listening")
         
         // Cancel the old task
         recognitionTask?.cancel()
@@ -354,6 +652,12 @@ class SpeechHelper {
             guard let self = self else { return }
             guard self.isListening else { return }
             
+            // LIFECYCLE: Reset the session start time for this fresh session
+            // This is critical — without this, the watchdog timer would see
+            // the OLD start time and immediately trigger another restart.
+            self.recognitionSessionStartTime = Date()
+            self.lastTranscriptionTime = Date()
+            
             // Create a new recognition request
             self.recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
             guard let recognitionRequest = self.recognitionRequest,
@@ -365,13 +669,29 @@ class SpeechHelper {
             recognitionRequest.shouldReportPartialResults = true
             
             // Start a new recognition task
+            // CRITICAL: Use the SAME error handling logic as startListeningInternal
+            // so that recoverable errors trigger another restart instead of killing
+            // the entire listening pipeline.
             self.recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { [weak self] result, error in
                 guard let self = self else { return }
                 
                 if let error = error {
                     let nsError = error as NSError
+                    
+                    // Error 216 = "speech recognition cancelled" — normal during restart
                     if nsError.domain == "kAFAssistantErrorDomain" && nsError.code == 216 {
                         self.logError("Recognition task cancelled (normal)")
+                        return
+                    }
+                    
+                    // RECOVERABLE ERRORS: Same list as in startListeningInternal
+                    // Instead of killing the pipeline, restart to get a fresh session.
+                    // WHY: Transient errors (server blips, "retry", "no speech detected")
+                    // resolve on their own. Killing the pipeline is overkill.
+                    let recoverableCodes = [301, 203, 209, 1110]
+                    if nsError.domain == "kAFAssistantErrorDomain" && recoverableCodes.contains(nsError.code) {
+                        self.logError("Recoverable recognition error in restarted task (code \(nsError.code)): \(error.localizedDescription) — restarting again")
+                        self.restartRecognition()
                         return
                     }
                     
@@ -383,6 +703,9 @@ class SpeechHelper {
                 if let result = result {
                     let transcription = result.bestTranscription.formattedString
                     let isFinal = result.isFinal
+                    
+                    // LIFECYCLE: Update last transcription time for hang detection
+                    self.lastTranscriptionTime = Date()
                     
                     self.sendTranscription(text: transcription, isFinal: isFinal)
                     
@@ -402,7 +725,7 @@ class SpeechHelper {
                 self?.recognitionRequest?.append(buffer)
             }
             
-            self.logError("Audio tap reinstalled with new recognition request after flush delay")
+            self.logError("Audio tap reinstalled with new recognition request after flush delay (restart #\(self.restartCount))")
         }
     }
     
@@ -414,13 +737,22 @@ class SpeechHelper {
     func stopListening() {
         guard isListening else { return }
         
+        // CRITICAL: Stop the periodic restart watchdog FIRST
+        // If we don't, it could fire after we've stopped and try to restart
+        // a recognition session that we're intentionally shutting down.
+        stopPeriodicRestartTimer()
+        
         audioEngine?.stop()
         audioEngine?.inputNode.removeTap(onBus: 0)
         recognitionRequest?.endAudio()
         recognitionTask?.cancel()
         
         isListening = false
-        logError("Stopped listening")
+        
+        // LIFECYCLE: Log the session summary for debugging
+        // This helps diagnose issues by showing how many restarts occurred
+        // and how long the total listening session lasted.
+        logError("Stopped listening (total restarts in session: \(restartCount))")
     }
     
     /**
@@ -607,9 +939,22 @@ class SpeechHelper {
             
         case "reset_recognition":
             // CRITICAL: Explicitly reset the recognition session
-            // This is called by the backend after the AI finishes speaking
-            // to ensure a fresh transcription session for the next user utterance
-            logError("Received reset_recognition command")
+            // This is called by the backend at several lifecycle points:
+            //   1. After the AI finishes speaking (speech_ended) — ensures fresh
+            //      session for the next user utterance
+            //   2. After an interruption is detected — gives the recognizer a
+            //      clean slate so the interrupting speech is captured accurately
+            //   3. After the timer cascade completes — prepares for next turn
+            //
+            // WHY THIS EXISTS (separate from periodic restart):
+            // The periodic restart runs on a fixed timer and doesn't know about
+            // the conversation turn structure. This command is the backend's way
+            // of saying "a logical conversation boundary just happened, start fresh."
+            //
+            // TOGETHER, they cover both scenarios:
+            // - Periodic restart: handles long continuous listening (accuracy + hang)
+            // - reset_recognition: handles turn boundaries (clean transcription state)
+            logError("Received reset_recognition command from backend (restart #\(restartCount + 1))")
             if isListening {
                 restartRecognition()
             }
