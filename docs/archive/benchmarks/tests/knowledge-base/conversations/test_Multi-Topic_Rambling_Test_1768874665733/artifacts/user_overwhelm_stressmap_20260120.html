@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(240, 245, 255, 0.9) 0%, rgba(220, 235, 255, 0.9) 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .stress-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-height: 250px;
+        }
+        .stress-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+        .stress-card .icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        .stress-card h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a3b6d;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        .stress-card p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555;
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+        .stress-card .details {
+            font-size: 13px;
+            color: #777;
+            font-weight: 400;
+        }
+        .stress-card .details span {
+            font-weight: 600;
+            color: #1a3b6d;
+        }
+        .color-startup {
+            color: #e57373; /* Red-ish */
+        }
+        .color-emma {
+            color: #64b5f6; /* Blue-ish */
+        }
+        .color-max {
+            color: #81c784; /* Green-ish */
+        }
+        .color-personal {
+            color: #ba68c8; /* Purple-ish */
+        }
+        .color-partner {
+            color: #ffd54f; /* Yellow-ish */
+        }
+        .title-container {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .title-container h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a3b6d;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+        .title-container p {
+            font-size: 16px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <div class="title-container">
+            <h1>Your Current Stress Landscape</h1>
+            <p>Navigating multiple priorities</p>
+        </div>
+
+        <div class="stress-card">
+            <div class="icon color-startup">💼</div>
+            <h3>Startup Pressures</h3>
+            <p>Urgent need for Q1 numbers and ongoing fundraising demands are creating significant work-related stress.</p>
+            <div class="details"><span>Key Concern:</span> Financial performance & investor relations</div>
+        </div>
+
+        <div class="stress-card">
+            <div class="icon color-emma">📚</div>
+            <h3>Emma's Reading Progress</h3>
+            <p>Upcoming teacher meeting requires preparation. Balancing concern for her struggles with the positive steps she's making.</p>
+            <div class="details"><span>Key Concern:</span> Academic performance & teacher communication</div>
+        </div>
+
+        <div class="stress-card">
+            <div class="icon color-max">⚽</div>
+            <h3>Max's Soccer Schedule</h3>
+            <p>Need to manage Max's Saturday game amidst other commitments. Positive aspect, but adds to logistical complexity.</p>
+            <div class="details"><span>Key Concern:</span> Time management & family logistics</div>
+        </div>
+        
+        <div class="stress-card">
+            <div class="icon color-personal">🏃</div>
+            <h3>Personal Well-being</h3>
+            <p>Feeling too exhausted to exercise, leading to a cycle of low energy and guilt. Neglecting self-care.</p>
+            <div class="details"><span>Key Concern:</span> Physical health & energy levels</div>
+        </div>
+
+        <div class="stress-card">
+            <div class="icon color-partner">❤️</div>
+            <h3>Relationship Time</h3>
+            <p>Lack of date nights with Jordan, indicating strained quality time due to current demands.</p>
+            <div class="details"><span>Key Concern:</span> Partner connection & relationship maintenance</div>
+        </div>
+
+    </div>
+</body>
+</html>

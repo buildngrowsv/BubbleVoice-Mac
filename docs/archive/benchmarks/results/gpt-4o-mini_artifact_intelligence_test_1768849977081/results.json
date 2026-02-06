@@ -1,0 +1,331 @@
+{
+  "run_id": "gpt-4o-mini_artifact_intelligence_test_1768849977081",
+  "scenario_id": "artifact_intelligence_test",
+  "model_id": "gpt-4o-mini",
+  "model_display_name": "GPT-4o Mini",
+  "started_at": "2026-01-19T19:12:57.081Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I'm feeling overwhelmed with everything going on",
+      "expected_behavior": {
+        "response": "empathize, ask clarifying questions",
+        "artifact_action": "none",
+        "reasoning": "Too vague, casual emotional expression - no artifact warranted yet"
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (401): {\n  \"error\": {\n    \"message\": \"Incorrect API key provided: sk-proj-********************************************************************************************************************************************************Tm4A. You can find your API key at https://platform.openai.com/account/api-keys.\",\n    \"type\": \"invalid_request_error\",\n    \"code\": \"invalid_api_key\",\n    \"param\": null\n  },\n  \"status\": 401\n}"
+    },
+    {
+      "turn_id": 2,
+      "user_input": "It's just... I have the startup launch next week, Emma's science fair project is due Friday, Jake is struggling with reading, the house needs repairs, and I haven't exercised in a month. I don't even know where to start.",
+      "expected_behavior": {
+        "response": "validate overwhelm, acknowledge complexity",
+        "artifact_action": "create",
+        "artifact_type": "stress_map_or_priority_matrix",
+        "reasoning": "PROACTIVE: Complex multi-domain problem with clear overwhelm - visual map would help without being asked",
+        "artifact_should_contain": {
+          "domains": [
+            "startup",
+            "family/kids",
+            "health",
+            "home"
+          ],
+          "urgency_indicators": true,
+          "visual_organization": "helps user see the landscape"
+        }
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (401): {\n  \"error\": {\n    \"message\": \"Incorrect API key provided: sk-proj-********************************************************************************************************************************************************Tm4A. You can find your API key at https://platform.openai.com/account/api-keys.\",\n    \"type\": \"invalid_request_error\",\n    \"code\": \"invalid_api_key\",\n    \"param\": null\n  },\n  \"status\": 401\n}"
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Yeah that helps. Actually Emma's project is due Thursday, not Friday",
+      "expected_behavior": {
+        "response": "acknowledge correction",
+        "artifact_action": "update",
+        "modification_type": "data_only",
+        "artifact_should_update": {
+          "emma_deadline": "Thursday"
+        },
+        "artifact_should_preserve": [
+          "all styling",
+          "all other data",
+          "layout",
+          "visual hierarchy"
+        ],
+        "reasoning": "Simple data correction - change ONLY the deadline, touch nothing else"
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (401): {\n  \"error\": {\n    \"message\": \"Incorrect API key provided: sk-proj-********************************************************************************************************************************************************Tm4A. You can find your API key at https://platform.openai.com/account/api-keys.\",\n    \"type\": \"invalid_request_error\",\n    \"code\": \"invalid_api_key\",\n    \"param\": null\n  },\n  \"status\": 401\n}"
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Can you make the startup stuff stand out more? That's the most urgent",
+      "expected_behavior": {
+        "response": "acknowledge priority shift",
+        "artifact_action": "update",
+        "modification_type": "ui_only",
+        "artifact_should_update": {
+          "visual_emphasis": "startup section highlighted/enlarged/colored",
+          "styling": "adjusted to show urgency"
+        },
+        "artifact_should_preserve": [
+          "all data",
+          "other sections styling",
+          "structure"
+        ],
+        "reasoning": "Visual/UI request - change ONLY styling/emphasis, data stays identical"
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (401): {\n  \"error\": {\n    \"message\": \"Incorrect API key provided: sk-proj-********************************************************************************************************************************************************Tm4A. You can find your API key at https://platform.openai.com/account/api-keys.\",\n    \"type\": \"invalid_request_error\",\n    \"code\": \"invalid_api_key\",\n    \"param\": null\n  },\n  \"status\": 401\n}"
+    },
+    {
+      "turn_id": 5,
+      "user_input": "I talked to my co-founder and we're pushing the launch to next month",
+      "expected_behavior": {
+        "response": "acknowledge timeline change, note reduced pressure",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "artifact_should_update": {
+          "startup_deadline": "next month",
+          "urgency_level": "reduced",
+          "visual_emphasis": "de-emphasize startup, re-balance priorities"
+        },
+        "reasoning": "Data change (deadline) + UI change (urgency) - both needed"
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (401): {\n  \"error\": {\n    \"message\": \"Incorrect API key provided: sk-proj-********************************************************************************************************************************************************Tm4A. You can find your API key at https://platform.openai.com/account/api-keys.\",\n    \"type\": \"invalid_request_error\",\n    \"code\": \"invalid_api_key\",\n    \"param\": null\n  },\n  \"status\": 401\n}"
+    },
+    {
+      "turn_id": 6,
+      "user_input": "So what should I focus on this week?",
+      "expected_behavior": {
+        "response": "suggest focusing on Emma's project (Thu) and Jake's reading based on the artifact",
+        "artifact_action": "none",
+        "reasoning": "Conversational question - artifact already shows priorities, no update needed"
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (401): {\n  \"error\": {\n    \"message\": \"Incorrect API key provided: sk-proj-********************************************************************************************************************************************************Tm4A. You can find your API key at https://platform.openai.com/account/api-keys.\",\n    \"type\": \"invalid_request_error\",\n    \"code\": \"invalid_api_key\",\n    \"param\": null\n  },\n  \"status\": 401\n}"
+    },
+    {
+      "turn_id": 7,
+      "user_input": "Actually, can you completely redesign this? I want to see it as a weekly calendar view instead of a priority matrix",
+      "expected_behavior": {
+        "response": "acknowledge complete redesign request",
+        "artifact_action": "update",
+        "modification_type": "complete_overhaul",
+        "artifact_should_update": {
+          "structure": "calendar layout instead of matrix",
+          "visualization_type": "timeline/calendar",
+          "all_styling": "rebuilt for new format"
+        },
+        "artifact_should_preserve": [
+          "all data/deadlines",
+          "priority information"
+        ],
+        "reasoning": "Complete UI overhaul - rebuild entire artifact with same data"
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (401): {\n  \"error\": {\n    \"message\": \"Incorrect API key provided: sk-proj-********************************************************************************************************************************************************Tm4A. You can find your API key at https://platform.openai.com/account/api-keys.\",\n    \"type\": \"invalid_request_error\",\n    \"code\": \"invalid_api_key\",\n    \"param\": null\n  },\n  \"status\": 401\n}"
+    },
+    {
+      "turn_id": 8,
+      "user_input": "Thanks, this is really helpful. I think I'll tackle Emma's project tonight.",
+      "expected_behavior": {
+        "response": "encourage, validate decision",
+        "artifact_action": "none",
+        "reasoning": "Casual update/gratitude - no artifact change needed"
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (401): {\n  \"error\": {\n    \"message\": \"Incorrect API key provided: sk-proj-********************************************************************************************************************************************************Tm4A. You can find your API key at https://platform.openai.com/account/api-keys.\",\n    \"type\": \"invalid_request_error\",\n    \"code\": \"invalid_api_key\",\n    \"param\": null\n  },\n  \"status\": 401\n}"
+    }
+  ],
+  "artifacts": {},
+  "metrics": {
+    "total_latency_ms": 0,
+    "avg_latency_ms": 0,
+    "json_valid_count": 0,
+    "json_invalid_count": 8,
+    "artifact_creates": 0,
+    "artifact_updates": 0
+  },
+  "completed_at": "2026-01-19T19:13:01.962Z",
+  "scores": {
+    "total_points": 60,
+    "max_points": 135,
+    "percentage": 44,
+    "turn_scores": [
+      {
+        "turn_id": 1,
+        "test_type": "restraint",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 2,
+        "test_type": "proactive_creation",
+        "points": 0,
+        "max_points": 25,
+        "breakdown": {
+          "proactive_creation": "❌ Should have proactively created artifact (got: none)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 3,
+        "test_type": "data_only_update",
+        "points": 0,
+        "max_points": 15,
+        "breakdown": {
+          "data_only": "❌ Should have updated data (got: none)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 4,
+        "test_type": "ui_only_update",
+        "points": 0,
+        "max_points": 15,
+        "breakdown": {
+          "ui_only": "❌ Should have updated UI (got: none)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 5,
+        "test_type": "combined_update",
+        "points": 0,
+        "max_points": 10,
+        "breakdown": {
+          "combined": "❌ Should have updated both data and UI (got: none)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 6,
+        "test_type": "preservation",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 7,
+        "test_type": "complete_overhaul",
+        "points": 0,
+        "max_points": 10,
+        "breakdown": {
+          "overhaul": "❌ Should have performed complete overhaul (got: none)"
+        },
+        "passed": false
+      },
+      {
+        "turn_id": 8,
+        "test_type": "restraint",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      }
+    ],
+    "summary": {
+      "restraint": {
+        "passed": 3,
+        "total": 3
+      },
+      "proactive_creation": {
+        "passed": 0,
+        "total": 1
+      },
+      "data_only": {
+        "passed": 0,
+        "total": 1
+      },
+      "ui_only": {
+        "passed": 0,
+        "total": 1
+      },
+      "combined": {
+        "passed": 0,
+        "total": 1
+      },
+      "overhaul": {
+        "passed": 0,
+        "total": 1
+      }
+    }
+  }
+}

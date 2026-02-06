@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma's Reading Journey</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 240, 255, 0.9));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .mind-map-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            border: 1px solid rgba(200, 220, 240, 0.3);
+        }
+        .mind-map-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #1e3a8a; /* Darker blue */
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .mind-map {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .node {
+            background: linear-gradient(120deg, rgba(96, 165, 250, 0.8), rgba(59, 130, 246, 0.8)); /* Blue gradient */
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 150px;
+        }
+        .node:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        .node-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+            line-height: 1.3;
+        }
+        .node-content {
+            font-size: 0.95em;
+            font-weight: 400;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        .node-content ul {
+            list-style: disc;
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        .node-content li {
+            margin-bottom: 5px;
+        }
+        .icon {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="mind-map-container">
+        <h1 class="mind-map-title">🧠 Emma's Reading Journey: Key Takeaways for Teacher Meeting</h1>
+        <div class="mind-map">
+            <div class="node">
+                <div class="icon">📚</div>
+                <div class="node-title">Reading Challenges</div>
+                <div class="node-content">
+                    <p>Decoding words is fine, but struggles with comprehension.</p>
+                    <p>Frustration and self-doubt (e.g., "I'm stupid").</p>
+                    <p>Homework takes significantly longer than expected.</p>
+                </div>
+            </div>
+            <div class="node">
+                <div class="icon">✨</div>
+                <div class="node-title">Recent Breakthroughs</div>
+                <div class="node-content">
+                    <p>Graphic novels (Dog Man) are highly engaging!</p>
+                    <p>Initiated extra reading time ("one more chapter").</p>
+                    <p>Indicates a potential visual learning preference.</p>
+                </div>
+            </div>
+            <div class="node">
+                <div class="icon">🧑‍🏫</div>
+                <div class="node-title">Teacher's Input & Next Steps</div>
+                <div class="node-content">
+                    <p>Ms. Johnson recommended educational testing.</p>
+                    <p>Concerns about potential learning differences.</p>
+                    <p>Meeting scheduled to discuss findings.</p>
+                </div>
+            </div>
+            <div class="node">
+                <div class="icon">💡</div>
+                <div class="node-title">Effective Strategies</div>
+                <div class="node-content">
+                    <ul>
+                        <li>Reading together</li>
+                        <li>Graphic novels/visuals</li>
+                        <li>Praise effort, not just results</li>
+                        <li>Taking breaks when frustrated</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="node">
+                <div class="icon">❤️</div>
+                <div class="node-title">Your Concerns</div>
+                <div class="node-content">
+                    <p>Worry about labeling Emma if tested.</p>
+                    <p>Desire to support her without making her feel "broken".</p>
+                    <p>Hopeful about her recent engagement.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

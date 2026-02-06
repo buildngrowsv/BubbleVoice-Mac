@@ -1,0 +1,157 @@
+{
+  "scenario_id": "artifact_intelligence_test",
+  "description": "Test AI's judgment on WHEN to create artifacts, WHAT to modify (data/UI/both), and WHEN to leave them alone",
+  "category": "artifact_intelligence",
+  "difficulty": "expert",
+  "evaluation_criteria": {
+    "proactive_creation": "Creates artifacts for complex problems without being asked",
+    "restraint": "Does NOT create artifacts for casual conversation",
+    "data_only_updates": "Can update data without touching UI/styling",
+    "ui_only_updates": "Can update styling/layout without touching data",
+    "preservation": "Leaves artifact unchanged when user doesn't request changes",
+    "complete_overhaul": "Can rebuild entire artifact when needed",
+    "timeliness": "Artifact appears at the right moment in conversation"
+  },
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_says": "I'm feeling overwhelmed with everything going on",
+      "expected_behavior": {
+        "response": "empathize, ask clarifying questions",
+        "artifact_action": "none",
+        "reasoning": "Too vague, casual emotional expression - no artifact warranted yet"
+      },
+      "test_type": "restraint"
+    },
+    {
+      "turn_id": 2,
+      "user_says": "It's just... I have the startup launch next week, Emma's science fair project is due Friday, Jake is struggling with reading, the house needs repairs, and I haven't exercised in a month. I don't even know where to start.",
+      "expected_behavior": {
+        "response": "validate overwhelm, acknowledge complexity",
+        "artifact_action": "create",
+        "artifact_type": "stress_map_or_priority_matrix",
+        "reasoning": "PROACTIVE: Complex multi-domain problem with clear overwhelm - visual map would help without being asked",
+        "artifact_should_contain": {
+          "domains": ["startup", "family/kids", "health", "home"],
+          "urgency_indicators": true,
+          "visual_organization": "helps user see the landscape"
+        }
+      },
+      "test_type": "proactive_creation"
+    },
+    {
+      "turn_id": 3,
+      "user_says": "Yeah that helps. Actually Emma's project is due Thursday, not Friday",
+      "expected_behavior": {
+        "response": "acknowledge correction",
+        "artifact_action": "update",
+        "modification_type": "data_only",
+        "artifact_should_update": {
+          "emma_deadline": "Thursday"
+        },
+        "artifact_should_preserve": ["all styling", "all other data", "layout", "visual hierarchy"],
+        "reasoning": "Simple data correction - change ONLY the deadline, touch nothing else"
+      },
+      "test_type": "data_only_update"
+    },
+    {
+      "turn_id": 4,
+      "user_says": "Can you make the startup stuff stand out more? That's the most urgent",
+      "expected_behavior": {
+        "response": "acknowledge priority shift",
+        "artifact_action": "update",
+        "modification_type": "ui_only",
+        "artifact_should_update": {
+          "visual_emphasis": "startup section highlighted/enlarged/colored",
+          "styling": "adjusted to show urgency"
+        },
+        "artifact_should_preserve": ["all data", "other sections styling", "structure"],
+        "reasoning": "Visual/UI request - change ONLY styling/emphasis, data stays identical"
+      },
+      "test_type": "ui_only_update"
+    },
+    {
+      "turn_id": 5,
+      "user_says": "I talked to my co-founder and we're pushing the launch to next month",
+      "expected_behavior": {
+        "response": "acknowledge timeline change, note reduced pressure",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "artifact_should_update": {
+          "startup_deadline": "next month",
+          "urgency_level": "reduced",
+          "visual_emphasis": "de-emphasize startup, re-balance priorities"
+        },
+        "reasoning": "Data change (deadline) + UI change (urgency) - both needed"
+      },
+      "test_type": "combined_update"
+    },
+    {
+      "turn_id": 6,
+      "user_says": "So what should I focus on this week?",
+      "expected_behavior": {
+        "response": "suggest focusing on Emma's project (Thu) and Jake's reading based on the artifact",
+        "artifact_action": "none",
+        "reasoning": "Conversational question - artifact already shows priorities, no update needed"
+      },
+      "test_type": "preservation"
+    },
+    {
+      "turn_id": 7,
+      "user_says": "Actually, can you completely redesign this? I want to see it as a weekly calendar view instead of a priority matrix",
+      "expected_behavior": {
+        "response": "acknowledge complete redesign request",
+        "artifact_action": "update",
+        "modification_type": "complete_overhaul",
+        "artifact_should_update": {
+          "structure": "calendar layout instead of matrix",
+          "visualization_type": "timeline/calendar",
+          "all_styling": "rebuilt for new format"
+        },
+        "artifact_should_preserve": ["all data/deadlines", "priority information"],
+        "reasoning": "Complete UI overhaul - rebuild entire artifact with same data"
+      },
+      "test_type": "complete_overhaul"
+    },
+    {
+      "turn_id": 8,
+      "user_says": "Thanks, this is really helpful. I think I'll tackle Emma's project tonight.",
+      "expected_behavior": {
+        "response": "encourage, validate decision",
+        "artifact_action": "none",
+        "reasoning": "Casual update/gratitude - no artifact change needed"
+      },
+      "test_type": "restraint"
+    }
+  ],
+  "scoring": {
+    "proactive_creation": {
+      "points": 25,
+      "criteria": "Created useful artifact at turn 2 without being asked"
+    },
+    "restraint": {
+      "points": 20,
+      "criteria": "Did NOT create artifacts at turns 1, 6, 8 (casual conversation)"
+    },
+    "data_only_precision": {
+      "points": 15,
+      "criteria": "Turn 3: Changed ONLY deadline, preserved all styling/UI"
+    },
+    "ui_only_precision": {
+      "points": 15,
+      "criteria": "Turn 4: Changed ONLY visual emphasis, preserved all data"
+    },
+    "combined_update": {
+      "points": 10,
+      "criteria": "Turn 5: Updated both data and UI appropriately"
+    },
+    "complete_overhaul": {
+      "points": 10,
+      "criteria": "Turn 7: Rebuilt entire artifact while preserving data"
+    },
+    "timeliness": {
+      "points": 5,
+      "criteria": "Artifact appeared at right moment (turn 2, not turn 1)"
+    }
+  }
+}

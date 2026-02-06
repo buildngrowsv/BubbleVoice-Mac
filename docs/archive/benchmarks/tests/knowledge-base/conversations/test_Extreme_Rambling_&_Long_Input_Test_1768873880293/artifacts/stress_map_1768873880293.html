@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life's Balancing Act</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .artifact-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px 40px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        h1 {
+            color: #1e3a8a; /* Dark blue */
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            color: #4b5563; /* Slate gray */
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        .stress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            text-align: left;
+        }
+        .stress-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(200, 200, 200, 0.3);
+        }
+        .stress-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+        }
+        .stress-card h2 {
+            font-size: 1.6em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #3b82f6; /* Bright blue */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stress-card h2 .icon {
+            font-size: 1.8em;
+        }
+        .stress-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .stress-card li {
+            margin-bottom: 12px;
+            font-size: 1.05em;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stress-card li .emoji {
+            font-size: 1.3em;
+        }
+        .stress-card .priority-level {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #e11d48; /* Red for high priority */
+            margin-top: 15px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            background-color: rgba(239, 68, 68, 0.1);
+            display: inline-block;
+        }
+        .stress-card .low-priority .priority-level {
+             color: #10b981; /* Green for lower priority */
+             background-color: rgba(16, 185, 121, 0.1);
+        }
+        .stress-card .medium-priority .priority-level {
+             color: #d97706; /* Orange for medium priority */
+             background-color: rgba(217, 119, 6, 0.1);
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #6b7280;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="artifact-container">
+        <h1>Navigating the Overwhelm</h1>
+        <p class="subtitle">Mapping your current pressures and priorities.</p>
+        <div class="stress-grid">
+            <div class="stress-card">
+                <h2><span class="icon">📚</span> Emma's Reading & School</h2>
+                <ul>
+                    <li><span class="emoji">😟</span> Anxiety about teacher meeting & testing</li>
+                    <li><span class="emoji">💔</span> Fear of impacting Emma's self-esteem</li>
+                    <li><span class="emoji">💡</span> Desire to support her strengths & creativity</li>
+                    <li><span class="emoji">🤔</span> Uncertainty on how to approach testing discussions</li>
+                </ul>
+                <div class="priority-level high-priority">HIGH PRIORITY</div>
+            </div>
+            <div class="stress-card">
+                <h2><span class="icon">🚀</span> Startup & Investors</h2>
+                <ul>
+                    <li><span class="emoji">💰</span> Critical investor call conflict</li>
+                    <li><span class="emoji">📈</span> Pressure for Q1 numbers & growth</li>
+                    <li><span class="emoji">👩‍💻</span> Hiring senior engineer is crucial</li>
+                    <li><span class="emoji">💭</span> Co-founder's ambitious feature push</li>
+                </ul>
+                <div class="priority-level high-priority">HIGH PRIORITY</div>
+            </div>
+            <div class="stress-card">
+                <h2><span class="icon">⚽</span> Max's Activities & Family Time</h2>
+                <ul>
+                    <li><span class="emoji">🗓️</span> Game vs. Investor call conflict</li>
+                    <li><span class="emoji">😔</span> Fear of disappointing Max</li>
+                    <li><span class="emoji">🏃‍♂️</span> Max's soccer commitments</li>
+                    <li><span class="emoji">⏳</span> Feeling of not being present enough</li>
+                </ul>
+                <div class="priority-level high-priority">HIGH PRIORITY</div>
+            </div>
+            <div class="stress-card low-priority">
+                <h2><span class="icon">🏠</span> Home & Personal Well-being</h2>
+                <ul>
+                    <li><span class="emoji">🛋️</span> Exhaustion & lack of personal time (running)
+                    <li><span class="emoji">🏗️</span> Kitchen renovation on hold</li>
+                    <li><span class="emoji">🗓️</span> Thanksgiving plans looming</li>
+                    <li><span class="emoji">❤️</span> Partner relationship (Jordan) needs attention</li>
+                </ul>
+                <div class="priority-level medium-priority">MEDIUM PRIORITY</div>
+            </div>
+        </div>
+        <div class="footer">
+            This visualization helps map the pressures. Remember, it's normal to feel overwhelmed when juggling so many important areas. You're doing your best.
+        </div>
+    </div>
+</body>
+</html>

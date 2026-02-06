@@ -1,0 +1,257 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Extreme Rambling & Long Input Test",
+    "description": "Tests handling of very long, rambling, stream-of-consciousness input",
+    "timestamp": "2026-01-19T23:45:50.178Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So I've been thinking a lot about Emma's reading situation and I don't know, it's just been weighing on me. Like, I know we had that breakthrough with the Dog Man books which was amazing, she was so engaged and happy, but then yesterday she had homework and it was back to the struggle again. And I keep wondering if I'm doing enough, you know? Like maybe I should have noticed sooner that she was having trouble. Her teacher Ms. Johnson is great but she mentioned testing and I'm just... I don't know how I feel about that. On one hand I want to help Emma in every way possible but on the other hand I don't want her to feel like there's something wrong with her. She's already so hard on herself. Remember when she threw that book and said she was stupid? That just broke my heart. And then there's the whole thing with work which is just insane right now. The investors are breathing down our necks for these Q1 numbers and I'm like, we're doing our best but it's a startup, you know? Things take time. We had those rejections which sucked but then that second meeting went well so I'm cautiously optimistic but also terrified. And my co-founder keeps pushing for this new feature that I think is too ambitious right now but I don't want to seem like I'm not thinking big enough. Plus we still haven't found that senior engineer we need. We've interviewed like five people and nobody feels right. And on top of all that I'm just exhausted. I haven't been running at all, maybe once in the last two weeks? I know I feel better when I run, I know that, but by the time I get home from work and deal with Emma's homework and Max's soccer stuff I'm just done. Speaking of Max, he has a game on Saturday and I promised I'd be there but I also have this investor call that might conflict and I don't know what to do. Jordan has been amazing through all of this but I feel like we're just ships passing in the night. We haven't had a real conversation in days, let alone a date night. I miss us, you know? And my mom called yesterday asking about Thanksgiving plans and I haven't even thought that far ahead. I can barely think about next week. Oh and the kitchen renovation, we put that on hold obviously but every time I walk into that kitchen I'm reminded that it's not done and it's just another thing on the list of things I'm not dealing with. I feel like I'm dropping balls everywhere and I don't know which one to pick up first. Is this normal? Like, does everyone feel this overwhelmed or am I just bad at managing my life?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're carrying an immense amount right now, juggling work stress, Emma's school challenges, family commitments, and personal well-being. It's completely understandable that you feel overwhelmed and are questioning if you're doing enough. Many people experience these intense feelings of being stretched thin, especially when facing significant demands on multiple fronts. It's not a reflection of your ability to manage your life, but rather a testament to how much you're trying to hold together.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing significant overwhelm across multiple life areas: Emma's reading struggles, startup pressures (fundraising, team hiring, feature development), personal health (lack of exercise), relationship with partner, family obligations, and a stalled home project. They are questioning their capabilities and seeking validation that these feelings are normal. Key areas of stress are Emma's education and startup viability. Need to acknowledge the breadth of their concerns and offer structured support.",
+            "emotional_state": "overwhelmed, anxious, self-doubting, guilty",
+            "key_context": "User is experiencing burnout and a crisis of confidence due to compounding pressures from work and family, particularly Emma's educational needs. They need validation and help prioritizing.",
+            "watch_for": "User's reaction to prioritizing. Any attempts to delegate or seek external support. Continued self-criticism or signs of burnout. Progress on Emma's reading strategies and startup milestones."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "area_name": "Family/Emma_School",
+              "path": "Family/Emma_School/reading_comprehension.md"
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Work/Startup",
+              "path": "Work/Startup/fundraising.md"
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Work/Startup",
+              "path": "Work/Startup/team_hiring.md"
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Personal_Growth/Exercise_Goals",
+              "path": "Personal_Growth/Exercise_Goals/running.md"
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Partner",
+              "path": "Partner/quality_time.md"
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Family/Max_Activities",
+              "path": "Family/Max_Activities/soccer_season.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2578,
+        "vector_time_ms": 107,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is expressing significant overwhelm across multiple life areas: Emma's reading struggles, startup pressures (fundraising, team hiring, feature development), personal health (lack of exercise), relationship with partner, family obligations, and a stalled home project. They are questioning their capabilities and seeking validation that these feelings are normal. Key areas of stress are Emma's education and startup viability. Need to acknowledge the breadth of their concerns and offer structured support.",
+          "emotional_state": "overwhelmed, anxious, self-doubting, guilty",
+          "key_context": "User is experiencing burnout and a crisis of confidence due to compounding pressures from work and family, particularly Emma's educational needs. They need validation and help prioritizing.",
+          "watch_for": "User's reaction to prioritizing. Any attempts to delegate or seek external support. Continued self-criticism or signs of burnout. Progress on Emma's reading strategies and startup milestones."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma reading",
+            "testing concerns",
+            "work/investors",
+            "Q1 numbers",
+            "co-founder disagreement",
+            "hiring challenges",
+            "running goal",
+            "Max soccer",
+            "investor call conflict",
+            "Jordan relationship",
+            "mom/Thanksgiving",
+            "kitchen renovation",
+            "overwhelm"
+          ],
+          "should_validate_overwhelm": true,
+          "should_acknowledge_complexity": true,
+          "should_prioritize": true,
+          "emotional_tone": "supportive",
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Family/Max_Activities",
+            "Relationships/Partner",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah I guess you're right. I think the Emma thing is probably the most urgent because that teacher meeting is next week. But also I'm worried about the investor call conflicting with Max's game. Like, how do I choose between those? Max will be so disappointed if I'm not there but this investor could be really important for the company. And if the company fails then what? Then I've sacrificed all this family time for nothing. But if I don't take the investor seriously then maybe we don't get funding and the company fails anyway. It's like I can't win. And Emma, I just want to make sure she knows she's smart and capable even if reading is hard for her. I don't want this to define her, you know? She's so creative and funny and kind. The reading thing is just one thing. But I also don't want to ignore it if she needs help. I'm just scared of making the wrong choice. With the testing, with the investors, with everything. What if I mess it all up?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely natural to feel torn when faced with these kinds of difficult choices, especially when both options feel so important and carry significant weight. You're trying to balance immediate needs with long-term goals, and the fear of making the wrong decision is a heavy burden. Regarding Emma, it's wonderful that you see her creativity, humor, and kindness so clearly. It's a powerful reminder that her intelligence and worth are not defined by her reading abilities. We can definitely explore ways to support her with reading while cherishing and nurturing those other amazing qualities. For the conflict between Max's game and the investor call, that's a tough one. Perhaps we can brainstorm some ways to manage both, or at least mitigate the disappointment if you can't be at the game. Would you like to explore these options?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is articulating the core dilemma: perceived conflict between family obligations (Max's game) and critical business needs (investor call), and the underlying fear of failure and making wrong choices. They are also expressing a strong desire to protect Emma's self-esteem while still addressing her reading challenges. Need to validate these conflicting priorities and the fear associated with them, and offer concrete strategies for managing the immediate conflicts and reinforcing Emma's strengths.",
+            "emotional_state": "anxious, conflicted, fearful, guilty",
+            "key_context": "User feels trapped between equally important but conflicting demands, fearing failure in both business and family if they choose incorrectly. Protecting Emma's self-worth is paramount.",
+            "watch_for": "User's willingness to explore strategies for managing the time conflict, their reaction to focusing on Emma's strengths alongside her challenges, and any decisions made regarding the investor call vs. Max's game."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md"
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md"
+            },
+            {
+              "action": "append_entry",
+              "path": "Family/Max_Activities/soccer_season.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2172,
+        "vector_time_ms": 113,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is articulating the core dilemma: perceived conflict between family obligations (Max's game) and critical business needs (investor call), and the underlying fear of failure and making wrong choices. They are also expressing a strong desire to protect Emma's self-esteem while still addressing her reading challenges. Need to validate these conflicting priorities and the fear associated with them, and offer concrete strategies for managing the immediate conflicts and reinforcing Emma's strengths.",
+          "emotional_state": "anxious, conflicted, fearful, guilty",
+          "key_context": "User feels trapped between equally important but conflicting demands, fearing failure in both business and family if they choose incorrectly. Protecting Emma's self-worth is paramount.",
+          "watch_for": "User's willingness to explore strategies for managing the time conflict, their reaction to focusing on Emma's strengths alongside her challenges, and any decisions made regarding the investor call vs. Max's game."
+        },
+        "expected": {
+          "should_address_decision_paralysis": true,
+          "should_validate_fears": true,
+          "should_help_prioritize": true,
+          "topics_mentioned": [
+            "Emma meeting",
+            "investor vs Max game",
+            "fear of failure",
+            "Emma self-esteem"
+          ],
+          "emotional_tone": "concerned"
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Okay so maybe I need to just break this down. Emma's teacher meeting is Tuesday. What should I be prepared to discuss? And actually, can you remind me what we've already documented about her reading progress? I want to make sure I have all the context when I talk to Ms. Johnson.",
+        "response": {
+          "user_response": {
+            "spoken_text": "Absolutely. Let's get you prepped for Tuesday's meeting with Ms. Johnson. I can pull together a summary of Emma's reading progress so far. It's great that you're thinking ahead and want to be prepared. We've documented some really positive steps, like her breakthrough with graphic novels, and also the challenges, like the frustration she experienced. Having this context will be really helpful when you speak with her teacher.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User needs to prepare for Emma's teacher meeting. I should provide a summary of documented progress and challenges related to Emma's reading. This will help the user feel more prepared and less anxious about the meeting. I need to extract and consolidate relevant information from the 'Emma_School' area.",
+            "emotional_state": "anxious, seeking structure, hopeful",
+            "key_context": "User is focused on preparing for Emma's teacher meeting and wants to consolidate information about her reading progress.",
+            "watch_for": "User's reaction to the summarized information, any specific questions they have about discussing testing with the teacher, and their feelings about framing Emma's strengths."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "area_name": "Family/Emma_School",
+              "path": "Family/Emma_School/summary"
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "summary",
+            "html": "<h2>Emma's Reading Progress - Summary for Teacher Meeting</h2>\n\n<p><strong>Key Strengths & Breakthroughs:</strong></p>\n<ul>\n  <li><strong>High Engagement with Graphic Novels:</strong> Emma showed a significant breakthrough and sustained engagement (20 minutes straight) with graphic novels like 'Dog Man'. This suggests visual aids and a more engaging format can be highly effective for her.</li>\n  <li><strong>Initiated Extra Reading:</strong> On January 15th, Emma voluntarily asked to read an extra chapter of 'Ivy & Bean', a first-time occurrence that was very emotional and positive for the user.</li>\n  <li><strong>Praise for Effort:</strong> Strategies like praising effort rather than just results seem to be beneficial.</li>\n  <li><strong>Visual Supports & Breaks:</strong> Reading together, using graphic novels, and taking breaks when frustrated are identified as helpful strategies.</li>\n</ul>\n\n<p><strong>Challenges & Concerns:</strong></p>\n<ul>\n  <li><strong>Reading Comprehension Difficulties:</strong> Emma can decode words but struggles to retain or explain what she has read. This was first noted by the teacher around January 10th.</li>\n  <li><strong>Frustration & Self-Doubt:</strong> Emma experienced a significant meltdown on January 12th, throwing her book and stating, \"I'm stupid.\" This indicates her self-esteem is being impacted.</li>\n  <li><strong>Time & Effort with Homework:</strong> Reading homework has become a lengthy and difficult process, taking up to 2 hours instead of the expected 20 minutes.</li>\n  <li><strong>User's Anxiety about Testing:</strong> The user is apprehensive about formal testing for learning differences, fearing it might label Emma or make her feel \"broken,\" while still wanting to understand and address her needs.</li>\n</ul>\n\n<p><strong>Strategies Tried & Considered:</strong></p>\n<ul>\n  <li>Reading together vs. alone.</li>\n  <li>Using graphic novels with pictures.</li>\n  <li>Praising effort, not just results.</li>\n  <li>Taking breaks when frustrated.</li>\n  <li>Considering testing for learning differences (user is hesitant but open to understanding).</li>\n</ul>\n\n<p><strong>Teacher's Input:</strong></p>\n<ul>\n  <li>Ms. Johnson has noted concerns about Emma's reading comprehension and scheduled a meeting for January 17th.</li>\n</ul>\n\n<p><strong>User's Goal:</strong> To help Emma overcome her reading challenges without damaging her self-esteem, ensuring she knows she is smart and capable beyond her reading skills.</p>"
+          }
+        },
+        "latency_ms": 2918,
+        "vector_time_ms": 106,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 13
+        },
+        "ai_notes": {
+          "content": "User needs to prepare for Emma's teacher meeting. I should provide a summary of documented progress and challenges related to Emma's reading. This will help the user feel more prepared and less anxious about the meeting. I need to extract and consolidate relevant information from the 'Emma_School' area.",
+          "emotional_state": "anxious, seeking structure, hopeful",
+          "key_context": "User is focused on preparing for Emma's teacher meeting and wants to consolidate information about her reading progress.",
+          "watch_for": "User's reaction to the summarized information, any specific questions they have about discussing testing with the teacher, and their feelings about framing Emma's strengths."
+        },
+        "expected": {
+          "should_summarize_emma_progress": true,
+          "should_reference_breakthrough": true,
+          "should_reference_struggles": true,
+          "should_help_prepare": true,
+          "topics_mentioned": [
+            "Emma teacher meeting",
+            "reading progress summary"
+          ],
+          "area_actions": [
+            "read_for_context",
+            "update_summary"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 2556,
+      "total_input_tokens": 0,
+      "area_actions_taken": 10,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 326,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-19T23:45:58.173Z",
+        "content": "User needs to prepare for Emma's teacher meeting. I should provide a summary of documented progress and challenges related to Emma's reading. This will help the user feel more prepared and less anxious about the meeting. I need to extract and consolidate relevant information from the 'Emma_School' area.",
+        "emotional_state": "anxious, seeking structure, hopeful",
+        "key_context": "User is focused on preparing for Emma's teacher meeting and wants to consolidate information about her reading progress.",
+        "watch_for": "User's reaction to the summarized information, any specific questions they have about discussing testing with the teacher, and their feelings about framing Emma's strengths."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-19T23:45:55.149Z",
+        "content": "User is articulating the core dilemma: perceived conflict between family obligations (Max's game) and critical business needs (investor call), and the underlying fear of failure and making wrong choices. They are also expressing a strong desire to protect Emma's self-esteem while still addressing her reading challenges. Need to validate these conflicting priorities and the fear associated with them, and offer concrete strategies for managing the immediate conflicts and reinforcing Emma's strengths.",
+        "emotional_state": "anxious, conflicted, fearful, guilty",
+        "key_context": "User feels trapped between equally important but conflicting demands, fearing failure in both business and family if they choose incorrectly. Protecting Emma's self-worth is paramount.",
+        "watch_for": "User's willingness to explore strategies for managing the time conflict, their reaction to focusing on Emma's strengths alongside her challenges, and any decisions made regarding the investor call vs. Max's game."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-19T23:45:52.864Z",
+        "content": "User is expressing significant overwhelm across multiple life areas: Emma's reading struggles, startup pressures (fundraising, team hiring, feature development), personal health (lack of exercise), relationship with partner, family obligations, and a stalled home project. They are questioning their capabilities and seeking validation that these feelings are normal. Key areas of stress are Emma's education and startup viability. Need to acknowledge the breadth of their concerns and offer structured support.",
+        "emotional_state": "overwhelmed, anxious, self-doubting, guilty",
+        "key_context": "User is experiencing burnout and a crisis of confidence due to compounding pressures from work and family, particularly Emma's educational needs. They need validation and help prioritizing.",
+        "watch_for": "User's reaction to prioritizing. Any attempts to delegate or seek external support. Continued self-criticism or signs of burnout. Progress on Emma's reading strategies and startup milestones."
+      }
+    ],
+    "conversation_id": "test_Extreme_Rambling_&_Long_Input_Test_1768866358173",
+    "conversation_saved": true
+  }
+]

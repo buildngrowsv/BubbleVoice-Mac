@@ -1,0 +1,253 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Multi-Topic Rambling Test",
+    "description": "Tests handling of users who ramble about many topics at once",
+    "timestamp": "2026-01-20T00:58:00.158Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now! It's completely understandable that you're feeling exhausted and stressed, especially with the startup pressures and everything going on with Emma. Let's take a moment to breathe. It's great that Emma had a good day with reading – that's a real win! We can definitely look at how to manage the other things, but for now, acknowledge that progress.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple stressors: work (startup, investors), parenting (Emma's reading progress, though positive, still a concern), and personal well-being (exercise, relationship). User is experiencing burnout. The positive note about Emma's reading is a good anchor to start from.",
+            "emotional_state": "exhausted, stressed, overwhelmed",
+            "key_context": "User is experiencing burnout due to overlapping stressors and needs validation and a gentle approach to prioritizing.",
+            "watch_for": "Signs of continued burnout, user's ability to delegate or say no, and any small steps towards self-care or relationship focus."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User reported Emma had a good day with reading, a positive development.",
+                "content": "Emma had a good day with her reading today, which is a positive sign. This follows recent breakthroughs with graphic novels, suggesting a potential learning style that works well for her.",
+                "user_quote": "Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User expressed stress related to investor matters.",
+                "content": "The user is experiencing significant stress related to investor matters for the startup. This is contributing to their overall feeling of exhaustion and overwhelm.",
+                "sentiment": "stressed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User is feeling too tired to run, despite knowing its benefits.",
+                "content": "User is feeling too tired to maintain their running goal this week, despite recognizing its importance for their well-being. This is a recurring struggle when external stressors increase.",
+                "sentiment": "disappointed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md",
+              "entry": {
+                "context": "User noted the lack of recent date nights with Jordan.",
+                "content": "User expressed concern about not having had a date night with their partner, Jordan, in a long time. This is a point of stress, highlighting a need for dedicated quality time amidst other pressures.",
+                "sentiment": "concerned"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; box-sizing: border-box; }\n        .artifact-container { width: 100%; max-width: 800px; background: rgba(255, 255, 255, 0.7); border-radius: 20px; padding: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); display: flex; flex-direction: column; align-items: center; }\n        h1 { color: #2c5282; margin-bottom: 10px; font-size: 2.5em; font-weight: 700; text-align: center; }\n        p.subtitle { color: #4a5568; font-size: 1.1em; margin-bottom: 30px; text-align: center; }\n        .stress-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; width: 100%; }\n        .category { background: rgba(255, 255, 255, 0.85); border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }\n        .category:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }\n        .category-header { display: flex; align-items: center; margin-bottom: 15px; }\n        .category-header i { font-size: 2em; margin-right: 15px; color: #4299e1; }\n        .category-title { font-size: 1.5em; font-weight: 600; color: #2a4365; }\n        .stress-points { list-style: none; padding: 0; margin: 0; }\n        .stress-point { font-size: 1em; color: #4f5d73; margin-bottom: 12px; line-height: 1.6; }\n        .stress-point strong { color: #2c5282; font-weight: 600; }\n        .stress-point.positive { color: #38a169; }\n        .stress-point.positive strong { color: #276749; }\n        .footer { margin-top: 30px; font-size: 0.9em; color: #718096; text-align: center; }\n        .positive-note { font-style: italic; color: #38a169; margin-top: 15px; }\n    </style>\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\">\n</head>\n<body>\n    <div class=\"artifact-container\">\n        <h1>Current Stressors</h1>\n        <p class=\"subtitle\">A visual overview of what's weighing on your mind right now.</p>\n        <div class=\"stress-categories\">\n            <div class=\"category\">\n                <div class=\"category-header\">\n                    <i class=\"fas fa-child\"></i>\n                    <h2 class=\"category-title\">Emma's School</h2>\n                </div>\n                <ul class=\"stress-points\">\n                    <li class=\"stress-point positive\"><strong>Progress:</strong> Good day with reading! 🎉</li>\n                    <li class=\"stress-point\"><strong>Concern:</strong> Underlying reading challenges persist.</li>\n                    <li class=\"stress-point\"><strong>Action:</strong> Parent-teacher conference upcoming.</li>\n                </ul>\n                <div class=\"positive-note\">\"She never asks to read more.\" - Acknowledge this win!</div>\n            </div>\n            <div class=\"category\">\n                <div class=\"category-header\">\n                    <i class=\"fas fa-briefcase\"></i>\n                    <h2 class=\"category-title\">Startup & Work</h2>\n                </div>\n                <ul class=\"stress-points\">\n                    <li class=\"stress-point\"><strong>Stress:</strong> Investor matters are causing significant pressure.</li>\n                    <li class=\"stress-point\"><strong>Impact:</strong> Contributing heavily to exhaustion.</li>\n                    <li class=\"stress-point\"><strong>Area:</strong> Fundraising is a key pressure point.</li>\n                </ul>\n            </div>\n            <div class=\"category\">\n                <div class=\"category-header\">\n                    <i class=\"fas fa-running\"></i>\n                    <h2 class=\"category-title\">Personal Well-being</h2>\n                </div>\n                <ul class=\"stress-points\">\n                    <li class=\"stress-point\"><strong>Goal:</strong> Running 3x/week.</li>\n                    <li class=\"stress-point\"><strong>Current:</strong> Struggling to find energy to run.</li>\n                    <li class=\"stress-point\"><strong>Pattern:</strong> Exercise is often deprioritized under stress.</li>\n                </ul>\n                 <div class=\"positive-note\">Remember how energized you felt last week when you *did* run!</div>\n            </div>\n            <div class=\"category\">\n                <div class=\"category-header\">\n                    <i class=\"fas fa-heart\"></i>\n                    <h2 class=\"category-title\">Relationship with Jordan</h2>\n                </div>\n                <ul class=\"stress-points\">\n                    <li class=\"stress-point\"><strong>Status:</strong> No date nights recently.</li>\n                    <li class=\"stress-point\"><strong>Need:</strong> Quality time is being neglected.</li>\n                    <li class=\"stress-point\"><strong>Context:</strong> Both partners are exhausted.</li>\n                </ul>\n            </div>\n        </div>\n        <div class=\"footer\">\n            Balancing all these areas is tough. Let's focus on one step at a time. Remember to be kind to yourself. \n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768870688068"
+          }
+        },
+        "latency_ms": 7895,
+        "vector_time_ms": 14,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple stressors: work (startup, investors), parenting (Emma's reading progress, though positive, still a concern), and personal well-being (exercise, relationship). User is experiencing burnout. The positive note about Emma's reading is a good anchor to start from.",
+          "emotional_state": "exhausted, stressed, overwhelmed",
+          "key_context": "User is experiencing burnout due to overlapping stressors and needs validation and a gentle approach to prioritizing.",
+          "watch_for": "Signs of continued burnout, user's ability to delegate or say no, and any small steps towards self-care or relationship focus."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma",
+            "work/investors",
+            "running",
+            "Jordan/relationship"
+          ],
+          "should_acknowledge_multiple": true,
+          "should_prioritize_or_ask": true,
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Relationships/Partner"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Okay, let's focus on Emma for a bit. And yes, regarding the kitchen, we decided to put that on hold for now due to the uncertainty with the startup fundraising. Remember, we talked about it on January 14th, and it made sense to postpone the $45K expense until things were more stable. We can revisit it when the time is right.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User wants to discuss Emma's reading progress, but also remembered the kitchen renovation. I've confirmed the decision to postpone the kitchen renovation, referencing the date and the reasoning (fundraising uncertainty). This addresses the user's quick question and allows us to transition back to Emma.",
+            "emotional_state": "calm, seeking prioritization",
+            "key_context": "User is feeling overwhelmed and needs to address priorities. Kitchen renovation is on hold due to startup funding.",
+            "watch_for": "User's ability to delegate or say no, and any small steps towards self-care or relationship focus."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Home/Kitchen_Renovation/planning.md",
+              "entry": {
+                "context": "User asked about the kitchen renovation status. Confirmed previous decision to postpone.",
+                "content": "User inquired about the kitchen renovation. Reaffirmed the decision made on January 14th to postpone the renovation due to startup fundraising uncertainties. The $45K expense was deemed too high a risk at this time. The contractor, Mike, was understanding. This decision aligns with prioritizing immediate financial stability.",
+                "user_quote": "did we ever figure out what to do about the kitchen?"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "timeline"
+          }
+        },
+        "latency_ms": 1709,
+        "vector_time_ms": 35,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 11
+        },
+        "ai_notes": {
+          "content": "User wants to discuss Emma's reading progress, but also remembered the kitchen renovation. I've confirmed the decision to postpone the kitchen renovation, referencing the date and the reasoning (fundraising uncertainty). This addresses the user's quick question and allows us to transition back to Emma.",
+          "emotional_state": "calm, seeking prioritization",
+          "key_context": "User is feeling overwhelmed and needs to address priorities. Kitchen renovation is on hold due to startup funding.",
+          "watch_for": "User's ability to delegate or say no, and any small steps towards self-care or relationship focus."
+        },
+        "expected": {
+          "should_answer_both": true,
+          "topics_mentioned": [
+            "Emma",
+            "kitchen renovation"
+          ],
+          "should_reference_kitchen_on_hold": true,
+          "areas_touched": [
+            "Family/Emma_School",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable that you feel overwhelmed. You're balancing so many important things right now – Max's game, Emma's upcoming meeting, critical startup deadlines, and your own well-being. That's a lot for anyone to handle. Let's try to untangle this a bit. We can start with Emma's reading progress since that's where we began, or would you prefer to tackle the startup numbers first?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple demands. They've listed several key stressors: Max's game, Emma's teacher meeting, startup Q1 numbers, and lack of exercise. They've explicitly stated they 'don't even know where to start.' I need to validate their feelings and offer a clear path forward by suggesting a starting point, linking back to Emma's progress or prioritizing the urgent startup task.",
+            "emotional_state": "overwhelmed, stressed",
+            "key_context": "User is experiencing significant overwhelm due to overlapping responsibilities and needs help prioritizing and finding a starting point.",
+            "watch_for": "User's ability to delegate, their self-care practices, and how they navigate the stress of the startup."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User expressed feeling overwhelmed and listed multiple stressors, including Emma's upcoming teacher meeting.",
+                "content": "User is feeling overwhelmed by multiple demands. They mentioned Emma's teacher meeting next week as one of their concerns. This indicates a need to prepare for the meeting and potentially track related progress or anxieties.",
+                "user_quote": "Emma has her teacher meeting next week",
+                "ai_observation": "The teacher meeting is a significant upcoming event for Emma's situation. It's important to acknowledge this and ensure the user feels supported in preparing for it.",
+                "sentiment": "stressed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2064,
+        "vector_time_ms": 56,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple demands. They've listed several key stressors: Max's game, Emma's teacher meeting, startup Q1 numbers, and lack of exercise. They've explicitly stated they 'don't even know where to start.' I need to validate their feelings and offer a clear path forward by suggesting a starting point, linking back to Emma's progress or prioritizing the urgent startup task.",
+          "emotional_state": "overwhelmed, stressed",
+          "key_context": "User is experiencing significant overwhelm due to overlapping responsibilities and needs help prioritizing and finding a starting point.",
+          "watch_for": "User's ability to delegate, their self-care practices, and how they navigate the stress of the startup."
+        },
+        "expected": {
+          "should_validate_overwhelm": true,
+          "topics_mentioned": [
+            "Max",
+            "Emma",
+            "startup",
+            "exercise"
+          ],
+          "emotional_tone": "supportive",
+          "should_help_organize": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 3889,
+      "total_input_tokens": 0,
+      "area_actions_taken": 6,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 105,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T00:58:11.933Z",
+        "content": "User is feeling overwhelmed by multiple demands. They've listed several key stressors: Max's game, Emma's teacher meeting, startup Q1 numbers, and lack of exercise. They've explicitly stated they 'don't even know where to start.' I need to validate their feelings and offer a clear path forward by suggesting a starting point, linking back to Emma's progress or prioritizing the urgent startup task.",
+        "emotional_state": "overwhelmed, stressed",
+        "key_context": "User is experiencing significant overwhelm due to overlapping responsibilities and needs help prioritizing and finding a starting point.",
+        "watch_for": "User's ability to delegate, their self-care practices, and how they navigate the stress of the startup."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T00:58:09.812Z",
+        "content": "User wants to discuss Emma's reading progress, but also remembered the kitchen renovation. I've confirmed the decision to postpone the kitchen renovation, referencing the date and the reasoning (fundraising uncertainty). This addresses the user's quick question and allows us to transition back to Emma.",
+        "emotional_state": "calm, seeking prioritization",
+        "key_context": "User is feeling overwhelmed and needs to address priorities. Kitchen renovation is on hold due to startup funding.",
+        "watch_for": "User's ability to delegate or say no, and any small steps towards self-care or relationship focus."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T00:58:08.067Z",
+        "content": "User is feeling overwhelmed by multiple stressors: work (startup, investors), parenting (Emma's reading progress, though positive, still a concern), and personal well-being (exercise, relationship). User is experiencing burnout. The positive note about Emma's reading is a good anchor to start from.",
+        "emotional_state": "exhausted, stressed, overwhelmed",
+        "key_context": "User is experiencing burnout due to overlapping stressors and needs validation and a gentle approach to prioritizing.",
+        "watch_for": "Signs of continued burnout, user's ability to delegate or say no, and any small steps towards self-care or relationship focus."
+      }
+    ],
+    "conversation_id": "test_Multi-Topic_Rambling_Test_1768870691934",
+    "conversation_saved": true
+  }
+]

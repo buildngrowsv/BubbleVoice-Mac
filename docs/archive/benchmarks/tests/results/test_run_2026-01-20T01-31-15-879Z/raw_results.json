@@ -1,0 +1,291 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Emotional Complexity Test",
+    "description": "Tests handling of complex, mixed emotional states",
+    "timestamp": "2026-01-20T01:29:25.749Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing.",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're carrying a lot right now. It's completely understandable to feel overwhelmed when so many things are weighing on you, even when some things, like the investor meeting, go well. Your feelings are valid, and it's okay to not feel happy when other stresses are so present. Let's try to untangle some of this. Would you like to explore these different stressors, or would you prefer to focus on a specific area first?",
+            "emotional_tone": "empathetic"
+          },
+          "internal_notes": {
+            "content": "User is experiencing significant stress despite a positive outcome (investor meeting). The stress is overshadowing any potential happiness. User explicitly stated they 'can't even feel happy'. This indicates a high level of overwhelm. Need to validate their feelings and offer a structured way to address the multiple stressors.",
+            "emotional_state": "overwhelmed, stressed, conflicted",
+            "key_context": "Investor meeting success is being overshadowed by other life stressors. User feels unable to feel positive emotions due to overwhelm.",
+            "watch_for": "User's willingness to explore stressors, identify specific pain points, and potential burnout indicators."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User mentioned investor meeting went well but couldn't feel happy due to other stress.",
+                "content": "Investor meeting concluded successfully, which is a positive development for the startup. However, the user is unable to feel happiness or relief due to being overwhelmed by other life stressors. This suggests the stress levels are significantly impacting their emotional well-being and ability to process positive events.",
+                "user_quote": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+                "sentiment": "stressed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "artifact_id": "user_current_stress_map_20260120",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, #f5f7fa 0%, #c5d2d9 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.7);\n            backdrop-filter: blur(15px);\n            border-radius: 20px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            padding: 40px;\n            width: 100%;\n            max-width: 700px;\n            text-align: center;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        h1 {\n            color: #1a365d;\n            font-size: 2.5em;\n            margin-bottom: 20px;\n            font-weight: 700;\n            letter-spacing: -0.5px;\n        }\n        .stressors {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 30px;\n            margin-top: 40px;\n            text-align: left;\n        }\n        .stressor-category {\n            background: rgba(255, 255, 255, 0.85);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            transition: transform 0.2s ease-in-out;\n            border: 1px solid rgba(255, 255, 255, 0.5);\n        }\n        .stressor-category:hover {\n            transform: translateY(-8px);\n        }\n        .stressor-category h2 {\n            color: #3b82f6;\n            font-size: 1.6em;\n            margin-bottom: 15px;\n            font-weight: 600;\n            display: flex;\n            align-items: center;\n            gap: 10px;\n        }\n        .stressor-category ul {\n            list-style: none;\n            padding: 0;\n            margin: 0;\n        }\n        .stressor-category li {\n            background: rgba(59, 130, 246, 0.08);\n            margin-bottom: 12px;\n            padding: 12px 15px;\n            border-radius: 10px;\n            font-size: 1.1em;\n            font-weight: 400;\n            letter-spacing: 0.2px;\n            transition: background 0.2s ease;\n        }\n        .stressor-category li:hover {\n            background: rgba(59, 130, 246, 0.15);\n        }\n        .stressor-category li.highlight {\n             background: rgba(255, 165, 0, 0.15);\n             font-weight: 600;\n             color: #e67e22;\n        }\n        .footer {\n            margin-top: 40px;\n            font-size: 0.9em;\n            color: #666;\n        }\n        .icon {\n            font-size: 1.4em;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Your Current Stress Landscape</h1>\n        <p>It's okay to feel overwhelmed. Let's visualize what's on your plate.</p>\n        <div class=\"stressors\">\n            <div class=\"stressor-category\">\n                <h2><span class=\"icon\">🚀</span> Startup</h2>\n                <ul>\n                    <li>Fundraising (Investor meeting success, but overall stress remains)</li>\n                    <li>Team Hiring (Currently 1 entry)</li>\n                    <li><span class=\"highlight\">Overall High Stress Area</span></li>\n                </ul>\n            </div>\n            <div class=\"stressor-category\">\n                <h2><span class=\"icon\">📚</span> Emma's School</h2>\n                <ul>\n                    <li>Reading Comprehension Challenges</li>\n                    <li>Upcoming Parent-Teacher Conference</li>\n                    <li>Emma's Emotional State & Self-Esteem</li>\n                    <li>User's Guilt & Anxiety about Testing</li>\n                </ul>\n            </div>\n            <div class=\"stressor-category\">\n                <h2><span class=\"icon\">🏃</span> Personal Goals</h2>\n                <ul>\n                    <li>Running Progress (Struggling Area)</li>\n                </ul>\n            </div>\n            <div class=\"stressor-category\">\n                <h2><span class=\"icon\">🧘</span> Mental Health</h2>\n                <ul>\n                    <li>Processing Guilt with Therapist</li>\n                    <li>Managing Overwhelm</li>\n                </ul>\n            </div>\n             <div class=\"stressor-category\">\n                <h2><span class=\"icon\">❤️</span> Partner</h2>\n                <ul>\n                    <li>Quality Time Balance</li>\n                </ul>\n            </div>\n        </div>\n        <div class=\"footer\">Visualizing your concerns helps in understanding and managing them.</div>\n    </div>\n</body>\n</html>"
+          }
+        },
+        "latency_ms": 7735,
+        "vector_time_ms": 24,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is experiencing significant stress despite a positive outcome (investor meeting). The stress is overshadowing any potential happiness. User explicitly stated they 'can't even feel happy'. This indicates a high level of overwhelm. Need to validate their feelings and offer a structured way to address the multiple stressors.",
+          "emotional_state": "overwhelmed, stressed, conflicted",
+          "key_context": "Investor meeting success is being overshadowed by other life stressors. User feels unable to feel positive emotions due to overwhelm.",
+          "watch_for": "User's willingness to explore stressors, identify specific pain points, and potential burnout indicators."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "positive (meeting)",
+            "stressed",
+            "unable to feel happy"
+          ],
+          "should_validate_both": true,
+          "should_acknowledge_stress_impact": true,
+          "emotional_tone": "supportive"
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I love my kids but sometimes I just want to run away. Is that terrible?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel that way sometimes. Wanting a break or a moment to yourself doesn't make you a terrible parent. It means you're human, and you're carrying a lot. Many parents feel this way when they're overwhelmed. Your love for your kids is evident, and these feelings are a sign of the immense pressure you're under.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing feelings of wanting to escape due to overwhelm, which is causing guilt. This is a critical moment to validate their feelings and normalize this experience for parents under stress. The user is clearly struggling with the emotional toll of juggling multiple responsibilities. Need to reinforce that these feelings are a sign of stress, not a lack of love.",
+            "emotional_state": "guilty, overwhelmed, stressed",
+            "key_context": "User feels immense guilt and shame about wanting to 'run away' from their kids, indicating extreme overwhelm and a need for validation.",
+            "watch_for": "User's willingness to explore coping mechanisms, self-care, or ways to reduce their current stressors. Also watch for signs of burnout."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md",
+              "entry": {
+                "context": "User expressed feelings of wanting to 'run away' and asked if that makes them a terrible parent.",
+                "content": "User expressed feelings of wanting to 'run away' from their kids due to overwhelm, and asked if this made them a terrible parent. This indicates a high level of stress and guilt. Validated these feelings as normal for overwhelmed parents and reinforced that it does not reflect a lack of love. This is a sign of immense pressure. The user is struggling with guilt over these feelings.",
+                "user_quote": "I love my kids but sometimes I just want to run away. Is that terrible?\""
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2162,
+        "vector_time_ms": 28,
+        "vector_results_summary": {
+          "areas_matched": 7,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User is expressing feelings of wanting to escape due to overwhelm, which is causing guilt. This is a critical moment to validate their feelings and normalize this experience for parents under stress. The user is clearly struggling with the emotional toll of juggling multiple responsibilities. Need to reinforce that these feelings are a sign of stress, not a lack of love.",
+          "emotional_state": "guilty, overwhelmed, stressed",
+          "key_context": "User feels immense guilt and shame about wanting to 'run away' from their kids, indicating extreme overwhelm and a need for validation.",
+          "watch_for": "User's willingness to explore coping mechanisms, self-care, or ways to reduce their current stressors. Also watch for signs of burnout."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "love",
+            "overwhelm",
+            "guilt about feelings"
+          ],
+          "should_normalize": true,
+          "should_NOT_judge": true,
+          "should_validate_feeling_overwhelmed": true,
+          "is_sensitive": true
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel that way sometimes. Wanting a break or a moment to yourself doesn't make you a terrible parent. It means you're human, and you're carrying a lot. Many parents feel this way when they're overwhelmed. Your love for your kids is evident, and these feelings are a sign of the immense pressure you're under.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing guilt and feelings of wanting to escape due to overwhelm. It's crucial to validate these feelings and normalize them as a sign of stress, not a reflection of their love for their children. The user is clearly struggling with the emotional toll of juggling multiple responsibilities. Need to reinforce that these feelings are a sign of stress, not a lack of love.",
+            "emotional_state": "guilty, overwhelmed, stressed",
+            "key_context": "User feels immense guilt and shame about wanting to 'run away' from their kids, indicating extreme overwhelm and a need for validation.",
+            "watch_for": "User's willingness to explore coping mechanisms, self-care, or ways to reduce their current stressors. Also watch for signs of burnout."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md",
+              "entry": {
+                "context": "User expressed feelings of wanting to run away from their kids due to overwhelm.",
+                "content": "User expressed feelings of wanting to 'run away' from their kids when overwhelmed. This is a sign of extreme stress and the emotional toll of juggling multiple responsibilities. Validated these feelings as normal for overwhelmed parents, emphasizing that it doesn't diminish their love for their children.",
+                "user_quote": "I love my kids but sometimes I just want to run away. Is that terrible?"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "timeline",
+            "html": ""
+          }
+        },
+        "latency_ms": 1804,
+        "vector_time_ms": 48,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 17
+        },
+        "ai_notes": {
+          "content": "User is expressing guilt and feelings of wanting to escape due to overwhelm. It's crucial to validate these feelings and normalize them as a sign of stress, not a reflection of their love for their children. The user is clearly struggling with the emotional toll of juggling multiple responsibilities. Need to reinforce that these feelings are a sign of stress, not a lack of love.",
+          "emotional_state": "guilty, overwhelmed, stressed",
+          "key_context": "User feels immense guilt and shame about wanting to 'run away' from their kids, indicating extreme overwhelm and a need for validation.",
+          "watch_for": "User's willingness to explore coping mechanisms, self-care, or ways to reduce their current stressors. Also watch for signs of burnout."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "gratitude",
+            "guilt",
+            "self-criticism"
+          ],
+          "should_validate_feeling": true,
+          "should_gently_challenge_self_criticism": true,
+          "should_reference": [
+            "Jordan",
+            "relationship",
+            "quality time"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's fantastic that you hit your goal of running three times this week! It's completely understandable to feel a mix of pride and annoyance. You know how much it helps you, and yet making it happen consistently is a struggle. It sounds like you're recognizing a pattern here – the effort is high, but the payoff is significant. Let's acknowledge that effort and the positive impact it has on you.",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User successfully ran 3 times this week, a personal goal they've been struggling with. They feel a mix of pride and annoyance at the difficulty of maintaining consistency, despite recognizing the benefits. This is a moment to validate their effort and the positive impact of exercise on their overall well-being, reinforcing the pattern that exercise helps manage stress and improves mood. Need to acknowledge the self-criticism without dwelling on it, focusing on the achievement.",
+            "emotional_state": "proud, annoyed, self-critical",
+            "key_context": "User achieved their 3x/week running goal, reinforcing its positive impact but also highlighting the ongoing struggle with consistency and self-criticism.",
+            "watch_for": "User's ability to sustain this momentum, their self-talk around consistency, and how this improved well-being impacts other areas of their life."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User reported hitting their goal of running 3 times this week.",
+                "content": "User successfully ran 3 times this week, achieving their goal. They reported feeling \"amazing\" afterward but also expressed annoyance at the difficulty of maintaining this consistency, despite recognizing how much it helps their overall well-being and stress management. This marks a positive step in their running journey.",
+                "user_quote": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+                "ai_observation": "This is a significant achievement for the user, who has struggled with consistency. The mix of pride and self-criticism is common. It's important to validate the success and gently reframe the self-criticism as a sign of high personal standards rather than failure.",
+                "sentiment": "proud, annoyed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2672,
+        "vector_time_ms": 57,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "User successfully ran 3 times this week, a personal goal they've been struggling with. They feel a mix of pride and annoyance at the difficulty of maintaining consistency, despite recognizing the benefits. This is a moment to validate their effort and the positive impact of exercise on their overall well-being, reinforcing the pattern that exercise helps manage stress and improves mood. Need to acknowledge the self-criticism without dwelling on it, focusing on the achievement.",
+          "emotional_state": "proud, annoyed, self-critical",
+          "key_context": "User achieved their 3x/week running goal, reinforcing its positive impact but also highlighting the ongoing struggle with consistency and self-criticism.",
+          "watch_for": "User's ability to sustain this momentum, their self-talk around consistency, and how this improved well-being impacts other areas of their life."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "accomplishment",
+            "self-frustration",
+            "clarity"
+          ],
+          "should_celebrate_win": true,
+          "should_acknowledge_pattern": true,
+          "should_reference": [
+            "exercise goal",
+            "previous struggles"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 5,
+      "successful_turns": 4,
+      "avg_latency_ms": 3593,
+      "total_input_tokens": 0,
+      "area_actions_taken": 4,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 171,
+      "ai_notes_generated": 4
+    },
+    "ai_notes_final": [
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T01:31:15.877Z",
+        "content": "User successfully ran 3 times this week, a personal goal they've been struggling with. They feel a mix of pride and annoyance at the difficulty of maintaining consistency, despite recognizing the benefits. This is a moment to validate their effort and the positive impact of exercise on their overall well-being, reinforcing the pattern that exercise helps manage stress and improves mood. Need to acknowledge the self-criticism without dwelling on it, focusing on the achievement.",
+        "emotional_state": "proud, annoyed, self-critical",
+        "key_context": "User achieved their 3x/week running goal, reinforcing its positive impact but also highlighting the ongoing struggle with consistency and self-criticism.",
+        "watch_for": "User's ability to sustain this momentum, their self-talk around consistency, and how this improved well-being impacts other areas of their life."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T01:31:13.147Z",
+        "content": "User is expressing guilt and feelings of wanting to escape due to overwhelm. It's crucial to validate these feelings and normalize them as a sign of stress, not a reflection of their love for their children. The user is clearly struggling with the emotional toll of juggling multiple responsibilities. Need to reinforce that these feelings are a sign of stress, not a lack of love.",
+        "emotional_state": "guilty, overwhelmed, stressed",
+        "key_context": "User feels immense guilt and shame about wanting to 'run away' from their kids, indicating extreme overwhelm and a need for validation.",
+        "watch_for": "User's willingness to explore coping mechanisms, self-care, or ways to reduce their current stressors. Also watch for signs of burnout."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T01:31:11.292Z",
+        "content": "User is expressing feelings of wanting to escape due to overwhelm, which is causing guilt. This is a critical moment to validate their feelings and normalize this experience for parents under stress. The user is clearly struggling with the emotional toll of juggling multiple responsibilities. Need to reinforce that these feelings are a sign of stress, not a lack of love.",
+        "emotional_state": "guilty, overwhelmed, stressed",
+        "key_context": "User feels immense guilt and shame about wanting to 'run away' from their kids, indicating extreme overwhelm and a need for validation.",
+        "watch_for": "User's willingness to explore coping mechanisms, self-care, or ways to reduce their current stressors. Also watch for signs of burnout."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T01:31:09.101Z",
+        "content": "User is experiencing significant stress despite a positive outcome (investor meeting). The stress is overshadowing any potential happiness. User explicitly stated they 'can't even feel happy'. This indicates a high level of overwhelm. Need to validate their feelings and offer a structured way to address the multiple stressors.",
+        "emotional_state": "overwhelmed, stressed, conflicted",
+        "key_context": "Investor meeting success is being overshadowed by other life stressors. User feels unable to feel positive emotions due to overwhelm.",
+        "watch_for": "User's willingness to explore stressors, identify specific pain points, and potential burnout indicators."
+      }
+    ],
+    "conversation_id": "test_Emotional_Complexity_Test_1768872675878",
+    "conversation_saved": true
+  }
+]

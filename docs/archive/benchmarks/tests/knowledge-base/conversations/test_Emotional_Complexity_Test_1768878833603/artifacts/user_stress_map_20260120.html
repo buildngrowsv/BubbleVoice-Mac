@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(240, 248, 255, 0.8), rgba(224, 236, 255, 0.8));
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .map-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #4299e1;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+        .map-subtitle {
+            font-size: 1.1em;
+            color: #667085;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .stress-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .category {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+            border: 1px solid rgba(200, 200, 200, 0.1);
+        }
+        .category:hover {
+            transform: translateY(-8px);
+        }
+        .category-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        .category-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 10px;
+        }
+        .category-details {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.5;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 30px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map-container">
+        <h1 class="map-title">Your Current Stress Landscape 🗺️</h1>
+        <p class="map-subtitle">Here's a visual breakdown of the pressures you're managing right now. Recognizing them is the first step to easing the load.</p>
+        <div class="stress-categories">
+            <div class="category">
+                <div class="category-icon">🚀</div>
+                <h3 class="category-title">Startup/Fundraising</h3>
+                <p class="category-details">Investor meeting went well, but the overall pressure remains high due to ongoing startup demands.</p>
+            </div>
+            <div class="category">
+                <div class="category-icon">📚</div>
+                <h3 class="category-title">Emma's School</h3>
+                <p class="category-details">Navigating reading comprehension challenges, preparing for meetings, and worrying about her development.</p>
+            </div>
+            <div class="category">
+                <div class="category-icon">🏃</div>
+                <h3 class="category-title">Exercise Goals</h3>
+                <p class="category-details">Struggling to maintain momentum with fitness goals amidst other responsibilities.</p>
+            </div>
+            <div class="category">
+                <div class="category-icon">🧠</div>
+                <h3 class="category-title">Mental Health</h3>
+                <p class="category-details">Processing guilt and self-criticism, even with therapeutic insights.</p>
+            </div>
+             <div class="category">
+                <div class="category-icon">🏠</div>
+                <h3 class="category-title">Kitchen Renovation</h3>
+                <p class="category-details">Project is on hold, likely adding a layer of unresolved task stress.</p>
+            </div>
+        </div>
+        <p class="note">Acknowledging all these areas is a lot. Remember to be kind to yourself as you navigate them.</p>
+    </div>
+</body>
+</html>

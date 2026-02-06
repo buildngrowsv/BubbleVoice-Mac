@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map: Competing Priorities</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237,137,54,0.8) 0%, rgba(251,191,36,0.8) 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map-container {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            color: #fff;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stressors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+            text-align: left;
+        }
+        .stressor-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        .stressor-card:hover {
+            transform: translateY(-8px);
+        }
+        .stressor-card h2 {
+            color: #fff;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stressor-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .stressor-card li {
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.05em;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stressor-card li span {
+            font-weight: 400;
+        }
+        .icon {
+            font-size: 1.2em;
+        }
+        .decision-point {
+            font-weight: 700;
+            color: #fff;
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map-container">
+        <h1>Navigating Critical Decisions</h1>
+        <p style="color: rgba(255,255,255,0.9); font-size: 1.1em;">Feeling the weight of multiple high-stakes choices? Let's visualize them.</p>
+        <div class="stressors">
+            <div class="stressor-card">
+                <h2><span class="icon">📚</span> Emma's Reading & Self-Esteem</h2>
+                <ul>
+                    <li><span class="icon">✅</span> Teacher meeting next week (Urgency)</li>
+                    <li><span class="icon">❤️</span> Desire to protect her self-worth</li>
+                    <li><span class="icon">😥</span> Fear of "labeling" or making her feel "wrong"</li>
+                    <li><span class="icon">💡</span> Recent breakthrough with graphic novels (Positive)</li>
+                    <li><span class="icon">❓</span> Uncertainty about testing and best approach</li>
+                </ul>
+            </div>
+            <div class="stressor-card">
+                <h2><span class="icon">🚀</span> Startup Funding & Growth</h2>
+                <ul>
+                    <li><span class="icon">💰</span> Crucial investor call (Potential conflict)</li>
+                    <li><span class="icon">📈</span> Pressure for Q1 numbers</li>
+                    <li><span class="icon">🤔</span> Feature ambition vs. current capacity</li>
+                    <li><span class="icon"> hiring</span> Need for senior engineer (Hiring challenge)</li>
+                    <li><span class="icon">📉</span> Fear of failure if funding isn't secured</li>
+                </ul>
+            </div>
+            <div class="stressor-card">
+                <h2><span class="icon">⚽</span> Max's Game & Family Commitment</h2>
+                <ul>
+                    <li><span class="icon">📅</span> Game on Saturday (Commitment)</li>
+                    <li><span class="icon">💔</span> Max's potential disappointment if you miss it</li>
+                    <li><span class="icon">❓</span> Direct conflict with investor call</li>
+                    <li><span class="icon">⚖️</span> Balancing parental presence with career demands</li>
+                </ul>
+            </div>
+        </div>
+        <div class="decision-point">
+            <strong>The Core Dilemma:</strong> <br>
+            Choosing between <span style="color: #fbbf24;">attending Max's game</span> and <span style="color: #4299e1;">taking the critical investor call</span>.<br>
+            Simultaneously, navigating <span style="color: #8b5cf6;">Emma's educational needs</span> without harming her confidence.
+        </div>
+        <div class="footer">
+            Visualizing these pressures can help in strategizing the next steps.
+        </div>
+    </div>
+</body>
+</html>

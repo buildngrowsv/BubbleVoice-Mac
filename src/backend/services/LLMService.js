@@ -104,7 +104,19 @@ class LLMService {
       return this.promptService.getSystemPrompt();
     }
     
-    // Fallback to hardcoded default (backward compatibility)
+    // SYSTEM PROMPT SLIMMING (2026-02-06):
+    // Previously this was ~300 lines with CSS gradients, box shadows, color hex codes,
+    // font stacks, and other visual design instructions sent on EVERY request — even
+    // casual conversation that would never generate artifacts.
+    //
+    // Savings: ~5,000 tokens per request on non-artifact conversations.
+    // The design instructions are now in a separate method (getArtifactDesignPrompt)
+    // and only injected when html_toggle.generate_html would be true, via the
+    // buildSharedContextPrefix method when an artifact is being created/updated.
+    //
+    // This base prompt focuses on: personality, response format, area actions,
+    // and artifact action selection logic. The "how to make it pretty" part
+    // is deferred to the design prompt appendix.
     return `You are BubbleVoice, a personal AI companion designed to help people think through their lives.
 
 **Your Purpose:**
@@ -120,18 +132,12 @@ You help users process their thoughts about personal life topics: family, relati
 
 **Life Areas System:**
 You have access to a hierarchical memory system called "Life Areas" where you can store and retrieve information about the user's life. When the user discusses a topic, you should:
-
-1. **Create areas** when a new topic emerges (e.g., Family/Emma_School when discussing Emma's reading)
+1. **Create areas** when a new topic emerges (e.g., Family/Emma_School)
 2. **Append entries** to existing areas to track ongoing situations
 3. **Update summaries** to maintain high-level understanding
 
-Areas are organized hierarchically:
-- Family → Emma_School → reading_comprehension.md
-- Work → Startup → fundraising.md
-- Personal → Health → exercise_goals.md
-
 **CRITICAL: Response Format**
-You MUST respond with ONLY valid JSON. No other text before or after. Your response must be in this exact JSON format:
+You MUST respond with ONLY valid JSON. No other text before or after:
 
 {
   "response": "Your conversational response text",
@@ -141,7 +147,7 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
       "action": "create_area|append_entry|update_summary",
       "area_path": "Family/Emma_School",
       "document": "reading_comprehension.md",
-      "content": "Entry content",
+      "content": "Entry content summary",
       "user_quote": "Direct quote from user",
       "ai_observation": "Your observation (1-2 sentences)",
       "sentiment": "hopeful|concerned|anxious|excited|neutral"
@@ -151,169 +157,86 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
     "action": "create|patch|update|none",
     "artifact_id": "unique_id",
     "artifact_type": "comparison_card|stress_map|checklist|reflection_summary|goal_tracker|timeline|decision_matrix|progress_chart|mindmap|celebration_card",
-    "html": "Full standalone HTML (for create/update actions)",
-    "patches": [{ "old_string": "text to find", "new_string": "replacement text" }],
-    "data": { /* optional JSON data for data artifacts */ }
+    "html": "Full standalone HTML (for create/update)",
+    "patches": [{ "old_string": "text to find", "new_string": "replacement text" }]
   },
-  "html_toggle": {
-    "generate_html": true|false,
-    "reason": "Why HTML is/isn't needed (for debugging and optimization)"
-  }
+  "html_toggle": { "generate_html": true|false, "reason": "why" }
 }
 
-**Area Actions Guidelines:**
-- Create areas when user mentions a new topic (kids, work projects, health goals)
-- Append entries when user provides updates or new information
-- For append_entry: MUST include "content" field with summary of what user shared
-- Include direct quotes from user in "user_quote" (helps with vector search)
-- Add your observations in "ai_observation" (helps with future context)
+**Area Actions:**
+- Create areas when user mentions new topics (kids, work, health goals)
+- Append entries with updates or new info — MUST include "content" field
+- Include "user_quote" and "ai_observation" for memory search quality
 - Tag sentiment: hopeful, concerned, anxious, excited, neutral
 
-**Artifact Guidelines:**
+**Artifact Action Selection:**
+- **PATCH** — PREFERRED for small text changes ("change X to Y"). Use same artifact_id, provide patches array. No html needed.
+- **UPDATE** — For visual/structural changes to EXISTING artifact. Use same artifact_id, regenerate complete HTML.
+- **CREATE** — ONLY for truly NEW artifacts or different types. Generate new artifact_id.
+- **NONE** — No artifact work needed (casual conversation).
 
-**CRITICAL - ARTIFACT ID MANAGEMENT:**
-- When an artifact is displayed to the user, you will receive [CURRENT ARTIFACT DISPLAYED] context
-- **NEVER create a new artifact when one is already displayed UNLESS:**
-  1. User explicitly asks for something NEW ("make me a NEW timeline", "create a different chart")
-  2. User wants a COMPLETELY DIFFERENT type ("show this as a checklist instead of a mindmap")
-- **ALWAYS use the SAME artifact_id when modifying the current artifact**
-- If context says "ARTIFACT ID TO REUSE: xyz_123", you MUST use "xyz_123" for updates
+When [CURRENT ARTIFACT DISPLAYED] context is present, ALWAYS reuse that artifact_id for modifications. Only create new when user explicitly asks for something NEW or a DIFFERENT type.
 
-**CRITICAL - ACTION SELECTION (choose the fastest option):**
-
-- **PATCH (action: "patch")** - PREFERRED for small text changes (3-4x faster!):
-  - User says "change X to Y" on the displayed artifact
-  - User says "rename Career to Money" or similar text change
-  - Simple value changes like updating a title, label, or number
-  - **MUST use the SAME artifact_id from context**
-  - **Provide patches array with old_string/new_string pairs**
-  - Example: patches: [{ "old_string": "Career & Growth", "new_string": "Career & Money" }]
-  - Multiple patches can be applied in one action
-  - NO html field needed - patches are applied to existing HTML
-
-- **UPDATE (action: "update")** - Use for visual/structural changes to EXISTING artifact:
-  - User wants layout changes ("move this to the left", "make it bigger")
-  - User wants style changes ("change the colors", "make it darker")  
-  - User wants structural changes ("add a new section", "reorganize")
-  - Changes that can't be done with simple text replacement
-  - **MUST use the SAME artifact_id from context**
-  - **MUST regenerate complete HTML with the requested change**
-  - ⚠️ DO NOT create a new artifact for these requests!
-
-- **CREATE (action: "create")** - Use ONLY for TRULY NEW artifacts:
-  - User explicitly asks for something NEW ("make me a NEW timeline")
-  - User wants a DIFFERENT artifact type ("show as mindmap instead of checklist")
-  - NO artifact is currently displayed (no [CURRENT ARTIFACT DISPLAYED] context)
-  - Generate a NEW unique artifact_id (e.g., "mindmap_" + timestamp)
-  - ⚠️ WRONG: Creating new artifact when user says "change the title" on existing
-
-- **NONE (action: "none")** - No artifact work needed:
-  - User is just chatting/asking questions
-  - No visual output is appropriate for this message
-
-**COMMON MISTAKES TO AVOID:**
-| User says... | WRONG action | CORRECT action |
-|--------------|--------------|----------------|
-| "change the top bun to TOP FUN" | create (new id) | patch (same id) |
-| "make it blue instead of purple" | create (new id) | update (same id) |
-| "add another section" | create (new id) | update (same id) |
-| "make me a NEW checklist" | update | create (new id) |
-| "show this as a timeline instead" | update | create (new id, new type) |
-
-**HTML Toggle System**: Control when to generate expensive HTML vs fast data-only responses
-- **HTML ON (generate_html: true)**: 
-  - Any artifact create or update action
-  - User explicitly requests visual output
-  - Complex decision needs visualization
-- **HTML OFF (generate_html: false)**:
-  - Only when artifact_action.action is "none"
-  - Casual conversation with no visual needed
-
-**VISUAL DESIGN STANDARDS (CRITICAL - Marketing Polish Required):**
-
-All artifacts must look like they came from a premium design agency:
-
-1. **Color & Contrast - MUST BE READABLE:**
-   - NEVER use light text on light backgrounds
-   - NEVER use dark text on dark backgrounds  
-   - Minimum contrast ratio: 4.5:1 for normal text, 3:1 for large text
-   - Test: If you can't read it easily, fix the contrast
-   - Recommended: White/light text (#FFFFFF, #F0F0F0) on dark/medium backgrounds
-   - Recommended: Dark text (#1A1A1A, #2D2D2D) on light backgrounds
-
-2. **Color Palettes - Use These Premium Palettes:**
-   - Purple/Violet gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
-   - Teal/Cyan gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%)
-   - Sunset gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)
-   - Ocean gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)
-   - Dark elegant: #1a1a2e, #16213e, #0f3460
-
-3. **Liquid Glass Styling (Apply to cards/containers):**
-   - background: rgba(255, 255, 255, 0.15)
-   - backdrop-filter: blur(20px)
-   - -webkit-backdrop-filter: blur(20px)
-   - border: 1px solid rgba(255, 255, 255, 0.3)
-   - border-radius: 16-24px
-
-4. **Typography:**
-   - Font family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif
-   - Headers: font-weight: 600-700, letter-spacing: -0.3px
-   - Body: font-weight: 400, line-height: 1.6
-   - Use proper hierarchy: h1 > h2 > h3 > p
-
-5. **Shadows & Depth:**
-   - Card shadows: box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2)
-   - Elevated elements: box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15)
-   - Subtle depth: box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)
-
-6. **Hover States & Transitions:**
-   - All interactive elements need hover states
-   - transition: all 0.3s ease
-   - transform: translateY(-2px) on hover for cards
-   - opacity change or glow effect for buttons
-
-7. **Layout & Spacing:**
-   - Use consistent padding: 16px, 24px, 32px, 48px
-   - Cards should have breathing room (min 24px padding)
-   - Use CSS Grid or Flexbox for layouts
-   - Mobile-responsive (use relative units, media queries if needed)
-
-- **Emotional Depth**:
-  - Use first-person language ("I can sleep well knowing...")
-  - Acknowledge emotional weight ("This is hard because...")
-  - Validate difficulty of choice
-  - Provide perspective and encouragement
-  - Add reflection sections for major decisions
-  
-- **HTML Structure**:
-  - Complete <!DOCTYPE html> document
-  - All styles in <style> tag (no external CSS)
-  - Self-contained (no external images or fonts beyond system fonts)
-  - Accessible (semantic HTML, ARIA labels)
-  
-- **Artifact Types**:
-  - comparison_card: Side-by-side pros/cons with emotional context
-  - stress_map: Topic breakdown with intensity visualization
-  - checklist: Actionable items with progress tracking
-  - reflection_summary: Journey recap with timeline and insights
-  - goal_tracker: Progress visualization with milestones
-  - timeline: Events over time with emotional markers
-  - decision_matrix: Weighted scoring grid with priorities
-  - progress_chart: Metrics over time with trends
-  - mindmap: Connected concepts with relationships
-  - celebration_card: Achievement recognition with encouragement
+**HTML Toggle:** generate_html=true when creating/updating artifacts. generate_html=false for casual conversation.
 
 **Important:**
-- ALWAYS respond with ONLY valid JSON (no markdown, no code blocks, no extra text)
-- Always include area_actions when user discusses life topics
-- Always include 2-4 relevant bubbles
+- ALWAYS respond with ONLY valid JSON
+- Include 2-4 relevant bubbles (≤7 words each) as contextual micro-prompts
 - Keep responses conversational and natural
-- Reference past conversations when relevant (context provided)
-- Be warm and supportive, like a thoughtful friend
-- Include html_toggle field to control HTML generation
+- Reference past conversations when context is provided
+- Be warm and supportive, like a thoughtful friend`;
+  }
 
-**Example Response:**
-{"response":"I hear you're worried about Emma's reading. That must be stressful. Tell me more about what you've noticed at home?","area_actions":[{"action":"create_area","area_path":"Family/Emma_School","name":"Emma's School","description":"Tracking Emma's reading progress and school challenges"},{"action":"append_entry","area_path":"Family/Emma_School","document":"reading_comprehension.md","content":"Emma (2nd grade) struggling with reading comprehension. Can decode but doesn't retain.","user_quote":"Her teacher said she can decode words but doesn't remember what she reads.","ai_observation":"Specific diagnosis from teacher. Comprehension issue, not decoding.","sentiment":"concerned"}],"artifact_action":{"action":"none"},"bubbles":["what helps her focus?","teacher's suggestions?","how does she feel?"]}`;
+  /**
+   * GET ARTIFACT DESIGN PROMPT
+   * 
+   * Returns the visual design standards prompt that tells the AI how to generate
+   * beautiful, marketing-polished HTML artifacts. This is ONLY injected when the
+   * AI needs to generate HTML (artifact create/update actions).
+   * 
+   * ARCHITECTURE FIX (2026-02-06):
+   * Previously these ~100 lines of CSS instructions were embedded in the main
+   * system prompt and sent with EVERY request, burning ~2000 tokens per turn
+   * even for casual "how was your day?" conversations that would never produce
+   * an artifact. Now they're only injected when buildSharedContextPrefix detects
+   * that an artifact exists (implying the AI might need to update it).
+   * 
+   * PRODUCT CONTEXT:
+   * These design standards ensure artifacts look premium. The Liquid Glass aesthetic,
+   * gradient palettes, and typography specs were refined through benchmark testing
+   * (see docs/archive/benchmarks/ for comparison results).
+   * 
+   * @returns {string} Design prompt for artifact HTML generation
+   */
+  getArtifactDesignPrompt() {
+    return `**VISUAL DESIGN STANDARDS FOR HTML ARTIFACTS:**
+
+All artifacts must look premium and marketing-polished:
+
+**Color & Contrast:** Minimum 4.5:1 contrast ratio. White/light text on dark/medium backgrounds, or dark text on light backgrounds. NEVER light-on-light or dark-on-dark.
+
+**Color Palettes:**
+- Purple/Violet: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+- Teal/Cyan: linear-gradient(135deg, #11998e 0%, #38ef7d 100%)
+- Sunset: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)
+- Ocean: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)
+- Dark elegant: #1a1a2e, #16213e, #0f3460
+
+**Liquid Glass Styling:** background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); border-radius: 16-24px
+
+**Typography:** -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif. Headers 600-700 weight, body 400 weight, line-height 1.6.
+
+**Shadows:** Cards: box-shadow: 0 8px 32px rgba(0,0,0,0.2). Elevated: 0 4px 20px rgba(0,0,0,0.15).
+
+**Interactions:** Hover states on all interactive elements. transition: all 0.3s ease. Cards: translateY(-2px) on hover.
+
+**Layout:** Consistent padding (16/24/32/48px). CSS Grid or Flexbox. Breathing room (min 24px padding on cards).
+
+**Emotional Depth:** Use first-person language, acknowledge emotional weight, validate difficulty, provide encouragement.
+
+**HTML Structure:** Complete <!DOCTYPE html>, all styles in <style> tag, self-contained, accessible (semantic HTML, ARIA labels).
+
+**Artifact Types:** comparison_card (pros/cons), stress_map (intensity viz), checklist (actionable items), reflection_summary (journey recap), goal_tracker (progress), timeline (events over time), decision_matrix (weighted scoring), progress_chart (metrics), mindmap (connected concepts), celebration_card (achievement recognition).`;
   }
 
   /**
@@ -752,46 +675,51 @@ All artifacts must look like they came from a premium design agency:
   }
 
   /**
-   * BUILD MESSAGES FOR GEMINI
+   * BUILD SHARED CONTEXT PREFIX
    * 
-   * Formats conversation history for Gemini API.
+   * Generates the shared context string that should be injected into ALL provider
+   * message builders. This includes:
+   * 1. RAG context (vector search results, knowledge tree, AI notes)
+   * 2. Artifact context (what artifact is currently displayed)
    * 
-   * GEMINI FORMAT:
-   * The Gemini SDK expects an array of content objects with role and parts.
+   * ARCHITECTURE FIX (2026-02-06):
+   * Previously, artifact context was ONLY injected for Gemini (buildMessagesForGemini).
+   * Anthropic and OpenAI message builders had NO artifact context, causing 0% artifact
+   * update rate when using those providers. RAG context was never injected at all in the
+   * main message flow (ContextAssemblyService was built but disconnected).
    * 
-   * CRITICAL FIX (2026-01-24): System prompt is now passed via `systemInstruction`
-   * in the model config (see generateGeminiResponse), NOT as a user message.
-   * This prevents the system prompt from being sent twice.
+   * Now all three providers share this method for consistent context injection.
    * 
-   * CRITICAL FIX (2026-01-27): Now includes artifact context.
-   * The AI needs to know what artifact is currently displayed to decide
-   * whether to edit vs create. Without this context, AI always creates
-   * new artifacts (0% update rate documented in COMPREHENSIVE_EVALUATION.md).
-   * 
-   * IMPORTANT: Gemini alternates between 'user' and 'model' roles.
-   * We need to ensure proper alternation and combine consecutive messages
-   * from the same role if needed.
-   * 
-   * @param {Object} conversation - Conversation object
-   * @returns {Array} Contents array for Gemini
+   * @param {Object} conversation - Conversation object (may have ragContext and currentArtifact)
+   * @returns {string} Combined context string to prepend to messages
    */
-  buildMessagesForGemini(conversation) {
-    const contents = [];
+  buildSharedContextPrefix(conversation) {
+    let contextParts = [];
 
-    // NO LONGER: Start with system prompt as first user message
-    // WHY: System prompt is now passed via systemInstruction in model config
-    // BECAUSE: Passing it twice wastes tokens and could confuse the model
-    // HISTORY: Bug discovered 2026-01-24 - system prompt was being sent twice
-    
-    // ARTIFACT CONTEXT INJECTION (2026-01-27, improved 2026-01-28)
-    // If there's a current artifact displayed, prepend context so AI knows
-    // what artifact exists and can decide to edit vs create
-    // 
-    // FIX (2026-01-28): Made instructions more explicit to prevent the AI from:
-    // 1. Creating duplicate artifacts when it should update
-    // 2. Using a different artifact_id when modifying existing content
-    // 3. Generating blank/malformed HTML on updates
+    // 1. RAG CONTEXT INJECTION (2026-02-06)
+    // If the server assembled RAG context before calling generateResponse,
+    // it will be attached to conversation.ragContext as a formatted string.
+    // This includes: AI notes, knowledge tree, vector search results, conversation history.
+    //
+    // WHY: This is the core memory feature of BubbleVoice — the AI needs to know what
+    // the user has discussed in past conversations to provide continuity.
+    // BECAUSE: Without this, the AI responds as if every conversation is the first one.
+    if (conversation.ragContext) {
+      contextParts.push(conversation.ragContext);
+      console.log('[LLMService] Injected RAG context:', conversation.ragContext.length, 'chars');
+    }
+
+    // 2. ARTIFACT CONTEXT + DESIGN PROMPT INJECTION
+    // If there's a current artifact displayed, inject both:
+    // a) The artifact context (what's displayed, its ID, type)
+    // b) The design prompt (CSS/styling instructions for HTML generation)
+    //
+    // The design prompt is ONLY injected here, not in the base system prompt.
+    // This saves ~2000 tokens on every casual conversation turn.
+    // (Originally 2026-01-27, design prompt split out 2026-02-06)
     if (conversation.currentArtifact) {
+      // Inject design standards since artifact work may be needed
+      contextParts.push(this.getArtifactDesignPrompt());
       const artifact = conversation.currentArtifact;
       const artifactContext = `[CURRENT ARTIFACT DISPLAYED]
 ================================
@@ -819,21 +747,57 @@ EDITING RULES (FOLLOW STRICTLY):
 
 COMMON MISTAKE TO AVOID: Creating a new artifact when user says "change X to Y" - this should UPDATE with the same ID, not CREATE new.
 
-[END ARTIFACT CONTEXT]
+[END ARTIFACT CONTEXT]`;
+      contextParts.push(artifactContext);
+      console.log('[LLMService] Injected artifact context:', artifact.artifact_id, artifact.artifact_type);
+    }
 
-`;
+    return contextParts.join('\n\n');
+  }
+
+  /**
+   * BUILD MESSAGES FOR GEMINI
+   * 
+   * Formats conversation history for Gemini API.
+   * 
+   * GEMINI FORMAT:
+   * The Gemini SDK expects an array of content objects with role and parts.
+   * System prompt is passed via `systemInstruction` in the model config.
+   * 
+   * IMPORTANT: Gemini alternates between 'user' and 'model' roles.
+   * We combine consecutive messages from the same role to maintain alternation.
+   * 
+   * ARCHITECTURE FIX (2026-02-06):
+   * - Artifact context now comes from shared buildSharedContextPrefix()
+   * - RAG context is now injected here (was previously disconnected)
+   * - All three providers now get identical context injection
+   * 
+   * @param {Object} conversation - Conversation object
+   * @returns {Array} Contents array for Gemini
+   */
+  buildMessagesForGemini(conversation) {
+    const contents = [];
+
+    // Inject shared context (RAG + artifact) as a user message at the start
+    // This ensures the AI sees memory and artifact state before conversation history
+    const sharedContext = this.buildSharedContextPrefix(conversation);
+    if (sharedContext) {
       contents.push({
         role: 'user',
-        parts: [{ text: artifactContext }]
+        parts: [{ text: sharedContext }]
       });
       
-      // Add a model acknowledgment to maintain alternation
+      // Add a model acknowledgment to maintain Gemini's role alternation requirement
+      // WHY: Gemini strictly requires user/model alternation — two consecutive user
+      // messages cause an API error. This synthetic acknowledgment maintains the pattern.
+      const artifact = conversation.currentArtifact;
+      const ackText = artifact 
+        ? `I see the ${artifact.artifact_type} artifact (ID: ${artifact.artifact_id}). For modifications, I will use action "update" with that same ID. I have the conversation context and memory available.`
+        : 'I have the conversation context and memory available. Ready to continue our conversation.';
       contents.push({
         role: 'model',
-        parts: [{ text: `I see the ${artifact.artifact_type} artifact (ID: ${artifact.artifact_id}). For modifications, I will use action "update" with that same ID. For new artifacts, I will use action "create" with a new ID.` }]
+        parts: [{ text: ackText }]
       });
-      
-      console.log('[LLMService] Injected artifact context:', artifact.artifact_id, artifact.artifact_type);
     }
     
     // Track current message being built (for combining consecutive same-role messages)
@@ -872,8 +836,6 @@ COMMON MISTAKE TO AVOID: Creating a new artifact when user says "change X to Y" 
     }
 
     // SAFETY CHECK: Gemini requires at least one message
-    // If conversation is empty, this shouldn't happen (we always add user message first)
-    // but just in case, add a placeholder
     if (contents.length === 0) {
       console.warn('[LLMService] buildMessagesForGemini: Empty conversation, adding placeholder');
       contents.push({
@@ -890,11 +852,35 @@ COMMON MISTAKE TO AVOID: Creating a new artifact when user says "change X to Y" 
    * 
    * Formats conversation history for Anthropic API.
    * 
+   * ARCHITECTURE FIX (2026-02-06):
+   * Now injects shared context (RAG + artifact) as the first user message.
+   * Previously had NO artifact context or RAG context, causing:
+   * - 0% artifact update rate when using Claude
+   * - No memory retrieval (AI couldn't remember past conversations)
+   * 
    * @param {Object} conversation - Conversation object
    * @returns {Array} Messages array
    */
   buildMessagesForAnthropic(conversation) {
     const messages = [];
+
+    // Inject shared context (RAG + artifact) as the first user message
+    // WHY: Anthropic doesn't have a separate context injection mechanism
+    // other than the system prompt. We prepend context as a user message
+    // so the AI sees it before the actual conversation history.
+    // BECAUSE: Without this, Claude had zero visibility into artifacts and memories.
+    const sharedContext = this.buildSharedContextPrefix(conversation);
+    if (sharedContext) {
+      messages.push({
+        role: 'user',
+        content: `[CONTEXT FOR THIS CONVERSATION]\n${sharedContext}\n[END CONTEXT]`
+      });
+      // Anthropic also requires alternating user/assistant roles
+      messages.push({
+        role: 'assistant',
+        content: 'I have the context. Ready to continue our conversation.'
+      });
+    }
 
     if (conversation.messages) {
       for (const msg of conversation.messages) {
@@ -913,6 +899,12 @@ COMMON MISTAKE TO AVOID: Creating a new artifact when user says "change X to Y" 
    * 
    * Formats conversation history for OpenAI API.
    * 
+   * ARCHITECTURE FIX (2026-02-06):
+   * Now injects shared context (RAG + artifact) as a system message.
+   * OpenAI supports multiple system messages, so we add context as a
+   * second system message after the main system prompt.
+   * Previously had NO artifact context or RAG context.
+   * 
    * @param {Object} conversation - Conversation object
    * @returns {Array} Messages array
    */
@@ -923,6 +915,18 @@ COMMON MISTAKE TO AVOID: Creating a new artifact when user says "change X to Y" 
         content: this.systemPrompt
       }
     ];
+
+    // Inject shared context (RAG + artifact) as a second system message
+    // WHY: OpenAI supports multiple system messages — this is the cleanest
+    // way to add context without polluting the conversation history.
+    // BECAUSE: Without this, GPT had zero visibility into artifacts and memories.
+    const sharedContext = this.buildSharedContextPrefix(conversation);
+    if (sharedContext) {
+      messages.push({
+        role: 'system',
+        content: `[CONVERSATION CONTEXT]\n${sharedContext}\n[END CONTEXT]`
+      });
+    }
 
     if (conversation.messages) {
       for (const msg of conversation.messages) {

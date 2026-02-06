@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #cddded 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .artifact-container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #2c5282;
+            letter-spacing: -0.5px;
+        }
+        p.subtitle {
+            font-size: 1.1em;
+            font-weight: 400;
+            color: #718096;
+            margin-bottom: 40px;
+        }
+        .stress-areas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .stress-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .stress-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        .stress-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        .stress-card h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1a365d;
+        }
+        .stress-card p {
+            font-size: 0.95em;
+            font-weight: 400;
+            line-height: 1.6;
+            color: #4a5568;
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+        .stress-card .sentiment {
+            font-size: 0.85em;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: #e2e8f0;
+            color: #718096;
+            display: inline-block;
+            margin-top: auto;
+        }
+        .sentiment.high {
+            background-color: rgba(245, 101, 101, 0.15);
+            color: #e53e3e;
+        }
+        .sentiment.medium {
+            background-color: rgba(236, 180, 109, 0.15);
+            color: #dd6b20;
+        }
+        .sentiment.low {
+            background-color: rgba(72, 187, 120, 0.15);
+            color: #38a169;
+        }
+        .sentiment.positive {
+             background-color: rgba(72, 187, 120, 0.15);
+             color: #38a169;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    </style>
+</head>
+<body>
+    <div class="artifact-container">
+        <h1>Your Current Stress Landscape</h1>
+        <p class="subtitle">A visual overview of where your energy is going.</p>
+        <div class="stress-areas">
+            <div class="stress-card">
+                <div class="icon">🚀</div>
+                <h2>Startup / Investors</h2>
+                <p>The investor situation is a significant source of stress, demanding your energy and attention.</p>
+                <span class="sentiment high">High Stress</span>
+            </div>
+            <div class="stress-card">
+                <div class="icon">🏃</div>
+                <h2>Exercise Goals</h2>
+                <p>Feeling too exhausted to run, despite knowing its benefits. This is a struggle area right now.</p>
+                <span class="sentiment medium">Struggling</span>
+            </div>
+            <div class="stress-card">
+                <div class="icon">❤️</div>
+                <h2>Partner / Jordan</h2>
+                <p>Quality time with Jordan has been neglected due to exhaustion and competing demands.</p>
+                <span class="sentiment medium">Needs Attention</span>
+            </div>
+            <div class="stress-card">
+                <div class="icon">📚</div>
+                <h2>Emma's Reading</h2>
+                <p>A positive development! Emma had a good day with reading, a bright spot amidst the challenges.</p>
+                <span class="sentiment positive">Positive Progress</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

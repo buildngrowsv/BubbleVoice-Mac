@@ -1,0 +1,604 @@
+{
+  "run_id": "gemini-2.5-flash-lite_html_visual_sophistication_1768850707460",
+  "scenario_id": "html_visual_sophistication",
+  "model_id": "gemini-2.5-flash-lite",
+  "model_display_name": "Gemini 2.5 Flash Lite",
+  "started_at": "2026-01-19T19:25:07.460Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I'm trying to decide between two job offers. One is at a stable company with good pay but boring work. The other is a startup with lower pay but exciting challenges. I have a family to support.",
+      "expected_behavior": {
+        "response": "acknowledge complexity, empathize with difficult choice",
+        "artifact_action": "create",
+        "artifact_type": "comparison_card",
+        "reasoning": "PROACTIVE: Complex decision with tradeoffs - visual comparison would help",
+        "html_requirements": {
+          "must_have": [
+            "Liquid glass / glassmorphism styling (backdrop-filter: blur)",
+            "Side-by-side comparison layout",
+            "Color-coded sections (stable vs exciting)",
+            "Visual hierarchy with typography",
+            "Gradients or sophisticated color palette",
+            "Inline CSS (complete standalone HTML)",
+            "Feels premium and polished"
+          ],
+          "wow_factors": [
+            "Subtle shadows and depth",
+            "Emoji or icon usage for visual interest",
+            "Progress bars or visual indicators",
+            "Smooth transitions on hover",
+            "Thoughtful spacing and padding",
+            "Color psychology (blue for stable, orange for exciting)"
+          ]
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "I'm trying to decide between two job offers. One is at a stable company with good pay but boring work. The other is a startup with lower pay but exciting challenges. I have a family to support.",
+          "tone": "contemplative"
+        },
+        "internal_notes": {
+          "observations": "User is comparing two distinct job offers with clear pros and cons for each. The decision involves financial security vs. career fulfillment, with the added complexity of family support.",
+          "reasoning": "This scenario presents a classic decision with tradeoffs between two options (stable company vs. startup). A comparison card is the most appropriate artifact to visualize these differences and aid decision-making."
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_type": "comparison_card",
+          "artifact_id": "job_decision_001",
+          "data": {
+            "stable_company": {
+              "name": "Stable Company",
+              "pros": [
+                "Good pay",
+                "Job security"
+              ],
+              "cons": [
+                "Boring work"
+              ],
+              "focus": "Security"
+            },
+            "startup": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth"
+            },
+            "considerations": [
+              "Family support needs"
+            ]
+          },
+          "html": "<div class=\"comparison-card\">\n  <h2>🤔 Job Offer Decision</h2>\n  <div class=\"comparison-grid\">\n    <div class=\"option stable\">\n      <div class=\"option-header\">\n        <h3>💼 Stable Company</h3>\n        <span class=\"badge\">Security First</span>\n      </div>\n      <div class=\"factors\">\n        <div class=\"factor pro\">✅ Good Pay</div>\n        <div class=\"factor pro\">✅ Job Security</div>\n        <div class=\"factor con\">⚠️ Potentially Boring Work</div>\n      </div>\n      <div class=\"key-consideration\">\n        <span class=\"icon\">👨‍👩‍👧‍👦</span> Family Support: High Priority\n      </div>\n    </div>\n    <div class=\"option exciting\">\n      <div class=\"option-header\">\n        <h3>🚀 Startup</h3>\n        <span class=\"badge\">Excitement & Growth</span>\n      </div>\n      <div class=\"factors\">\n        <div class=\"factor pro\">✅ Exciting Challenges</div>\n        <div class=\"factor pro\">✅ Potential for Equity</div>\n        <div class=\"factor con\">⚠️ Lower Initial Pay</div>\n        <div class=\"factor con\">⚠️ Higher Risk</div>\n      </div>\n      <div class=\"key-consideration\">\n        <span class=\"icon\">👨‍👩‍👧‍👦</span> Family Support: Requires Careful Budgeting\n      </div>\n    </div>\n  </div>\n  <div class=\"summary\">\n    <p>Balancing financial stability for your family with career fulfillment and excitement is key. Consider the long-term implications of each path.</p>\n  </div>\n</div>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');\n  \n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body {\n    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);\n    padding: 40px;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n  }\n  .comparison-card {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(25px);\n    border-radius: 24px;\n    padding: 40px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);\n    max-width: 900px;\n    width: 100%;\n    border: 1px solid rgba(255, 255, 255, 0.3);\n  }\n  h2 {\n    font-size: 36px;\n    margin-bottom: 32px;\n    color: #343a40;\n    text-align: center;\n    font-weight: 700;\n    letter-spacing: -0.5px;\n  }\n  .comparison-grid {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 30px;\n    margin-bottom: 30px;\n  }\n  .option {\n    background: rgba(255, 255, 255, 0.85);\n    border-radius: 18px;\n    padding: 30px;\n    border-left: 5px solid;\n    box-shadow: 0 5px 20px rgba(0,0,0,0.08);\n    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;\n  }\n  .option:hover {\n      transform: translateY(-5px);\n      box-shadow: 0 15px 40px rgba(0,0,0,0.15);\n  }\n  .option.stable { border-color: #4dabf7; }\n  .option.exciting { border-color: #fca311; }\n  .option-header {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    margin-bottom: 24px;\n  }\n  h3 {\n    font-size: 24px;\n    color: #212529;\n    font-weight: 700;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .badge {\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    color: white;\n    padding: 8px 16px;\n    border-radius: 14px;\n    font-size: 13px;\n    font-weight: 600;\n    letter-spacing: 0.5px;\n  }\n  .option.stable .badge { background: linear-gradient(135deg, #4dabf7, #2b82f4); }\n  .option.exciting .badge { background: linear-gradient(135deg, #fca311, #e67e22); }\n  \n  .factors { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }\n  .factor {\n    padding: 14px 18px;\n    border-radius: 12px;\n    font-size: 16px;\n    font-weight: 500;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    line-height: 1.5;\n  }\n  .factor.pro { background: rgba(76, 175, 80, 0.1); color: #388e3c; }\n  .factor.con { background: rgba(244, 67, 54, 0.1); color: #d32f2f; }\n  \n  .key-consideration {\n    margin-top: 20px;\n    padding: 15px;\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    font-size: 15px;\n    font-weight: 600;\n    color: #495057;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    border: 1px dashed rgba(0,0,0,0.1);\n  }\n  .key-consideration .icon {\n      font-size: 20px;\n  }\n\n  .summary {\n    margin-top: 30px;\n    text-align: center;\n    font-size: 15px;\n    color: #6c757d;\n    line-height: 1.6;\n  }\n  \n  @media (max-width: 768px) {\n    .comparison-grid {\n      grid-template-columns: 1fr;\n    }\n    .comparison-card {\n      padding: 30px;\n    }\n    h2 {\n      font-size: 30px;\n    }\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "I'm trying to decide between two job offers. One is at a stable company with good pay but boring work. The other is a startup with lower pay but exciting challenges. I have a family to support.",
+          "tone": "contemplative"
+        },
+        "internal_notes": {
+          "observations": "User is comparing two distinct job offers with clear pros and cons for each. The decision involves financial security vs. career fulfillment, with the added complexity of family support.",
+          "context_updates": "",
+          "reasoning": "This scenario presents a classic decision with tradeoffs between two options (stable company vs. startup). A comparison card is the most appropriate artifact to visualize these differences and aid decision-making."
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "job_decision_001",
+          "artifact_type": "comparison_card",
+          "data": {
+            "stable_company": {
+              "name": "Stable Company",
+              "pros": [
+                "Good pay",
+                "Job security"
+              ],
+              "cons": [
+                "Boring work"
+              ],
+              "focus": "Security"
+            },
+            "startup": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth"
+            },
+            "considerations": [
+              "Family support needs"
+            ]
+          }
+        }
+      },
+      "latency_ms": 8212,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created",
+        "data": {
+          "stable_company": {
+            "name": "Stable Company",
+            "pros": [
+              "Good pay",
+              "Job security"
+            ],
+            "cons": [
+              "Boring work"
+            ],
+            "focus": "Security"
+          },
+          "startup": {
+            "name": "Startup",
+            "pros": [
+              "Exciting challenges",
+              "Potential for growth/equity"
+            ],
+            "cons": [
+              "Lower pay",
+              "Higher risk"
+            ],
+            "focus": "Growth"
+          },
+          "considerations": [
+            "Family support needs"
+          ]
+        }
+      }
+    },
+    {
+      "turn_id": 2,
+      "user_input": "Actually, the startup just offered equity. That changes things.",
+      "expected_behavior": {
+        "response": "acknowledge significant new factor",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "html_requirements": {
+          "must_have": [
+            "Add equity as new factor in startup column",
+            "Visually emphasize the equity (maybe with icon or badge)",
+            "Preserve all existing styling",
+            "Update may shift visual balance toward startup"
+          ]
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Actually, the startup just offered equity. That changes things.",
+          "tone": "informative"
+        },
+        "internal_notes": {
+          "observations": "The user is providing an update to the existing job offer comparison. Specifically, the startup offer now includes equity, which is a significant factor that could influence the decision.",
+          "reasoning": "The user is adding a new, important detail (equity) to one of the options in the comparison card. This requires updating the data associated with the startup and visually representing this new pro. The core structure remains the same, so a data_and_ui update is appropriate."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_type": "comparison_card",
+          "artifact_id": "job_decision_001",
+          "data": {
+            "stable_company": {
+              "name": "Stable Company",
+              "pros": [
+                "Good pay",
+                "Job security"
+              ],
+              "cons": [
+                "Boring work"
+              ],
+              "focus": "Security"
+            },
+            "startup": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth",
+              "equity_offered": true
+            },
+            "considerations": [
+              "Family support needs"
+            ]
+          },
+          "html": "<div class=\"comparison-card\">\n  <h2>🤔 Job Offer Decision</h2>\n  <div class=\"comparison-grid\">\n    <div class=\"option stable\">\n      <div class=\"option-header\">\n        <h3>💼 Stable Company</h3>\n        <span class=\"badge\">Security First</span>\n      </div>\n      <div class=\"factors\">\n        <div class=\"factor pro\">✅ Good Pay</div>\n        <div class=\"factor pro\">✅ Job Security</div>\n        <div class=\"factor con\">⚠️ Potentially Boring Work</div>\n      </div>\n      <div class=\"key-consideration\">\n        <span class=\"icon\">👨‍👩‍👧‍👦</span> Family Support: High Priority\n      </div>\n    </div>\n    <div class=\"option exciting\">\n      <div class=\"option-header\">\n        <h3>🚀 Startup</h3>\n        <span class=\"badge\">Excitement & Growth</span>\n      </div>\n      <div class=\"factors\">\n        <div class=\"factor pro\">✅ Exciting Challenges</div>\n        <div class=\"factor pro\">✅ Potential for Equity</div>\n        <div class=\"factor pro\">✅ Ownership Stake (Equity)</div>\n        <div class=\"factor con\">⚠️ Lower Initial Pay</div>\n        <div class=\"factor con\">⚠️ Higher Risk</div>\n      </div>\n      <div class=\"key-consideration\">\n        <span class=\"icon\">👨‍👩‍👧‍👦</span> Family Support: Requires Careful Budgeting\n      </div>\n    </div>\n  </div>\n  <div class=\"summary\">\n    <p>Balancing financial stability for your family with career fulfillment and excitement is key. The addition of equity in the startup significantly impacts the potential upside.</p>\n  </div>\n</div>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');\n  \n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body {\n    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);\n    padding: 40px;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n  }\n  .comparison-card {\n    background: rgba(255, 255, 255, 0.9);\n    backdrop-filter: blur(25px);\n    border-radius: 24px;\n    padding: 40px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);\n    max-width: 900px;\n    width: 100%;\n    border: 1px solid rgba(255, 255, 255, 0.3);\n  }\n  h2 {\n    font-size: 36px;\n    margin-bottom: 32px;\n    color: #343a40;\n    text-align: center;\n    font-weight: 700;\n    letter-spacing: -0.5px;\n  }\n  .comparison-grid {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 30px;\n    margin-bottom: 30px;\n  }\n  .option {\n    background: rgba(255, 255, 255, 0.85);\n    border-radius: 18px;\n    padding: 30px;\n    border-left: 5px solid;\n    box-shadow: 0 5px 20px rgba(0,0,0,0.08);\n    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;\n  }\n  .option:hover {\n      transform: translateY(-5px);\n      box-shadow: 0 15px 40px rgba(0,0,0,0.15);\n  }\n  .option.stable { border-color: #4dabf7; }\n  .option.exciting { border-color: #fca311; }\n  .option-header {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    margin-bottom: 24px;\n  }\n  h3 {\n    font-size: 24px;\n    color: #212529;\n    font-weight: 700;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .badge {\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    color: white;\n    padding: 8px 16px;\n    border-radius: 14px;\n    font-size: 13px;\n    font-weight: 600;\n    letter-spacing: 0.5px;\n  }\n  .option.stable .badge { background: linear-gradient(135deg, #4dabf7, #2b82f4); }\n  .option.exciting .badge { background: linear-gradient(135deg, #fca311, #e67e22); }\n  \n  .factors { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }\n  .factor {\n    padding: 14px 18px;\n    border-radius: 12px;\n    font-size: 16px;\n    font-weight: 500;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    line-height: 1.5;\n  }\n  .factor.pro { background: rgba(76, 175, 80, 0.1); color: #388e3c; }\n  .factor.con { background: rgba(244, 67, 54, 0.1); color: #d32f2f; }\n  \n  .key-consideration {\n    margin-top: 20px;\n    padding: 15px;\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    font-size: 15px;\n    font-weight: 600;\n    color: #495057;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    border: 1px dashed rgba(0,0,0,0.1);\n  }\n  .key-consideration .icon {\n      font-size: 20px;\n  }\n\n  .summary {\n    margin-top: 30px;\n    text-align: center;\n    font-size: 15px;\n    color: #6c757d;\n    line-height: 1.6;\n  }\n  \n  @media (max-width: 768px) {\n    .comparison-grid {\n      grid-template-columns: 1fr;\n    }\n    .comparison-card {\n      padding: 30px;\n    }\n    h2 {\n      font-size: 30px;\n    }\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Actually, the startup just offered equity. That changes things.",
+          "tone": "informative"
+        },
+        "internal_notes": {
+          "observations": "The user is providing an update to the existing job offer comparison. Specifically, the startup offer now includes equity, which is a significant factor that could influence the decision.",
+          "context_updates": "",
+          "reasoning": "The user is adding a new, important detail (equity) to one of the options in the comparison card. This requires updating the data associated with the startup and visually representing this new pro. The core structure remains the same, so a data_and_ui update is appropriate."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_id": "job_decision_001",
+          "artifact_type": "comparison_card",
+          "data": {
+            "stable_company": {
+              "name": "Stable Company",
+              "pros": [
+                "Good pay",
+                "Job security"
+              ],
+              "cons": [
+                "Boring work"
+              ],
+              "focus": "Security"
+            },
+            "startup": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth",
+              "equity_offered": true
+            },
+            "considerations": [
+              "Family support needs"
+            ]
+          }
+        }
+      },
+      "latency_ms": 5033,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "startup",
+            "before": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth"
+            },
+            "after": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth",
+              "equity_offered": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Can you make this feel more personal? Like it understands this is a huge life decision for me and my family?",
+      "expected_behavior": {
+        "response": "acknowledge emotional weight",
+        "artifact_action": "update",
+        "modification_type": "ui_only",
+        "html_requirements": {
+          "must_have": [
+            "Add empathetic language or notes",
+            "Maybe add family-focused section or callout",
+            "Warmer color palette or softer styling",
+            "Preserve all data",
+            "Feels more human and less clinical"
+          ],
+          "wow_factors": [
+            "Personal touches (family icon, heart emoji)",
+            "Softer shadows or warmer tones",
+            "Encouraging or supportive messaging"
+          ]
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Can you make this feel more personal? Like it understands this is a huge life decision for me and my family?",
+          "tone": "seeking reassurance"
+        },
+        "internal_notes": {
+          "observations": "The user wants the artifact to convey a greater sense of empathy and personal significance, acknowledging the weight of the decision, especially concerning family.",
+          "reasoning": "The user is requesting a change in the emotional tone and emphasis of the artifact, rather than a change in the data itself. This calls for a UI-only modification to adjust the language, visual cues, and overall presentation to feel more personal and understanding."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "ui_only",
+          "artifact_type": "comparison_card",
+          "artifact_id": "job_decision_001",
+          "data": {
+            "stable_company": {
+              "name": "Stable Company",
+              "pros": [
+                "Good pay",
+                "Job security"
+              ],
+              "cons": [
+                "Boring work"
+              ],
+              "focus": "Security"
+            },
+            "startup": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth",
+              "equity_offered": true
+            },
+            "considerations": [
+              "Family support needs"
+            ]
+          },
+          "html": "<div class=\"comparison-card\">\n  <h2>Choosing Your Path: A Big Decision for Your Family 💖</h2>\n  <div class=\"comparison-grid\">\n    <div class=\"option stable\">\n      <div class=\"option-header\">\n        <h3>💼 The Stable Path</h3>\n        <span class=\"badge\">Reliability & Comfort</span>\n      </div>\n      <div class=\"factors\">\n        <div class=\"factor pro\">✅ Financial Security for Your Family</div>\n        <div class=\"factor pro\">✅ Predictable Routine</div>\n        <div class=\"factor con\">⚠️ May lack daily spark or passion</div>\n      </div>\n      <div class=\"key-consideration\">\n        <span class=\"icon\">🏡</span> Peace of Mind: Knowing family needs are met consistently.\n      </div>\n    </div>\n    <div class=\"option exciting\">\n      <div class=\"option-header\">\n        <h3>🚀 The Adventure Path</h3>\n        <span class=\"badge\">Innovation & Potential</span>\n      </div>\n      <div class=\"factors\">\n        <div class=\"factor pro\">✅ Thrilling Challenges & Growth</div>\n        <div class=\"factor pro\">✅ Potential for Significant Future Gains (Equity)</div>\n        <div class=\"factor pro\">✅ Opportunity to Build Something New</div>\n        <div class=\"factor con\">⚠️ Initial Income May Be Tighter</div>\n        <div class=\"factor con\">⚠️ Inherent Startup Risks</div>\n      </div>\n      <div class=\"key-consideration\">\n        <span class=\"icon\">🌟</span> Future Vision: Balancing today's needs with tomorrow's possibilities for your family.\n      </div>\n    </div>\n  </div>\n  <div class=\"summary\">\n    <p>This isn't just about a job; it's about the future you're building for yourself and your loved ones. Both paths offer different kinds of rewards and require different considerations. Reflect on what truly matters most for your family's well-being and your personal fulfillment right now.</p>\n  </div>\n</div>\n\n<style>\n  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');\n  \n  * { margin: 0; padding: 0; box-sizing: border-box; }\n  body {\n    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;\n    background: linear-gradient(135deg, #f0f4f8 0%, #e6e9f0 100%);\n    padding: 40px;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    min-height: 100vh;\n  }\n  .comparison-card {\n    background: rgba(255, 255, 255, 0.92);\n    backdrop-filter: blur(25px);\n    border-radius: 24px;\n    padding: 40px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);\n    max-width: 900px;\n    width: 100%;\n    border: 1px solid rgba(255, 255, 255, 0.4);\n  }\n  h2 {\n    font-size: 38px;\n    margin-bottom: 32px;\n    color: #2c3e50;\n    text-align: center;\n    font-weight: 700;\n    letter-spacing: -0.8px;\n    line-height: 1.3;\n  }\n  .comparison-grid {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 30px;\n    margin-bottom: 30px;\n  }\n  .option {\n    background: rgba(255, 255, 255, 0.85);\n    border-radius: 18px;\n    padding: 30px;\n    border-left: 5px solid;\n    box-shadow: 0 5px 20px rgba(0,0,0,0.08);\n    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;\n  }\n  .option:hover {\n      transform: translateY(-5px);\n      box-shadow: 0 15px 40px rgba(0,0,0,0.15);\n  }\n  .option.stable { border-color: #5080d0; }\n  .option.exciting { border-color: #e69030; }\n  .option-header {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    margin-bottom: 24px;\n  }\n  h3 {\n    font-size: 24px;\n    color: #34495e;\n    font-weight: 700;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n  }\n  .badge {\n    background: linear-gradient(135deg, #747bff 0%, #4854c4 100%);\n    color: white;\n    padding: 8px 16px;\n    border-radius: 14px;\n    font-size: 13px;\n    font-weight: 600;\n    letter-spacing: 0.5px;\n    text-transform: uppercase;\n    font-family: 'Inter', sans-serif;\n  }\n  .option.stable .badge { background: linear-gradient(135deg, #5080d0, #3a60a0); }\n  .option.exciting .badge { background: linear-gradient(135deg, #e69030, #c47520); }\n  \n  .factors { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; }\n  .factor {\n    padding: 14px 18px;\n    border-radius: 12px;\n    font-size: 16px;\n    font-weight: 500;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    line-height: 1.5;\n    background: rgba(255, 255, 255, 0.8);\n  }\n  .factor.pro { background: rgba(76, 175, 80, 0.15); color: #276a2a; }\n  .factor.con { background: rgba(244, 67, 54, 0.15); color: #a81d10; }\n  \n  .key-consideration {\n    margin-top: 20px;\n    padding: 15px;\n    background: rgba(255, 255, 255, 0.95);\n    border-radius: 12px;\n    font-size: 15px;\n    font-weight: 600;\n    color: #555;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    border: 1px dashed rgba(0,0,0,0.12);\n    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);\n  }\n  .key-consideration .icon {\n      font-size: 20px;\n      color: #f39c12;\n  }\n  .option.stable .key-consideration .icon { color: #3498db; }\n  .option.exciting .key-consideration .icon { color: #e74c3c; }\n\n  .summary {\n    margin-top: 30px;\n    text-align: center;\n    font-size: 16px;\n    color: #555;\n    line-height: 1.7;\n    font-style: italic;\n    background: rgba(248, 249, 250, 0.7);\n    padding: 20px;\n    border-radius: 12px;\n    border: 1px solid rgba(0,0,0,0.05);\n  }\n  \n  @media (max-width: 768px) {\n    .comparison-grid {\n      grid-template-columns: 1fr;\n    }\n    .comparison-card {\n      padding: 30px;\n    }\n    h2 {\n      font-size: 30px;\n    }\n  }\n</style>"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Can you make this feel more personal? Like it understands this is a huge life decision for me and my family?",
+          "tone": "seeking reassurance"
+        },
+        "internal_notes": {
+          "observations": "The user wants the artifact to convey a greater sense of empathy and personal significance, acknowledging the weight of the decision, especially concerning family.",
+          "context_updates": "",
+          "reasoning": "The user is requesting a change in the emotional tone and emphasis of the artifact, rather than a change in the data itself. This calls for a UI-only modification to adjust the language, visual cues, and overall presentation to feel more personal and understanding."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "ui_only",
+          "artifact_id": "job_decision_001",
+          "artifact_type": "comparison_card",
+          "data": {
+            "stable_company": {
+              "name": "Stable Company",
+              "pros": [
+                "Good pay",
+                "Job security"
+              ],
+              "cons": [
+                "Boring work"
+              ],
+              "focus": "Security"
+            },
+            "startup": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth",
+              "equity_offered": true
+            },
+            "considerations": [
+              "Family support needs"
+            ]
+          }
+        }
+      },
+      "latency_ms": 8182,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": []
+      }
+    }
+  ],
+  "artifacts": {
+    "job_decision_001": {
+      "type": "comparison_card",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 1,
+          "data": {
+            "stable_company": {
+              "name": "Stable Company",
+              "pros": [
+                "Good pay",
+                "Job security"
+              ],
+              "cons": [
+                "Boring work"
+              ],
+              "focus": "Security"
+            },
+            "startup": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth"
+            },
+            "considerations": [
+              "Family support needs"
+            ]
+          }
+        },
+        {
+          "version": 2,
+          "turn_id": 2,
+          "data": {
+            "stable_company": {
+              "name": "Stable Company",
+              "pros": [
+                "Good pay",
+                "Job security"
+              ],
+              "cons": [
+                "Boring work"
+              ],
+              "focus": "Security"
+            },
+            "startup": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth",
+              "equity_offered": true
+            },
+            "considerations": [
+              "Family support needs"
+            ]
+          }
+        },
+        {
+          "version": 3,
+          "turn_id": 3,
+          "data": {
+            "stable_company": {
+              "name": "Stable Company",
+              "pros": [
+                "Good pay",
+                "Job security"
+              ],
+              "cons": [
+                "Boring work"
+              ],
+              "focus": "Security"
+            },
+            "startup": {
+              "name": "Startup",
+              "pros": [
+                "Exciting challenges",
+                "Potential for growth/equity"
+              ],
+              "cons": [
+                "Lower pay",
+                "Higher risk"
+              ],
+              "focus": "Growth",
+              "equity_offered": true
+            },
+            "considerations": [
+              "Family support needs"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total_latency_ms": 21427,
+    "avg_latency_ms": 7142.333333333333,
+    "json_valid_count": 3,
+    "json_invalid_count": 0,
+    "artifact_creates": 1,
+    "artifact_updates": 2
+  },
+  "completed_at": "2026-01-19T19:25:30.401Z",
+  "scores": {
+    "total_points": 0,
+    "max_points": 0,
+    "percentage": 0,
+    "turn_scores": [
+      {
+        "turn_id": 1,
+        "test_type": "html_creation_sophistication",
+        "points": 0,
+        "max_points": 0,
+        "breakdown": {},
+        "passed": false
+      },
+      {
+        "turn_id": 2,
+        "test_type": "html_update_preservation",
+        "points": 0,
+        "max_points": 0,
+        "breakdown": {},
+        "passed": false
+      },
+      {
+        "turn_id": 3,
+        "test_type": "emotional_sophistication",
+        "points": 0,
+        "max_points": 0,
+        "breakdown": {},
+        "passed": false
+      }
+    ],
+    "summary": {
+      "restraint": {
+        "passed": 0,
+        "total": 0
+      },
+      "proactive_creation": {
+        "passed": 0,
+        "total": 0
+      },
+      "data_only": {
+        "passed": 0,
+        "total": 0
+      },
+      "ui_only": {
+        "passed": 0,
+        "total": 0
+      },
+      "combined": {
+        "passed": 0,
+        "total": 0
+      },
+      "overhaul": {
+        "passed": 0,
+        "total": 0
+      }
+    }
+  }
+}

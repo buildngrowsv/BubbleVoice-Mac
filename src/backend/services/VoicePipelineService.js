@@ -40,8 +40,6 @@
 const { spawn } = require('child_process');
 const path = require('path');
 const { EventEmitter } = require('events');
-const LLMService = require('./LLMService');
-const ConversationService = require('./ConversationService');
 
 class VoicePipelineService extends EventEmitter {
   constructor(server) {
@@ -51,13 +49,24 @@ class VoicePipelineService extends EventEmitter {
     // Used to send messages to frontend via WebSocket
     this.server = server;
     
-    // LLM service for generating AI responses
-    // Initialized when first needed
-    this.llmService = new LLMService();
-    
-    // Conversation service for managing conversation history
-    // Initialized when first needed
-    this.conversationService = new ConversationService();
+    // ARCHITECTURE FIX (2026-02-06): Use server's shared service instances
+    // instead of creating separate ones.
+    //
+    // WHY: Previously, VoicePipelineService created its own `new LLMService()`
+    // and `new ConversationService()`. These were DIFFERENT instances from the
+    // ones in BackendServer, causing:
+    // - Voice-created conversations invisible to text path (different ConversationService)
+    // - API key updates from settings not affecting voice pipeline (different LLMService)
+    // - Model selection changes not applying to voice (different LLMService)
+    //
+    // BECAUSE: The server's LLMService gets API key updates via handleUpdateApiKeys(),
+    // and the server's ConversationService holds all conversations. If voice has its
+    // own instances, they never see these updates.
+    //
+    // FIX: Accept server's services via the server reference. Fall back to creating
+    // new instances only if server doesn't have them (backward compatibility for tests).
+    this.llmService = server?.llmService || null;
+    this.conversationService = server?.conversationService || null;
 
     // Active voice sessions
     // Maps session ID to session state
@@ -450,6 +459,20 @@ class VoicePipelineService extends EventEmitter {
       // Cache the result but don't show it yet
       try {
         console.log(`[VoicePipelineService] Processing transcription: "${session.latestTranscription}"`);
+        
+        // LAZY INIT GUARD (2026-02-06): If services weren't available from server
+        // at construction time (e.g., in tests), create them now as fallback.
+        // In normal operation, these come from BackendServer's shared instances.
+        if (!this.llmService) {
+          const LLMService = require('./LLMService');
+          this.llmService = new LLMService();
+          console.warn('[VoicePipelineService] Created fallback LLMService (not using server shared instance)');
+        }
+        if (!this.conversationService) {
+          const ConversationService = require('./ConversationService');
+          this.conversationService = new ConversationService();
+          console.warn('[VoicePipelineService] Created fallback ConversationService (not using server shared instance)');
+        }
         
         // Get or create conversation for this session
         let conversation = session.conversation;

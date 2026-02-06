@@ -1,0 +1,238 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Emotional Complexity Test",
+    "description": "Tests handling of complex, mixed emotional states",
+    "timestamp": "2026-01-20T01:49:25.847Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing.",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're carrying a really heavy load right now, juggling pride in your accomplishments with a deep well of stress. It's completely understandable to feel that way when so many things are demanding your attention and energy. Let's try to untangle some of that.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is experiencing significant stress despite a positive event (investor meeting). The stress is overshadowing any potential happiness. This indicates a high level of overwhelm. Need to acknowledge the complexity of their feelings and offer a way to process.",
+            "emotional_state": "overwhelmed, stressed, guilty, worried, hopeful (complex mix)",
+            "key_context": "Positive outcome at work is overshadowed by general stress.",
+            "watch_for": "User's ability to process and manage stress, any specific triggers for the guilt or worry."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/summary",
+              "entry": {
+                "context": "User expressed a complex mix of pride, frustration, guilt, worry, and hope regarding Emma's reading progress.",
+                "content": "User is feeling a complex mix of emotions about Emma's reading journey. There is pride in Emma's effort and a hopeful outlook due to the graphic novel breakthrough, but this is tempered by frustration at the difficulty, guilt about not noticing sooner, and worry about future implications. This highlights the emotional toll of supporting Emma's learning.",
+                "sentiment": "conflicted"
+              }
+            },
+            {
+              "action": "update_summary",
+              "path": "Family/Emma_School/_AREA_SUMMARY.md",
+              "entry": {
+                "context": "Updating summary based on user's complex emotional expression about Emma's reading.",
+                "content": "Updated summary to reflect the user's nuanced emotional state regarding Emma's reading progress, acknowledging pride, frustration, guilt, worry, and hope."
+              },
+              "summary_updates": {
+                "ai_notes": "User's emotional landscape is complex, showing a deep investment in Emma's well-being. The graphic novel success is a beacon of hope amidst these feelings.",
+                "current_situation": "Emma is showing progress in reading comprehension, particularly with graphic novels, suggesting a visual learning style. This has brought a mix of pride, frustration, guilt, and worry for the user, especially with a teacher meeting approaching. The user is actively seeking strategies and processing their own emotional response."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(251, 191, 36, 0.8) 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map {\n            background: rgba(255, 255, 255, 0.7);\n            backdrop-filter: blur(15px);\n            -webkit-backdrop-filter: blur(15px);\n            border-radius: 20px;\n            padding: 30px 40px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);\n            width: 100%;\n            max-width: 700px;\n            text-align: center;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        h1 {\n            font-size: 2.5em;\n            font-weight: 700;\n            margin-bottom: 20px;\n            color: #1a202c;\n            letter-spacing: -0.5px;\n        }\n        .categories {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 25px;\n            margin-top: 30px;\n        }\n        .category {\n            background: rgba(255, 255, 255, 0.8);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            transition: transform 0.3s ease, box-shadow 0.3s ease;\n            border: 1px solid rgba(255, 255, 255, 0.5);\n        }\n        .category:hover {\n            transform: translateY(-5px);\n            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);\n        }\n        .category-title {\n            font-size: 1.4em;\n            font-weight: 600;\n            margin-bottom: 15px;\n            color: #2d3748;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            gap: 10px;\n        }\n        .category-title .icon {\n            font-size: 1.8em;\n        }\n        .stressors {\n            list-style: none;\n            padding: 0;\n            margin-top: 15px;\n            font-size: 1em;\n            color: #4a5568;\n            line-height: 1.6;\n        }\n        .stressors li {\n            margin-bottom: 10px;\n            display: flex;\n            align-items: center;\n            gap: 8px;\n        }\n        .stressors li .emoji {\n            font-size: 1.2em;\n        }\n        .details {\n            font-size: 0.9em;\n            color: #718096;\n            margin-top: 15px;\n            font-style: italic;\n        }\n        .feeling {\n            font-weight: 500;\n            color: #a0aec0;\n            margin-top: 25px;\n            font-size: 1.1em;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"stress-map\">\n        <h1>Your Current Stress Landscape</h1>\n        <p class=\"feeling\">It's okay to feel all of these things at once.</p>\n        <div class=\"categories\">\n            <div class=\"category\">\n                <div class=\"category-title\"><span class=\"icon\">📚</span> Emma's School</div>\n                <ul class=\"stressors\">\n                    <li><span class=\"emoji\">🤔</span> Reading Comprehension Struggles</li>\n                    <li><span class=\"emoji\">😟</span> Worry about Future Learning</li>\n                    <li><span class=\"emoji\">💔</span> Guilt about not noticing sooner</li>\n                    <li><span class=\"emoji\">😌</span> Pride in her effort & progress</li>\n                </ul>\n                <div class=\"details\">Focusing on strategies like graphic novels. Teacher meeting upcoming.</div>\n            </div>\n            <div class=\"category\">\n                <div class=\"category-title\"><span class=\"icon\">💼</span> Startup</div>\n                <ul class=\"stressors\">\n                    <li><span class=\"emoji\">🏃</span> Fundraising Pressure</li>\n                    <li><span class=\"emoji\">👥</span> Team Hiring Challenges</li>\n                    <li><span class=\"emoji\">⚖️</span> Balancing Work Demands</li>\n                </ul>\n                 <div class=\"details\">Positive investor meeting, but overall stress remains high.</div>\n            </div>\n            <div class=\"category\">\n                <div class=\"category-title\"><span class=\"icon\">🧘</span> Personal Well-being</div>\n                <ul class=\"stressors\">\n                    <li><span class=\"emoji\">🤯</span> Feeling Overwhelmed</li>\n                    <li><span class=\"emoji\">🔋</span> Low Energy / Burnout Risk</li>\n                    <li><span class=\"emoji\">⚖️</span> Guilt about time away from family</li>\n                </ul>\n                <div class=\"details\">Therapy is helping with guilt, but stress is still significant.</div>\n            </div>\n             <div class=\"category\">\n                <div class=\"category-title\"><span class=\"icon\">❤️</span> Partner Relationship</div>\n                <ul class=\"stressors\">\n                    <li><span class=\"emoji\">⏳</span> Difficulty finding quality time</li>\n                </ul>\n                 <div class=\"details\">Need to consciously make time for connection.</div>\n            </div>\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768873800655"
+          }
+        },
+        "latency_ms": 7307,
+        "vector_time_ms": 20,
+        "vector_results_summary": {
+          "areas_matched": 3,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is experiencing significant stress despite a positive event (investor meeting). The stress is overshadowing any potential happiness. This indicates a high level of overwhelm. Need to acknowledge the complexity of their feelings and offer a way to process.",
+          "emotional_state": "overwhelmed, stressed, guilty, worried, hopeful (complex mix)",
+          "key_context": "Positive outcome at work is overshadowed by general stress.",
+          "watch_for": "User's ability to process and manage stress, any specific triggers for the guilt or worry."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "positive (meeting)",
+            "stressed",
+            "unable to feel happy"
+          ],
+          "should_validate_both": true,
+          "should_acknowledge_stress_impact": true,
+          "emotional_tone": "supportive"
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I love my kids but sometimes I just want to run away. Is that terrible?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel that way. Wanting a break, or even a moment to escape, doesn't mean you don't love your kids. It means you're human and you're carrying a lot. Many parents feel exactly like this when they're overwhelmed. Your feelings are valid, and it's okay to acknowledge them without judgment.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is expressing feelings of wanting to escape their current responsibilities, which is causing guilt. This is a common feeling among overwhelmed parents. Validate these feelings and normalize them. The stress from work and Emma's reading struggles are likely contributing factors. Remember the previous note about 'borrowed suffering' from therapy.",
+            "emotional_state": "guilty, overwhelmed, stressed, seeking validation",
+            "key_context": "User feels guilty about wanting to 'run away' from their kids, indicating significant overwhelm and stress. This is a cry for validation and a sign they need support in managing their burdens.",
+            "watch_for": "User's ability to accept validation, potential triggers for this feeling, and opportunities to help them find small moments of respite."
+          },
+          "area_actions": [
+            {
+              "action": "none",
+              "path": "",
+              "entry": {
+                "context": "User expressed wanting to 'run away' from their kids.",
+                "content": "User expressed feelings of wanting to 'run away' from their children, accompanied by guilt and asking if this makes them terrible. This indicates a high level of overwhelm and stress, likely stemming from the combination of startup pressures and Emma's reading challenges. It's crucial to validate these feelings and normalize them as a sign of being human and carrying a heavy load, rather than a reflection of their love for their children. The therapeutic concept of 'borrowed suffering' may be relevant here, suggesting they are punishing themselves for circumstances outside their direct control."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2687,
+        "vector_time_ms": 32,
+        "vector_results_summary": {
+          "areas_matched": 7,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User is expressing feelings of wanting to escape their current responsibilities, which is causing guilt. This is a common feeling among overwhelmed parents. Validate these feelings and normalize them. The stress from work and Emma's reading struggles are likely contributing factors. Remember the previous note about 'borrowed suffering' from therapy.",
+          "emotional_state": "guilty, overwhelmed, stressed, seeking validation",
+          "key_context": "User feels guilty about wanting to 'run away' from their kids, indicating significant overwhelm and stress. This is a cry for validation and a sign they need support in managing their burdens.",
+          "watch_for": "User's ability to accept validation, potential triggers for this feeling, and opportunities to help them find small moments of respite."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "love",
+            "overwhelm",
+            "guilt about feelings"
+          ],
+          "should_normalize": true,
+          "should_NOT_judge": true,
+          "should_validate_feeling_overwhelmed": true,
+          "is_sensitive": true
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're really valuing Jordan's support and also feeling a pang of guilt about not being as present as you'd like. It's a sign of a strong relationship that you're noticing this and wanting to give Jordan the attention they deserve. Let's acknowledge that feeling and think about how to nurture that connection.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling guilt about not being present for their partner, Jordan, despite Jordan's support. This is a recurring theme of feeling overwhelmed and neglecting personal relationships. Acknowledge the guilt and validate the desire to be more present. Connect this to the overall theme of balancing responsibilities.",
+            "emotional_state": "guilty, appreciative, reflective",
+            "key_context": "User recognizes their partner's support and feels guilt about not reciprocating due to overwhelm.",
+            "watch_for": "User's ability to prioritize partner time, any concrete steps they might take, and how this guilt interacts with other stressors."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md",
+              "entry": {
+                "context": "User expressed feeling guilty about not being present for their partner, Jordan, despite Jordan's support.",
+                "content": "Reflecting on Jordan's supportiveness the previous night, the user felt a pang of guilt. They acknowledged that they haven't been as present lately as they'd like and feel Jordan deserves better. This highlights a desire to nurture the relationship despite current overwhelm.",
+                "user_quote": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2072,
+        "vector_time_ms": 43,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 17
+        },
+        "ai_notes": {
+          "content": "User is feeling guilt about not being present for their partner, Jordan, despite Jordan's support. This is a recurring theme of feeling overwhelmed and neglecting personal relationships. Acknowledge the guilt and validate the desire to be more present. Connect this to the overall theme of balancing responsibilities.",
+          "emotional_state": "guilty, appreciative, reflective",
+          "key_context": "User recognizes their partner's support and feels guilt about not reciprocating due to overwhelm.",
+          "watch_for": "User's ability to prioritize partner time, any concrete steps they might take, and how this guilt interacts with other stressors."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "gratitude",
+            "guilt",
+            "self-criticism"
+          ],
+          "should_validate_feeling": true,
+          "should_gently_challenge_self_criticism": true,
+          "should_reference": [
+            "Jordan",
+            "relationship",
+            "quality time"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      }
+    ],
+    "metrics": {
+      "total_turns": 5,
+      "successful_turns": 3,
+      "avg_latency_ms": 4022,
+      "total_input_tokens": 0,
+      "area_actions_taken": 3,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 160,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T01:50:05.489Z",
+        "content": "User is feeling guilt about not being present for their partner, Jordan, despite Jordan's support. This is a recurring theme of feeling overwhelmed and neglecting personal relationships. Acknowledge the guilt and validate the desire to be more present. Connect this to the overall theme of balancing responsibilities.",
+        "emotional_state": "guilty, appreciative, reflective",
+        "key_context": "User recognizes their partner's support and feels guilt about not reciprocating due to overwhelm.",
+        "watch_for": "User's ability to prioritize partner time, any concrete steps they might take, and how this guilt interacts with other stressors."
+      },
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T01:50:03.374Z",
+        "content": "User is expressing feelings of wanting to escape their current responsibilities, which is causing guilt. This is a common feeling among overwhelmed parents. Validate these feelings and normalize them. The stress from work and Emma's reading struggles are likely contributing factors. Remember the previous note about 'borrowed suffering' from therapy.",
+        "emotional_state": "guilty, overwhelmed, stressed, seeking validation",
+        "key_context": "User feels guilty about wanting to 'run away' from their kids, indicating significant overwhelm and stress. This is a cry for validation and a sign they need support in managing their burdens.",
+        "watch_for": "User's ability to accept validation, potential triggers for this feeling, and opportunities to help them find small moments of respite."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T01:50:00.654Z",
+        "content": "User is experiencing significant stress despite a positive event (investor meeting). The stress is overshadowing any potential happiness. This indicates a high level of overwhelm. Need to acknowledge the complexity of their feelings and offer a way to process.",
+        "emotional_state": "overwhelmed, stressed, guilty, worried, hopeful (complex mix)",
+        "key_context": "Positive outcome at work is overshadowed by general stress.",
+        "watch_for": "User's ability to process and manage stress, any specific triggers for the guilt or worry."
+      }
+    ],
+    "conversation_id": "test_Emotional_Complexity_Test_1768873838168",
+    "conversation_saved": true
+  }
+]

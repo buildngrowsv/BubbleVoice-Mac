@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(240, 244, 247, 0.8) 0%, rgba(211, 220, 230, 0.8) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        .stress-map h1 {
+            color: #2c5282; /* Deep blue */
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .stress-map p {
+            color: #4a5568; /* Muted gray */
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        .stressors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .stressor {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s ease-in-out;
+        }
+        .stressor:hover {
+            transform: translateY(-5px);
+        }
+        .stressor i {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #60a5fa; /* Light blue */
+        }
+        .stressor h3 {
+            font-size: 1.3em;
+            color: #1e3a8a; /* Darker blue */
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .stressor span {
+            font-size: 0.95em;
+            color: #718096; /* Gray text */
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map">
+        <h1>Your Current Stressors</h1>
+        <p>It's understandable to feel overwhelmed when juggling so much. Let's visualize what's on your plate.</p>
+        <div class="stressors">
+            <div class="stressor">
+                <i class="fas fa-child"></i>
+                <h3>Emma's Reading</h3>
+                <span>Positive progress, but a source of underlying worry and effort.</span>
+            </div>
+            <div class="stressor">
+                <i class="fas fa-briefcase"></i>
+                <h3>Startup/Investors</h3>
+                <span>High stress from work and investor relations.</span>
+            </div>
+            <div class="stressor">
+                <i class="fas fa-running"></i>
+                <h3>Exercise Goals</h3>
+                <span>Desire to run unmet due to exhaustion.</span>
+            </div>
+            <div class="stressor">
+                <i class="fas fa-heart"></i>
+                <h3>Relationship Time</h3>
+                <span>Lack of quality time with Jordan.</span>
+            </div>
+        </div>
+    </div>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

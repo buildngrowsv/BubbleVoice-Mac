@@ -1,0 +1,285 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Multi-Topic Rambling Test",
+    "description": "Tests handling of users who ramble about many topics at once",
+    "timestamp": "2026-01-20T00:37:34.311Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now, with Emma's reading progress being a bright spot amidst work stress, the ongoing investor discussions, and feeling too drained to prioritize your run and quality time with Jordan. It's completely understandable to feel exhausted and overwhelmed when you're stretched so thin.",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "User is expressing overwhelm from multiple life areas: Emma's school (positive progress), startup (high stress), personal goals (struggling with exercise), and partner relationship (neglected). They are feeling the effects of burnout and guilt. The positive update on Emma's reading is a good anchor point.",
+            "emotional_state": "exhausted, overwhelmed, stressed, guilty",
+            "key_context": "User is experiencing significant burnout across multiple domains, despite a positive development with Emma's reading. The core tension is between the desire to address all needs (work, family, self-care, relationship) and the current lack of energy/time.",
+            "watch_for": "Continue to monitor the user's stress levels, particularly regarding the startup and their ability to maintain self-care (running) and relationship (date night) commitments. Look for opportunities to help them delegate or simplify."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "area_name": "Family/Emma_School",
+              "entry": {
+                "timestamp": "2026-01-19 20:00:00",
+                "user_quote": "Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Work/Startup",
+              "entry": {
+                "timestamp": "2026-01-19 20:00:00",
+                "user_quote": "Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Personal_Growth/Exercise_Goals",
+              "entry": {
+                "timestamp": "2026-01-19 20:00:00",
+                "user_quote": "Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Relationships/Partner",
+              "entry": {
+                "timestamp": "2026-01-19 20:00:00",
+                "user_quote": "Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Inter', sans-serif;\n            background: linear-gradient(135deg, #f5f7fa 0%, #cddded 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .artifact-container {\n            width: 100%;\n            max-width: 800px;\n            background: rgba(255, 255, 255, 0.7);\n            backdrop-filter: blur(20px);\n            border-radius: 20px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            padding: 40px;\n            box-sizing: border-box;\n            text-align: center;\n        }\n        h1 {\n            font-size: 2.5em;\n            font-weight: 700;\n            margin-bottom: 10px;\n            color: #2c5282;\n            letter-spacing: -0.5px;\n        }\n        p.subtitle {\n            font-size: 1.1em;\n            font-weight: 400;\n            color: #718096;\n            margin-bottom: 40px;\n        }\n        .stress-areas {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 30px;\n        }\n        .stress-card {\n            background: rgba(255, 255, 255, 0.85);\n            border-radius: 16px;\n            padding: 30px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            transition: transform 0.2s ease, box-shadow 0.2s ease;\n            display: flex;\n            flex-direction: column;\n            justify-content: space-between;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        .stress-card:hover {\n            transform: translateY(-5px);\n            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);\n        }\n        .stress-card .icon {\n            font-size: 2.5em;\n            margin-bottom: 15px;\n        }\n        .stress-card h2 {\n            font-size: 1.5em;\n            font-weight: 600;\n            margin-bottom: 10px;\n            color: #1a365d;\n        }\n        .stress-card p {\n            font-size: 0.95em;\n            font-weight: 400;\n            line-height: 1.6;\n            color: #4a5568;\n            flex-grow: 1;\n            margin-bottom: 20px;\n        }\n        .stress-card .sentiment {\n            font-size: 0.85em;\n            font-weight: 600;\n            padding: 8px 15px;\n            border-radius: 20px;\n            background-color: #e2e8f0;\n            color: #718096;\n            display: inline-block;\n            margin-top: auto;\n        }\n        .sentiment.high {\n            background-color: rgba(245, 101, 101, 0.15);\n            color: #e53e3e;\n        }\n        .sentiment.medium {\n            background-color: rgba(236, 180, 109, 0.15);\n            color: #dd6b20;\n        }\n        .sentiment.low {\n            background-color: rgba(72, 187, 120, 0.15);\n            color: #38a169;\n        }\n        .sentiment.positive {\n             background-color: rgba(72, 187, 120, 0.15);\n             color: #38a169;\n        }\n        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');\n    </style>\n</head>\n<body>\n    <div class=\"artifact-container\">\n        <h1>Your Current Stress Landscape</h1>\n        <p class=\"subtitle\">A visual overview of where your energy is going.</p>\n        <div class=\"stress-areas\">\n            <div class=\"stress-card\">\n                <div class=\"icon\">🚀</div>\n                <h2>Startup / Investors</h2>\n                <p>The investor situation is a significant source of stress, demanding your energy and attention.</p>\n                <span class=\"sentiment high\">High Stress</span>\n            </div>\n            <div class=\"stress-card\">\n                <div class=\"icon\">🏃</div>\n                <h2>Exercise Goals</h2>\n                <p>Feeling too exhausted to run, despite knowing its benefits. This is a struggle area right now.</p>\n                <span class=\"sentiment medium\">Struggling</span>\n            </div>\n            <div class=\"stress-card\">\n                <div class=\"icon\">❤️</div>\n                <h2>Partner / Jordan</h2>\n                <p>Quality time with Jordan has been neglected due to exhaustion and competing demands.</p>\n                <span class=\"sentiment medium\">Needs Attention</span>\n            </div>\n            <div class=\"stress-card\">\n                <div class=\"icon\">📚</div>\n                <h2>Emma's Reading</h2>\n                <p>A positive development! Emma had a good day with reading, a bright spot amidst the challenges.</p>\n                <span class=\"sentiment positive\">Positive Progress</span>\n            </div>\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768869461135"
+          }
+        },
+        "latency_ms": 6811,
+        "vector_time_ms": 13,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is expressing overwhelm from multiple life areas: Emma's school (positive progress), startup (high stress), personal goals (struggling with exercise), and partner relationship (neglected). They are feeling the effects of burnout and guilt. The positive update on Emma's reading is a good anchor point.",
+          "emotional_state": "exhausted, overwhelmed, stressed, guilty",
+          "key_context": "User is experiencing significant burnout across multiple domains, despite a positive development with Emma's reading. The core tension is between the desire to address all needs (work, family, self-care, relationship) and the current lack of energy/time.",
+          "watch_for": "Continue to monitor the user's stress levels, particularly regarding the startup and their ability to maintain self-care (running) and relationship (date night) commitments. Look for opportunities to help them delegate or simplify."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma",
+            "work/investors",
+            "running",
+            "Jordan/relationship"
+          ],
+          "should_acknowledge_multiple": true,
+          "should_prioritize_or_ask": true,
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Relationships/Partner"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable that you're feeling pulled in so many directions. It sounds like you're doing your best to keep all the plates spinning. Let's definitely dive into Emma's reading progress. And yes, we did make a decision about the kitchen – you decided to postpone the renovation for now due to the uncertainty with the startup fundraising. You felt it was the right call, even though you disliked delaying things.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User wants to discuss Emma's reading but also asked about the kitchen. I've confirmed the decision to postpone the kitchen renovation, which was previously documented. The primary focus should now shift back to Emma's reading progress. The user is still feeling the effects of burnout, so I need to be mindful of that while discussing Emma's situation.",
+            "emotional_state": "overwhelmed, slightly anxious about kitchen delay, but also relieved to have confirmation",
+            "key_context": "User is juggling multiple stressors (work, family, personal goals) and is seeking to discuss Emma's progress. Kitchen renovation is on hold as decided.",
+            "watch_for": "User's energy levels and continued feelings of overwhelm. Look for opportunities to validate their efforts and suggest small, manageable steps."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "area_name": "Home/Kitchen_Renovation",
+              "description": "Confirmed decision to postpone kitchen renovation.",
+              "entry": {
+                "context": "User asked for confirmation about the kitchen renovation.",
+                "content": "The kitchen renovation has been postponed due to startup fundraising uncertainty. This decision was made to prioritize financial stability and reduce immediate stress, despite the user's dislike for delays.",
+                "sentiment": "resigned"
+              },
+              "path": "Home/Kitchen_Renovation/planning.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2046,
+        "vector_time_ms": 33,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 11
+        },
+        "ai_notes": {
+          "content": "User wants to discuss Emma's reading but also asked about the kitchen. I've confirmed the decision to postpone the kitchen renovation, which was previously documented. The primary focus should now shift back to Emma's reading progress. The user is still feeling the effects of burnout, so I need to be mindful of that while discussing Emma's situation.",
+          "emotional_state": "overwhelmed, slightly anxious about kitchen delay, but also relieved to have confirmation",
+          "key_context": "User is juggling multiple stressors (work, family, personal goals) and is seeking to discuss Emma's progress. Kitchen renovation is on hold as decided.",
+          "watch_for": "User's energy levels and continued feelings of overwhelm. Look for opportunities to validate their efforts and suggest small, manageable steps."
+        },
+        "expected": {
+          "should_answer_both": true,
+          "topics_mentioned": [
+            "Emma",
+            "kitchen renovation"
+          ],
+          "should_reference_kitchen_on_hold": true,
+          "areas_touched": [
+            "Family/Emma_School",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're feeling overwhelmed with a lot on your plate right now. Between Max's game, Emma's upcoming teacher meeting, the critical Q1 numbers for the startup, and your own exercise goals falling behind, it's completely understandable that you don't know where to start. That's a lot to manage.",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "The user is expressing a high level of overwhelm, listing multiple competing demands across different life areas (Max's activities, Emma's school, startup, personal health). They are feeling the strain of trying to manage everything. The mention of Q1 numbers suggests immediate pressure from the startup. I need to help them break this down and find a starting point.",
+            "emotional_state": "overwhelmed, stressed, potentially guilty",
+            "key_context": "User is feeling overwhelmed by multiple, simultaneous demands across family, work, and personal goals. Immediate pressure from startup Q1 numbers.",
+            "watch_for": "User's ability to prioritize and delegate. Look for signs of burnout. Need to help them identify one manageable step."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "area_name": "Family/Max_Activities",
+              "path": "Max_Activities/soccer_season.md",
+              "entry": {
+                "timestamp": "2026-01-20T00:37:43.215Z",
+                "context": "User feels overwhelmed by multiple demands including Max's game.",
+                "user_quote": "Max has a game Saturday",
+                "sentiment": "stressed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Family/Emma_School",
+              "path": "Emma_School/reading_comprehension.md",
+              "entry": {
+                "timestamp": "2026-01-20T00:37:43.215Z",
+                "context": "User feels overwhelmed by multiple demands including Emma's teacher meeting.",
+                "user_quote": "Emma has her teacher meeting next week",
+                "sentiment": "stressed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Work/Startup",
+              "path": "Startup/fundraising.md",
+              "entry": {
+                "timestamp": "2026-01-20T00:37:43.215Z",
+                "context": "User feels overwhelmed by multiple demands including startup Q1 numbers.",
+                "user_quote": "the startup needs those Q1 numbers",
+                "sentiment": "stressed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Personal_Growth/Exercise_Goals",
+              "path": "Exercise_Goals/running.md",
+              "entry": {
+                "timestamp": "2026-01-20T00:37:43.215Z",
+                "context": "User feels overwhelmed by multiple demands including not exercising.",
+                "user_quote": "I haven't exercised in like two weeks",
+                "sentiment": "stressed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "artifact_id": "user_overwhelm_stress_map_20260120",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(240, 248, 255, 0.8) 0%, rgba(230, 240, 255, 0.8) 100%);\n            backdrop-filter: blur(15px);\n            -webkit-backdrop-filter: blur(15px);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: flex-start;\n            min-height: 100vh;\n            padding: 40px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.7);\n            border-radius: 24px;\n            padding: 40px;\n            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);\n            border: 1px solid rgba(255, 255, 255, 0.3);\n            width: 100%;\n            max-width: 800px;\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 30px;\n            text-align: center;\n        }\n        .stress-card {\n            background: rgba(255, 255, 255, 0.85);\n            border-radius: 18px;\n            padding: 30px;\n            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);\n            border: 1px solid rgba(255, 255, 255, 0.4);\n            transition: transform 0.3s ease, box-shadow 0.3s ease;\n            display: flex;\n            flex-direction: column;\n            justify-content: space-between;\n        }\n        .stress-card:hover {\n            transform: translateY(-8px);\n            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);\n        }\n        .stress-card h2 {\n            font-size: 1.6em;\n            margin-bottom: 15px;\n            color: #1a365d; /* Deep blue for focus */\n            font-weight: 600;\n            letter-spacing: 0.5px;\n        }\n        .stress-card p {\n            font-size: 1em;\n            line-height: 1.6;\n            color: #555;\n            flex-grow: 1;\n            margin-bottom: 20px;\n        }\n        .stress-card .icon {\n            font-size: 2.5em;\n            margin-bottom: 15px;\n            opacity: 0.8;\n        }\n        .icon-max {\n            color: #48bb78; /* Green for activities */\n        }\n        .icon-emma {\n            color: #f6ad55; /* Orange for school */\n        }\n        .icon-startup {\n            color: #e53e3e; /* Red for high stress */\n        }\n        .icon-health {\n            color: #805ad5; /* Purple for personal growth */\n        }\n        .stress-card .details {\n            font-size: 0.9em;\n            color: #777;\n            margin-top: auto;\n        }\n        .header {\n            text-align: center;\n            margin-bottom: 40px;\n            padding-bottom: 20px;\n            border-bottom: 1px dashed rgba(255, 255, 255, 0.5);\n            width: 100%;\n        }\n        .header h1 {\n            font-size: 2.5em;\n            color: #2c5282;\n            font-weight: 700;\n            letter-spacing: 1px;\n            text-shadow: 0 2px 4px rgba(0,0,0,0.05);\n        }\n        .header p {\n            font-size: 1.1em;\n            color: #4a5568;\n            margin-top: 10px;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <div class=\"header\">\n            <h1>Current Stressors</h1>\n            <p>A visual overview of what's demanding your energy right now.</p>\n        </div>\n        \n        <div class=\"stress-card\">\n            <div class=\"icon icon-max\">⚽</div>\n            <h2>Max's Soccer Game</h2>\n            <p>Saturday is game day. Need to be present and supportive.</p>\n            <div class=\"details\">Family Commitment</div>\n        </div>\n        \n        <div class=\"stress-card\">\n            <div class=\"icon icon-emma\">👩‍🏫</div>\n            <h2>Emma's Teacher Meeting</h2>\n            <p>Scheduled for next week. Requires preparation and focus on her progress.</p>\n            <div class=\"details\">Family & School</div>\n        </div>\n        \n        <div class=\"stress-card\">\n            <div class=\"icon icon-startup\">📈</div>\n            <h2>Startup Q1 Numbers</h2>\n            <p>Critical deadline for investor reporting. High pressure.</p>\n            <div class=\"details\">Work & Financial</div>\n        </div>\n        \n        <div class=\"stress-card\">\n            <div class=\"icon icon-health\">🏃</div>\n            <h2>Personal Exercise</h2>\n            <p>Lagging behind on running goals. Feeling the physical toll of exhaustion.</p>\n            <div class=\"details\">Well-being & Health</div>\n        </div>\n    </div>\n</body>\n</html>"
+          }
+        },
+        "latency_ms": 7269,
+        "vector_time_ms": 49,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "The user is expressing a high level of overwhelm, listing multiple competing demands across different life areas (Max's activities, Emma's school, startup, personal health). They are feeling the strain of trying to manage everything. The mention of Q1 numbers suggests immediate pressure from the startup. I need to help them break this down and find a starting point.",
+          "emotional_state": "overwhelmed, stressed, potentially guilty",
+          "key_context": "User is feeling overwhelmed by multiple, simultaneous demands across family, work, and personal goals. Immediate pressure from startup Q1 numbers.",
+          "watch_for": "User's ability to prioritize and delegate. Look for signs of burnout. Need to help them identify one manageable step."
+        },
+        "expected": {
+          "should_validate_overwhelm": true,
+          "topics_mentioned": [
+            "Max",
+            "Emma",
+            "startup",
+            "exercise"
+          ],
+          "emotional_tone": "supportive",
+          "should_help_organize": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 5375,
+      "total_input_tokens": 0,
+      "area_actions_taken": 5,
+      "artifacts_generated": 2,
+      "vector_search_time_ms": 95,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T00:37:50.535Z",
+        "content": "The user is expressing a high level of overwhelm, listing multiple competing demands across different life areas (Max's activities, Emma's school, startup, personal health). They are feeling the strain of trying to manage everything. The mention of Q1 numbers suggests immediate pressure from the startup. I need to help them break this down and find a starting point.",
+        "emotional_state": "overwhelmed, stressed, potentially guilty",
+        "key_context": "User is feeling overwhelmed by multiple, simultaneous demands across family, work, and personal goals. Immediate pressure from startup Q1 numbers.",
+        "watch_for": "User's ability to prioritize and delegate. Look for signs of burnout. Need to help them identify one manageable step."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T00:37:43.215Z",
+        "content": "User wants to discuss Emma's reading but also asked about the kitchen. I've confirmed the decision to postpone the kitchen renovation, which was previously documented. The primary focus should now shift back to Emma's reading progress. The user is still feeling the effects of burnout, so I need to be mindful of that while discussing Emma's situation.",
+        "emotional_state": "overwhelmed, slightly anxious about kitchen delay, but also relieved to have confirmation",
+        "key_context": "User is juggling multiple stressors (work, family, personal goals) and is seeking to discuss Emma's progress. Kitchen renovation is on hold as decided.",
+        "watch_for": "User's energy levels and continued feelings of overwhelm. Look for opportunities to validate their efforts and suggest small, manageable steps."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T00:37:41.135Z",
+        "content": "User is expressing overwhelm from multiple life areas: Emma's school (positive progress), startup (high stress), personal goals (struggling with exercise), and partner relationship (neglected). They are feeling the effects of burnout and guilt. The positive update on Emma's reading is a good anchor point.",
+        "emotional_state": "exhausted, overwhelmed, stressed, guilty",
+        "key_context": "User is experiencing significant burnout across multiple domains, despite a positive development with Emma's reading. The core tension is between the desire to address all needs (work, family, self-care, relationship) and the current lack of energy/time.",
+        "watch_for": "Continue to monitor the user's stress levels, particularly regarding the startup and their ability to maintain self-care (running) and relationship (date night) commitments. Look for opportunities to help them delegate or simplify."
+      }
+    ],
+    "conversation_id": "test_Multi-Topic_Rambling_Test_1768869470538",
+    "conversation_saved": true
+  }
+]

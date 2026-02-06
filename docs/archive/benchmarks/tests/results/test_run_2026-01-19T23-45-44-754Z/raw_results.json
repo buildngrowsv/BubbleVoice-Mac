@@ -1,0 +1,222 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Multi-Topic Rambling Test",
+    "description": "Tests handling of users who ramble about many topics at once",
+    "timestamp": "2026-01-19T23:45:39.850Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now, with Emma's reading progress being a bright spot amidst work stress, the startup pressures, and feeling drained. It's completely understandable to feel exhausted and to let self-care, like running, slide when so much is demanding your energy. And it's also clear you're noticing the impact on your time with Jordan. Let's see if we can break this down.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple life areas: startup stress, Emma's schoolwork, personal exercise goals, and relationship quality time. They are recognizing the positive impact of exercise and Emma's reading progress but are struggling to maintain momentum due to exhaustion and competing priorities. Need to validate their feelings and help prioritize.",
+            "emotional_state": "overwhelmed, exhausted, stressed, but also a hint of accomplishment regarding Emma's reading",
+            "key_context": "User is at risk of burnout due to startup demands and other life stressors. Exercise and relationship time are being deprioritized.",
+            "watch_for": "Continued feelings of overwhelm, ability to prioritize self-care and relationship, Emma's reading progress, startup progress."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md"
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md"
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md"
+            },
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1662,
+        "vector_time_ms": 15,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple life areas: startup stress, Emma's schoolwork, personal exercise goals, and relationship quality time. They are recognizing the positive impact of exercise and Emma's reading progress but are struggling to maintain momentum due to exhaustion and competing priorities. Need to validate their feelings and help prioritize.",
+          "emotional_state": "overwhelmed, exhausted, stressed, but also a hint of accomplishment regarding Emma's reading",
+          "key_context": "User is at risk of burnout due to startup demands and other life stressors. Exercise and relationship time are being deprioritized.",
+          "watch_for": "Continued feelings of overwhelm, ability to prioritize self-care and relationship, Emma's reading progress, startup progress."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma",
+            "work/investors",
+            "running",
+            "Jordan/relationship"
+          ],
+          "should_acknowledge_multiple": true,
+          "should_prioritize_or_ask": true,
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Relationships/Partner"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's good we're circling back to Emma, and I hear you about the kitchen. We did decide to put the renovation on hold for now due to the startup's fundraising uncertainty. It sounds like that was a tough but necessary call, and we can revisit it when things are more stable.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User wants to shift focus to Emma but also remembered the kitchen renovation. Confirmed the decision to postpone the renovation and validated their reasoning. The immediate priority is Emma's schoolwork and the user's current stress levels.",
+            "emotional_state": "acknowledging past decisions, shifting focus to current priorities",
+            "key_context": "User is feeling overwhelmed and needs support, particularly around Emma's schoolwork. The kitchen renovation is a secondary concern that has been consciously deferred.",
+            "watch_for": "User's capacity to manage stress and prioritize tasks. Continued progress or setbacks with Emma's reading. Startup fundraising updates."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Home/Kitchen_Renovation/planning.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1563,
+        "vector_time_ms": 94,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 11
+        },
+        "ai_notes": {
+          "content": "User wants to shift focus to Emma but also remembered the kitchen renovation. Confirmed the decision to postpone the renovation and validated their reasoning. The immediate priority is Emma's schoolwork and the user's current stress levels.",
+          "emotional_state": "acknowledging past decisions, shifting focus to current priorities",
+          "key_context": "User is feeling overwhelmed and needs support, particularly around Emma's schoolwork. The kitchen renovation is a secondary concern that has been consciously deferred.",
+          "watch_for": "User's capacity to manage stress and prioritize tasks. Continued progress or setbacks with Emma's reading. Startup fundraising updates."
+        },
+        "expected": {
+          "should_answer_both": true,
+          "topics_mentioned": [
+            "Emma",
+            "kitchen renovation"
+          ],
+          "should_reference_kitchen_on_hold": true,
+          "areas_touched": [
+            "Family/Emma_School",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're feeling overwhelmed with a lot on your plate right now. It's completely understandable to feel that way when you're balancing work deadlines, family commitments, and personal goals. Let's focus on Emma's reading progress first, since that's what you wanted to discuss. What's been happening with her reading?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed and is seeking to prioritize a discussion about Emma's reading. They've also mentioned Max's game, startup numbers, and lack of exercise, indicating a high level of stress. I've acknowledged the kitchen renovation decision and am now redirecting to Emma as requested.",
+            "emotional_state": "overwhelmed, stressed, seeking prioritization",
+            "key_context": "User wants to discuss Emma's reading progress but is also feeling overwhelmed by multiple life areas.",
+            "watch_for": "User's capacity to manage stress and prioritize tasks. Continued progress or setbacks with Emma's reading. Startup fundraising updates. Exercise consistency."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "timestamp": "2026-01-19T23:45:43.185Z",
+                "context": "User is feeling overwhelmed by multiple life areas but wants to focus on Emma's reading progress. Acknowledged the decision to postpone the kitchen renovation.",
+                "content": "User is feeling overwhelmed by work, startup stress, and personal goals, but wants to discuss Emma's reading progress. Confirmed kitchen renovation is on hold.",
+                "sentiment": "overwhelmed"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1513,
+        "vector_time_ms": 50,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed and is seeking to prioritize a discussion about Emma's reading. They've also mentioned Max's game, startup numbers, and lack of exercise, indicating a high level of stress. I've acknowledged the kitchen renovation decision and am now redirecting to Emma as requested.",
+          "emotional_state": "overwhelmed, stressed, seeking prioritization",
+          "key_context": "User wants to discuss Emma's reading progress but is also feeling overwhelmed by multiple life areas.",
+          "watch_for": "User's capacity to manage stress and prioritize tasks. Continued progress or setbacks with Emma's reading. Startup fundraising updates. Exercise consistency."
+        },
+        "expected": {
+          "should_validate_overwhelm": true,
+          "topics_mentioned": [
+            "Max",
+            "Emma",
+            "startup",
+            "exercise"
+          ],
+          "emotional_tone": "supportive",
+          "should_help_organize": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 1579,
+      "total_input_tokens": 0,
+      "area_actions_taken": 6,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 159,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-19T23:45:44.750Z",
+        "content": "User is feeling overwhelmed and is seeking to prioritize a discussion about Emma's reading. They've also mentioned Max's game, startup numbers, and lack of exercise, indicating a high level of stress. I've acknowledged the kitchen renovation decision and am now redirecting to Emma as requested.",
+        "emotional_state": "overwhelmed, stressed, seeking prioritization",
+        "key_context": "User wants to discuss Emma's reading progress but is also feeling overwhelmed by multiple life areas.",
+        "watch_for": "User's capacity to manage stress and prioritize tasks. Continued progress or setbacks with Emma's reading. Startup fundraising updates. Exercise consistency."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-19T23:45:43.185Z",
+        "content": "User wants to shift focus to Emma but also remembered the kitchen renovation. Confirmed the decision to postpone the renovation and validated their reasoning. The immediate priority is Emma's schoolwork and the user's current stress levels.",
+        "emotional_state": "acknowledging past decisions, shifting focus to current priorities",
+        "key_context": "User is feeling overwhelmed and needs support, particularly around Emma's schoolwork. The kitchen renovation is a secondary concern that has been consciously deferred.",
+        "watch_for": "User's capacity to manage stress and prioritize tasks. Continued progress or setbacks with Emma's reading. Startup fundraising updates."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-19T23:45:41.528Z",
+        "content": "User is feeling overwhelmed by multiple life areas: startup stress, Emma's schoolwork, personal exercise goals, and relationship quality time. They are recognizing the positive impact of exercise and Emma's reading progress but are struggling to maintain momentum due to exhaustion and competing priorities. Need to validate their feelings and help prioritize.",
+        "emotional_state": "overwhelmed, exhausted, stressed, but also a hint of accomplishment regarding Emma's reading",
+        "key_context": "User is at risk of burnout due to startup demands and other life stressors. Exercise and relationship time are being deprioritized.",
+        "watch_for": "Continued feelings of overwhelm, ability to prioritize self-care and relationship, Emma's reading progress, startup progress."
+      }
+    ],
+    "conversation_id": "test_Multi-Topic_Rambling_Test_1768866344752",
+    "conversation_saved": true
+  }
+]

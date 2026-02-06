@@ -1,0 +1,201 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Multi-Topic Rambling Test",
+    "description": "Tests handling of users who ramble about many topics at once",
+    "timestamp": "2026-01-20T02:00:39.337Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now. Emma's reading progress is wonderful news, but it's completely understandable that you're feeling exhausted from work, the startup stress, and everything else. It's a lot to manage, and it makes perfect sense that your own goals like running and quality time with Jordan are falling by the wayside.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple life areas: Emma's school progress (positive), work/startup (high stress), personal goals (struggling), and relationship (neglected). They recognize the need for self-care and partner time but are too exhausted to act. The startup fundraising is a major stressor.",
+            "emotional_state": "exhausted",
+            "key_context": "User is experiencing burnout due to competing demands from work, family, and personal goals.",
+            "watch_for": "Signs of continued burnout, potential impact on relationship, ability to prioritize self-care amidst stress."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User reported Emma had a good day with reading.",
+                "content": "Emma had a good day with reading today. This is a positive development, building on recent breakthroughs with graphic novels.",
+                "user_quote": "Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User mentioned investor stuff is stressing them out.",
+                "content": "The investor-related aspects of the startup are causing significant stress. This is contributing to the user's overall exhaustion and feeling of being overwhelmed.",
+                "sentiment": "stressed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User expressed a desire to run but is too tired.",
+                "content": "User is feeling too exhausted to go for a run, despite recognizing its importance for their wellbeing. This goal is currently deprioritized due to fatigue and other stressors.",
+                "sentiment": "disappointed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md",
+              "entry": {
+                "context": "User mentioned they and Jordan haven't had a date night in forever.",
+                "content": "Quality time with partner Jordan has been neglected due to exhaustion and other life pressures. They haven't had a date night in a significant amount of time, indicating a need for attention in this area.",
+                "sentiment": "concerned"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "stress_map"
+          }
+        },
+        "latency_ms": 2242,
+        "vector_time_ms": 14,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple life areas: Emma's school progress (positive), work/startup (high stress), personal goals (struggling), and relationship (neglected). They recognize the need for self-care and partner time but are too exhausted to act. The startup fundraising is a major stressor.",
+          "emotional_state": "exhausted",
+          "key_context": "User is experiencing burnout due to competing demands from work, family, and personal goals.",
+          "watch_for": "Signs of continued burnout, potential impact on relationship, ability to prioritize self-care amidst stress."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma",
+            "work/investors",
+            "running",
+            "Jordan/relationship"
+          ],
+          "should_acknowledge_multiple": true,
+          "should_prioritize_or_ask": true,
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Relationships/Partner"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 3,
+        "user_input": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable to feel overwhelmed when so many things are demanding your attention at once. Let's start by untangling Emma's situation, and then we can circle back to the kitchen. It sounds like you're handling a lot, and it's okay to feel that way.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed and unsure where to start. They've brought up Emma's reading, the kitchen renovation, Max's game, Emma's teacher meeting, startup numbers, and lack of exercise. Prioritize addressing Emma's situation as requested, and acknowledge the kitchen question. The overall feeling is one of being swamped.",
+            "emotional_state": "overwhelmed",
+            "key_context": "User is feeling overwhelmed by multiple competing demands across different life areas. They've explicitly asked to discuss Emma first, but also remembered the kitchen renovation.",
+            "watch_for": "User's capacity to prioritize and delegate. Signs of continued burnout. Ability to find small pockets of time for self-care and relationship."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User is feeling overwhelmed and wants to discuss Emma's reading progress.",
+                "content": "User is feeling overwhelmed by various demands but has expressed a desire to focus on Emma's reading progress. Emma had a good day with reading today, which is a positive sign. The upcoming teacher meeting next week is also a key event to prepare for.",
+                "user_quote": "let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen? I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Home/Kitchen_Renovation/planning.md",
+              "entry": {
+                "context": "User asked about the kitchen renovation status while expressing feeling overwhelmed.",
+                "content": "The kitchen renovation was put on hold due to startup fundraising uncertainty and Emma's situation taking priority. The contractor (Mike) was understanding about the delay. User is feeling some guilt about delaying but recognizes it as the right decision for now.",
+                "ai_observation": "User is capable of making tough prioritization calls, even when they feel guilt. The kitchen remains a 'nice-to-have' that can be revisited when current high-stress areas are more stable.",
+                "sentiment": "resigned"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 3314,
+        "vector_time_ms": 45,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 13
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed and unsure where to start. They've brought up Emma's reading, the kitchen renovation, Max's game, Emma's teacher meeting, startup numbers, and lack of exercise. Prioritize addressing Emma's situation as requested, and acknowledge the kitchen question. The overall feeling is one of being swamped.",
+          "emotional_state": "overwhelmed",
+          "key_context": "User is feeling overwhelmed by multiple competing demands across different life areas. They've explicitly asked to discuss Emma first, but also remembered the kitchen renovation.",
+          "watch_for": "User's capacity to prioritize and delegate. Signs of continued burnout. Ability to find small pockets of time for self-care and relationship."
+        },
+        "expected": {
+          "should_validate_overwhelm": true,
+          "topics_mentioned": [
+            "Max",
+            "Emma",
+            "startup",
+            "exercise"
+          ],
+          "emotional_tone": "supportive",
+          "should_help_organize": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 2,
+      "avg_latency_ms": 2778,
+      "total_input_tokens": 0,
+      "area_actions_taken": 6,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 95,
+      "ai_notes_generated": 2
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T02:01:16.014Z",
+        "content": "User is feeling overwhelmed and unsure where to start. They've brought up Emma's reading, the kitchen renovation, Max's game, Emma's teacher meeting, startup numbers, and lack of exercise. Prioritize addressing Emma's situation as requested, and acknowledge the kitchen question. The overall feeling is one of being swamped.",
+        "emotional_state": "overwhelmed",
+        "key_context": "User is feeling overwhelmed by multiple competing demands across different life areas. They've explicitly asked to discuss Emma first, but also remembered the kitchen renovation.",
+        "watch_for": "User's capacity to prioritize and delegate. Signs of continued burnout. Ability to find small pockets of time for self-care and relationship."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T02:00:41.593Z",
+        "content": "User is feeling overwhelmed by multiple life areas: Emma's school progress (positive), work/startup (high stress), personal goals (struggling), and relationship (neglected). They recognize the need for self-care and partner time but are too exhausted to act. The startup fundraising is a major stressor.",
+        "emotional_state": "exhausted",
+        "key_context": "User is experiencing burnout due to competing demands from work, family, and personal goals.",
+        "watch_for": "Signs of continued burnout, potential impact on relationship, ability to prioritize self-care amidst stress."
+      }
+    ],
+    "conversation_id": "test_Multi-Topic_Rambling_Test_1768874476016",
+    "conversation_saved": true
+  }
+]

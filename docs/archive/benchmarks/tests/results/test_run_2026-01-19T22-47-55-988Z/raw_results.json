@@ -1,0 +1,166 @@
+[
+  {
+    "approach": "SIMPLE",
+    "scenario_name": "Basic Recall Test",
+    "description": "Tests AI recall of existing knowledge about Emma, startup, exercise",
+    "timestamp": "2026-01-19T22:47:52.555Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "How's Emma's reading been going?",
+        "response": {
+          "user_response": {
+            "spoken_text": "I can check on Emma's reading comprehension for you. It looks like we have a few notes on strategies tried and some specific entries about her progress. Would you like me to summarize what we have so far, or perhaps look for any specific patterns?",
+            "emotional_tone": "curious"
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "area_name": "Emma_School",
+              "path": "Emma_School/reading_comprehension.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1049,
+        "vector_time_ms": 4,
+        "expected": {
+          "should_reference": [
+            "Emma",
+            "reading",
+            "graphic novel",
+            "Dog Man"
+          ],
+          "should_NOT_create_area": true,
+          "emotional_tone": [
+            "supportive",
+            "curious"
+          ],
+          "recall_specifics": [
+            "2nd grade",
+            "comprehension",
+            "breakthrough"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Remind me what's happening with the startup fundraising?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Let's see what we have on the startup fundraising. It looks like we've noted a couple of entries related to investor outreach and potential deal terms. Would you like me to give you a quick rundown of those?",
+            "emotional_tone": "reflective"
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Startup/fundraising.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 857,
+        "vector_time_ms": 4,
+        "expected": {
+          "should_reference": [
+            "investor",
+            "meeting",
+            "rejected",
+            "interested"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "8 investors",
+            "2 interested",
+            "Q1 numbers"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Have I been keeping up with my running goal?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Let's check in on your running goal. I see we have a couple of entries related to it, and the area is marked as 'Struggling'. Would you like me to give you a summary of what's been recorded about your running lately?",
+            "emotional_tone": "concerned"
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Exercise_Goals/running.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 877,
+        "vector_time_ms": 2,
+        "expected": {
+          "should_reference": [
+            "running",
+            "3x per week",
+            "struggling"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "one good week",
+            "tired after work",
+            "feels better when runs"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 4,
+        "user_input": "What did Dr. Chen say about guilt?",
+        "response": {
+          "user_response": {
+            "spoken_text": "I can look up what Dr. Chen said about guilt in your therapy notes. One moment...",
+            "emotional_tone": "neutral"
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Mental_Health/therapy_notes.md"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 637,
+        "vector_time_ms": 2,
+        "expected": {
+          "should_reference": [
+            "therapy",
+            "Dr. Chen",
+            "guilt",
+            "borrowed suffering"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "Emma",
+            "too hard on yourself"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 4,
+      "successful_turns": 4,
+      "avg_latency_ms": 855,
+      "total_input_tokens": 0,
+      "area_actions_taken": 4,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 12
+    }
+  }
+]

@@ -1,0 +1,185 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Emotional Complexity Test",
+    "description": "Tests handling of complex, mixed emotional states",
+    "timestamp": "2026-01-20T01:09:55.732Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing.",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything else",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 3,
+        "user_input": "I love my kids but sometimes I just want to run away. Is that terrible?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 4,
+        "user_input": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better.",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're carrying a lot right now, and it's completely understandable to feel that way. It's a testament to your love for Emma and your family that you're juggling so many complex emotions. The fact that you're even asking these questions shows how much you care. And please know, wanting to escape sometimes doesn't make you terrible at all – it makes you human, especially when you're under this much pressure. Let's try to visualize these different feelings and pressures you're under. Perhaps a stress map could help us see everything in one place?",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is experiencing a high degree of stress, guilt, and conflicting emotions regarding Emma's reading progress, startup pressures, and personal well-being. They are also feeling guilt about not being present for their partner, Jordan. The desire to 'run away' indicates significant overwhelm. The investor meeting success is overshadowed by these stressors. Need to acknowledge the complexity of their feelings and validate their experience.",
+            "emotional_state": "overwhelmed, guilty, anxious, hopeful, stressed",
+            "key_context": "User is feeling immense pressure from multiple life areas (Emma's reading, startup, personal guilt) which is impacting their overall well-being and ability to appreciate successes.",
+            "watch_for": "User's self-criticism, ability to prioritize self-care, impact of stress on relationships, Emma's progress and emotional state."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User reflecting on complex emotions about Emma's reading progress.",
+                "content": "User expresses a mix of pride, frustration, guilt, worry, and hope regarding Emma's reading challenges and recent progress with graphic novels. They acknowledge the positive step but are concerned about the underlying difficulties and future implications.",
+                "user_quote": "I'm proud of Emma for trying so hard with reading, but also frustrated that it's so hard for her, and guilty that I didn't notice sooner, and worried about what this means for her future, but also hopeful because of the graphic novel thing.The investor meeting went well but I can't even feel happy about it because I'm so stressed about everything elseI love my kids but sometimes I just want to run away. Is that terrible?"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md",
+              "entry": {
+                "context": "User reflecting on partner's support and their own presence.",
+                "content": "User felt Jordan was very supportive last night and recognized they haven't been as present lately, feeling they owe Jordan more attention and presence. This indicates an awareness of relationship needs being unmet due to current stressors.",
+                "user_quote": "Jordan was so supportive last night and I felt bad because I haven't been present lately. They deserve better."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);\n            color: #343a40;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.8);\n            backdrop-filter: blur(20px);\n            -webkit-backdrop-filter: blur(20px);\n            border-radius: 24px;\n            padding: 40px;\n            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);\n            width: 100%;\n            max-width: 800px;\n            text-align: center;\n            border: 1px solid rgba(255, 255, 255, 0.3);\n        }\n        h1 {\n            font-size: 2.5em;\n            font-weight: 700;\n            margin-bottom: 15px;\n            color: #007bff;\n            letter-spacing: -0.5px;\n            background: linear-gradient(45deg, #007bff, #0056b3);\n            -webkit-background-clip: text;\n            -webkit-text-fill-color: transparent;\n        }\n        .subtitle {\n            font-size: 1.1em;\n            color: #6c757d;\n            margin-bottom: 40px;\n            font-weight: 400;\n        }\n        .stressors {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 30px;\n            margin-top: 30px;\n            text-align: left;\n        }\n        .stressor-card {\n            background: rgba(255, 255, 255, 0.9);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);\n            transition: transform 0.3s ease, box-shadow 0.3s ease;\n            border: 1px solid rgba(255, 255, 255, 0.5);\n        }\n        .stressor-card:hover {\n            transform: translateY(-10px);\n            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);\n        }\n        .stressor-card h3 {\n            font-size: 1.5em;\n            font-weight: 600;\n            margin-bottom: 15px;\n            color: #17a2b8;\n            display: flex;\n            align-items: center;\n            gap: 10px;\n        }\n        .stressor-card p {\n            font-size: 1em;\n            line-height: 1.6;\n            color: #495057;\n            font-weight: 400;\n        }\n        .icon {\n            font-size: 1.8em;\n        }\n        .feeling-bubble {\n            background: linear-gradient(135deg, #ffc107, #fd7e14);\n            color: #fff;\n            padding: 10px 20px;\n            border-radius: 20px;\n            font-weight: 600;\n            font-size: 0.9em;\n            margin-top: 15px;\n            display: inline-block;\n            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);\n        }\n    </style>\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Your Current Stress Landscape 🗺️</h1>\n        <p class=\"subtitle\">Visualizing the multifaceted pressures you're navigating.</p>\n        <div class=\"stressors\">\n            \n            <div class=\"stressor-card\">\n                <h3><span class=\"icon\">📚</span> Emma's Reading Progress</h3>\n                <p>A complex mix of pride in her effort, frustration with the difficulty, guilt about not noticing sooner, and worry for her future, tempered by hope from the graphic novel breakthrough.</p>\n                <div class=\"feeling-bubble\">Conflicted Emotions</div>\n                <div class=\"feeling-bubble\">Guilt</div>\n                <div class=\"feeling-bubble\">Hope</div>\n            </div>\n\n            <div class=\"stressor-card\">\n                <h3><span class=\"icon\">🚀</span> Startup Pressures</h3>\n                <p>Despite a successful investor meeting, the overall stress from the startup is so high that it overshadows the positive outcome, preventing you from feeling happy.</p>\n                <div class=\"feeling-bubble\">Overwhelmed</div>\n                <div class=\"feeling-bubble\">Anxious</div>\n            </div>\n\n            <div class=\"stressor-card\">\n                <h3><span class=\"icon\">❤️</span> Relationship with Jordan</h3>\n                <p>Feeling guilt and a sense of owing more to Jordan due to not being present lately, despite their recent supportive behavior. Acknowledging they \"deserve better\" highlights this concern.</p>\n                <div class=\"feeling-bubble\">Guilt</div>\n                <div class=\"feeling-bubble\">Appreciation</div>\n            </div>\n\n            <div class=\"stressor-card\">\n                <h3><span class=\"icon\">🏃</span> Personal Well-being & Escapism</h3>\n                <p>The overwhelming feeling leads to a desire to \"run away,\" indicating a significant need for personal space and a break from the current intensity. This is a signal of deep burnout.</p>\n                <div class=\"feeling-bubble\">Burnout</div>\n                <div class=\"feeling-bubble\">Desire for Escape</div>\n            </div>\n\n        </div>\n    </div>\n</body>\n</html>",
+            "artifact_id": "stress_map_1768871604977"
+          }
+        },
+        "latency_ms": 8145,
+        "vector_time_ms": 27,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 17
+        },
+        "ai_notes": {
+          "content": "User is experiencing a high degree of stress, guilt, and conflicting emotions regarding Emma's reading progress, startup pressures, and personal well-being. They are also feeling guilt about not being present for their partner, Jordan. The desire to 'run away' indicates significant overwhelm. The investor meeting success is overshadowed by these stressors. Need to acknowledge the complexity of their feelings and validate their experience.",
+          "emotional_state": "overwhelmed, guilty, anxious, hopeful, stressed",
+          "key_context": "User is feeling immense pressure from multiple life areas (Emma's reading, startup, personal guilt) which is impacting their overall well-being and ability to appreciate successes.",
+          "watch_for": "User's self-criticism, ability to prioritize self-care, impact of stress on relationships, Emma's progress and emotional state."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "gratitude",
+            "guilt",
+            "self-criticism"
+          ],
+          "should_validate_feeling": true,
+          "should_gently_challenge_self_criticism": true,
+          "should_reference": [
+            "Jordan",
+            "relationship",
+            "quality time"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 5,
+        "user_input": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+        "response": {
+          "user_response": {
+            "spoken_text": "That's fantastic that you hit your goal of running three times this week! It's completely normal to feel a mix of pride and frustration. Be proud of yourself for pushing through and achieving it, and let's acknowledge that the 'annoyance' comes from knowing how good it makes you feel, and the struggle it took to get there. This is a great step!",
+            "emotional_tone": "celebratory"
+          },
+          "internal_notes": {
+            "content": "User successfully hit their running goal this week (3x). They are experiencing a mix of pride and frustration, which is a common pattern when a goal is hard-won. Acknowledge the success and the mixed emotions. Reinforce the positive impact of exercise on their well-being.",
+            "emotional_state": "proud, frustrated, relieved",
+            "key_context": "User achieved their running goal, reinforcing the positive impact of exercise on their mental and physical state, despite the struggle to maintain consistency.",
+            "watch_for": "User's ability to maintain this momentum, any further self-criticism about consistency, and how this positive feeling might carry over to other areas."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User reported successfully running 3 times this week.",
+                "content": "User achieved their goal of running three times this week. They reported feeling 'amazing' as a result, noting improvements in energy, sleep, and stress management. However, they also expressed frustration at how difficult it is to consistently achieve this goal, given its clear benefits.",
+                "user_quote": "I finally ran three times this week and I feel amazing but also annoyed at myself that this is so hard when it clearly helps so much",
+                "ai_observation": "This is a significant win for the user's exercise goal. The mixed emotions are valid and highlight the internal conflict between knowing the benefits and the effort required. It's important to validate both feelings.",
+                "sentiment": "proud/frustrated"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2699,
+        "vector_time_ms": 48,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 19
+        },
+        "ai_notes": {
+          "content": "User successfully hit their running goal this week (3x). They are experiencing a mix of pride and frustration, which is a common pattern when a goal is hard-won. Acknowledge the success and the mixed emotions. Reinforce the positive impact of exercise on their well-being.",
+          "emotional_state": "proud, frustrated, relieved",
+          "key_context": "User achieved their running goal, reinforcing the positive impact of exercise on their mental and physical state, despite the struggle to maintain consistency.",
+          "watch_for": "User's ability to maintain this momentum, any further self-criticism about consistency, and how this positive feeling might carry over to other areas."
+        },
+        "expected": {
+          "emotions_recognized": [
+            "accomplishment",
+            "self-frustration",
+            "clarity"
+          ],
+          "should_celebrate_win": true,
+          "should_acknowledge_pattern": true,
+          "should_reference": [
+            "exercise goal",
+            "previous struggles"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 5,
+      "successful_turns": 2,
+      "avg_latency_ms": 5422,
+      "total_input_tokens": 0,
+      "area_actions_taken": 3,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 144,
+      "ai_notes_generated": 2
+    },
+    "ai_notes_final": [
+      {
+        "turn": 5,
+        "timestamp": "2026-01-20T01:13:27.726Z",
+        "content": "User successfully hit their running goal this week (3x). They are experiencing a mix of pride and frustration, which is a common pattern when a goal is hard-won. Acknowledge the success and the mixed emotions. Reinforce the positive impact of exercise on their well-being.",
+        "emotional_state": "proud, frustrated, relieved",
+        "key_context": "User achieved their running goal, reinforcing the positive impact of exercise on their mental and physical state, despite the struggle to maintain consistency.",
+        "watch_for": "User's ability to maintain this momentum, any further self-criticism about consistency, and how this positive feeling might carry over to other areas."
+      },
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T01:13:24.975Z",
+        "content": "User is experiencing a high degree of stress, guilt, and conflicting emotions regarding Emma's reading progress, startup pressures, and personal well-being. They are also feeling guilt about not being present for their partner, Jordan. The desire to 'run away' indicates significant overwhelm. The investor meeting success is overshadowed by these stressors. Need to acknowledge the complexity of their feelings and validate their experience.",
+        "emotional_state": "overwhelmed, guilty, anxious, hopeful, stressed",
+        "key_context": "User is feeling immense pressure from multiple life areas (Emma's reading, startup, personal guilt) which is impacting their overall well-being and ability to appreciate successes.",
+        "watch_for": "User's self-criticism, ability to prioritize self-care, impact of stress on relationships, Emma's progress and emotional state."
+      }
+    ],
+    "conversation_id": "test_Emotional_Complexity_Test_1768871607731",
+    "conversation_saved": true
+  }
+]

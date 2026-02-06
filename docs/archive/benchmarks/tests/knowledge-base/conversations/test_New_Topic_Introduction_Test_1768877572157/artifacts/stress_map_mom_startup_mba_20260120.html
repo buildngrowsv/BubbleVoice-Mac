@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e1e6ec 100%);
+            color: #333;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .stress-map {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2c5282; /* Darker blue */
+            letter-spacing: 0.5px;
+        }
+        .artifact-subtitle {
+            font-size: 1.1em;
+            font-weight: 400;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        .domains {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .domain {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+        }
+        .domain:hover {
+            transform: translateY(-5px);
+        }
+        .domain-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #3182ce; /* Primary blue */
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .domain-title i {
+            font-size: 1.2em;
+        }
+        .domain-content p {
+            font-size: 1em;
+            font-weight: 400;
+            line-height: 1.6;
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+        .domain-content ul {
+            list-style: none;
+            padding-left: 0;
+            font-size: 0.95em;
+            color: #718096;
+        }
+        .domain-content li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .domain-content li::before {
+            content: '\2022';
+            color: #60a5fa; /* Lighter blue */
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="stress-map">
+        <h1>Your Current Stress Landscape</h1>
+        <p class="artifact-subtitle">Balancing multiple priorities requires careful navigation.</p>
+        <div class="domains">
+            <div class="domain">
+                <div class="domain-title"><i class="fas fa-building"></i> Startup <span style="font-size:0.8em; font-weight:400; color:#718096;">(High Stress)</span></div>
+                <div class="domain-content">
+                    <p>Fundraising status: Pitched 8 investors, 2 interested.</p>
+                    <p>Hiring: Struggling to find senior engineer.</p>
+                    <p>Product Development: Behind schedule.</p>
+                    <p>Overall Feeling: Torn, high pressure.</p>
+                </div>
+            </div>
+            <div class="domain">
+                <div class="domain-title"><i class="fas fa-graduation-cap"></i> Personal Growth <span style="font-size:0.8em; font-weight:400; color:#718096;">(Contemplative)</span></div>
+                <div class="domain-content">
+                    <p>Considering an MBA (part-time).</p>
+                    <p>Motivation: Enhance business skills for startup.</p>
+                    <p>Needs: Clarification on specific skills.</p>
+                </div>
+            </div>
+            <div class="domain">
+                <div class="domain-title"><i class="fas fa-heartbeat"></i> Family Health <span style="font-size:0.8em; font-weight:400; color:#718096;">(Emerging Concern)</span></div>
+                <div class="domain-content">
+                    <p>Mom experiencing daily life difficulties.</p>
+                    <p>Action Needed: Plan support with sister.</p>
+                    <p>Feeling: Concerned, responsible.</p>
+                </div>
+            </div>
+             <div class="domain">
+                <div class="domain-title"><i class="fas fa-running"></i> Exercise Goals <span style="font-size:0.8em; font-weight:400; color:#718096;">(Struggling)</span></div>
+                <div class="domain-content">
+                    <p>Struggling to maintain running routine.</p>
+                    <p>Common Barrier: Fatigue, competing priorities.</p>
+                    <p>Self-Perception: Feels like failure.</p>
+                </div>
+            </div>
+            <div class="domain">
+                <div class="domain-title"><i class="fas fa-child"></i> Emma's School <span style="font-size:0.8em; font-weight:400; color:#718096;">(Needs Attention)</span></div>
+                <div class="domain-content">
+                    <p>Reading comprehension challenges.</p>
+                    <p>Strategies: Graphic novels showing promise.</p>
+                    <p>Next Steps: Parent-teacher conference soon.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

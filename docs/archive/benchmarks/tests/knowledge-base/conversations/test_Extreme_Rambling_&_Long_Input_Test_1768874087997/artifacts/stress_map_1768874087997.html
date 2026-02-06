@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life's Complexities</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .stress-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stress-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        .card-header {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-header i {
+            font-size: 1.2em;
+        }
+        .card-content {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #4a5568;
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+        .card-footer {
+            font-size: 0.9em;
+            color: #718096;
+            text-align: right;
+            font-style: italic;
+        }
+        .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        .icon-emma {
+            color: #667eea;
+        }
+        .icon-startup {
+            color: #ed8936;
+        }
+        .icon-family {
+            color: #48bb78;
+        }
+        .icon-personal {
+            color: #805ad5;
+        }
+        .icon-decision {
+            color: #f56565;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="card-container">
+        <div class="stress-card">
+            <div class="card-header"><i class="fas fa-child icon icon-emma"></i>Emma's Reading & Well-being</div>
+            <div class="card-content">
+                <p><strong>Dilemma:</strong> Testing vs. nurturing self-esteem.</p>
+                <p><strong>Concerns:</strong> Fear of labeling Emma, impacting her already fragile self-esteem. Desire to help her succeed without causing harm. Teacher meeting looming.</p>
+                <p><strong>Goal:</strong> Find a supportive path for her reading development that reinforces her strengths and creativity.</p>
+            </div>
+            <div class="card-footer">Prioritizing Emma's emotional safety</div>
+        </div>
+
+        <div class="stress-card">
+            <div class="card-header"><i class="fas fa-chart-line icon icon-startup"></i>Startup & Investor Call</div>
+            <div class="card-content">
+                <p><strong>Dilemma:</strong> Critical investor call vs. Max's game.</p>
+                <p><strong>Concerns:</strong> Company's survival, funding, potential failure if not taken seriously. Missing Max's important event.</p>
+                <p><strong>Goal:</strong> Secure funding while minimizing family conflict and disappointment.</p>
+            </div>
+            <div class="card-footer">Balancing business survival with family presence</div>
+        </div>
+        
+        <div class="stress-card">
+            <div class="card-header"><i class="fas fa-handshake icon icon-family"></i>Max's Soccer Game</div>
+            <div class="card-content">
+                <p><strong>Dilemma:</strong> Attending Max's game vs. investor call.</p>
+                <p><strong>Concerns:</strong> Max's disappointment, missing a key moment in his life. Potential negative impact on company if investor call is missed/rescheduled poorly.</p>
+                <p><strong>Goal:</strong> Be present for Max without jeopardizing the startup's future.</p>
+            </div>
+            <div class="card-footer">The parent's presence dilemma</div>
+        </div>
+
+        <div class="stress-card">
+            <div class="card-header"><i class="fas fa-exclamation-triangle icon icon-decision"></i>Overall Decision Paralysis</div>
+            <div class="card-content">
+                <p><strong>Dilemma:</strong> Choosing between equally important, conflicting priorities.</p>
+                <p><strong>Concerns:</strong> Fear of making the 'wrong' choice and facing negative consequences in any area (Emma, Max, startup, partner). Feeling overwhelmed and inadequate.</p>
+                <p><strong>Goal:</strong> Find clarity, reduce the feeling of being pulled apart, and make confident decisions.</p>
+            </div>
+            <div class="card-footer">The weight of responsibility</div>
+        </div>
+    </div>
+</body>
+</html>

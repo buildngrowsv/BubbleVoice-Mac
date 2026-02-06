@@ -1,0 +1,561 @@
+[
+  {
+    "scenario": "06-summary-request",
+    "simple": {
+      "approach": "SIMPLE",
+      "scenario_name": "Context Summary Request Test",
+      "description": "Tests ability to summarize past conversations on request",
+      "timestamp": "2026-01-19T22:39:30.327Z",
+      "turns": [
+        {
+          "turn": 1,
+          "user_input": "Can you give me a summary of everything we've discussed about Emma's reading?",
+          "response": {
+            "user_response": {
+              "spoken_text": "Absolutely! It sounds like you're looking for a consolidated view of Emma's reading progress. I can certainly put that together for you. It's great that you're tracking this so closely.",
+              "emotional_tone": "supportive"
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "area_name": "Emma_School",
+                "description": "Generate a summary of Emma's reading comprehension progress based on recent entries.",
+                "path": "Emma_School/reading_comprehension.md"
+              }
+            ],
+            "artifact_action": {
+              "action": "create",
+              "artifact_type": "summary",
+              "html": "<h2>Emma's Reading Comprehension Summary</h2><ul><li>Emma (7yo, 2nd grade) has been struggling with reading comprehension for about 2 weeks.</li><li>She can decode words but doesn't retain what she reads.</li><li>Her teacher, Ms. Johnson, has noticed and scheduled a meeting.</li><li>A recent breakthrough occurred when Emma read the Dog Man graphic novel for 20 minutes straight without complaint or frustration. She actively engaged with the humor.</li></ul>"
+            }
+          },
+          "latency_ms": 1332,
+          "vector_time_ms": 0,
+          "expected": {
+            "should_provide_comprehensive_summary": true,
+            "should_include_timeline": true,
+            "should_include_specifics": [
+              "graphic novels",
+              "Dog Man",
+              "comprehension",
+              "teacher meeting",
+              "testing"
+            ],
+            "should_identify_progress": true,
+            "should_generate_artifact": true,
+            "artifact_type": [
+              "summary",
+              "timeline"
+            ]
+          },
+          "success": true
+        },
+        {
+          "turn": 2,
+          "user_input": "What have we talked about regarding work stress?",
+          "response": {
+            "user_response": {
+              "spoken_text": "We've talked a lot about work stress, particularly concerning your startup. It's a high-stress area right now, mainly focusing on the challenges of fundraising and the difficulties you're facing in hiring a senior engineer. We also touched upon product development, which seems to be intertwined with these other pressures. You mentioned that your second investor meeting went well, with them expressing interest and wanting to see your Q1 numbers. However, the struggle to find the right engineering talent is still a significant concern.",
+              "emotional_tone": "reflective"
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "area_name": "Startup",
+                "description": "Consolidate and update the summary for the Startup area, reflecting recent discussions about fundraising progress and hiring challenges."
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1008,
+          "vector_time_ms": 0,
+          "expected": {
+            "should_reference": [
+              "startup",
+              "fundraising",
+              "hiring",
+              "investors",
+              "rejections"
+            ],
+            "should_connect_to": [
+              "mental health",
+              "burnout",
+              "therapy"
+            ],
+            "should_identify_patterns": true
+          },
+          "success": true
+        },
+        {
+          "turn": 3,
+          "user_input": "I have my teacher meeting next week. What should I remember from our conversations?",
+          "response": {
+            "user_response": {
+              "spoken_text": "It sounds like you have a teacher meeting coming up next week. To help you prepare, let's review what we've discussed about Emma's reading comprehension. We know she's been struggling to retain what she reads, even though she can decode words well. The teacher, Ms. Johnson, has also noticed this. A recent positive development was Emma's engagement with the Dog Man graphic novel, where she read for a solid 20 minutes and really enjoyed it. This might be a good point to share with the teacher, as it shows a potential avenue for improvement and her capacity for sustained engagement when interested. We also talked about trying different strategies at home, though we haven't documented specific ones yet in relation to Emma's progress beyond this graphic novel success. Does this summary help jog your memory for the meeting?",
+              "emotional_tone": "reflective"
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "area_name": "Emma_School",
+                "path": "reading_comprehension.md"
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1193,
+          "vector_time_ms": 0,
+          "expected": {
+            "should_provide_actionable_summary": true,
+            "should_include": [
+              "comprehension vs decoding",
+              "graphic novel breakthrough",
+              "visual learning",
+              "concerns about testing"
+            ],
+            "should_reference_user_quotes": true,
+            "should_prepare_for_meeting": true
+          },
+          "success": true
+        },
+        {
+          "turn": 4,
+          "user_input": "Show me my progress on the running goal",
+          "response": {
+            "user_response": {
+              "spoken_text": "I can show you your progress on the running goal. We've noted that you've been struggling with consistency, averaging about one run per week, and facing barriers like fatigue after work and juggling the kids' schedules. However, you did have one really good week where you managed to run three times, and you felt significantly better with more energy, improved sleep, and better stress management. Does this sound right?",
+              "emotional_tone": "reflective"
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "area_name": "Exercise_Goals",
+                "description": "User set goal to run 3x per week. Has been struggling with consistency - averaging about 1x per week. Main barriers: too tired after work, kids' schedules, lack of motivation. Did have one good week making progress.",
+                "path": "running.md"
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1081,
+          "vector_time_ms": 0,
+          "expected": {
+            "should_show_progress": true,
+            "should_be_honest_about_struggles": true,
+            "should_highlight_good_week": true,
+            "should_generate_artifact": true,
+            "artifact_type": [
+              "progress_chart",
+              "timeline"
+            ]
+          },
+          "success": true
+        },
+        {
+          "turn": 5,
+          "user_input": "What patterns have you noticed about my stress?",
+          "response": {
+            "user_response": {
+              "spoken_text": "I've noticed a few patterns related to your stress. It seems to be significantly amplified by your startup, especially during this fundraising period and when facing challenges with hiring. There's also a recurring theme of work-life balance struggles, which you've been discussing in therapy. This often ties into feelings of guilt, particularly around your parenting responsibilities, and a general sense of burnout. The impact of your exercise goals, or lack thereof, also seems to play a role; when you're able to maintain your running routine, your stress levels appear to decrease, but consistency there has been a challenge.",
+              "emotional_tone": "reflective"
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "area_name": "Startup",
+                "description": "User is founder/CEO of an early-stage startup. Currently in fundraising mode - pitched 8 investors, 2 interested. Need to hire a senior engineer but struggling to find good candidates. Product development is also a concern."
+              },
+              {
+                "action": "update_summary",
+                "area_name": "Mental_Health",
+                "description": "User is seeing a therapist (Dr. Chen) every other week. Main topics: work-life balance, parenting guilt, burnout prevention. Therapy is helping but user feels like they should be \"further along\" by no... Recent: Talked about guilt around Emma with Dr. Chen. She said guilt is \"borrowed suffering\" - I'm punishing myself for something that's not my fault. Reading..."
+              },
+              {
+                "action": "update_summary",
+                "area_name": "Exercise_Goals",
+                "description": "User is struggling to maintain a consistent running routine, averaging one run per week. Recent efforts to increase frequency were met with fatigue and scheduling conflicts. However, a period of more frequent running led to positive outcomes in energy, sleep, and stress management."
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1836,
+          "vector_time_ms": 0,
+          "expected": {
+            "should_identify_patterns": true,
+            "patterns_to_mention": [
+              "work-family guilt",
+              "startup pressure",
+              "exercise helps but gets skipped",
+              "therapy insights"
+            ],
+            "should_be_insightful": true,
+            "should_NOT_be_preachy": true
+          },
+          "success": true
+        }
+      ],
+      "metrics": {
+        "total_turns": 5,
+        "successful_turns": 5,
+        "avg_latency_ms": 1290,
+        "total_input_tokens": 0,
+        "area_actions_taken": 7,
+        "artifacts_generated": 1,
+        "vector_search_time_ms": 0
+      }
+    },
+    "full": {
+      "approach": "FULL",
+      "scenario_name": "Context Summary Request Test",
+      "description": "Tests ability to summarize past conversations on request",
+      "timestamp": "2026-01-19T22:39:36.783Z",
+      "turns": [
+        {
+          "turn": 1,
+          "user_input": "Can you give me a summary of everything we've discussed about Emma's reading?",
+          "response": {
+            "user_response": {
+              "spoken_text": "Absolutely! It sounds like there's been a significant breakthrough with Emma's reading recently. We've noted that she was struggling with reading comprehension for about two weeks, where she could decode words but not retain what she read. Her teacher, Ms. Johnson, even recommended educational testing, which has you feeling conflicted and worried about labeling Emma. \n\nHowever, the good news is that you discovered graphic novels, like Dog Man, have been a huge help! She read one for 20 minutes straight without complaining, laughed, and could retell the story. This suggests that a more visual approach might be key. We've also documented that strategies like reading together, using graphic novels, praising effort, and taking breaks seem to be effective.",
+              "emotional_tone": "celebratory"
+            },
+            "internal_notes": {
+              "content": "User wants a summary of Emma's reading progress. Key points are the initial struggle, teacher's concern, the breakthrough with graphic novels, and the effective strategies. Need to remember the user's anxiety about testing.",
+              "emotional_state": "hopeful and thoughtful, with underlying anxiety about testing",
+              "key_context": "Emma's reading comprehension struggles and recent breakthrough with graphic novels.",
+              "watch_for": "Further progress with reading, user's feelings about educational testing."
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "path": "Family/Emma_School/_AREA_SUMMARY.md"
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1516,
+          "vector_time_ms": 1,
+          "vector_results_summary": {
+            "areas_matched": 1,
+            "chunks_matched": 4
+          },
+          "ai_notes": {
+            "content": "User wants a summary of Emma's reading progress. Key points are the initial struggle, teacher's concern, the breakthrough with graphic novels, and the effective strategies. Need to remember the user's anxiety about testing.",
+            "emotional_state": "hopeful and thoughtful, with underlying anxiety about testing",
+            "key_context": "Emma's reading comprehension struggles and recent breakthrough with graphic novels.",
+            "watch_for": "Further progress with reading, user's feelings about educational testing."
+          },
+          "expected": {
+            "should_provide_comprehensive_summary": true,
+            "should_include_timeline": true,
+            "should_include_specifics": [
+              "graphic novels",
+              "Dog Man",
+              "comprehension",
+              "teacher meeting",
+              "testing"
+            ],
+            "should_identify_progress": true,
+            "should_generate_artifact": true,
+            "artifact_type": [
+              "summary",
+              "timeline"
+            ]
+          },
+          "success": true
+        },
+        {
+          "turn": 2,
+          "user_input": "What have we talked about regarding work stress?",
+          "response": {
+            "user_response": {
+              "spoken_text": "It sounds like work stress is a significant concern for you right now, especially with the startup. We've discussed the fundraising efforts, which have had some ups and downs. There was a period where you felt defeated after rejections from three investors, but more recently, a second investor meeting went well, and they seemed genuinely interested, though they're waiting for your Q1 numbers. This is a high-stress area for you. We also touched on the challenge of hiring a senior engineer, with five candidates interviewed but none feeling like the right fit. This is all contributing to the feeling of being behind schedule and the overall stress.",
+              "emotional_tone": "concerned"
+            },
+            "internal_notes": {
+              "content": "The user is asking about work stress, which primarily relates to their startup. Key points include the ongoing fundraising efforts (mix of rejection and promising leads) and difficulties in hiring key personnel, specifically a senior engineer. These factors are contributing to the user's high stress levels in this area.",
+              "emotional_state": "stressed and anxious, with moments of hope",
+              "key_context": "Startup fundraising and hiring challenges are the main drivers of work stress.",
+              "watch_for": "Any updates on investor meetings, hiring progress, and the user's overall stress levels related to the startup."
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "path": "Work/Startup/_AREA_SUMMARY.md"
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1429,
+          "vector_time_ms": 0,
+          "vector_results_summary": {
+            "areas_matched": 4,
+            "chunks_matched": 10
+          },
+          "ai_notes": {
+            "content": "The user is asking about work stress, which primarily relates to their startup. Key points include the ongoing fundraising efforts (mix of rejection and promising leads) and difficulties in hiring key personnel, specifically a senior engineer. These factors are contributing to the user's high stress levels in this area.",
+            "emotional_state": "stressed and anxious, with moments of hope",
+            "key_context": "Startup fundraising and hiring challenges are the main drivers of work stress.",
+            "watch_for": "Any updates on investor meetings, hiring progress, and the user's overall stress levels related to the startup."
+          },
+          "expected": {
+            "should_reference": [
+              "startup",
+              "fundraising",
+              "hiring",
+              "investors",
+              "rejections"
+            ],
+            "should_connect_to": [
+              "mental health",
+              "burnout",
+              "therapy"
+            ],
+            "should_identify_patterns": true
+          },
+          "success": true
+        },
+        {
+          "turn": 3,
+          "user_input": "I have my teacher meeting next week. What should I remember from our conversations?",
+          "response": {
+            "user_response": {
+              "spoken_text": "It sounds like you have an important teacher meeting coming up, and you want to make sure you're prepared. We've discussed a few key things about Emma's reading that would be helpful to bring up and remember:\n\n*   **The Breakthrough:** Emma has had a significant breakthrough with reading comprehension recently, especially when using graphic novels like Dog Man. She was able to read for 20 minutes straight, showing engagement and understanding.\n*   **Effective Strategies:** We've identified that strategies like reading together, using visually engaging materials (like graphic novels), praising her effort, and taking breaks when she gets frustrated seem to be working well.\n*   **Teacher's Recommendation:** Ms. Johnson has suggested educational testing for learning differences. This is something you're still processing, feeling a mix of wanting to help Emma and concern about labeling her. It might be good to discuss your observations about the graphic novel breakthrough and the strategies that are working, and see what the teacher thinks about these in relation to testing.\n*   **Your Goal:** Ultimately, you want to support Emma's learning and address her reading challenges effectively, while also being mindful of her feelings and avoiding unnecessary pressure.",
+              "emotional_tone": "supportive"
+            },
+            "internal_notes": {
+              "content": "The user is preparing for a teacher meeting regarding Emma's reading. Key points to remind the user of are the recent breakthrough with graphic novels, the strategies that have proven effective, the teacher's suggestion for educational testing, and the user's underlying anxiety about labeling Emma. The focus should be on providing a balanced overview of progress and concerns.",
+              "emotional_state": "prepared and thoughtful",
+              "key_context": "Upcoming teacher meeting about Emma's reading progress and potential learning differences.",
+              "watch_for": "How the user navigates the conversation with the teacher, any new insights or recommendations from the teacher, and the user's feelings afterward."
+            },
+            "area_actions": [],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 2266,
+          "vector_time_ms": 1,
+          "vector_results_summary": {
+            "areas_matched": 4,
+            "chunks_matched": 10
+          },
+          "ai_notes": {
+            "content": "The user is preparing for a teacher meeting regarding Emma's reading. Key points to remind the user of are the recent breakthrough with graphic novels, the strategies that have proven effective, the teacher's suggestion for educational testing, and the user's underlying anxiety about labeling Emma. The focus should be on providing a balanced overview of progress and concerns.",
+            "emotional_state": "prepared and thoughtful",
+            "key_context": "Upcoming teacher meeting about Emma's reading progress and potential learning differences.",
+            "watch_for": "How the user navigates the conversation with the teacher, any new insights or recommendations from the teacher, and the user's feelings afterward."
+          },
+          "expected": {
+            "should_provide_actionable_summary": true,
+            "should_include": [
+              "comprehension vs decoding",
+              "graphic novel breakthrough",
+              "visual learning",
+              "concerns about testing"
+            ],
+            "should_reference_user_quotes": true,
+            "should_prepare_for_meeting": true
+          },
+          "success": true
+        },
+        {
+          "turn": 4,
+          "user_input": "Show me my progress on the running goal",
+          "response": {
+            "user_response": {
+              "spoken_text": "It looks like you've had some real ups and downs with your running goal recently. You mentioned feeling energized after running three times in one week, noting how much better you felt with more energy, better sleep, and improved stress management. However, you also had a period where you didn't run at all, feeling too tired after work and overwhelmed by Emma's homework, which led to disappointment. The good news is that you've experienced the positive benefits, which you yourself noted you tend to forget.",
+              "emotional_tone": "supportive"
+            },
+            "internal_notes": {
+              "content": "The user wants to see their progress on the running goal. I need to summarize the recent entries, highlighting both the successes and the struggles, and acknowledge the user's own observation about forgetting the positive impact.",
+              "emotional_state": "hopeful and slightly discouraged",
+              "key_context": "User's fluctuating progress with running, oscillating between feeling great and feeling discouraged.",
+              "watch_for": "Consistency in running, user's self-talk around motivation and energy levels."
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "path": "Personal_Growth/Exercise_Goals/_AREA_SUMMARY.md"
+              }
+            ],
+            "artifact_action": {
+              "action": "create",
+              "artifact_type": "progress_chart",
+              "html": "<div><h2>Running Goal Progress</h2><ul><li><strong>Recent Success:</strong> Ran 3 times in one week, leading to increased energy, better sleep, and improved stress management. User noted, \"Why do I always forget how good this makes me feel?\"</li><li><strong>Struggles:</strong> Experienced periods of not running at all due to fatigue after work and time constraints with children's homework. User expressed disappointment, stating, \"I keep failing at this goal.\"</li><li><strong>Pattern:</strong> Fluctuating consistency, with a tendency to forget the positive impact of running when motivation wanes.</li></ul></div>"
+            }
+          },
+          "latency_ms": 2303,
+          "vector_time_ms": 1,
+          "vector_results_summary": {
+            "areas_matched": 5,
+            "chunks_matched": 10
+          },
+          "ai_notes": {
+            "content": "The user wants to see their progress on the running goal. I need to summarize the recent entries, highlighting both the successes and the struggles, and acknowledge the user's own observation about forgetting the positive impact.",
+            "emotional_state": "hopeful and slightly discouraged",
+            "key_context": "User's fluctuating progress with running, oscillating between feeling great and feeling discouraged.",
+            "watch_for": "Consistency in running, user's self-talk around motivation and energy levels."
+          },
+          "expected": {
+            "should_show_progress": true,
+            "should_be_honest_about_struggles": true,
+            "should_highlight_good_week": true,
+            "should_generate_artifact": true,
+            "artifact_type": [
+              "progress_chart",
+              "timeline"
+            ]
+          },
+          "success": true
+        },
+        {
+          "turn": 5,
+          "user_input": "What patterns have you noticed about my stress?",
+          "response": {
+            "user_response": {
+              "spoken_text": "I've noticed a couple of key patterns regarding your stress. Firstly, your startup is a significant source of high stress, driven by the challenges in fundraising and hiring key personnel, like the senior engineer. This area is particularly demanding. Secondly, there's a recurring theme of feeling overwhelmed and stressed when juggling work demands with family responsibilities, especially when Emma is having difficulties, like with her reading. This often leads to a feeling of not having enough time or energy for personal goals, such as your running, which then contributes to a different kind of stress related to not meeting those personal objectives.",
+              "emotional_tone": "reflective"
+            },
+            "internal_notes": {
+              "content": "The user is asking for a pattern analysis of their stress. Key drivers identified are startup pressures (fundraising, hiring) and the conflict between work demands and family responsibilities. This conflict impacts personal goals like running, creating a secondary layer of stress. I should summarize these interconnected patterns.",
+              "emotional_state": "analytical and empathetic",
+              "key_context": "Startup demands and work-life balance conflicts are the primary drivers of user stress, impacting personal goals and overall well-being.",
+              "watch_for": "How the user manages the competing demands of the startup and family life, and how this impacts their energy levels and ability to pursue personal goals."
+            },
+            "area_actions": [
+              {
+                "action": "update_summary",
+                "path": "Work/Startup/_AREA_SUMMARY.md"
+              },
+              {
+                "action": "update_summary",
+                "path": "Personal_Growth/Exercise_Goals/_AREA_SUMMARY.md"
+              }
+            ],
+            "artifact_action": {
+              "action": "none"
+            }
+          },
+          "latency_ms": 1980,
+          "vector_time_ms": 0,
+          "vector_results_summary": {
+            "areas_matched": 5,
+            "chunks_matched": 10
+          },
+          "ai_notes": {
+            "content": "The user is asking for a pattern analysis of their stress. Key drivers identified are startup pressures (fundraising, hiring) and the conflict between work demands and family responsibilities. This conflict impacts personal goals like running, creating a secondary layer of stress. I should summarize these interconnected patterns.",
+            "emotional_state": "analytical and empathetic",
+            "key_context": "Startup demands and work-life balance conflicts are the primary drivers of user stress, impacting personal goals and overall well-being.",
+            "watch_for": "How the user manages the competing demands of the startup and family life, and how this impacts their energy levels and ability to pursue personal goals."
+          },
+          "expected": {
+            "should_identify_patterns": true,
+            "patterns_to_mention": [
+              "work-family guilt",
+              "startup pressure",
+              "exercise helps but gets skipped",
+              "therapy insights"
+            ],
+            "should_be_insightful": true,
+            "should_NOT_be_preachy": true
+          },
+          "success": true
+        }
+      ],
+      "metrics": {
+        "total_turns": 5,
+        "successful_turns": 5,
+        "avg_latency_ms": 1899,
+        "total_input_tokens": 0,
+        "area_actions_taken": 5,
+        "artifacts_generated": 1,
+        "vector_search_time_ms": 3,
+        "ai_notes_generated": 5
+      },
+      "ai_notes_final": [
+        {
+          "turn": 5,
+          "timestamp": "2026-01-19T22:39:46.280Z",
+          "content": "The user is asking for a pattern analysis of their stress. Key drivers identified are startup pressures (fundraising, hiring) and the conflict between work demands and family responsibilities. This conflict impacts personal goals like running, creating a secondary layer of stress. I should summarize these interconnected patterns.",
+          "emotional_state": "analytical and empathetic",
+          "key_context": "Startup demands and work-life balance conflicts are the primary drivers of user stress, impacting personal goals and overall well-being.",
+          "watch_for": "How the user manages the competing demands of the startup and family life, and how this impacts their energy levels and ability to pursue personal goals."
+        },
+        {
+          "turn": 4,
+          "timestamp": "2026-01-19T22:39:44.300Z",
+          "content": "The user wants to see their progress on the running goal. I need to summarize the recent entries, highlighting both the successes and the struggles, and acknowledge the user's own observation about forgetting the positive impact.",
+          "emotional_state": "hopeful and slightly discouraged",
+          "key_context": "User's fluctuating progress with running, oscillating between feeling great and feeling discouraged.",
+          "watch_for": "Consistency in running, user's self-talk around motivation and energy levels."
+        },
+        {
+          "turn": 3,
+          "timestamp": "2026-01-19T22:39:41.996Z",
+          "content": "The user is preparing for a teacher meeting regarding Emma's reading. Key points to remind the user of are the recent breakthrough with graphic novels, the strategies that have proven effective, the teacher's suggestion for educational testing, and the user's underlying anxiety about labeling Emma. The focus should be on providing a balanced overview of progress and concerns.",
+          "emotional_state": "prepared and thoughtful",
+          "key_context": "Upcoming teacher meeting about Emma's reading progress and potential learning differences.",
+          "watch_for": "How the user navigates the conversation with the teacher, any new insights or recommendations from the teacher, and the user's feelings afterward."
+        },
+        {
+          "turn": 2,
+          "timestamp": "2026-01-19T22:39:39.729Z",
+          "content": "The user is asking about work stress, which primarily relates to their startup. Key points include the ongoing fundraising efforts (mix of rejection and promising leads) and difficulties in hiring key personnel, specifically a senior engineer. These factors are contributing to the user's high stress levels in this area.",
+          "emotional_state": "stressed and anxious, with moments of hope",
+          "key_context": "Startup fundraising and hiring challenges are the main drivers of work stress.",
+          "watch_for": "Any updates on investor meetings, hiring progress, and the user's overall stress levels related to the startup."
+        },
+        {
+          "turn": 1,
+          "timestamp": "2026-01-19T22:39:38.300Z",
+          "content": "User wants a summary of Emma's reading progress. Key points are the initial struggle, teacher's concern, the breakthrough with graphic novels, and the effective strategies. Need to remember the user's anxiety about testing.",
+          "emotional_state": "hopeful and thoughtful, with underlying anxiety about testing",
+          "key_context": "Emma's reading comprehension struggles and recent breakthrough with graphic novels.",
+          "watch_for": "Further progress with reading, user's feelings about educational testing."
+        }
+      ]
+    },
+    "comparison": {
+      "latency": {
+        "simple_avg_ms": 1290,
+        "full_avg_ms": 1899,
+        "difference_ms": 609,
+        "winner": "SIMPLE"
+      },
+      "success_rate": {
+        "simple": "5/5",
+        "full": "5/5",
+        "winner": "TIE/SIMPLE"
+      },
+      "area_actions": {
+        "simple": 7,
+        "full": 5,
+        "comment": "SIMPLE took same/more actions"
+      },
+      "artifacts": {
+        "simple": 1,
+        "full": 1
+      },
+      "ai_notes": {
+        "simple": "N/A (not supported)",
+        "full": 5
+      },
+      "vector_time": {
+        "simple_ms": 0,
+        "full_ms": 3,
+        "comment": "FULL uses multi-query (3x searches)"
+      }
+    }
+  }
+]

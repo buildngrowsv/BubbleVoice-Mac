@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Pathway: Max's Game vs. Investor Call</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #e0f2f7, #b3e5fc); color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(15px); border-radius: 20px; padding: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+        h1 { color: #0d47a1; text-align: center; margin-bottom: 30px; font-weight: 600; }
+        .node {
+            background: linear-gradient(135deg, #ffffff, #e3f2fd);
+            border: 1px solid #90caf9;
+            border-radius: 16px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        .node:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+        .decision {
+            background: linear-gradient(135deg, #fff9c4, #fff176);
+            border-color: #fbc02d;
+            font-weight: 600;
+        }
+        .outcome {
+            background: linear-gradient(135deg, #c8e6c9, #81c784);
+            border-color: #388e3c;
+            font-weight: 600;
+            color: #1b5e20;
+        }
+        .path-line {
+            position: relative;
+            margin: 0 auto 20px auto;
+            width: 2px;
+            height: 40px;
+            background-color: #64b5f6;
+            border-radius: 1px;
+            z-index: 0;
+        }
+        .path-line::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 10px;
+            height: 10px;
+            border: 2px solid #64b5f6;
+            border-top: none;
+            border-left: none;
+            background: rgba(255,255,255,0.7);
+            border-radius: 0 3px 0 0;
+        }
+        .final-outcome {
+             background: linear-gradient(135deg, #f8bbd0, #f48fb1);
+             border-color: #c2185b;
+             font-weight: 700;
+             color: #880e4f;
+        }
+        .note {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 25px;
+            text-align: center;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Navigating Your Choices</h1>
+
+        <div class="node">Attend Max's Game</div>
+        <div class="path-line"></div>
+        <div class="node decision">Postpone/Reschedule Investor Call?</div>
+        <div class="path-line"></div>
+        <div class="node outcome">Potential funding delay, Max happy</div>
+
+        <div class="path-line"></div>
+        
+        <div class="node">Prioritize Investor Call</div>
+        <div class="path-line"></div>
+        <div class="node decision">Communicate Max conflict to investors?</div>
+        <div class="path-line"></div>
+        <div class="node outcome">Potential funding secured, Max disappointed</div>
+
+        <div class="path-line"></div>
+
+        <div class="node final-outcome">Explore hybrid solutions: <br> - Can partner attend Max's game? <br> - Can investor call be shorter/rescheduled? <br> - Can you join part of game via phone?</div>
+        
+        <p class="note">
+            It's okay to feel overwhelmed. This diagram highlights the immediate conflict. Remember Emma's needs too - perhaps focusing on her strengths and the positive steps you're taking with her reading can provide some grounding. Testing is a tool for understanding, not a label.
+        </p>
+    </div>
+</body>
+</html>

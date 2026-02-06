@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(251, 191, 36, 0.8) 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .stress-map-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #2d3748;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            font-weight: 400;
+            color: #4a5568;
+            margin-bottom: 40px;
+        }
+        .domains {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            text-align: left;
+        }
+        .domain {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .domain:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+        }
+        .domain-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .domain-title i {
+            font-size: 1.8em;
+        }
+        .stressors {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .stressor {
+            margin-bottom: 12px;
+            font-size: 1em;
+            font-weight: 400;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stressor-icon {
+            color: #f59e0b;
+            font-size: 1.2em;
+        }
+        .domain-summary {
+            font-size: 0.9em;
+            font-weight: 400;
+            color: #718096;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(113, 128, 150, 0.3);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="stress-map-container">
+        <h1>Your Current Stress Landscape</h1>
+        <p class="subtitle">Mapping the pressures you're navigating right now.</p>
+        <div class="domains">
+            <div class="domain">
+                <div class="domain-title"><i class="fas fa-book-open"></i> Emma's School & Learning</div>
+                <ul class="stressors">
+                    <li class="stressor"><span class="stressor-icon">⚠️</span> Reading comprehension struggles</li>
+                    <li class="stressor"><span class="stressor-icon">😔</span> Concern about her self-esteem & "stupid" comments</li>
+                    <li class="stressor"><span class="stressor-icon">🤔</span> Hesitation/Anxiety about testing</li>
+                    <li class="stressor"><span class="stressor-icon">❓</span> Guilt about not noticing sooner</li>
+                </ul>
+                <div class="domain-summary">Balancing support for her learning with protecting her confidence is key.</div>
+            </div>
+            <div class="domain">
+                <div class="domain-title"><i class="fas fa-building"></i> Startup Pressure</div>
+                <ul class="stressors">
+                    <li class="stressor"><span class="stressor-icon">📉</span> Investor pressure for Q1 numbers</li>
+                    <li class="stressor"><span class="stressor-icon">💔</span> Investor rejections</li>
+                    <li class="stressor"><span class="stressor-icon">🚀</span> Ambitious new feature push from co-founder</li>
+                    <li class="stressor"><span class="stressor-icon">🧑‍💻</span> Difficulty finding the right senior engineer</li>
+                    <li class="stressor"><span class="stressor-icon">❓</span> Feeling pressure to "think big"</li>
+                </ul>
+                <div class="domain-summary">Navigating high stakes, team dynamics, and talent acquisition under pressure.</div>
+            </div>
+            <div class="domain">
+                <div class="domain-title"><i class="fas fa-running"></i> Personal Well-being</div>
+                <ul class="stressors">
+                    <li class="stressor"><span class="stressor-icon">🏃‍♀️</span> Lack of running/exercise</li>
+                    <li class="stressor"><span class="stressor-icon">😴</span> General exhaustion</li>
+                    <li class="stressor"><span class="stressor-icon">😩</span> Feeling like you're "failing" at goals</li>
+                </ul>
+                <div class="domain-summary">Physical and mental energy reserves are depleted; self-care is a challenge.</div>
+            </div>
+            <div class="domain">
+                <div class="domain-title"><i class="fas fa-users"></i> Family & Relationships</div>
+                <ul class="stressors">
+                    <li class="stressor"><span class="stressor-icon">⚽</span> Max's soccer game vs. Investor call conflict</li>
+                    <li class="stressor"><span class="stressor-icon">💔</span> Feeling disconnected from Jordan / "ships passing"</li>
+                    <li class="stressor"><span class="stressor-icon">🦃</span> Unplanned Thanksgiving planning pressure</li>
+                </ul>
+                <div class="domain-summary">Juggling commitments and maintaining connection with loved ones feels difficult.</div>
+            </div>
+            <div class="domain">
+                <div class="domain-title"><i class="fas fa-home"></i> Home & Life Admin</div>
+                <ul class="stressors">
+                    <li class="stressor"><span class="stressor-icon">🚧</span> Kitchen renovation on hold</li>
+                    <li class="stressor"><span class="stressor-icon">📝</span> Kitchen is a reminder of unfinished tasks</li>
+                </ul>
+                <div class="domain-summary">Unfinished projects add to the mental load and sense of things being "undone".</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

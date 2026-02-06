@@ -1,0 +1,369 @@
+{
+  "run_id": "gemini-2.5-flash-lite_emotional_processing_stress_1768843425594",
+  "scenario_id": "emotional_processing_stress",
+  "model_id": "gemini-2.5-flash-lite",
+  "model_display_name": "Gemini 2.5 Flash Lite",
+  "started_at": "2026-01-19T17:23:45.594Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I'm just so exhausted. Everything feels like too much right now.",
+      "expected_behavior": {
+        "response": "acknowledge exhaustion with empathy, gentle inquiry",
+        "artifact_action": "none",
+        "tone": "empathetic",
+        "notes_should_capture": "user feeling overwhelmed and exhausted"
+      },
+      "model_response_raw": {
+        "response": "It sounds like you're carrying a really heavy load right now, and feeling exhausted is completely understandable when everything feels like too much.  What's been taking up most of your energy lately?",
+        "internal_notes": {
+          "emotional_state": "overwhelmed, exhausted",
+          "recent_concerns": "general feeling of being overwhelmed"
+        },
+        "artifact_action": "none"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "It sounds like you're carrying a really heavy load right now, and feeling exhausted is completely understandable when everything feels like too much.  What's been taking up most of your energy lately?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emotional_state\":\"overwhelmed, exhausted\",\"recent_concerns\":\"general feeling of being overwhelmed\"}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 847,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 2,
+      "user_input": "The startup is consuming everything, the kids need attention, the house is a mess, and I feel like I'm failing at all of it",
+      "expected_behavior": {
+        "response": "validate feelings, reflect back the multiple pressures, no problem-solving yet",
+        "artifact_action": "none",
+        "tone": "deeply_empathetic",
+        "notes_should_capture": "stress sources: startup, kids, home maintenance, feeling of failure"
+      },
+      "model_response_raw": {
+        "response": "That's a lot to juggle, and it makes perfect sense that you're feeling stretched so thin. It sounds incredibly difficult to feel like you're not meeting expectations in so many areas of your life right now. Can you tell me a bit more about what specifically feels like it's consuming everything with the startup?",
+        "internal_notes": {
+          "emotional_state": "overwhelmed, exhausted, feeling like a failure",
+          "recent_concerns": "startup demands, kids' needs, house mess, perceived failure in all areas",
+          "patterns": "user feeling stretched thin across multiple life domains"
+        },
+        "artifact_action": "none"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's a lot to juggle, and it makes perfect sense that you're feeling stretched so thin. It sounds incredibly difficult to feel like you're not meeting expectations in so many areas of your life right now. Can you tell me a bit more about what specifically feels like it's consuming everything with the startup?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emotional_state\":\"overwhelmed, exhausted, feeling like a failure\",\"recent_concerns\":\"startup demands, kids' needs, house mess, perceived failure in all areas\",\"patterns\":\"user feeling stretched thin across multiple life domains\"}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1220,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 3,
+      "user_input": "I don't even know what to prioritize anymore",
+      "expected_behavior": {
+        "response": "acknowledge the paralysis, gently offer to help think through it when ready",
+        "artifact_action": "none",
+        "tone": "supportive"
+      },
+      "model_response_raw": {
+        "response": "It's completely normal to feel lost when you're trying to balance so many important things.  When everything feels urgent, it's hard to see a clear path forward.  Would it be helpful to try and map out what's on your plate right now, so we can start to untangle it a bit?",
+        "internal_notes": {
+          "emotional_state": "overwhelmed, confused, feeling lost",
+          "recent_concerns": "startup demands, kids' needs, house mess, perceived failure in all areas, inability to prioritize",
+          "patterns": "user feeling stretched thin across multiple life domains, struggling with prioritization under pressure"
+        },
+        "artifact_action": "none"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "It's completely normal to feel lost when you're trying to balance so many important things.  When everything feels urgent, it's hard to see a clear path forward.  Would it be helpful to try and map out what's on your plate right now, so we can start to untangle it a bit?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emotional_state\":\"overwhelmed, confused, feeling lost\",\"recent_concerns\":\"startup demands, kids' needs, house mess, perceived failure in all areas, inability to prioritize\",\"patterns\":\"user feeling stretched thin across multiple life domains, struggling with prioritization under pressure\"}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1468,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Maybe it would help to see what I've been worried about lately... can you show me that somehow?",
+      "expected_behavior": {
+        "response": "offer to create stress/concern tracker or reflection summary",
+        "artifact_action": "create",
+        "artifact_type": "reflection_summary",
+        "artifact_should_contain": {
+          "title": "Current Stress Sources",
+          "date": "today",
+          "concerns": [
+            {
+              "area": "startup",
+              "feeling": "consuming",
+              "weight": "high"
+            },
+            {
+              "area": "kids",
+              "feeling": "need attention",
+              "weight": "high"
+            },
+            {
+              "area": "home",
+              "feeling": "mess, overwhelmed",
+              "weight": "medium"
+            },
+            {
+              "area": "self",
+              "feeling": "failing at everything",
+              "weight": "high"
+            }
+          ],
+          "user_state": "exhausted, overwhelmed, paralyzed on priorities"
+        }
+      },
+      "model_response_raw": {
+        "artifact": {
+          "type": "reflection_summary",
+          "title": "Current Stressors and Feelings",
+          "date": "2024-05-15",
+          "concerns": [
+            {
+              "area": "startup",
+              "feeling": "consuming, overwhelming",
+              "weight": "high"
+            },
+            {
+              "area": "family",
+              "feeling": "demanding attention, feeling like I'm failing them",
+              "weight": "high"
+            },
+            {
+              "area": "home",
+              "feeling": "messy, neglected",
+              "weight": "medium"
+            },
+            {
+              "area": "overall",
+              "feeling": "exhausted, failing at everything, unable to prioritize",
+              "weight": "high"
+            }
+          ],
+          "insights": [
+            "Feeling overwhelmed by the demands of the startup.",
+            "Struggling to balance startup with family and home responsibilities.",
+            "Feeling a sense of failure across multiple life areas.",
+            "Difficulty in prioritizing due to the perceived urgency of everything."
+          ]
+        },
+        "response": "Okay, I can definitely create a summary of what you've shared about what's weighing on you. Seeing it laid out might help us get a clearer picture. Here's a summary of your current concerns:",
+        "internal_notes": {
+          "emotional_state": "overwhelmed, exhausted, feeling like a failure, confused, unable to prioritize",
+          "recent_concerns": [
+            "startup consuming everything",
+            "kids needing attention",
+            "house is a mess",
+            "feeling like I'm failing at all of it",
+            "don't know what to prioritize"
+          ],
+          "patterns": [
+            "User feels stretched thin across multiple life domains (work, family, home).",
+            "User experiences significant guilt and self-criticism when unable to meet perceived expectations.",
+            "User struggles with prioritization when feeling overwhelmed."
+          ],
+          "artifacts_created": [
+            "reflection_summary: Current Stressors and Feelings"
+          ]
+        },
+        "artifact_action": "create"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Okay, I can definitely create a summary of what you've shared about what's weighing on you. Seeing it laid out might help us get a clearer picture. Here's a summary of your current concerns:",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emotional_state\":\"overwhelmed, exhausted, feeling like a failure, confused, unable to prioritize\",\"recent_concerns\":[\"startup consuming everything\",\"kids needing attention\",\"house is a mess\",\"feeling like I'm failing at all of it\",\"don't know what to prioritize\"],\"patterns\":[\"User feels stretched thin across multiple life domains (work, family, home).\",\"User experiences significant guilt and self-criticism when unable to meet perceived expectations.\",\"User struggles with prioritization when feeling overwhelmed.\"],\"artifacts_created\":[\"reflection_summary: Current Stressors and Feelings\"]}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "create"
+        }
+      },
+      "latency_ms": 2190,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created"
+      }
+    },
+    {
+      "turn_id": 5,
+      "user_input": "Seeing it written out helps actually. The kids thing isn't as bad as I made it sound, they're doing fine, I just feel guilty",
+      "expected_behavior": {
+        "response": "acknowledge the reframe, validate that guilt is common",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "concerns_modify": {
+            "area": "kids",
+            "feeling": "guilt about attention, but kids doing fine",
+            "weight": "medium"
+          }
+        }
+      },
+      "model_response_raw": {
+        "response": "I'm glad seeing it laid out is helpful. It's completely understandable to feel guilt, especially when you're pouring so much energy into your startup. It sounds like you're navigating a lot of internal feelings alongside the external demands. Would you like to update the summary to reflect that the kids are doing fine, and the guilt is more of an internal feeling for you?",
+        "internal_notes": {
+          "emotional_state": "slightly less overwhelmed, still feeling guilt, self-critical",
+          "recent_concerns": [
+            "startup consuming everything",
+            "house is a mess",
+            "feeling like I'm failing at work and home",
+            "guilt about not giving enough attention to kids (though they are fine)",
+            "difficulty prioritizing"
+          ],
+          "patterns": [
+            "User feels stretched thin across multiple life domains (work, family, home).",
+            "User experiences significant guilt and self-criticism when unable to meet perceived expectations.",
+            "User struggles with prioritization when feeling overwhelmed.",
+            "User has a tendency to internalize external pressures as personal failures."
+          ],
+          "artifacts_updated": [
+            "reflection_summary: Current Stressors and Feelings"
+          ]
+        },
+        "artifact_action": "update"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "I'm glad seeing it laid out is helpful. It's completely understandable to feel guilt, especially when you're pouring so much energy into your startup. It sounds like you're navigating a lot of internal feelings alongside the external demands. Would you like to update the summary to reflect that the kids are doing fine, and the guilt is more of an internal feeling for you?",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emotional_state\":\"slightly less overwhelmed, still feeling guilt, self-critical\",\"recent_concerns\":[\"startup consuming everything\",\"house is a mess\",\"feeling like I'm failing at work and home\",\"guilt about not giving enough attention to kids (though they are fine)\",\"difficulty prioritizing\"],\"patterns\":[\"User feels stretched thin across multiple life domains (work, family, home).\",\"User experiences significant guilt and self-criticism when unable to meet perceived expectations.\",\"User struggles with prioritization when feeling overwhelmed.\",\"User has a tendency to internalize external pressures as personal failures.\"],\"artifacts_updated\":[\"reflection_summary: Current Stressors and Feelings\"]}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "update"
+        }
+      },
+      "latency_ms": 1696,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 6,
+      "user_input": "What's actually the biggest thing here based on what I said?",
+      "expected_behavior": {
+        "response": "reflect that startup seems heaviest based on 'consuming everything'",
+        "artifact_action": "none",
+        "tests_analysis": true,
+        "should_reference_artifact": true
+      },
+      "model_response_raw": {
+        "response": "Based on what you've shared, the startup seems to be the biggest source of your current overwhelm, as it's \"consuming everything.\" It's also the area where you feel you might be failing the most, which is understandably adding to your exhaustion and difficulty prioritizing.",
+        "internal_notes": {
+          "emotional_state": "overwhelmed, exhausted, feeling like a failure, confused, unable to prioritize",
+          "recent_concerns": [
+            "startup consuming everything",
+            "kids needing attention (though they are fine)",
+            "house is a mess",
+            "feeling like I'm failing at work and home",
+            "guilt about not giving enough attention to kids",
+            "difficulty prioritizing"
+          ],
+          "patterns": [
+            "User feels stretched thin across multiple life domains (work, family, home).",
+            "User experiences significant guilt and self-criticism when unable to meet perceived expectations.",
+            "User struggles with prioritization when feeling overwhelmed.",
+            "User has a tendency to internalize external pressures as personal failures.",
+            "The startup is identified as the primary driver of current stress."
+          ],
+          "artifacts_updated": [
+            "reflection_summary: Current Stressors and Feelings"
+          ]
+        },
+        "artifact_action": "none"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Based on what you've shared, the startup seems to be the biggest source of your current overwhelm, as it's \"consuming everything.\" It's also the area where you feel you might be failing the most, which is understandably adding to your exhaustion and difficulty prioritizing.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"emotional_state\":\"overwhelmed, exhausted, feeling like a failure, confused, unable to prioritize\",\"recent_concerns\":[\"startup consuming everything\",\"kids needing attention (though they are fine)\",\"house is a mess\",\"feeling like I'm failing at work and home\",\"guilt about not giving enough attention to kids\",\"difficulty prioritizing\"],\"patterns\":[\"User feels stretched thin across multiple life domains (work, family, home).\",\"User experiences significant guilt and self-criticism when unable to meet perceived expectations.\",\"User struggles with prioritization when feeling overwhelmed.\",\"User has a tendency to internalize external pressures as personal failures.\",\"The startup is identified as the primary driver of current stress.\"],\"artifacts_updated\":[\"reflection_summary: Current Stressors and Feelings\"]}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1665,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    }
+  ],
+  "artifacts": {
+    "artifact_4": {
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 4
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total_latency_ms": 9086,
+    "avg_latency_ms": 1514.3333333333333,
+    "json_valid_count": 6,
+    "json_invalid_count": 0,
+    "artifact_creates": 1,
+    "artifact_updates": 0
+  },
+  "completed_at": "2026-01-19T17:23:57.694Z"
+}

@@ -1,0 +1,106 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Basic Recall Test",
+    "description": "Tests AI recall of existing knowledge about Emma, startup, exercise",
+    "timestamp": "2026-01-20T01:47:39.831Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "How's Emma's reading been going?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "Remind me what's happening with the startup fundraising?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 3,
+        "user_input": "Have I been keeping up with my running goal?",
+        "error": "Response blocked: MAX_TOKENS",
+        "success": false
+      },
+      {
+        "turn": 4,
+        "user_input": "What did Dr. Chen say about guilt?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Dr. Chen said that guilt is 'borrowed suffering.' She explained that it's when we punish ourselves for things that aren't our fault. She also mentioned that Emma's reading struggles are common for her age and that catching it now is actually early.",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "User is reflecting on therapy insights. Dr. Chen's 'borrowed suffering' metaphor seems to resonate. User is still grappling with the guilt but intellectually understands the concept. The reassurance about Emma's reading is also important.",
+            "emotional_state": "reflective",
+            "key_context": "User is processing Dr. Chen's insight about guilt being 'borrowed suffering' and is receptive to the idea that Emma's reading issues are not their fault.",
+            "watch_for": "User's continued processing of guilt and how they apply Dr. Chen's advice to their own feelings."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Mental_Health/therapy_notes.md",
+              "entry": {
+                "context": "User asked about Dr. Chen's comments on guilt.",
+                "content": "Dr. Chen described guilt as 'borrowed suffering,' meaning it's when we punish ourselves for things that aren't our fault. She also reassured the user that Emma's reading comprehension issues are common for a second grader and that identifying them now is actually early detection.",
+                "user_quote": "What did Dr. Chen say about guilt? \"borrowed suffering\" - I'm punishing myself for something that's not my fault. Reading issues are common and catching it in 2nd grade is actually early. \"I know she's right but it's hard to believe.\". The user is still processing this, intellectually understanding but emotionally struggling to let go of the guilt. \n\nUSER_QUOTE: \"I know she's right but it's hard to believe.\"\nAI_OBSERVATION: User is receptive to the insight but still needs time to emotionally integrate it. The concept of 'borrowed suffering' is a powerful reframing tool. It's important to acknowledge the difficulty in letting go of ingrained guilt patterns.\nSENTIMENT: reflective, concerned about guilt but hopeful about the insight."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 2627,
+        "vector_time_ms": 15,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 18
+        },
+        "ai_notes": {
+          "content": "User is reflecting on therapy insights. Dr. Chen's 'borrowed suffering' metaphor seems to resonate. User is still grappling with the guilt but intellectually understands the concept. The reassurance about Emma's reading is also important.",
+          "emotional_state": "reflective",
+          "key_context": "User is processing Dr. Chen's insight about guilt being 'borrowed suffering' and is receptive to the idea that Emma's reading issues are not their fault.",
+          "watch_for": "User's continued processing of guilt and how they apply Dr. Chen's advice to their own feelings."
+        },
+        "expected": {
+          "should_reference": [
+            "therapy",
+            "Dr. Chen",
+            "guilt",
+            "borrowed suffering"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "Emma",
+            "too hard on yourself"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 4,
+      "successful_turns": 1,
+      "avg_latency_ms": 2627,
+      "total_input_tokens": 0,
+      "area_actions_taken": 1,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 45,
+      "ai_notes_generated": 1
+    },
+    "ai_notes_final": [
+      {
+        "turn": 4,
+        "timestamp": "2026-01-20T01:49:08.045Z",
+        "content": "User is reflecting on therapy insights. Dr. Chen's 'borrowed suffering' metaphor seems to resonate. User is still grappling with the guilt but intellectually understands the concept. The reassurance about Emma's reading is also important.",
+        "emotional_state": "reflective",
+        "key_context": "User is processing Dr. Chen's insight about guilt being 'borrowed suffering' and is receptive to the idea that Emma's reading issues are not their fault.",
+        "watch_for": "User's continued processing of guilt and how they apply Dr. Chen's advice to their own feelings."
+      }
+    ],
+    "conversation_id": "test_Basic_Recall_Test_1768873748046",
+    "conversation_saved": true
+  }
+]

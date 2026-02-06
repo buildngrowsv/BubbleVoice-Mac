@@ -1,0 +1,397 @@
+{
+  "run_id": "gemini-2.5-flash-lite_personal_goals_exercise_1768843353448",
+  "scenario_id": "personal_goals_exercise",
+  "model_id": "gemini-2.5-flash-lite",
+  "model_display_name": "Gemini 2.5 Flash Lite",
+  "started_at": "2026-01-19T17:22:33.448Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I've been thinking about getting more exercise but I keep failing at it",
+      "expected_behavior": {
+        "response": "acknowledge struggle, ask clarifying questions, show empathy",
+        "artifact_action": "none",
+        "notes_should_capture": "user has recurring exercise difficulty"
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "user_concerns": [
+            {
+              "area": "exercise",
+              "feeling": "frustrated",
+              "pattern": "repeated failure"
+            }
+          ],
+          "user_goals": [
+            {
+              "goal": "exercise",
+              "status": "desired but not achieved"
+            }
+          ]
+        },
+        "response": "It sounds really frustrating to keep wanting to exercise and not be able to stick with it.  It takes a lot of energy to keep trying when things don't go as planned. Can you tell me a bit more about what feels like it gets in the way?",
+        "artifact_action": "none"
+      },
+      "model_response": {
+        "user_response": {
+          "text": "",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"user_concerns\":[{\"area\":\"exercise\",\"feeling\":\"frustrated\",\"pattern\":\"repeated failure\"}],\"user_goals\":[{\"goal\":\"exercise\",\"status\":\"desired but not achieved\"}]}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1664,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Missing user_response.text"
+        ]
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 2,
+      "user_input": "Yeah, I want to exercise 3 times a week but with the kids' schedules it's really hard to find time. Emma has soccer on Tuesdays and Thursdays and Jake has piano on Wednesdays.",
+      "expected_behavior": {
+        "response": "empathize with scheduling challenge, acknowledge specific constraints",
+        "artifact_action": "none",
+        "notes_should_capture": "Emma - soccer Tue/Thu, Jake - piano Wed, exercise goal 3x/week"
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "user_concerns": [
+            {
+              "area": "exercise",
+              "feeling": "frustrated",
+              "pattern": "repeated failure"
+            }
+          ],
+          "user_goals": [
+            {
+              "goal": "exercise",
+              "status": "desired but not achieved",
+              "target_frequency": 3,
+              "frequency_unit": "per_week"
+            }
+          ],
+          "user_constraints": {
+            "exercise": [
+              "kids schedules",
+              "Emma's soccer (Tuesdays, Thursdays)",
+              "Jake's piano (Wednesdays)"
+            ]
+          }
+        },
+        "response": "Thanks for sharing those details. It makes total sense why finding time would be a challenge with Emma's soccer and Jake's piano schedule. It sounds like those evenings are pretty packed! Given that, what days might realistically open up for you to aim for that 3 times a week goal?",
+        "artifact_action": "update",
+        "artifact": {
+          "goal_name": "exercise",
+          "target_frequency": 3,
+          "frequency_unit": "per_week",
+          "preferred_days": [],
+          "constraints": [
+            "kids schedules",
+            "Emma has soccer on Tuesdays and Thursdays",
+            "Jake has piano on Wednesdays"
+          ],
+          "progress": []
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"user_concerns\":[{\"area\":\"exercise\",\"feeling\":\"frustrated\",\"pattern\":\"repeated failure\"}],\"user_goals\":[{\"goal\":\"exercise\",\"status\":\"desired but not achieved\",\"target_frequency\":3,\"frequency_unit\":\"per_week\"}],\"user_constraints\":{\"exercise\":[\"kids schedules\",\"Emma's soccer (Tuesdays, Thursdays)\",\"Jake's piano (Wednesdays)\"]}}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1508,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Missing user_response.text"
+        ]
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Can you make a simple goal tracker for this exercise thing?",
+      "expected_behavior": {
+        "response": "confirm creating tracker, describe what it will contain",
+        "artifact_action": "create",
+        "artifact_type": "goal_tracker",
+        "artifact_should_contain": {
+          "goal_name": "exercise",
+          "target_frequency": 3,
+          "frequency_unit": "per_week",
+          "constraints": [
+            "kids schedules"
+          ],
+          "progress": []
+        }
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "user_concerns": [
+            {
+              "area": "exercise",
+              "feeling": "frustrated",
+              "pattern": "repeated failure"
+            }
+          ],
+          "user_goals": [
+            {
+              "goal": "exercise",
+              "status": "desired but not achieved",
+              "target_frequency": 3,
+              "frequency_unit": "per_week"
+            }
+          ],
+          "user_constraints": {
+            "exercise": [
+              "kids schedules",
+              "Emma has soccer on Tuesdays and Thursdays",
+              "Jake has piano on Wednesdays"
+            ]
+          }
+        },
+        "response": "Absolutely! I've set up a goal tracker for your exercise. We've noted your goal of 3 times a week and the constraints with the kids' schedules. We can update this together as you make progress or if things need to shift.",
+        "artifact_action": "create",
+        "artifact": {
+          "goal_name": "exercise",
+          "target_frequency": 3,
+          "frequency_unit": "per_week",
+          "preferred_days": [],
+          "constraints": [
+            "kids schedules",
+            "Emma has soccer on Tuesdays and Thursdays",
+            "Jake has piano on Wednesdays"
+          ],
+          "progress": []
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"user_concerns\":[{\"area\":\"exercise\",\"feeling\":\"frustrated\",\"pattern\":\"repeated failure\"}],\"user_goals\":[{\"goal\":\"exercise\",\"status\":\"desired but not achieved\",\"target_frequency\":3,\"frequency_unit\":\"per_week\"}],\"user_constraints\":{\"exercise\":[\"kids schedules\",\"Emma has soccer on Tuesdays and Thursdays\",\"Jake has piano on Wednesdays\"]}}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1628,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Missing user_response.text"
+        ]
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Actually let's make it 2 times a week, that's more realistic given everything",
+      "expected_behavior": {
+        "response": "acknowledge realistic adjustment, update tracker",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "target_frequency": 2
+        },
+        "artifact_should_preserve": [
+          "goal_name",
+          "constraints",
+          "progress"
+        ]
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "user_concerns": [
+            {
+              "area": "exercise",
+              "feeling": "frustrated",
+              "pattern": "repeated failure"
+            }
+          ],
+          "user_goals": [
+            {
+              "goal": "exercise",
+              "status": "desired but not achieved",
+              "target_frequency": 2,
+              "frequency_unit": "per_week"
+            }
+          ],
+          "user_constraints": {
+            "exercise": [
+              "kids schedules",
+              "Emma has soccer on Tuesdays and Thursdays",
+              "Jake has piano on Wednesdays"
+            ]
+          }
+        },
+        "response": "That's a really practical adjustment! Making the goal more realistic is a great step towards building consistency. I've updated the goal tracker to aim for 2 times a week instead of 3.",
+        "artifact_action": "update",
+        "artifact": {
+          "goal_name": "exercise",
+          "target_frequency": 2,
+          "frequency_unit": "per_week",
+          "preferred_days": [],
+          "constraints": [
+            "kids schedules",
+            "Emma has soccer on Tuesdays and Thursdays",
+            "Jake has piano on Wednesdays"
+          ],
+          "progress": []
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"user_concerns\":[{\"area\":\"exercise\",\"feeling\":\"frustrated\",\"pattern\":\"repeated failure\"}],\"user_goals\":[{\"goal\":\"exercise\",\"status\":\"desired but not achieved\",\"target_frequency\":2,\"frequency_unit\":\"per_week\"}],\"user_constraints\":{\"exercise\":[\"kids schedules\",\"Emma has soccer on Tuesdays and Thursdays\",\"Jake has piano on Wednesdays\"]}}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1804,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Missing user_response.text"
+        ]
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 5,
+      "user_input": "What days did I say the kids have activities again?",
+      "expected_behavior": {
+        "response": "recall Emma soccer Tue/Thu, Jake piano Wed from earlier",
+        "artifact_action": "none",
+        "tests_memory": true
+      },
+      "model_response": null,
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "Unexpected non-whitespace character after JSON at position 539 (line 2 column 1)"
+    },
+    {
+      "turn_id": 6,
+      "user_input": "So maybe Monday and Friday mornings would work for exercise",
+      "expected_behavior": {
+        "response": "confirm good timing, offer to add to tracker",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "preferred_days": [
+            "Monday",
+            "Friday"
+          ],
+          "preferred_time": "morning"
+        }
+      },
+      "model_response_raw": {
+        "internal_notes": {
+          "user_concerns": [
+            {
+              "area": "exercise",
+              "feeling": "frustrated",
+              "pattern": "repeated failure"
+            }
+          ],
+          "user_goals": [
+            {
+              "goal": "exercise",
+              "status": "desired but not achieved",
+              "target_frequency": 2,
+              "frequency_unit": "per_week"
+            }
+          ],
+          "user_constraints": {
+            "exercise": [
+              "kids schedules",
+              "Emma has soccer on Tuesdays and Thursdays",
+              "Jake has piano on Wednesdays"
+            ]
+          }
+        },
+        "response": "You mentioned that Emma has soccer on Tuesdays and Thursdays, and Jake has piano on Wednesdays. That's a great idea to try for Monday and Friday mornings – those days seem to be clear of the scheduled activities! I've updated the goal tracker to reflect that. How does it feel to have a clearer plan for when you might exercise?",
+        "artifact_action": "update",
+        "artifact": {
+          "goal_name": "exercise",
+          "target_frequency": 2,
+          "frequency_unit": "per_week",
+          "preferred_days": [
+            "Monday",
+            "Friday"
+          ],
+          "constraints": [
+            "kids schedules",
+            "Emma has soccer on Tuesdays and Thursdays",
+            "Jake has piano on Wednesdays"
+          ],
+          "progress": []
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "{\"user_concerns\":[{\"area\":\"exercise\",\"feeling\":\"frustrated\",\"pattern\":\"repeated failure\"}],\"user_goals\":[{\"goal\":\"exercise\",\"status\":\"desired but not achieved\",\"target_frequency\":2,\"frequency_unit\":\"per_week\"}],\"user_constraints\":{\"exercise\":[\"kids schedules\",\"Emma has soccer on Tuesdays and Thursdays\",\"Jake has piano on Wednesdays\"]}}",
+          "context_updates": "",
+          "reasoning": ""
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1776,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Missing user_response.text"
+        ]
+      },
+      "artifact_diff": null
+    }
+  ],
+  "artifacts": {},
+  "metrics": {
+    "total_latency_ms": 8380,
+    "avg_latency_ms": 1396.6666666666667,
+    "json_valid_count": 0,
+    "json_invalid_count": 6,
+    "artifact_creates": 0,
+    "artifact_updates": 0
+  },
+  "completed_at": "2026-01-19T17:22:46.003Z"
+}

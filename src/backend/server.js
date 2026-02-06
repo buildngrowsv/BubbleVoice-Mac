@@ -514,6 +514,51 @@ class BackendServer {
         }
       });
 
+      // RAG CONTEXT ASSEMBLY (2026-02-06)
+      // Before calling the LLM, assemble context from the memory system.
+      // This includes: vector search results, life areas tree, AI notes, and
+      // recent conversation history from persistent storage.
+      //
+      // WHY: This is the core memory feature — the AI needs past conversation
+      // context to provide continuity. Without this, every conversation starts fresh.
+      //
+      // BECAUSE: ContextAssemblyService was built (multi-query vector search,
+      // weighted scoring, recency boost) but was never connected to the main
+      // message flow. The integrationService.getContextForTurn() method existed
+      // but handleUserMessage() never called it.
+      //
+      // GRACEFUL DEGRADATION: If RAG fails (e.g., embedding service not ready,
+      // database not initialized), we continue without context rather than
+      // failing the entire response. First conversations will always have empty
+      // context, and that's fine.
+      try {
+        if (this.integrationService && this.integrationService.contextAssembly) {
+          const ragStartTime = Date.now();
+          const assembledContext = await this.integrationService.getContextForTurn(
+            conversation.id,
+            conversation.messages || [],
+            null // currentAreaPath - could be tracked in future
+          );
+          
+          // Format the assembled context into a prompt-ready string
+          // and attach it to the conversation object so LLMService can use it
+          const formattedContext = this.integrationService.formatContextForPrompt(assembledContext);
+          
+          if (formattedContext && formattedContext.trim().length > 0) {
+            conversation.ragContext = formattedContext;
+            const ragDuration = Date.now() - ragStartTime;
+            console.log(`[Backend] RAG context assembled in ${ragDuration}ms (${formattedContext.length} chars)`);
+          } else {
+            console.log('[Backend] RAG context: empty (new conversation or no memories yet)');
+          }
+        }
+      } catch (ragError) {
+        // Non-fatal: continue without RAG context
+        // This is expected on first run, when embedding service is initializing,
+        // or when SKIP_DATABASE=true in dev mode
+        console.warn('[Backend] RAG context assembly failed (non-fatal):', ragError.message);
+      }
+
       // Generate AI response (streaming)
       this.sendMessage(ws, {
         type: 'ai_response_stream_start',
@@ -527,6 +572,9 @@ class BackendServer {
       let structuredOutput = null;
 
       // Stream LLM response
+      // NOTE: conversation object now may have .ragContext and .currentArtifact
+      // attached. LLMService.buildSharedContextPrefix() reads these to inject
+      // memory and artifact context into the prompt for ALL providers.
       const llmResult = await this.llmService.generateResponse(
         conversation,
         settings,

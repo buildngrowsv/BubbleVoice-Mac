@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); margin: 0; padding: 40px; color: #1e3a8a; }
+        .card { background: rgba(255, 255, 255, 0.7); border-radius: 20px; padding: 30px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.3); margin-bottom: 30px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15); }
+        h1 { color: #1e3a8a; font-size: 32px; font-weight: 700; text-align: center; margin-bottom: 40px; letter-spacing: 0.5px; }
+        h2 { color: #3b82f6; font-size: 24px; font-weight: 600; margin-bottom: 20px; border-bottom: 2px solid #60a5fa; padding-bottom: 10px; }
+        .stressor {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: background 0.3s ease;
+        }
+        .stressor:hover {
+            background: rgba(219, 234, 254, 0.85);
+        }
+        .stressor-icon {
+            font-size: 28px;
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        .stressor-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1e3a8a;
+            line-height: 1.4;
+        }
+        .positive-note {
+            background: rgba(236, 253, 236, 0.85);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #166534;
+            border: 1px dashed #4ade80;
+        }
+        .positive-note-icon {
+            font-size: 24px;
+            vertical-align: middle;
+            margin-right: 10px;
+            color: #4ade80;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Your Current Stress Landscape</h1>
+
+    <div class="card">
+        <h2>Overarching Feeling</h2>
+        <div class="stressor">
+            <span class="stressor-icon">🤯</span>
+            <div class="stressor-text">
+                Feeling overwhelmed, where positive news is hard to appreciate due to the weight of other concerns.
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Key Stressors Identified</h2>
+        <div class="stressor">
+            <span class="stressor-icon">🚀</span>
+            <div class="stressor-text">
+                <strong>Startup Operations & Team Hiring:</strong> High stress area. Ongoing challenges with building the team and managing operations.
+            </div>
+        </div>
+        <div class="stressor">
+            <span class="stressor-icon">📚</span>
+            <div class="stressor-text">
+                <strong>Emma's School/Reading:</strong> Persistent concerns about Emma's reading comprehension, progress, and upcoming teacher meetings. This is a significant emotional burden.
+            </div>
+        </div>
+        <div class="stressor">
+            <span class="stressor-icon">🏃</span>
+            <div class="stressor-text">
+                <strong>Exercise Goals (Running):</strong> Struggling to maintain progress, adding to a sense of falling short.
+            </div>
+        </div>
+        <div class="stressor">
+            <span class="stressor-icon">❤️</span>
+            <div class="stressor-text">
+                <strong>Partner Relationship:</strong> Potential strain or need for balance, especially concerning quality time amidst other pressures.
+            </div>
+        </div>
+         <div class="stressor">
+            <span class="stressor-icon">🧠</span>
+            <div class="stressor-text">
+                <strong>Mental Health & Therapy:</strong> While actively engaging in therapy, the process itself can be demanding, and you're working through guilt.
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>A Bright Spot</h2>
+        <div class="stressor">
+            <span class="stressor-icon">💰</span>
+            <div class="stressor-text">
+                <strong>Investor Meeting Success:</strong> A significant positive achievement for the startup! This is a testament to your hard work and the viability of your venture.
+            </div>
+        </div>
+        <div class="positive-note">
+            <span class="positive-note-icon">🌟</span> Successfully navigated the investor meeting - a key milestone achieved!
+        </div>
+    </div>
+
+</body>
+</html>

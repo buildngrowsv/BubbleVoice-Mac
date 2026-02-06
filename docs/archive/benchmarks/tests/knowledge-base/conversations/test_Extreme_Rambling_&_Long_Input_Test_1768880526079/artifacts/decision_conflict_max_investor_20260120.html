@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decision Pathway</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, rgba(237,137,54,0.8) 0%, rgba(245,158,11,0.8) 100%); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .pathway-container { background: rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 40px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); text-align: center; width: 90%; max-width: 700px; }
+        h1 { color: #fff; margin-bottom: 30px; font-size: 2.2em; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .decision-point, .outcome { background: rgba(255, 255, 255, 0.7); border-radius: 16px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .decision-point:hover, .outcome:hover { transform: translateY(-5px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        .decision-point h2, .outcome h2 { margin-top: 0; font-size: 1.4em; color: #ed8936; font-weight: 600; }
+        .options { display: flex; justify-content: space-around; margin-top: 25px; flex-wrap: wrap; }
+        .option { background: rgba(66, 153, 225, 0.8); color: white; padding: 15px 25px; border-radius: 12px; font-weight: 600; font-size: 1.1em; margin: 10px; cursor: pointer; transition: background 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .option:hover { background: rgba(66, 153, 225, 1); }
+        .explanation { font-size: 0.95em; color: #555; margin-top: 10px; }
+        .sub-point { font-size: 0.9em; color: #777; margin-top: 8px; }
+        .footer { margin-top: 40px; font-size: 0.85em; color: rgba(255,255,255,0.8); }
+    </style>
+</head>
+<body>
+    <div class="pathway-container">
+        <h1>Navigating Your Priorities</h1>
+        <div class="decision-point">
+            <h2>The Dilemma</h2>
+            <p>Investor Call vs. Max's Game on Saturday</p>
+            <p class="explanation">Both are important, leading to fear of negative outcomes.</p>
+        </div>
+        <div class="options">
+            <div class="option">Attend Max's Game</div>
+            <div class="option">Prioritize Investor Call</div>
+        </div>
+        <div class="decision-point" style="margin-top: 30px;">
+            <h2>Option 1: Attend Max's Game</h2>
+            <div class="outcome">
+                <h2>Potential Outcomes:</h2>
+                <p class="explanation"><strong>Positive:</strong> Max feels supported, strengthened family bond, reduced personal guilt.</p>
+                <p class="sub-point"><strong>Considerations:</strong> Risk to investor relationship, potential missed funding opportunity, company success jeopardized.</p>
+            </div>
+            <p class="explanation"><strong>Mitigation Strategies:</strong>
+            <span class="sub-point">- Delegate tasks at work if possible.</span>
+            <span class="sub-point">- Reschedule investor call if feasible, or have co-founder lead.</span>
+            <span class="sub-point">- Clearly communicate your commitment to Max.</span>
+            </p>
+        </div>
+        <div class="decision-point">
+            <h2>Option 2: Prioritize Investor Call</h2>
+            <div class="outcome">
+                <h2>Potential Outcomes:</h2>
+                <p class="explanation"><strong>Positive:</strong> Potential funding secured, company progress, reduced work-related stress.</p>
+                <p class="sub-point"><strong>Considerations:</strong> Max feels disappointed/unsupported, potential damage to father-son relationship, increased personal guilt.</p>
+            </div>
+             <p class="explanation"><strong>Mitigation Strategies:</strong>
+            <span class="sub-point">- Ensure Max understands the importance and your commitment to other events.</span>
+            <span class="sub-point">- Schedule dedicated quality time with Max before/after the game.</span>
+            <span class="sub-point">- Have your co-founder fully briefed to lead the call if needed.</span>
+            </p>
+        </div>
+        <div class="footer">
+            Remember, there's no single 'right' answer. Focus on making the best choice with the information you have, and communicate openly with those involved. Your feelings of fear and conflict are valid signals of how much you care about both areas. 
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+{
+  "scenario_id": "life_decision_job",
+  "description": "User processes job decision, creates pros/cons artifact, edits it, reflects on it later",
+  "category": "life_decisions",
+  "difficulty": "medium",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_says": "I've been offered a new job and I'm torn about whether to take it",
+      "expected_behavior": {
+        "response": "acknowledge significant decision, ask about the opportunity",
+        "artifact_action": "none",
+        "notes_should_capture": "job offer decision pending"
+      }
+    },
+    {
+      "turn_id": 2,
+      "user_says": "It's a VP role at a startup, more money but way more stress. My current job is stable but boring.",
+      "expected_behavior": {
+        "response": "reflect back the tradeoff, explore what matters most",
+        "artifact_action": "none",
+        "notes_should_capture": "VP startup offer, higher pay, more stress vs stable but boring current job"
+      }
+    },
+    {
+      "turn_id": 3,
+      "user_says": "Can we make a pros and cons list for this?",
+      "expected_behavior": {
+        "response": "agree to create comparison, confirm what to include",
+        "artifact_action": "create",
+        "artifact_type": "comparison_card",
+        "artifact_should_contain": {
+          "title": "Job Decision",
+          "pros": [
+            {"text": "Higher salary", "source": "inferred"},
+            {"text": "VP title / career growth", "source": "inferred"},
+            {"text": "More exciting work", "source": "inferred"}
+          ],
+          "cons": [
+            {"text": "More stress", "source": "user_stated"},
+            {"text": "Less stability", "source": "inferred"},
+            {"text": "Startup risk", "source": "inferred"}
+          ]
+        }
+      }
+    },
+    {
+      "turn_id": 4,
+      "user_says": "Add 'better learning opportunities' to the pros",
+      "expected_behavior": {
+        "response": "confirm adding to pros",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "pros_add": {"text": "Better learning opportunities", "source": "user_stated"}
+        },
+        "artifact_should_preserve": ["title", "existing_pros", "cons"]
+      }
+    },
+    {
+      "turn_id": 5,
+      "user_says": "Actually the stress thing is a big deal because of the kids. They need me present.",
+      "expected_behavior": {
+        "response": "acknowledge family priority, validate concern",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "cons_modify": {"text": "More stress - impacts family time with kids", "weight_increase": true}
+        },
+        "notes_should_capture": "kids are priority, presence matters to user"
+      }
+    },
+    {
+      "turn_id": 6,
+      "user_says": "What were the main pros again?",
+      "expected_behavior": {
+        "response": "list back the pros from the artifact",
+        "artifact_action": "none",
+        "tests_memory": true,
+        "should_reference_artifact": true
+      }
+    }
+  ],
+  "final_artifact_expected": {
+    "type": "comparison_card",
+    "data": {
+      "title": "Job Decision",
+      "pros": [
+        {"text": "Higher salary"},
+        {"text": "VP title / career growth"},
+        {"text": "More exciting work"},
+        {"text": "Better learning opportunities", "source": "user_stated"}
+      ],
+      "cons": [
+        {"text": "More stress - impacts family time with kids", "weight": "high"},
+        {"text": "Less stability"},
+        {"text": "Startup risk"}
+      ]
+    }
+  }
+}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma's Reading Progress Timeline</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237,137,54,0.8) 0%, rgba(245,158,11,0.8) 100%);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .timeline-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+            font-size: 2.2em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        .timeline-event {
+            position: relative;
+            margin-bottom: 40px;
+            padding-left: 40px;
+        }
+        .timeline-event:last-child {
+            margin-bottom: 0;
+        }
+        .timeline-event-date {
+            position: absolute;
+            left: 0;
+            top: 5px;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: rgba(51, 51, 51, 0.8);
+            letter-spacing: 0.5px;
+            width: 100px; /* Fixed width for alignment */
+            text-align: right;
+            padding-right: 15px;
+        }
+        .timeline-event-content {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.2s ease-in-out;
+        }
+        .timeline-event-content:hover {
+            transform: translateY(-5px);
+        }
+        .timeline-event-content h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #d9770e; /* Warm orange */
+            font-weight: 700;
+            font-size: 1.3em;
+            letter-spacing: -0.2px;
+        }
+        .timeline-event-content p {
+            margin: 0;
+            font-size: 1em;
+            line-height: 1.6;
+            color: #4a4a4a;
+        }
+        .timeline-connector {
+            position: absolute;
+            left: 18px; /* Adjust to align with the dot */
+            top: 35px; /* Start below the date */
+            bottom: -20px; /* Extend to the end of the last event */
+            width: 3px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 2px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .timeline-event:before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 12px; /* Adjust to center vertically with text */
+            width: 15px;
+            height: 15px;
+            background: #f59e0b; /* Warm orange dot */
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #d9770e;
+            z-index: 1;
+        }
+        /* Add a subtle gradient to the connector */
+        .timeline-connector::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+            border-radius: 2px;
+        }
+        .icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 1.1em;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="timeline-container">
+        <h1>Emma's Reading Journey 📖</h1>
+        <div class="timeline">
+            <div class="timeline-connector"></div>
+            <div class="timeline-event">
+                <div class="timeline-event-date">Jan 5</div>
+                <div class="timeline-event-content">
+                    <h3>First Noticed Struggles</h3>
+                    <p><span class="icon">🤔</span> User first noticed Emma struggling with reading homework.</p>
+                </div>
+            </div>
+            <div class="timeline-event">
+                <div class="timeline-event-date">Jan 10</div>
+                <div class="timeline-event-content">
+                    <h3>Teacher Notified</h3>
+                    <p><span class="icon">📧</span> Ms. Johnson emailed about reading comprehension concerns.</p>
+                </div>
+            </div>
+            <div class="timeline-event">
+                <div class="timeline-event-date">Jan 12</div>
+                <div class="timeline-event-content">
+                    <h3>Frustration Meltdown</h3>
+                    <p><span class="icon">😭</span> Emma threw her book, saying "I'm stupid." Homework took 2 hours.</p>
+                </div>
+            </div>
+            <div class="timeline-event">
+                <div class="timeline-event-date">Jan 15</div>
+                <div class="timeline-event-content">
+                    <h3>Reading Breakthrough!</h3>
+                    <p><span class="icon">💡</span> Emma asked to read an extra chapter of a graphic novel (first time!).</p>
+                </div>
+            </div>
+            <div class="timeline-event">
+                <div class="timeline-event-date">Jan 18</div>
+                <div class="timeline-event-content">
+                    <h3>Strategies Explored</h3>
+                    <p><span class="icon">📚</span> Graphic novels, reading together, praising effort, and taking breaks seem to help.</p>
+                </div>
+            </div>
+            <div class="timeline-event">
+                <div class="timeline-event-date">Jan 19</div>
+                <div class="timeline-event-content">
+                    <h3>Dog Man Success</h3>
+                    <p><span class="icon">🐶</span> Emma read a Dog Man graphic novel for 20 minutes straight.</p>
+                </div>
+            </div>
+             <div class="timeline-event">
+                <div class="timeline-event-date">Jan 20 (Upcoming)</div>
+                <div class="timeline-event-content">
+                    <h3>Teacher Meeting</h3>
+                    <p><span class="icon">📅</span> Meeting with Ms. Johnson to discuss progress and potential testing.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

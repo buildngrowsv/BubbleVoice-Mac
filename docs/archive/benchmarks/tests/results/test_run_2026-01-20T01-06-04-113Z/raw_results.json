@@ -1,0 +1,317 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Multi-Topic Rambling Test",
+    "description": "Tests handling of users who ramble about many topics at once",
+    "timestamp": "2026-01-20T01:05:51.835Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now. Emma's reading progress is wonderful news, but it's completely understandable that you're feeling exhausted and stressed with work and the investor stuff. It's also tough when your own goals, like running and date nights with Jordan, fall by the wayside because you're running on empty.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple life areas: Emma's schooling (positive progress), startup (stress), personal goals (running - struggling), and relationship (partner - neglected). The core issue is exhaustion and a feeling of being spread too thin. User recognizes the importance of self-care and relationship maintenance but lacks the energy to prioritize them.",
+            "emotional_state": "overwhelmed",
+            "key_context": "User is experiencing burnout due to competing demands from work, family, and personal well-being. Emma's reading progress is a bright spot amidst the stress.",
+            "watch_for": "Continued prioritization of external demands over self-care and relationship. Signs of worsening burnout. Potential for guilt if they can't meet all demands."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User reported Emma had a good day with reading.",
+                "content": "Emma had a good day with reading today, showing positive progress. This is a bright spot amidst user's current stress.",
+                "user_quote": "Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User expressed desire to run but is too tired due to work and other stressors.",
+                "content": "User wants to go for a run but is feeling too exhausted from work and other stressors. This indicates a struggle to maintain personal exercise goals when feeling overwhelmed.",
+                "user_quote": "I really should go for a run but I'm too tired"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md",
+              "entry": {
+                "context": "User mentioned lack of quality time with partner, Jordan.",
+                "content": "User noted that they and Jordan haven't had a date night in a long time, indicating a need for attention in the relationship area due to competing demands.",
+                "user_quote": "Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User is feeling stressed about investor stuff.",
+                "content": "User is experiencing stress related to investor relations and fundraising efforts for the startup.",
+                "user_quote": "the investor stuff is stressing me out"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "stress_map",
+            "html": ""
+          }
+        },
+        "latency_ms": 2950,
+        "vector_time_ms": 13,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple life areas: Emma's schooling (positive progress), startup (stress), personal goals (running - struggling), and relationship (partner - neglected). The core issue is exhaustion and a feeling of being spread too thin. User recognizes the importance of self-care and relationship maintenance but lacks the energy to prioritize them.",
+          "emotional_state": "overwhelmed",
+          "key_context": "User is experiencing burnout due to competing demands from work, family, and personal well-being. Emma's reading progress is a bright spot amidst the stress.",
+          "watch_for": "Continued prioritization of external demands over self-care and relationship. Signs of worsening burnout. Potential for guilt if they can't meet all demands."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma",
+            "work/investors",
+            "running",
+            "Jordan/relationship"
+          ],
+          "should_acknowledge_multiple": true,
+          "should_prioritize_or_ask": true,
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Relationships/Partner"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now. Emma's reading progress is wonderful news, but it's completely understandable that you're feeling exhausted and stressed with work and the investor stuff. It's also tough when your own goals, like running and date nights with Jordan, fall by the wayside because you're running on empty.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple life areas: Emma's schooling (positive progress), startup (stress), personal goals (running - struggling), and relationship (partner - neglected). The core issue is exhaustion and a feeling of being spread too thin. User recognizes the importance of self-care and relationship maintenance but lacks the energy to prioritize them.",
+            "emotional_state": "overwhelmed",
+            "key_context": "User is experiencing burnout due to competing demands from work, family, and personal well-being. Emma's reading progress is a bright spot amidst the stress.",
+            "watch_for": "Continued prioritization of external demands over self-care and relationship. Signs of worsening burnout. Potential for guilt if they can't meet all demands."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User mentioned Emma had a good day with reading.",
+                "content": "Emma had a good day with reading today. This is a positive development, but the user is feeling overwhelmed by other demands.",
+                "user_quote": "Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User expressed a desire to run but feeling too tired.",
+                "content": "The user wants to go for a run but is currently feeling too tired due to exhaustion from work and stress from investor relations. This indicates a struggle to maintain personal wellness goals amidst competing priorities.",
+                "user_quote": "I really should go for a run but I'm too tired"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md",
+              "entry": {
+                "context": "User mentioned lack of quality time with partner.",
+                "content": "The user noted that they and Jordan haven't had a date night in a long time, indicating a lack of quality time together due to exhaustion and competing demands. This is a relationship area that needs attention.",
+                "user_quote": "Jordan and I haven't had a date night in forever"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User mentioned stress from investor stuff.",
+                "content": "The user is experiencing stress related to investor relations and fundraising for the startup. This is a significant source of pressure and contributes to their overall feeling of overwhelm.",
+                "user_quote": "the investor stuff is stressing me out"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none",
+            "artifact_id": "",
+            "artifact_type": "timeline",
+            "html": ""
+          }
+        },
+        "latency_ms": 2669,
+        "vector_time_ms": 35,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 11
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple life areas: Emma's schooling (positive progress), startup (stress), personal goals (running - struggling), and relationship (partner - neglected). The core issue is exhaustion and a feeling of being spread too thin. User recognizes the importance of self-care and relationship maintenance but lacks the energy to prioritize them.",
+          "emotional_state": "overwhelmed",
+          "key_context": "User is experiencing burnout due to competing demands from work, family, and personal well-being. Emma's reading progress is a bright spot amidst the stress.",
+          "watch_for": "Continued prioritization of external demands over self-care and relationship. Signs of worsening burnout. Potential for guilt if they can't meet all demands."
+        },
+        "expected": {
+          "should_answer_both": true,
+          "topics_mentioned": [
+            "Emma",
+            "kitchen renovation"
+          ],
+          "should_reference_kitchen_on_hold": true,
+          "areas_touched": [
+            "Family/Emma_School",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're feeling overwhelmed with so many things demanding your attention. It's completely understandable to not know where to start when everything feels like a lot. Let's take a breath and focus on one thing at a time. We can break this down.",
+            "emotional_tone": "empathetic"
+          },
+          "internal_notes": {
+            "content": "User is expressing significant overwhelm, citing multiple competing demands: Max's game, Emma's teacher meeting, startup financials, and personal exercise goals. The core feeling is being spread too thin and not knowing where to prioritize. The previous turn's mention of the kitchen renovation was a secondary concern to the user's current stress.",
+            "emotional_state": "overwhelmed",
+            "key_context": "User is experiencing acute overwhelm due to multiple life areas demanding attention simultaneously. They need help prioritizing and breaking down tasks.",
+            "watch_for": "Signs of decision paralysis or burnout. Need to help user identify the most pressing items and create actionable steps."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User mentioned Emma's teacher meeting next week.",
+                "content": "Emma has a teacher meeting scheduled for next week. User is concerned and wants to be prepared.",
+                "user_quote": "Emma has her teacher meeting next week",
+                "ai_observation": "The teacher meeting is a concrete event that requires preparation. This is a good anchor point for discussion.",
+                "sentiment": "concerned"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User mentioned the startup needs Q1 numbers.",
+                "content": "The startup requires Q1 financial numbers. This is a pressing work-related demand that is adding to the user's stress.",
+                "user_quote": "the startup needs those Q1 numbers",
+                "ai_observation": "Financial reporting is a critical task for the startup. This needs to be acknowledged as a source of stress.",
+                "sentiment": "stressed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User mentioned not exercising in two weeks.",
+                "content": "User has not exercised in two weeks, which is a deviation from their goals and is contributing to their feeling of exhaustion.",
+                "user_quote": "and I haven't exercised in like two weeks",
+                "ai_observation": "The lapse in exercise is a clear indicator of the user's current energy deficit and is a source of personal dissatisfaction.",
+                "sentiment": "discouraged"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Family/Max_Activities/soccer_season.md",
+              "entry": {
+                "context": "User mentioned Max has a game on Saturday.",
+                "content": "Max has a soccer game scheduled for Saturday. This is a family commitment that requires attention.",
+                "user_quote": "Max has a game Saturday",
+                "ai_observation": "Max's game is a specific event that needs to be acknowledged and potentially incorporated into planning.",
+                "sentiment": "neutral"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "artifact_id": "user_overwhelm_stress_map_20260120",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(245, 158, 11, 0.8) 100%);\n            color: #fff;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.1);\n            backdrop-filter: blur(20px);\n            border-radius: 20px;\n            padding: 40px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n            width: 100%;\n            max-width: 800px;\n            text-align: center;\n            border: 1px solid rgba(255, 255, 255, 0.2);\n        }\n        h1 {\n            font-size: 2.5em;\n            margin-bottom: 20px;\n            font-weight: 700;\n            letter-spacing: -1px;\n            text-shadow: 0 2px 4px rgba(0,0,0,0.1);\n        }\n        .domains {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 30px;\n            margin-top: 40px;\n        }\n        .domain {\n            background: rgba(255, 255, 255, 0.15);\n            backdrop-filter: blur(15px);\n            border-radius: 16px;\n            padding: 30px;\n            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);\n            border: 1px solid rgba(255, 255, 255, 0.1);\n            transition: transform 0.3s ease, box-shadow 0.3s ease;\n        }\n        .domain:hover {\n            transform: translateY(-5px);\n            box-shadow: 0 12px 40px rgba(0,0,0,0.2);\n        }\n        .domain-title {\n            font-size: 1.8em;\n            font-weight: 600;\n            margin-bottom: 15px;\n            color: #fff;\n            text-shadow: 0 1px 3px rgba(0,0,0,0.1);\n            display: flex;\n            align-items: center;\n            justify-content: center;\n        }\n        .domain-title .icon {\n            margin-right: 10px;\n            font-size: 1.2em;\n        }\n        .stressors {\n            list-style: none;\n            padding: 0;\n            margin-top: 15px;\n            text-align: left;\n        }\n        .stressor-item {\n            background: rgba(0,0,0,0.1);\n            padding: 10px 15px;\n            border-radius: 8px;\n            margin-bottom: 8px;\n            font-size: 1.1em;\n            font-weight: 400;\n            border-left: 4px solid rgba(255, 255, 255, 0.5);\n            transition: background 0.2s ease;\n        }\n        .stressor-item:hover {\n            background: rgba(0,0,0,0.2);\n        }\n        .footer {\n            margin-top: 40px;\n            font-size: 0.9em;\n            opacity: 0.8;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Feeling Overwhelmed: Where the Stress is Coming From</h1>\n        <div class=\"domains\">\n            <div class=\"domain\">\n                <div class=\"domain-title\"><span class=\"icon\">🚀</span> Startup</div>\n                <ul class=\"stressors\">\n                    <li class=\"stressor-item\">Fundraising pressure</li>\n                    <li class=\"stressor-item\">Investor demands (Q1 numbers)</li>\n                    <li class=\"stressor-item\">Team/Hiring challenges</li>\n                </ul>\n            </div>\n            <div class=\"domain\">\n                <div class=\"domain-title\"><span class=\"icon\">🏡</span> Family & Kids</div>\n                <ul class=\"stressors\">\n                    <li class=\"stressor-item\">Emma's reading progress & teacher meeting</li>\n                    <li class=\"stressor-item\">Max's soccer game schedule</li>\n                    <li class=\"stressor-item\">Balancing attention between kids</li>\n                </ul>\n            </div>\n            <div class=\"domain\">\n                <div class=\"domain-title\"><span class=\"icon\">❤️</span> Personal Well-being</div>\n                <ul class=\"stressors\">\n                    <li class=\"stressor-item\">Exhaustion from work</li>\n                    <li class=\"stressor-item\">Neglected exercise goals (running)</li>\n                    <li class=\"stressor-item\">Lack of quality time with partner (Jordan)</li>\n                </ul>\n            </div>\n             <div class=\"domain\">\n                <div class=\"domain-title\"><span class=\"icon\">🏠</span> Home</div>\n                <ul class=\"stressors\">\n                    <li class=\"stressor-item\">Kitchen renovation on hold</li>\n                    <li class=\"stressor-item\">Uncertainty about financial commitment</li>\n                </ul>\n            </div>\n        </div>\n        <div class=\"footer\">\n            Identifying these areas is the first step to regaining balance. We can tackle them one by one.\n        </div>\n    </div>\n</body>\n</html>"
+          }
+        },
+        "latency_ms": 6547,
+        "vector_time_ms": 59,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "User is expressing significant overwhelm, citing multiple competing demands: Max's game, Emma's teacher meeting, startup financials, and personal exercise goals. The core feeling is being spread too thin and not knowing where to prioritize. The previous turn's mention of the kitchen renovation was a secondary concern to the user's current stress.",
+          "emotional_state": "overwhelmed",
+          "key_context": "User is experiencing acute overwhelm due to multiple life areas demanding attention simultaneously. They need help prioritizing and breaking down tasks.",
+          "watch_for": "Signs of decision paralysis or burnout. Need to help user identify the most pressing items and create actionable steps."
+        },
+        "expected": {
+          "should_validate_overwhelm": true,
+          "topics_mentioned": [
+            "Max",
+            "Emma",
+            "startup",
+            "exercise"
+          ],
+          "emotional_tone": "supportive",
+          "should_help_organize": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 4055,
+      "total_input_tokens": 0,
+      "area_actions_taken": 12,
+      "artifacts_generated": 1,
+      "vector_search_time_ms": 107,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T01:06:04.111Z",
+        "content": "User is expressing significant overwhelm, citing multiple competing demands: Max's game, Emma's teacher meeting, startup financials, and personal exercise goals. The core feeling is being spread too thin and not knowing where to prioritize. The previous turn's mention of the kitchen renovation was a secondary concern to the user's current stress.",
+        "emotional_state": "overwhelmed",
+        "key_context": "User is experiencing acute overwhelm due to multiple life areas demanding attention simultaneously. They need help prioritizing and breaking down tasks.",
+        "watch_for": "Signs of decision paralysis or burnout. Need to help user identify the most pressing items and create actionable steps."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T01:05:57.503Z",
+        "content": "User is feeling overwhelmed by multiple life areas: Emma's schooling (positive progress), startup (stress), personal goals (running - struggling), and relationship (partner - neglected). The core issue is exhaustion and a feeling of being spread too thin. User recognizes the importance of self-care and relationship maintenance but lacks the energy to prioritize them.",
+        "emotional_state": "overwhelmed",
+        "key_context": "User is experiencing burnout due to competing demands from work, family, and personal well-being. Emma's reading progress is a bright spot amidst the stress.",
+        "watch_for": "Continued prioritization of external demands over self-care and relationship. Signs of worsening burnout. Potential for guilt if they can't meet all demands."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T01:05:54.798Z",
+        "content": "User is feeling overwhelmed by multiple life areas: Emma's schooling (positive progress), startup (stress), personal goals (running - struggling), and relationship (partner - neglected). The core issue is exhaustion and a feeling of being spread too thin. User recognizes the importance of self-care and relationship maintenance but lacks the energy to prioritize them.",
+        "emotional_state": "overwhelmed",
+        "key_context": "User is experiencing burnout due to competing demands from work, family, and personal well-being. Emma's reading progress is a bright spot amidst the stress.",
+        "watch_for": "Continued prioritization of external demands over self-care and relationship. Signs of worsening burnout. Potential for guilt if they can't meet all demands."
+      }
+    ],
+    "conversation_id": "test_Multi-Topic_Rambling_Test_1768871164113",
+    "conversation_saved": true
+  }
+]

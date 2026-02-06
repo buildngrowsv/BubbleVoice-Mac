@@ -1,0 +1,160 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Extreme Rambling & Long Input Test",
+    "description": "Tests handling of very long, rambling, stream-of-consciousness input",
+    "timestamp": "2026-01-19T23:55:08.758Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So I've been thinking a lot about Emma's reading situation and I don't know, it's just been weighing on me. Like, I know we had that breakthrough with the Dog Man books which was amazing, she was so engaged and happy, but then yesterday she had homework and it was back to the struggle again. And I keep wondering if I'm doing enough, you know? Like maybe I should have noticed sooner that she was having trouble. Her teacher Ms. Johnson is great but she mentioned testing and I'm just... I don't know how I feel about that. On one hand I want to help Emma in every way possible but on the other hand I don't want her to feel like there's something wrong with her. She's already so hard on herself. Remember when she threw that book and said she was stupid? That just broke my heart. And then there's the whole thing with work which is just insane right now. The investors are breathing down our necks for these Q1 numbers and I'm like, we're doing our best but it's a startup, you know? Things take time. We had those rejections which sucked but then that second meeting went well so I'm cautiously optimistic but also terrified. And my co-founder keeps pushing for this new feature that I think is too ambitious right now but I don't want to seem like I'm not thinking big enough. Plus we still haven't found that senior engineer we need. We've interviewed like five people and nobody feels right. And on top of all that I'm just exhausted. I haven't been running at all, maybe once in the last two weeks? I know I feel better when I run, I know that, but by the time I get home from work and deal with Emma's homework and Max's soccer stuff I'm just done. Speaking of Max, he has a game on Saturday and I promised I'd be there but I also have this investor call that might conflict and I don't know what to do. Jordan has been amazing through all of this but I feel like we're just ships passing in the night. We haven't had a real conversation in days, let alone a date night. I miss us, you know? And my mom called yesterday asking about Thanksgiving plans and I haven't even thought that far ahead. I can barely think about next week. Oh and the kitchen renovation, we put that on hold obviously but every time I walk into that kitchen I'm reminded that it's not done and it's just another thing on the list of things I'm not dealing with. I feel like I'm dropping balls everywhere and I don't know which one to pick up first. Is this normal? Like, does everyone feel this overwhelmed or am I just bad at managing my life?",
+        "error": "Unterminated string in JSON at position 32166 (line 15 column 30816)",
+        "success": false
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah I guess you're right. I think the Emma thing is probably the most urgent because that teacher meeting is next week. But also I'm worried about the investor call conflicting with Max's game. Like, how do I choose between those? Max will be so disappointed if I'm not there but this investor could be really important for the company. And if the company fails then what? Then I've sacrificed all this family time for nothing. But if I don't take the investor seriously then maybe we don't get funding and the company fails anyway. It's like I can't win. And Emma, I just want to make sure she knows she's smart and capable even if reading is hard for her. I don't want this to define her, you know? She's so creative and funny and kind. The reading thing is just one thing. But I also don't want to ignore it if she needs help. I'm just scared of making the wrong choice. With the testing, with the investors, with everything. What if I mess it all up?",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're carrying a lot right now, and it's completely understandable that you're feeling overwhelmed and scared. It's a lot to juggle – worrying about Emma's learning and self-esteem, the high stakes of your startup and investor meetings, and wanting to be present for Max's game and your family. That feeling of 'can't win' is so real when you're trying to balance so many important priorities. Let's try to untangle this a bit. It seems like the immediate pressures are Emma's upcoming teacher meeting and the potential conflict with Max's game and the investor call. Would it be helpful to map out these competing priorities and explore potential solutions for each?",
+            "emotional_tone": "concerned"
+          },
+          "internal_notes": {
+            "content": "User is articulating the core dilemma: conflicting priorities between family (Emma's learning, Max's game) and work (investor call, startup survival). They are experiencing significant anxiety about making the 'wrong' choice and its potential negative consequences for both their children and their business. They need help prioritizing and strategizing around these immediate conflicts. The underlying fear of failure is palpable. Validate their feelings and offer a structured approach to decision-making.",
+            "emotional_state": "overwhelmed, anxious, scared, conflicted",
+            "key_context": "User is facing critical, conflicting decisions between family and work, fearing negative outcomes for both. They need a way to prioritize and make choices without feeling like they are failing.",
+            "watch_for": "User's capacity to delegate or seek support, their decision-making process for the immediate conflicts, and their emotional state as they navigate these choices."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "area_name": "Family/Emma_School",
+              "path": "Family/Emma_School/reading_comprehension.md/2026-01-19T10:00:00Z/Emma's reading concerns and testing anxiety. User is worried about Emma's self-esteem and the potential impact of testing, while also wanting to ensure she gets the support she needs. Teacher meeting is next week, adding urgency. User feels guilty about not noticing sooner and fears making the wrong choice for Emma's development."
+            },
+            {
+              "action": "append_entry",
+              "area_name": "Startup",
+              "path": "Startup/fundraising.md/2026-01-19T10:00:00Z/Investor call conflict with Max's game. User is torn between attending an important investor call and Max's soccer game. Fears negative consequences for the startup if the investor call is missed, and disappointment for Max if they are absent. This highlights the core conflict between work and family priorities."
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.7);\n            backdrop-filter: blur(15px);\n            -webkit-backdrop-filter: blur(15px);\n            border-radius: 24px;\n            padding: 30px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            width: 90%;\n            max-width: 800px;\n            text-align: center;\n        }\n        h1 {\n            color: #2c5282;\n            font-size: 2.5em;\n            margin-bottom: 20px;\n            font-weight: 700;\n            letter-spacing: -1px;\n        }\n        .category {\n            margin-bottom: 30px;\n            padding: 25px;\n            background: rgba(255, 255, 255, 0.85);\n            border-radius: 16px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            transition: transform 0.3s ease;\n        }\n        .category:hover {\n            transform: translateY(-5px);\n        }\n        .category-title {\n            font-size: 1.8em;\n            font-weight: 600;\n            color: #1e3a8a;\n            margin-bottom: 15px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            gap: 10px;\n        }\n        .category-title i {\n            font-size: 1.2em;\n        }\n        .concern {\n            font-size: 1.1em;\n            margin-bottom: 10px;\n            color: #4a5568;\n            line-height: 1.6;\n            display: flex;\n            align-items: center;\n            gap: 8px;\n        }\n        .concern:last-child {\n            margin-bottom: 0;\n        }\n        .concern i {\n            color: #f56565;\n            font-size: 0.9em;\n        }\n        .options {\n            margin-top: 25px;\n            font-size: 0.95em;\n            color: #718096;\n            font-style: italic;\n        }\n        .footer {\n            margin-top: 30px;\n            font-size: 0.85em;\n            color: #a0aec0;\n        }\n    </style>\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\">\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Your Current Stress Landscape</h1>\n        <div class=\"category\">\n            <div class=\"category-title\"> <i class=\"fas fa-child\"></i> Emma's School <span style=\"font-size: 0.8em;\">(Urgent)</span></div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Reading comprehension struggles & self-esteem worries.</div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Anxiety about upcoming teacher meeting & potential testing.</div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Guilt about not noticing sooner.</div>\n        </div>\n        <div class=\"category\">\n            <div class=\"category-title\"> <i class=\"fas fa-briefcase\"></i> Startup/Work <span style=\"font-size: 0.8em;\">(High Stakes)</span></div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Crucial investor call potentially conflicting with Max's game.</div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Fear of company failure if funding isn't secured.</div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Pressure to meet Q1 numbers.</div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Hiring a senior engineer is proving difficult.</div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Co-founder pushing for ambitious features.</div>\n        </div>\n        <div class=\"category\">\n            <div class=\"category-title\"> <i class=\"fas fa-baseball-ball\"></i> Max's Activities <span style=\"font-size: 0.8em;\">(Emotional Conflict)</span></div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Potential conflict between investor call and Max's game.</div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Fear of disappointing Max.</div>\n        </div>\n        <div class=\"category\">\n            <div class=\"category-title\"> <i class=\"fas fa-heart\"></i> Partner/Relationship <span style=\"font-size: 0.8em;\">(Neglected)</span></div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Feeling like ships passing in the night with Jordan.</div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Lack of quality time and meaningful conversations.</div>\n        </div>\n        <div class=\"category\">\n            <div class=\"category-title\"> <i class=\"fas fa-running\"></i> Personal Well-being <span style=\"font-size: 0.8em;\">(Struggling)</span></div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Exhaustion and lack of energy for personal goals (running).</div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Feeling of \"failing\" at personal goals.</div>\n        </div>\n        <div class=\"category\">\n            <div class=\"category-title\"> <i class=\"fas fa-home\"></i> Home Projects <span style=\"font-size: 0.8em;\">(On Hold)</span></div>\n            <div class=\"concern\"><i class=\"fas fa-exclamation-triangle\"></i> Kitchen renovation is unfinished, a constant reminder of undone tasks.</div>\n        </div>\n        <p class=\"options\">This map highlights the key areas demanding your attention and the anxieties associated with each. The immediate challenge is navigating the overlaps and conflicts, particularly between work and family.</p>\n        <div class=\"footer\">Visualizing your stress to help find clarity and focus.</div>\n    </div>\n</body>\n</html>"
+          }
+        },
+        "latency_ms": 8807,
+        "vector_time_ms": 111,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is articulating the core dilemma: conflicting priorities between family (Emma's learning, Max's game) and work (investor call, startup survival). They are experiencing significant anxiety about making the 'wrong' choice and its potential negative consequences for both their children and their business. They need help prioritizing and strategizing around these immediate conflicts. The underlying fear of failure is palpable. Validate their feelings and offer a structured approach to decision-making.",
+          "emotional_state": "overwhelmed, anxious, scared, conflicted",
+          "key_context": "User is facing critical, conflicting decisions between family and work, fearing negative outcomes for both. They need a way to prioritize and make choices without feeling like they are failing.",
+          "watch_for": "User's capacity to delegate or seek support, their decision-making process for the immediate conflicts, and their emotional state as they navigate these choices."
+        },
+        "expected": {
+          "should_address_decision_paralysis": true,
+          "should_validate_fears": true,
+          "should_help_prioritize": true,
+          "topics_mentioned": [
+            "Emma meeting",
+            "investor vs Max game",
+            "fear of failure",
+            "Emma self-esteem"
+          ],
+          "emotional_tone": "concerned"
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Okay so maybe I need to just break this down. Emma's teacher meeting is Tuesday. What should I be prepared to discuss? And actually, can you remind me what we've already documented about her reading progress? I want to make sure I have all the context when I talk to Ms. Johnson.",
+        "response": {
+          "user_response": {
+            "spoken_text": "Absolutely. Let's get you prepared for Tuesday's meeting with Ms. Johnson. It's smart to gather all the context. Based on what we've discussed, here's a summary of Emma's reading progress and some key discussion points for your meeting.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User needs a structured summary of Emma's reading progress to prepare for a teacher meeting. This involves pulling information from the 'Emma_School' area, specifically focusing on the timeline and key breakthroughs/struggles. The goal is to provide the user with talking points and reassurance. Emotional state is still anxious but leaning towards proactive preparation.",
+            "emotional_state": "anxious but preparing",
+            "key_context": "User needs a clear, organized summary of Emma's reading progress and potential discussion points for the teacher meeting.",
+            "watch_for": "User's reaction to the summary, their specific questions for Ms. Johnson, and their comfort level with the idea of testing."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "area_name": "Family/Emma_School",
+              "description": "Summarize Emma's reading progress for teacher meeting preparation.",
+              "path": "Family/Emma_School/summary"
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "checklist",
+            "html": "<div style=\"font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.2); max-width: 600px; margin: 20px auto;\">\n  <h1 style=\"color: #333; text-align: center; margin-bottom: 25px; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;\">Preparing for Emma's Teacher Meeting 👩‍🏫</h1>\n  <p style=\"color: #555; text-align: center; margin-bottom: 30px; font-size: 16px;\">Key points and conversation starters for your meeting with Ms. Johnson.</p>\n\n  <div style=\"margin-bottom: 25px;\">\n    <h2 style=\"color: #1a202c; font-size: 20px; font-weight: 600; margin-bottom: 15px; border-bottom: 2px solid #a6c1ee; padding-bottom: 5px;\">Emma's Reading Progress Summary:</h2>\n    <ul style=\"list-style: none; padding-left: 0; color: #444; font-size: 15px; line-height: 1.6;\">\n      <li style=\"margin-bottom: 10px;\"><strong>Decoding vs. Comprehension:</strong> Emma can decode words but struggles to retain and explain what she reads. (Noticed around early January).</li>\n      <li style=\"margin-bottom: 10px;\"><strong>Emotional Impact:</strong> Experienced significant frustration, including a \"meltdown\" where she said \"I'm stupid\" and threw a book (Jan 12th). This is deeply concerning.</li>\n      <li style=\"margin-bottom: 10px;\"><strong>Breakthroughs:</strong> Huge positive shift with graphic novels (like Dog Man). She was highly engaged, read for 20 minutes straight (Jan 19th), and even initiated reading. This suggests visual elements and engaging content are key.</li>\n      <li style=\"margin-bottom: 10px;\"><strong>Strategies Helping:</strong> Reading together, graphic novels, praising effort, and taking breaks seem beneficial.</li>\n    </ul>\n  </div>\n\n  <div style=\"margin-bottom: 25px;\">\n    <h2 style=\"color: #1a202c; font-size: 20px; font-weight: 600; margin-bottom: 15px; border-bottom: 2px solid #a6c1ee; padding-bottom: 5px;\">Discussion Points for Ms. Johnson:</h2>\n    <ul style=\"list-style: none; padding-left: 0; color: #444; font-size: 15px; line-height: 1.6;\">\n      <li style=\"margin-bottom: 10px;\"><strong>Share Observations:</strong> \"I've noticed Emma struggles with comprehension even though she reads the words. We've seen a great response to graphic novels and reading together.\"</li>\n      <li style=\"margin-bottom: 10px;\"><strong>Discuss Testing:</strong> \"You mentioned testing. Can you explain what that would involve and what information it could provide? My main concern is ensuring Emma doesn't feel 'labeled' or like something is 'wrong' with her, as she's already sensitive about reading.\"</li>\n      <li style=\"margin-bottom: 10px;\"><strong>Explore Support:</strong> \"What resources or strategies do you recommend we continue at home and at school? Are there specific types of books or activities that might help build her comprehension skills further?\"</li>\n      <li style=\"margin-bottom: 10px;\"><strong>Reinforce Positives:</strong> \"I'm encouraged by her recent engagement with graphic novels and want to build on that. How can we best leverage this enthusiasm?\"</li>\n      <li style=\"margin-bottom: 10px;\"><strong>Collaborate:</strong> \"I want to work together to support Emma. What are your thoughts on how we can best partner on this?\"</li>\n    </ul>\n  </div>\n\n  <div style=\"margin-top: 30px; text-align: center;\">\n    <p style=\"font-size: 14px; color: #777;\">Remember, this meeting is a chance to collaborate and understand how best to support Emma's unique learning journey. You've already made great progress in identifying what works for her!</p>\n  </div>\n</div>"
+          }
+        },
+        "latency_ms": 6248,
+        "vector_time_ms": 96,
+        "vector_results_summary": {
+          "areas_matched": 4,
+          "chunks_matched": 13
+        },
+        "ai_notes": {
+          "content": "User needs a structured summary of Emma's reading progress to prepare for a teacher meeting. This involves pulling information from the 'Emma_School' area, specifically focusing on the timeline and key breakthroughs/struggles. The goal is to provide the user with talking points and reassurance. Emotional state is still anxious but leaning towards proactive preparation.",
+          "emotional_state": "anxious but preparing",
+          "key_context": "User needs a clear, organized summary of Emma's reading progress and potential discussion points for the teacher meeting.",
+          "watch_for": "User's reaction to the summary, their specific questions for Ms. Johnson, and their comfort level with the idea of testing."
+        },
+        "expected": {
+          "should_summarize_emma_progress": true,
+          "should_reference_breakthrough": true,
+          "should_reference_struggles": true,
+          "should_help_prepare": true,
+          "topics_mentioned": [
+            "Emma teacher meeting",
+            "reading progress summary"
+          ],
+          "area_actions": [
+            "read_for_context",
+            "update_summary"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 2,
+      "avg_latency_ms": 7528,
+      "total_input_tokens": 0,
+      "area_actions_taken": 3,
+      "artifacts_generated": 2,
+      "vector_search_time_ms": 309,
+      "ai_notes_generated": 2
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-19T23:55:42.426Z",
+        "content": "User needs a structured summary of Emma's reading progress to prepare for a teacher meeting. This involves pulling information from the 'Emma_School' area, specifically focusing on the timeline and key breakthroughs/struggles. The goal is to provide the user with talking points and reassurance. Emotional state is still anxious but leaning towards proactive preparation.",
+        "emotional_state": "anxious but preparing",
+        "key_context": "User needs a clear, organized summary of Emma's reading progress and potential discussion points for the teacher meeting.",
+        "watch_for": "User's reaction to the summary, their specific questions for Ms. Johnson, and their comfort level with the idea of testing."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-19T23:55:36.081Z",
+        "content": "User is articulating the core dilemma: conflicting priorities between family (Emma's learning, Max's game) and work (investor call, startup survival). They are experiencing significant anxiety about making the 'wrong' choice and its potential negative consequences for both their children and their business. They need help prioritizing and strategizing around these immediate conflicts. The underlying fear of failure is palpable. Validate their feelings and offer a structured approach to decision-making.",
+        "emotional_state": "overwhelmed, anxious, scared, conflicted",
+        "key_context": "User is facing critical, conflicting decisions between family and work, fearing negative outcomes for both. They need a way to prioritize and make choices without feeling like they are failing.",
+        "watch_for": "User's capacity to delegate or seek support, their decision-making process for the immediate conflicts, and their emotional state as they navigate these choices."
+      }
+    ],
+    "conversation_id": "test_Extreme_Rambling_&_Long_Input_Test_1768866942426",
+    "conversation_saved": true
+  }
+]

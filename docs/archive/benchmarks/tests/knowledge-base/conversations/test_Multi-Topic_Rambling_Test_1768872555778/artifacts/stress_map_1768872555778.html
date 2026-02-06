@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card-container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        .stress-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .stress-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        .stress-card h3 {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2c5282;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .stress-card p {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #4a5568;
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+        .icon {
+            font-size: 1.8em;
+        }
+        .work {
+            border-left: 5px solid #f56565;
+        }
+        .personal {
+            border-left: 5px solid #ed8936;
+        }
+        .relationship {
+            border-left: 5px solid #63b3ed;
+        }
+        .family {
+            border-left: 5px solid #48bb78;
+        }
+        .title {
+            text-align: center;
+            font-size: 2em;
+            font-weight: 700;
+            color: #2a4365;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <h1 class="title">Your Current Stress Landscape</h1>
+        <div class="stress-card work">
+            <h3><span class="icon">💼</span> Work/Startup Stress</h3>
+            <p>Investor-related tasks are causing significant stress, contributing to overall exhaustion. This area feels demanding and overwhelming right now.</p>
+        </div>
+        <div class="stress-card personal">
+            <h3><span class="icon">🏃</span> Personal Goals (Running)</h3>
+            <p>You recognize the need to run for well-being but are currently too exhausted to follow through. This is a key area where self-care is being deprioritized.</p>
+        </div>
+        <div class="stress-card relationship">
+            <h3><span class="icon">❤️</span> Relationship (Date Night)</h3>
+            <p>Quality time with Jordan has been lacking, with no date nights recently. This suggests a need to nurture your connection amidst the busyness.</p>
+        </div>
+        <div class="stress-card family">
+            <h3><span class="icon">📚</span> Family (Emma's Reading)</h3>
+            <p>A positive note here! Emma had a good day with reading, showing progress. While this is encouraging, it doesn't negate the exhaustion from other areas.</p>
+        </div>
+    </div>
+</body>
+</html>

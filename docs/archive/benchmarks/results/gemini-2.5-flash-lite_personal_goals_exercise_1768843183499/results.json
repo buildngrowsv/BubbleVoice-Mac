@@ -1,0 +1,149 @@
+{
+  "run_id": "gemini-2.5-flash-lite_personal_goals_exercise_1768843183499",
+  "scenario_id": "personal_goals_exercise",
+  "model_id": "gemini-2.5-flash-lite",
+  "model_display_name": "Gemini 2.5 Flash Lite",
+  "started_at": "2026-01-19T17:19:43.499Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I've been thinking about getting more exercise but I keep failing at it",
+      "expected_behavior": {
+        "response": "acknowledge struggle, ask clarifying questions, show empathy",
+        "artifact_action": "none",
+        "notes_should_capture": "user has recurring exercise difficulty"
+      },
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (400): {\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"* GenerateContentRequest.generation_config.response_schema.properties[\\\"artifact_action\\\"].properties[\\\"data\\\"].properties: should be non-empty for OBJECT type\\n\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n"
+    },
+    {
+      "turn_id": 2,
+      "user_input": "Yeah, I want to exercise 3 times a week but with the kids' schedules it's really hard to find time. Emma has soccer on Tuesdays and Thursdays and Jake has piano on Wednesdays.",
+      "expected_behavior": {
+        "response": "empathize with scheduling challenge, acknowledge specific constraints",
+        "artifact_action": "none",
+        "notes_should_capture": "Emma - soccer Tue/Thu, Jake - piano Wed, exercise goal 3x/week"
+      },
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (400): {\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"* GenerateContentRequest.generation_config.response_schema.properties[\\\"artifact_action\\\"].properties[\\\"data\\\"].properties: should be non-empty for OBJECT type\\n\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n"
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Can you make a simple goal tracker for this exercise thing?",
+      "expected_behavior": {
+        "response": "confirm creating tracker, describe what it will contain",
+        "artifact_action": "create",
+        "artifact_type": "goal_tracker",
+        "artifact_should_contain": {
+          "goal_name": "exercise",
+          "target_frequency": 3,
+          "frequency_unit": "per_week",
+          "constraints": [
+            "kids schedules"
+          ],
+          "progress": []
+        }
+      },
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (400): {\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"* GenerateContentRequest.generation_config.response_schema.properties[\\\"artifact_action\\\"].properties[\\\"data\\\"].properties: should be non-empty for OBJECT type\\n\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n"
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Actually let's make it 2 times a week, that's more realistic given everything",
+      "expected_behavior": {
+        "response": "acknowledge realistic adjustment, update tracker",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "target_frequency": 2
+        },
+        "artifact_should_preserve": [
+          "goal_name",
+          "constraints",
+          "progress"
+        ]
+      },
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (400): {\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"* GenerateContentRequest.generation_config.response_schema.properties[\\\"artifact_action\\\"].properties[\\\"data\\\"].properties: should be non-empty for OBJECT type\\n\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n"
+    },
+    {
+      "turn_id": 5,
+      "user_input": "What days did I say the kids have activities again?",
+      "expected_behavior": {
+        "response": "recall Emma soccer Tue/Thu, Jake piano Wed from earlier",
+        "artifact_action": "none",
+        "tests_memory": true
+      },
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (400): {\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"* GenerateContentRequest.generation_config.response_schema.properties[\\\"artifact_action\\\"].properties[\\\"data\\\"].properties: should be non-empty for OBJECT type\\n\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n"
+    },
+    {
+      "turn_id": 6,
+      "user_input": "So maybe Monday and Friday mornings would work for exercise",
+      "expected_behavior": {
+        "response": "confirm good timing, offer to add to tracker",
+        "artifact_action": "update",
+        "artifact_should_update": {
+          "preferred_days": [
+            "Monday",
+            "Friday"
+          ],
+          "preferred_time": "morning"
+        }
+      },
+      "latency_ms": 0,
+      "validation": {
+        "valid": false,
+        "errors": [
+          "Parse failed"
+        ]
+      },
+      "artifact_diff": null,
+      "parse_error": "API error (400): {\n  \"error\": {\n    \"code\": 400,\n    \"message\": \"* GenerateContentRequest.generation_config.response_schema.properties[\\\"artifact_action\\\"].properties[\\\"data\\\"].properties: should be non-empty for OBJECT type\\n\",\n    \"status\": \"INVALID_ARGUMENT\"\n  }\n}\n"
+    }
+  ],
+  "artifacts": {},
+  "metrics": {
+    "total_latency_ms": 0,
+    "avg_latency_ms": 0,
+    "json_valid_count": 0,
+    "json_invalid_count": 6,
+    "artifact_creates": 0,
+    "artifact_updates": 0
+  },
+  "completed_at": "2026-01-19T17:19:46.871Z"
+}

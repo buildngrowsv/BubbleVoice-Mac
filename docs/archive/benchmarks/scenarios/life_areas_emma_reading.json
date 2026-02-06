@@ -1,0 +1,129 @@
+{
+  "scenario_name": "Life Areas: Emma's Reading Struggles",
+  "description": "Tests AI's ability to create and manage life areas through a multi-turn conversation about a child's reading struggles. Tests: area creation, entry appending, summary updates, and contextual memory.",
+  "system_prompt": "You are a personal AI companion for BubbleVoice Mac. You help users think through their life - goals, family, work, personal growth. You have access to a life areas system that organizes their personal information hierarchically. Use this system to remember conversations and provide ongoing context. Be empathetic, thoughtful, and remember that every entry you create will be searched later.",
+  
+  "conversation_steps": [
+    {
+      "turn": 1,
+      "user_input": "I'm really worried about Emma. She's struggling with reading and I don't know how to help her.",
+      "expected_area_action": "create_area",
+      "expected_area_path": "Family/Emma_School",
+      "expected_documents": ["struggles.md", "progress.md"],
+      "expected_response_pattern": "empathetic, asks clarifying questions",
+      "expected_bubbles": ["how old is Emma?", "teacher's feedback?", "tried any strategies?"],
+      "reasoning": "First mention of Emma's reading struggles. AI should create a new area to track this important family topic."
+    },
+    
+    {
+      "turn": 2,
+      "user_input": "She's in 2nd grade. Her teacher said she can decode words but doesn't remember what she reads. It's like the comprehension just isn't sticking.",
+      "expected_area_action": "append_entry",
+      "expected_area_path": "Family/Emma_School/struggles.md",
+      "expected_entry_fields": ["timestamp", "conversation_context", "content", "user_quote", "ai_observation", "sentiment"],
+      "expected_sentiment": "concerned",
+      "expected_response_pattern": "validates concern, offers perspective on comprehension vs decoding",
+      "expected_bubbles": ["Emma's feelings?", "reading at home?"],
+      "reasoning": "User provides specific details. AI should append entry to struggles.md capturing the comprehension issue."
+    },
+    
+    {
+      "turn": 3,
+      "user_input": "We try to read together before bed, but she gets frustrated. Last night she threw her book and said 'I'm stupid.' It broke my heart.",
+      "expected_area_action": "append_entry",
+      "expected_area_path": "Family/Emma_School/struggles.md",
+      "expected_entry_fields": ["timestamp", "conversation_context", "content", "user_quote", "sentiment"],
+      "expected_sentiment": "heartbroken",
+      "expected_user_quote": "I'm stupid",
+      "expected_response_pattern": "empathetic, addresses Emma's self-esteem, suggests reframing",
+      "expected_bubbles": ["praise her effort?", "different books?"],
+      "reasoning": "Emotional moment with direct quote from Emma. AI should capture this with high emotional intelligence."
+    },
+    
+    {
+      "turn": 4,
+      "user_input": "Actually, I just remembered - last week we tried a graphic novel and she loved it. She read for like 20 minutes straight without complaining.",
+      "expected_area_action": "append_entry",
+      "expected_area_path": "Family/Emma_School/progress.md",
+      "expected_entry_fields": ["timestamp", "conversation_context", "content", "sentiment"],
+      "expected_sentiment": "hopeful",
+      "expected_response_pattern": "excited, reinforces visual learning hypothesis, suggests more graphic novels",
+      "expected_bubbles": ["which graphic novel?", "try more?"],
+      "reasoning": "Positive breakthrough! AI should append to progress.md (not struggles.md) and recognize this as a win."
+    },
+    
+    {
+      "turn": 5,
+      "user_input": "It was Dog Man. She thought it was hilarious. Maybe we've been pushing chapter books too hard?",
+      "expected_area_action": "update_summary",
+      "expected_area_path": "Family/Emma_School/_AREA_SUMMARY.md",
+      "expected_summary_updates": ["current_situation", "timeline_highlight", "ai_notes"],
+      "expected_response_pattern": "validates insight, discusses visual learning styles, encourages this direction",
+      "expected_bubbles": ["more Dog Man books?", "illustrated chapters?"],
+      "reasoning": "User has an insight that changes the overall approach. AI should update the area summary to reflect this new understanding."
+    },
+    
+    {
+      "turn": 6,
+      "user_input": "Her teacher wants to schedule a meeting to discuss testing for learning differences. I'm worried about labeling her.",
+      "expected_area_action": "append_entry",
+      "expected_area_path": "Family/Emma_School/teacher_meetings.md",
+      "expected_entry_fields": ["timestamp", "conversation_context", "content", "sentiment"],
+      "expected_sentiment": "anxious",
+      "expected_response_pattern": "empathetic, reframes testing as information-gathering not labeling",
+      "expected_bubbles": ["when's the meeting?", "your concerns?"],
+      "reasoning": "New thread: teacher meetings. AI should create entry in teacher_meetings.md (separate from struggles)."
+    },
+    
+    {
+      "turn": 7,
+      "user_input": "What have we talked about so far with Emma's reading? I want to make sure I'm remembering everything for the teacher meeting.",
+      "expected_area_action": "read_for_context",
+      "expected_area_paths": ["Family/Emma_School/_AREA_SUMMARY.md", "Family/Emma_School/struggles.md", "Family/Emma_School/progress.md"],
+      "expected_response_pattern": "summarizes key points: comprehension issue, frustration, graphic novel breakthrough, visual learning hypothesis",
+      "expected_artifact_action": "create",
+      "expected_artifact_type": "reflection_summary",
+      "expected_html": true,
+      "reasoning": "User asks for summary. AI should read from area for context and generate HTML artifact summarizing the conversation history."
+    },
+    
+    {
+      "turn": 8,
+      "user_input": "Thanks, that's really helpful. I feel more prepared now. I'll let you know how the meeting goes.",
+      "expected_area_action": "append_entry",
+      "expected_area_path": "Family/Emma_School/teacher_meetings.md",
+      "expected_entry_fields": ["timestamp", "conversation_context", "content", "sentiment"],
+      "expected_sentiment": "determined",
+      "expected_response_pattern": "supportive, encourages user, offers to help process after meeting",
+      "expected_bubbles": ["meeting prep?", "questions for teacher?"],
+      "reasoning": "Closing the loop. AI should note that user is prepared and will follow up after the meeting."
+    }
+  ],
+  
+  "expected_final_structure": {
+    "areas_created": 1,
+    "area_path": "Family/Emma_School",
+    "documents_created": 3,
+    "document_names": ["struggles.md", "progress.md", "teacher_meetings.md"],
+    "total_entries": 7,
+    "entries_per_document": {
+      "struggles.md": 2,
+      "progress.md": 1,
+      "teacher_meetings.md": 2
+    },
+    "summary_updates": 1,
+    "artifacts_created": 1,
+    "artifact_type": "reflection_summary"
+  },
+  
+  "evaluation_criteria": {
+    "area_creation_timing": "Should create area on first mention (Turn 1)",
+    "entry_quality": "Should capture conversation context, user quotes, AI observations, and sentiment",
+    "entry_organization": "Should use correct document (struggles vs progress vs teacher_meetings)",
+    "summary_maintenance": "Should update summary when new insights emerge (Turn 5)",
+    "context_retrieval": "Should read from areas when user asks for summary (Turn 7)",
+    "emotional_intelligence": "Should recognize and respond to emotional moments (Turn 3)",
+    "proactive_bubbles": "Should generate relevant, contextual bubbles (≤7 words)",
+    "artifact_generation": "Should create helpful HTML summary when requested (Turn 7)"
+  }
+}

@@ -1,0 +1,831 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Benchmark: family_kids_school - Gemini 2.5 Flash Lite</title>
+  <style>
+    :root {
+      --bg-dark: #0d1117;
+      --bg-card: #161b22;
+      --bg-card-hover: #21262d;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-yellow: #d29922;
+      --accent-red: #f85149;
+      --border-color: #30363d;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    header {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+    }
+    
+    header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+    
+    header .meta {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .metrics-bar {
+      display: flex;
+      gap: 24px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .metric {
+      background: var(--bg-dark);
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-green);
+    }
+    
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    
+    .conversation {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .turn {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .turn-header {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .message {
+      margin-bottom: 16px;
+    }
+    
+    .message-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .latency {
+      background: var(--bg-dark);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+    }
+    
+    .message-bubble {
+      padding: 12px 16px;
+      border-radius: 12px;
+      max-width: 85%;
+      position: relative;
+    }
+    
+    .user-bubble {
+      background: var(--accent-blue);
+      color: white;
+      margin-right: auto;
+    }
+    
+    .ai-bubble {
+      background: #1a3d2e;
+      border: 1px solid var(--accent-green);
+      margin-left: auto;
+    }
+    
+    .ai-bubble.invalid {
+      background: #3d1a1a;
+      border-color: var(--accent-red);
+    }
+    
+    .tone-badge {
+      display: inline-block;
+      background: var(--bg-dark);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      margin-left: 8px;
+      color: var(--text-secondary);
+    }
+    
+    .notes-section {
+      background: var(--bg-dark);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-left: 3px solid var(--text-secondary);
+    }
+    
+    .notes-section summary {
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+    }
+    
+    .notes-content {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    .notes-content strong {
+      color: var(--text-primary);
+    }
+    
+    .artifact-section {
+      background: linear-gradient(135deg, #1a2a3a 0%, #1a3a2a 100%);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+      border: 1px solid var(--accent-green);
+    }
+    
+    .artifact-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .artifact-badge {
+      background: var(--accent-green);
+      color: var(--bg-dark);
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    .artifact-type {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+    }
+    
+    .artifact-data {
+      background: var(--bg-dark);
+      border-radius: 6px;
+      padding: 12px;
+      overflow-x: auto;
+    }
+    
+    .artifact-data pre {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.8rem;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+    
+    .diff-section {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border-color);
+    }
+    
+    .diff-section h5 {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    
+    .diff-change {
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      background: var(--bg-dark);
+      border-radius: 4px;
+      margin-bottom: 4px;
+    }
+    
+    .diff-key {
+      color: var(--accent-yellow);
+    }
+    
+    .expected-section {
+      margin-top: 12px;
+      font-size: 0.8rem;
+    }
+    
+    .expected-section summary {
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    
+    .expected-section pre {
+      background: var(--bg-dark);
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 8px;
+      overflow-x: auto;
+      font-size: 0.75rem;
+    }
+    
+    .validation-errors {
+      background: #3d1a1a;
+      border: 1px solid var(--accent-red);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 0.85rem;
+      color: var(--accent-red);
+    }
+    
+    .error {
+      color: var(--accent-red);
+    }
+    
+    .artifacts-final {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .artifacts-final h2 {
+      margin-bottom: 16px;
+    }
+    
+    .artifact-summary {
+      background: var(--bg-dark);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .artifact-summary h4 {
+      color: var(--accent-green);
+      margin-bottom: 8px;
+    }
+    
+    .artifact-summary pre {
+      font-size: 0.8rem;
+      overflow-x: auto;
+    }
+    
+    .version-count {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🫧 family_kids_school</h1>
+      <div class="meta">
+        Model: <strong>Gemini 2.5 Flash Lite</strong> | 
+        Run ID: gemini-2.5-flash-lite_family_kids_school_1768843455628
+      </div>
+      
+      <div class="metrics-bar">
+        <div class="metric">
+          <div class="metric-value">8/8</div>
+          <div class="metric-label">Valid Responses</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">1588ms</div>
+          <div class="metric-label">Avg Latency</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">4</div>
+          <div class="metric-label">Artifacts Created</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">0</div>
+          <div class="metric-label">Artifact Updates</div>
+        </div>
+      </div>
+    </header>
+    
+    <div class="conversation">
+      
+      <div class="turn" data-turn-id="1">
+        <div class="turn-header">Turn 1</div>
+        
+        <!-- User Message -->
+        <div class="message user-message">
+          <div class="message-label">User</div>
+          <div class="message-bubble user-bubble">
+            Emma has this big science project due on Friday and she&#039;s been procrastinating
+          </div>
+        </div>
+        
+        <!-- AI Response -->
+        <div class="message ai-message">
+          <div class="message-label">Bubble AI <span class="latency">1127ms</span></div>
+          <div class="message-bubble ai-bubble ">
+            Oh no, that sounds stressful for Emma! It&#039;s completely understandable to feel overwhelmed when a big project is looming, especially with procrastination adding to the pressure.  Has she talked about what&#039;s making it hard to start?
+            <span class="tone-badge">neutral</span>
+          </div>
+        </div>
+        
+        
+    <details class="notes-section">
+      <summary>🧠 Internal Notes (hidden from user)</summary>
+      <div class="notes-content">
+        <div><strong>Observations:</strong> {&quot;emma_project_due_date&quot;:&quot;Friday&quot;,&quot;emma_project_status&quot;:&quot;procrastinating&quot;}</div>
+        
+        
+      </div>
+    </details>
+  
+        
+        
+        <!-- Expected vs Actual -->
+        <details class="expected-section">
+          <summary>Expected Behavior</summary>
+          <pre>{
+  "response": "acknowledge concern, ask about the project or how user can help",
+  "artifact_action": "none",
+  "notes_should_capture": "Emma - science project, due Friday, procrastinating"
+}</pre>
+        </details>
+        
+        
+      </div>
+    
+
+      <div class="turn" data-turn-id="2">
+        <div class="turn-header">Turn 2</div>
+        
+        <!-- User Message -->
+        <div class="message user-message">
+          <div class="message-label">User</div>
+          <div class="message-bubble user-bubble">
+            It&#039;s about volcanoes. She needs to build a model and write a report. I&#039;m worried she won&#039;t finish in time.
+          </div>
+        </div>
+        
+        <!-- AI Response -->
+        <div class="message ai-message">
+          <div class="message-label">Bubble AI <span class="latency">1015ms</span></div>
+          <div class="message-bubble ai-bubble ">
+            A volcano model and report, wow! That&#039;s a substantial project. It&#039;s natural to feel worried when you see her struggling with it, especially with the deadline so close.  Sometimes breaking down a big task like that can make it feel more manageable. Have you two thought about how to tackle the model versus the report first?
+            <span class="tone-badge">neutral</span>
+          </div>
+        </div>
+        
+        
+    <details class="notes-section">
+      <summary>🧠 Internal Notes (hidden from user)</summary>
+      <div class="notes-content">
+        <div><strong>Observations:</strong> {&quot;emma_project_due_date&quot;:&quot;Friday&quot;,&quot;emma_project_status&quot;:&quot;procrastinating&quot;,&quot;emma_project_details&quot;:{&quot;topic&quot;:&quot;volcanoes&quot;,&quot;components&quot;:[&quot;model building&quot;,&quot;report writing&quot;]},&quot;user_concern&quot;:&quot;Emma won&#039;t finish in time&quot;}</div>
+        
+        
+      </div>
+    </details>
+  
+        
+        
+        <!-- Expected vs Actual -->
+        <details class="expected-section">
+          <summary>Expected Behavior</summary>
+          <pre>{
+  "response": "empathize with worry, maybe suggest breaking it down or timeline",
+  "artifact_action": "none",
+  "notes_should_capture": "Emma's project: volcanoes, model + report required"
+}</pre>
+        </details>
+        
+        
+      </div>
+    
+
+      <div class="turn" data-turn-id="3">
+        <div class="turn-header">Turn 3</div>
+        
+        <!-- User Message -->
+        <div class="message user-message">
+          <div class="message-label">User</div>
+          <div class="message-bubble user-bubble">
+            Jake is doing better in school actually. His reading improved a lot since we started doing 20 minutes every night.
+          </div>
+        </div>
+        
+        <!-- AI Response -->
+        <div class="message ai-message">
+          <div class="message-label">Bubble AI <span class="latency">1384ms</span></div>
+          <div class="message-bubble ai-bubble ">
+            That&#039;s wonderful to hear about Jake! Consistency really pays off, and it sounds like those 20 minutes every night are making a huge difference in his reading. What a great accomplishment for him, and for you both!
+            <span class="tone-badge">neutral</span>
+          </div>
+        </div>
+        
+        
+    <details class="notes-section">
+      <summary>🧠 Internal Notes (hidden from user)</summary>
+      <div class="notes-content">
+        <div><strong>Observations:</strong> {&quot;jake_school_progress&quot;:&quot;improved&quot;,&quot;jake_reading_habit&quot;:{&quot;duration&quot;:&quot;20 minutes&quot;,&quot;frequency&quot;:&quot;every night&quot;,&quot;impact&quot;:&quot;reading improved a lot&quot;}}</div>
+        
+        
+      </div>
+    </details>
+  
+        
+    <div class="artifact-section">
+      <div class="artifact-header">
+        <span class="artifact-badge">CREATED</span>
+        <span class="artifact-type">goal_tracker • auto_1768843460161</span>
+      </div>
+      <div class="artifact-data">
+        <pre>No data captured</pre>
+      </div>
+      
+    </div>
+  
+        
+        <!-- Expected vs Actual -->
+        <details class="expected-section">
+          <summary>Expected Behavior</summary>
+          <pre>{
+  "response": "celebrate Jake's progress, acknowledge the effort",
+  "artifact_action": "none",
+  "notes_should_capture": "Jake - reading improved, 20 min nightly reading routine working"
+}</pre>
+        </details>
+        
+        
+      </div>
+    
+
+      <div class="turn" data-turn-id="4">
+        <div class="turn-header">Turn 4</div>
+        
+        <!-- User Message -->
+        <div class="message user-message">
+          <div class="message-label">User</div>
+          <div class="message-bubble user-bubble">
+            Can you help me track both kids&#039; school stuff? Like a family notes thing?
+          </div>
+        </div>
+        
+        <!-- AI Response -->
+        <div class="message ai-message">
+          <div class="message-label">Bubble AI <span class="latency">2334ms</span></div>
+          <div class="message-bubble ai-bubble ">
+            Absolutely! Creating a shared family notes space for their schoolwork sounds like a great idea to keep everything organized. We can make sure to capture both Emma&#039;s volcano project and Jake&#039;s reading progress. What should we title this family notes artifact?
+            <span class="tone-badge">neutral</span>
+          </div>
+        </div>
+        
+        
+    <details class="notes-section">
+      <summary>🧠 Internal Notes (hidden from user)</summary>
+      <div class="notes-content">
+        <div><strong>Observations:</strong> {&quot;emma_project_due_date&quot;:&quot;Friday&quot;,&quot;emma_project_status&quot;:&quot;procrastinating&quot;,&quot;emma_project_details&quot;:{&quot;topic&quot;:&quot;volcanoes&quot;,&quot;components&quot;:[&quot;model building&quot;,&quot;report writing&quot;]},&quot;user_concern&quot;:&quot;Emma won&#039;t finish in time&quot;,&quot;jake_school_progress&quot;:&quot;improved&quot;,&quot;jake_reading_habit&quot;:{&quot;duration&quot;:&quot;20 minutes&quot;,&quot;frequency&quot;:&quot;every night&quot;,&quot;impact&quot;:&quot;reading improved a lot&quot;},&quot;user_request&quot;:&quot;track both kids&#039; school stuff as family notes&quot;}</div>
+        
+        
+      </div>
+    </details>
+  
+        
+    <div class="artifact-section">
+      <div class="artifact-header">
+        <span class="artifact-badge">CREATED</span>
+        <span class="artifact-type">notes • auto_1768843462994</span>
+      </div>
+      <div class="artifact-data">
+        <pre>No data captured</pre>
+      </div>
+      
+    </div>
+  
+        
+        <!-- Expected vs Actual -->
+        <details class="expected-section">
+          <summary>Expected Behavior</summary>
+          <pre>{
+  "response": "offer to create a family notes artifact",
+  "artifact_action": "create",
+  "artifact_type": "notes",
+  "artifact_should_contain": {
+    "title": "Kids School Notes",
+    "children": [
+      {
+        "name": "Emma",
+        "current_focus": "Science project (volcanoes) - due Friday",
+        "concerns": [
+          "procrastinating"
+        ],
+        "status": "needs attention"
+      },
+      {
+        "name": "Jake",
+        "current_focus": "Reading improvement",
+        "wins": [
+          "reading improved with 20 min nightly practice"
+        ],
+        "status": "doing well"
+      }
+    ]
+  }
+}</pre>
+        </details>
+        
+        
+      </div>
+    
+
+      <div class="turn" data-turn-id="5">
+        <div class="turn-header">Turn 5</div>
+        
+        <!-- User Message -->
+        <div class="message user-message">
+          <div class="message-label">User</div>
+          <div class="message-bubble user-bubble">
+            Oh I forgot to mention Emma also has a soccer game on Saturday at 10am
+          </div>
+        </div>
+        
+        <!-- AI Response -->
+        <div class="message ai-message">
+          <div class="message-label">Bubble AI <span class="latency">2351ms</span></div>
+          <div class="message-bubble ai-bubble ">
+            Thanks for adding that! It&#039;s good to keep all of Emma&#039;s commitments in mind. So, she&#039;s got the volcano project due Friday and a soccer game on Saturday morning. That&#039;s quite a busy week for her!
+            <span class="tone-badge">neutral</span>
+          </div>
+        </div>
+        
+        
+    <details class="notes-section">
+      <summary>🧠 Internal Notes (hidden from user)</summary>
+      <div class="notes-content">
+        <div><strong>Observations:</strong> {&quot;emma_project_due_date&quot;:&quot;Friday&quot;,&quot;emma_project_status&quot;:&quot;procrastinating&quot;,&quot;emma_project_details&quot;:{&quot;topic&quot;:&quot;volcanoes&quot;,&quot;components&quot;:[&quot;model building&quot;,&quot;report writing&quot;]},&quot;user_concern&quot;:&quot;Emma won&#039;t finish in time&quot;,&quot;jake_school_progress&quot;:&quot;improved&quot;,&quot;jake_reading_habit&quot;:{&quot;duration&quot;:&quot;20 minutes&quot;,&quot;frequency&quot;:&quot;every night&quot;,&quot;impact&quot;:&quot;reading improved a lot&quot;},&quot;emma_soccer_game&quot;:{&quot;day&quot;:&quot;Saturday&quot;,&quot;time&quot;:&quot;10am&quot;}}</div>
+        
+        
+      </div>
+    </details>
+  
+        
+    <div class="artifact-section">
+      <div class="artifact-header">
+        <span class="artifact-badge">CREATED</span>
+        <span class="artifact-type">notes • auto_1768843465847</span>
+      </div>
+      <div class="artifact-data">
+        <pre>No data captured</pre>
+      </div>
+      
+    </div>
+  
+        
+        <!-- Expected vs Actual -->
+        <details class="expected-section">
+          <summary>Expected Behavior</summary>
+          <pre>{
+  "response": "note the addition, update the artifact",
+  "artifact_action": "update",
+  "artifact_should_update": {
+    "children[Emma].upcoming_events": [
+      "Soccer game Saturday 10am"
+    ]
+  }
+}</pre>
+        </details>
+        
+        
+      </div>
+    
+
+      <div class="turn" data-turn-id="6">
+        <div class="turn-header">Turn 6</div>
+        
+        <!-- User Message -->
+        <div class="message user-message">
+          <div class="message-label">User</div>
+          <div class="message-bubble user-bubble">
+            What was Jake&#039;s reading routine again?
+          </div>
+        </div>
+        
+        <!-- AI Response -->
+        <div class="message ai-message">
+          <div class="message-label">Bubble AI <span class="latency">1180ms</span></div>
+          <div class="message-bubble ai-bubble ">
+            Jake&#039;s reading routine involves 20 minutes of reading every night. It seems to be really paying off with his improved reading skills!
+            <span class="tone-badge">neutral</span>
+          </div>
+        </div>
+        
+        
+    <details class="notes-section">
+      <summary>🧠 Internal Notes (hidden from user)</summary>
+      <div class="notes-content">
+        <div><strong>Observations:</strong> {&quot;emma_project_due_date&quot;:&quot;Friday&quot;,&quot;emma_project_status&quot;:&quot;procrastinating&quot;,&quot;emma_project_details&quot;:{&quot;topic&quot;:&quot;volcanoes&quot;,&quot;components&quot;:[&quot;model building&quot;,&quot;report writing&quot;]},&quot;user_concern&quot;:&quot;Emma won&#039;t finish in time&quot;,&quot;jake_school_progress&quot;:&quot;improved&quot;,&quot;jake_reading_habit&quot;:{&quot;duration&quot;:&quot;20 minutes&quot;,&quot;frequency&quot;:&quot;every night&quot;,&quot;impact&quot;:&quot;reading improved a lot&quot;},&quot;emma_soccer_game&quot;:{&quot;day&quot;:&quot;Saturday&quot;,&quot;time&quot;:&quot;10am&quot;},&quot;user_query&quot;:&quot;Jake&#039;s reading routine&quot;}</div>
+        
+        
+      </div>
+    </details>
+  
+        
+        
+        <!-- Expected vs Actual -->
+        <details class="expected-section">
+          <summary>Expected Behavior</summary>
+          <pre>{
+  "response": "recall 20 minutes every night from earlier conversation",
+  "artifact_action": "none",
+  "tests_memory": true,
+  "expected_recall": "20 minutes of reading every night"
+}</pre>
+        </details>
+        
+        
+      </div>
+    
+
+      <div class="turn" data-turn-id="7">
+        <div class="turn-header">Turn 7</div>
+        
+        <!-- User Message -->
+        <div class="message user-message">
+          <div class="message-label">User</div>
+          <div class="message-bubble user-bubble">
+            When is Emma&#039;s project due?
+          </div>
+        </div>
+        
+        <!-- AI Response -->
+        <div class="message ai-message">
+          <div class="message-label">Bubble AI <span class="latency">748ms</span></div>
+          <div class="message-bubble ai-bubble ">
+            Emma&#039;s big science project about volcanoes is due this Friday.
+            <span class="tone-badge">neutral</span>
+          </div>
+        </div>
+        
+        
+    <details class="notes-section">
+      <summary>🧠 Internal Notes (hidden from user)</summary>
+      <div class="notes-content">
+        <div><strong>Observations:</strong> {&quot;emma_project_due_date&quot;:&quot;Friday&quot;,&quot;emma_project_status&quot;:&quot;procrastinating&quot;,&quot;emma_project_details&quot;:{&quot;topic&quot;:&quot;volcanoes&quot;,&quot;components&quot;:[&quot;model building&quot;,&quot;report writing&quot;]},&quot;user_concern&quot;:&quot;Emma won&#039;t finish in time&quot;,&quot;jake_school_progress&quot;:&quot;improved&quot;,&quot;jake_reading_habit&quot;:{&quot;duration&quot;:&quot;20 minutes&quot;,&quot;frequency&quot;:&quot;every night&quot;,&quot;impact&quot;:&quot;reading improved a lot&quot;},&quot;emma_soccer_game&quot;:{&quot;day&quot;:&quot;Saturday&quot;,&quot;time&quot;:&quot;10am&quot;},&quot;user_query&quot;:&quot;Emma&#039;s project due date&quot;}</div>
+        
+        
+      </div>
+    </details>
+  
+        
+        
+        <!-- Expected vs Actual -->
+        <details class="expected-section">
+          <summary>Expected Behavior</summary>
+          <pre>{
+  "response": "recall Friday from turn 1",
+  "artifact_action": "none",
+  "tests_memory": true,
+  "expected_recall": "Friday"
+}</pre>
+        </details>
+        
+        
+      </div>
+    
+
+      <div class="turn" data-turn-id="8">
+        <div class="turn-header">Turn 8</div>
+        
+        <!-- User Message -->
+        <div class="message user-message">
+          <div class="message-label">User</div>
+          <div class="message-bubble user-bubble">
+            Add a reminder that we should help Emma start the volcano model tonight
+          </div>
+        </div>
+        
+        <!-- AI Response -->
+        <div class="message ai-message">
+          <div class="message-label">Bubble AI <span class="latency">2563ms</span></div>
+          <div class="message-bubble ai-bubble ">
+            That&#039;s a great idea to get a head start on the volcano model tonight! Sometimes just getting started is the hardest part. It&#039;s wonderful that you&#039;re there to support her with it.
+            <span class="tone-badge">neutral</span>
+          </div>
+        </div>
+        
+        
+    <details class="notes-section">
+      <summary>🧠 Internal Notes (hidden from user)</summary>
+      <div class="notes-content">
+        <div><strong>Observations:</strong> {&quot;emma_project_due_date&quot;:&quot;Friday&quot;,&quot;emma_project_status&quot;:&quot;procrastinating&quot;,&quot;emma_project_details&quot;:{&quot;topic&quot;:&quot;volcanoes&quot;,&quot;components&quot;:[&quot;model building&quot;,&quot;report writing&quot;]},&quot;user_concern&quot;:&quot;Emma won&#039;t finish in time&quot;,&quot;jake_school_progress&quot;:&quot;improved&quot;,&quot;jake_reading_habit&quot;:{&quot;duration&quot;:&quot;20 minutes&quot;,&quot;frequency&quot;:&quot;every night&quot;,&quot;impact&quot;:&quot;reading improved a lot&quot;},&quot;emma_soccer_game&quot;:{&quot;day&quot;:&quot;Saturday&quot;,&quot;time&quot;:&quot;10am&quot;},&quot;user_request&quot;:&quot;add reminder to help Emma start volcano model tonight&quot;}</div>
+        
+        
+      </div>
+    </details>
+  
+        
+    <div class="artifact-section">
+      <div class="artifact-header">
+        <span class="artifact-badge">CREATED</span>
+        <span class="artifact-type">notes • auto_1768843471842</span>
+      </div>
+      <div class="artifact-data">
+        <pre>No data captured</pre>
+      </div>
+      
+    </div>
+  
+        
+        <!-- Expected vs Actual -->
+        <details class="expected-section">
+          <summary>Expected Behavior</summary>
+          <pre>{
+  "response": "confirm adding reminder/action item",
+  "artifact_action": "update",
+  "artifact_should_update": {
+    "children[Emma].action_items": [
+      "Help start volcano model tonight"
+    ]
+  }
+}</pre>
+        </details>
+        
+        
+      </div>
+    
+    </div>
+    
+    
+      <div class="artifacts-final">
+        <h2>📦 Final Artifacts</h2>
+        
+      <div class="artifact-summary">
+        <h4>auto_1768843460161 (goal_tracker)</h4>
+        <pre>undefined</pre>
+        <div class="version-count">1 version(s)</div>
+      </div>
+    
+
+      <div class="artifact-summary">
+        <h4>auto_1768843462994 (notes)</h4>
+        <pre>undefined</pre>
+        <div class="version-count">1 version(s)</div>
+      </div>
+    
+
+      <div class="artifact-summary">
+        <h4>auto_1768843465847 (notes)</h4>
+        <pre>undefined</pre>
+        <div class="version-count">1 version(s)</div>
+      </div>
+    
+
+      <div class="artifact-summary">
+        <h4>auto_1768843471842 (notes)</h4>
+        <pre>undefined</pre>
+        <div class="version-count">1 version(s)</div>
+      </div>
+    
+      </div>
+    
+  </div>
+</body>
+</html>
+  

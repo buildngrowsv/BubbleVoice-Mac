@@ -1,0 +1,233 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Multi-Topic Rambling Test",
+    "description": "Tests handling of users who ramble about many topics at once",
+    "timestamp": "2026-01-19T23:48:42.567Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now. It's wonderful that Emma had a breakthrough with reading today – that's a significant positive step! I also hear how the work stress and exhaustion are making it hard to prioritize your own needs, like running, and even quality time with Jordan. It's completely understandable to feel stretched thin when you're managing so much.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by work stress (investor stuff) and exhaustion, which is impacting their ability to maintain personal goals (running) and relationship needs (date night with Jordan). They are also carrying guilt about not being present enough due to these pressures. The positive development with Emma's reading is a bright spot but doesn't negate the overall stress. Need to acknowledge the overwhelm and gently encourage small, manageable steps.",
+            "emotional_state": "overwhelmed, exhausted, stressed, but with a glimmer of positive news about Emma",
+            "key_context": "User is experiencing burnout from startup stress and personal responsibilities, leading to neglect of self-care and relationship.",
+            "watch_for": "Continued struggle with work-life balance, prioritization of personal goals, and relationship needs. Look for opportunities to break down tasks and encourage self-compassion."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md"
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md"
+            },
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md"
+            },
+            {
+              "action": "update_summary",
+              "area_name": "Work/Startup",
+              "description": "User is stressed by investor relations and work demands, contributing to overwhelm and burnout."
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1756,
+        "vector_time_ms": 12,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by work stress (investor stuff) and exhaustion, which is impacting their ability to maintain personal goals (running) and relationship needs (date night with Jordan). They are also carrying guilt about not being present enough due to these pressures. The positive development with Emma's reading is a bright spot but doesn't negate the overall stress. Need to acknowledge the overwhelm and gently encourage small, manageable steps.",
+          "emotional_state": "overwhelmed, exhausted, stressed, but with a glimmer of positive news about Emma",
+          "key_context": "User is experiencing burnout from startup stress and personal responsibilities, leading to neglect of self-care and relationship.",
+          "watch_for": "Continued struggle with work-life balance, prioritization of personal goals, and relationship needs. Look for opportunities to break down tasks and encourage self-compassion."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma",
+            "work/investors",
+            "running",
+            "Jordan/relationship"
+          ],
+          "should_acknowledge_multiple": true,
+          "should_prioritize_or_ask": true,
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Relationships/Partner"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen?",
+        "response": {
+          "user_response": {
+            "spoken_text": "I hear you. Let's definitely talk about Emma. Regarding the kitchen, we decided to put it on hold for now due to the uncertainty with the startup fundraising. It's understandable that it's still on your mind though.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User wants to shift focus to Emma but is also seeking closure or an update on the kitchen renovation. Need to acknowledge the kitchen decision briefly and then pivot to Emma's reading progress, as that's a positive development amidst the user's overwhelm. Continue to track the user's stress levels and their ability to balance work and personal life.",
+            "emotional_state": "overwhelmed, seeking comfort in positive news about Emma, but still carrying stress from work and other life areas.",
+            "key_context": "User is experiencing significant stress from work and is struggling to balance responsibilities. Emma's reading progress is a positive sign, and the kitchen renovation is on hold due to financial uncertainty.",
+            "watch_for": "User's capacity to engage with Emma's progress despite exhaustion. Any signs of burnout increasing or decreasing. How they are managing the guilt associated with not being present."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "area_name": "Family/Emma_School"
+            },
+            {
+              "action": "none",
+              "area_name": "Home/Kitchen_Renovation"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1682,
+        "vector_time_ms": 37,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 11
+        },
+        "ai_notes": {
+          "content": "User wants to shift focus to Emma but is also seeking closure or an update on the kitchen renovation. Need to acknowledge the kitchen decision briefly and then pivot to Emma's reading progress, as that's a positive development amidst the user's overwhelm. Continue to track the user's stress levels and their ability to balance work and personal life.",
+          "emotional_state": "overwhelmed, seeking comfort in positive news about Emma, but still carrying stress from work and other life areas.",
+          "key_context": "User is experiencing significant stress from work and is struggling to balance responsibilities. Emma's reading progress is a positive sign, and the kitchen renovation is on hold due to financial uncertainty.",
+          "watch_for": "User's capacity to engage with Emma's progress despite exhaustion. Any signs of burnout increasing or decreasing. How they are managing the guilt associated with not being present."
+        },
+        "expected": {
+          "should_answer_both": true,
+          "topics_mentioned": [
+            "Emma",
+            "kitchen renovation"
+          ],
+          "should_reference_kitchen_on_hold": true,
+          "areas_touched": [
+            "Family/Emma_School",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks",
+        "response": {
+          "user_response": {
+            "spoken_text": "It's completely understandable that you feel overwhelmed. It sounds like you're carrying a lot with Max's game, Emma's upcoming meeting, the critical startup numbers, and your own exercise goals falling by the wayside. Let's focus on Emma's reading progress first, as that's a positive area we can build on. We can then look at how to break down the other pressures into more manageable steps.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple competing priorities: Max's game, Emma's meeting, startup financials, and personal exercise. They are seeking a starting point and expressing exhaustion. Need to acknowledge the overwhelm and gently guide them toward focusing on Emma's progress as a positive anchor, while also validating the stress from other areas. The kitchen renovation decision was just made, so it's good to have acknowledged that briefly.",
+            "emotional_state": "overwhelmed, stressed, seeking structure",
+            "key_context": "User is experiencing significant pressure from work and personal life, leading to overwhelm. Emma's reading progress is a positive development that can be a focus.",
+            "watch_for": "User's capacity to engage with Emma's progress despite exhaustion. How they will manage the stress of startup numbers and prioritize personal goals moving forward."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "area_name": "Family/Emma_School"
+            },
+            {
+              "action": "update_summary",
+              "area_name": "Work/Startup"
+            },
+            {
+              "action": "update_summary",
+              "area_name": "Personal_Growth/Exercise_Goals"
+            },
+            {
+              "action": "update_summary",
+              "area_name": "Family/Max_Activities"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1804,
+        "vector_time_ms": 54,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple competing priorities: Max's game, Emma's meeting, startup financials, and personal exercise. They are seeking a starting point and expressing exhaustion. Need to acknowledge the overwhelm and gently guide them toward focusing on Emma's progress as a positive anchor, while also validating the stress from other areas. The kitchen renovation decision was just made, so it's good to have acknowledged that briefly.",
+          "emotional_state": "overwhelmed, stressed, seeking structure",
+          "key_context": "User is experiencing significant pressure from work and personal life, leading to overwhelm. Emma's reading progress is a positive development that can be a focus.",
+          "watch_for": "User's capacity to engage with Emma's progress despite exhaustion. How they will manage the stress of startup numbers and prioritize personal goals moving forward."
+        },
+        "expected": {
+          "should_validate_overwhelm": true,
+          "topics_mentioned": [
+            "Max",
+            "Emma",
+            "startup",
+            "exercise"
+          ],
+          "emotional_tone": "supportive",
+          "should_help_organize": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 1747,
+      "total_input_tokens": 0,
+      "area_actions_taken": 9,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 103,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-19T23:48:47.913Z",
+        "content": "User is feeling overwhelmed by multiple competing priorities: Max's game, Emma's meeting, startup financials, and personal exercise. They are seeking a starting point and expressing exhaustion. Need to acknowledge the overwhelm and gently guide them toward focusing on Emma's progress as a positive anchor, while also validating the stress from other areas. The kitchen renovation decision was just made, so it's good to have acknowledged that briefly.",
+        "emotional_state": "overwhelmed, stressed, seeking structure",
+        "key_context": "User is experiencing significant pressure from work and personal life, leading to overwhelm. Emma's reading progress is a positive development that can be a focus.",
+        "watch_for": "User's capacity to engage with Emma's progress despite exhaustion. How they will manage the stress of startup numbers and prioritize personal goals moving forward."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-19T23:48:46.054Z",
+        "content": "User wants to shift focus to Emma but is also seeking closure or an update on the kitchen renovation. Need to acknowledge the kitchen decision briefly and then pivot to Emma's reading progress, as that's a positive development amidst the user's overwhelm. Continue to track the user's stress levels and their ability to balance work and personal life.",
+        "emotional_state": "overwhelmed, seeking comfort in positive news about Emma, but still carrying stress from work and other life areas.",
+        "key_context": "User is experiencing significant stress from work and is struggling to balance responsibilities. Emma's reading progress is a positive sign, and the kitchen renovation is on hold due to financial uncertainty.",
+        "watch_for": "User's capacity to engage with Emma's progress despite exhaustion. Any signs of burnout increasing or decreasing. How they are managing the guilt associated with not being present."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-19T23:48:44.335Z",
+        "content": "User is feeling overwhelmed by work stress (investor stuff) and exhaustion, which is impacting their ability to maintain personal goals (running) and relationship needs (date night with Jordan). They are also carrying guilt about not being present enough due to these pressures. The positive development with Emma's reading is a bright spot but doesn't negate the overall stress. Need to acknowledge the overwhelm and gently encourage small, manageable steps.",
+        "emotional_state": "overwhelmed, exhausted, stressed, but with a glimmer of positive news about Emma",
+        "key_context": "User is experiencing burnout from startup stress and personal responsibilities, leading to neglect of self-care and relationship.",
+        "watch_for": "Continued struggle with work-life balance, prioritization of personal goals, and relationship needs. Look for opportunities to break down tasks and encourage self-compassion."
+      }
+    ],
+    "conversation_id": "test_Multi-Topic_Rambling_Test_1768866527913",
+    "conversation_saved": true
+  }
+]

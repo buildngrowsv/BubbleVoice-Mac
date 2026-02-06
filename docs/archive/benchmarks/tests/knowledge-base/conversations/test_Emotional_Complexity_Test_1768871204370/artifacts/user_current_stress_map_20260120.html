@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237,137,54,0.9) 0%, rgba(251,191,36,0.9) 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card-container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        .card-title {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stress-area {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .stress-area:hover {
+            transform: translateY(-5px);
+        }
+        .stress-area-icon {
+            font-size: 2em;
+            color: #fff;
+            padding: 10px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.15);
+        }
+        .stress-area-content {
+            flex-grow: 1;
+        }
+        .stress-area-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+            letter-spacing: 0.3px;
+        }
+        .stress-area-details {
+            font-size: 0.95em;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+        }
+        .emotion-tag {
+            background: rgba(0,0,0,0.1);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+            margin-top: 8px;
+            display: inline-block;
+            transition: background 0.2s ease;
+        }
+        .emotion-tag:hover {
+            background: rgba(0,0,0,0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <h1 class="card-title">Your Current Stress Landscape 🗺️</h1>
+        
+        <div class="stress-area">
+            <div class="stress-area-icon">📚</div>
+            <div class="stress-area-content">
+                <h2 class="stress-area-title">Emma's School 🍎</h2>
+                <p class="stress-area-details">
+                    Struggles with reading comprehension, but showing promise with graphic novels.
+                    Teacher meeting scheduled. User feels a mix of pride, frustration, guilt, worry, and hope.
+                </p>
+                <span class="emotion-tag">😟 Frustrated</span>
+                <span class="emotion-tag">😔 Guilty</span>
+                <span class="emotion-tag">😥 Worried</span>
+                <span class="emotion-tag">😊 Hopeful</span>
+            </div>
+        </div>
+
+        <div class="stress-area">
+            <div class="stress-area-icon">🚀</div>
+            <div class="stress-area-content">
+                <h2 class="stress-area-title">Startup 💼</h2>
+                <p class="stress-area-details">
+                    Investor meeting went well, a positive development.
+                    However, the stress from this area is currently overshadowing the good news due to other life pressures.
+                </p>
+                <span class="emotion-tag">😓 Stressed</span>
+                <span class="emotion-tag">😐 Overwhelmed</span>
+            </div>
+        </div>
+        
+        <div class="stress-area">
+            <div class="stress-area-icon">🧘</div>
+            <div class="stress-area-content">
+                <h2 class="stress-area-title">Mental Health 🧠</h2>
+                <p class="stress-area-details">
+                    Therapy session acknowledged guilt as 'borrowed suffering'.
+                    User is working on self-compassion but finds it challenging.
+                </p>
+                <span class="emotion-tag">⚖️ Reflective</span>
+                <span class="emotion-tag">☁️ Processing</span>
+            </div>
+        </div>
+
+        <div class="stress-area">
+            <div class="stress-area-icon">❤️</div>
+            <div class="stress-area-content">
+                <h2 class="stress-area-title">Partner Time ⏳</h2>
+                <p class="stress-area-details">
+                    Active area, but potential for strain given overall stress levels.
+                    Needs conscious effort to maintain quality time.
+                </p>
+                <span class="emotion-tag">🤔 Balancing</span>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

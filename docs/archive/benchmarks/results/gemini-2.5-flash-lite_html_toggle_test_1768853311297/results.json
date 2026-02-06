@@ -1,0 +1,239 @@
+{
+  "scenario": "html_toggle_test",
+  "model": "gemini-2.5-flash-lite",
+  "turns": [
+    {
+      "turn": 1,
+      "user_input": "I'm trying to decide between two job offers",
+      "expected_html_toggle": false,
+      "actual_html_toggle": true,
+      "toggle_match": false,
+      "latency": 1214,
+      "model_response": {
+        "user_response": {
+          "text": "It sounds like you have a big decision to make! I can help you compare these two job offers.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is deciding between two job offers. This is a significant decision that would benefit from a visual comparison.",
+          "context_updates": "User is facing a decision between two job offers.",
+          "reasoning": "The user is making a significant decision between two job offers. A visual comparison will help them weigh the pros and cons of each offer more effectively."
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_type": "comparison_card",
+          "data_json": "{\"job_offers\": [{\"name\": \"Job Offer 1\"}, {\"name\": \"Job Offer 2\"}]}",
+          "modification_type": "complete_overhaul"
+        },
+        "html_toggle": {
+          "generate_html": true,
+          "reason": "User needs to visualize and compare two job offers to make a decision."
+        }
+      },
+      "reasoning": "First mention - need more details before creating anything. HTML OFF (fast mode)."
+    },
+    {
+      "turn": 2,
+      "user_input": "Offer A is at Google - $180k, great benefits, but 60 hour weeks and I'd have to relocate to SF. Offer B is at a startup - $140k, equity, flexible hours, remote, but risky.",
+      "expected_html_toggle": true,
+      "actual_html_toggle": false,
+      "toggle_match": false,
+      "latency": 2907,
+      "model_response": {
+        "user_response": {
+          "text": "Thanks for sharing those details! It sounds like you have two very different opportunities. Let's break them down to help you decide.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User has provided details for two job offers: Offer A (Google) and Offer B (startup). Offer A has higher salary and benefits but longer hours and relocation. Offer B has lower salary but flexibility, remote work, and equity, with higher risk.",
+          "context_updates": "Details for Offer A (Google: $180k, great benefits, 60hr weeks, relocate to SF) and Offer B (Startup: $140k, equity, flexible hours, remote, risky) have been provided.",
+          "reasoning": "The user has provided specific details for both job offers. This information is sufficient to update the comparison card artifact with the new data and regenerate the visualization."
+        },
+        "artifact_action": {
+          "action": "update",
+          "html": "<div class=\"artifact\" style=\"font-family: sans-serif; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;\">\n  <h2 style=\"color: #333; margin-bottom: 15px;\">Job Offer Comparison</h2>\n  <div style=\"display: flex; justify-content: space-around; gap: 20px;\">\n    <div style=\"flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 5px; background-color: #fff;\">\n      <h3 style=\"color: #007bff; margin-top: 0;\">Offer A: Google</h3>\n      <ul style=\"list-style: none; padding: 0;\">\n        <li style=\"margin-bottom: 10px;\"><strong>Salary:</strong> $180k</li>\n        <li style=\"margin-bottom: 10px;\"><strong>Benefits:</strong> Great</li>\n        <li style=\"margin-bottom: 10px;\"><strong>Hours:</strong> 60 hours/week</li>\n        <li style=\"margin-bottom: 10px;\"><strong>Location:</strong> Relocation to SF required</li>\n        <li style=\"margin-bottom: 10px;\"><strong>Risk:</strong> Low</li>\n      </ul>\n    </div>\n    <div style=\"flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 5px; background-color: #fff;\">\n      <h3 style=\"color: #28a745; margin-top: 0;\">Offer B: Startup</h3>\n      <ul style=\"list-style: none; padding: 0;\">\n        <li style=\"margin-bottom: 10px;\"><strong>Salary:</strong> $140k</li>\n        <li style=\"margin-bottom: 10px;\"><strong>Benefits:</strong> Equity</li>\n        <li style=\"margin-bottom: 10px;\"><strong>Hours:</strong> Flexible</li>\n        <li style=\"margin-bottom: 10px;\"><strong>Location:</strong> Remote</li>\n        <li style=\"margin-bottom: 10px;\"><strong>Risk:</strong> High</li>\n      </ul>\n    </div>\n  </div>\n</div>",
+          "artifact_id": "job_comparison_1",
+          "data_json": "{\"job_offers\": [{\"name\": \"Offer A\", \"company\": \"Google\", \"salary\": \"$180k\", \"benefits\": \"Great\", \"hours\": \"60 hours/week\", \"location\": \"Relocate to SF\", \"risk\": \"Low\"}, {\"name\": \"Offer B\", \"company\": \"Startup\", \"salary\": \"$140k\", \"benefits\": \"Equity\", \"hours\": \"Flexible\", \"location\": \"Remote\", \"risk\": \"High\"}]}",
+          "modification_type": "data_and_ui"
+        }
+      },
+      "reasoning": "Complex decision with multiple factors - TOGGLE HTML ON. User needs to SEE the comparison."
+    },
+    {
+      "turn": 3,
+      "user_input": "Actually the Google salary is $190k, not $180k",
+      "expected_html_toggle": false,
+      "actual_html_toggle": false,
+      "toggle_match": true,
+      "latency": 1394,
+      "model_response": {
+        "user_response": {
+          "text": "Got it, thanks for the correction! I've updated the salary for the Google offer to $190k. This is an important detail to get right for your comparison.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User corrected the salary for Google offer from $180k to $190k. This is a minor data update to an existing artifact.",
+          "context_updates": "Google offer salary updated to $190k.",
+          "reasoning": "The user provided a correction to the existing data. The artifact needs to be updated with this new information. Since the visual already exists and only data has changed, a 'data_only' modification is appropriate."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "job_comparison_1",
+          "data_json": "{\"job_offers\": [{\"name\": \"Offer A\", \"company\": \"Google\", \"salary\": \"$190k\", \"benefits\": \"Great\", \"hours\": \"60 hours/week\", \"location\": \"Relocate to SF\", \"risk\": \"Low\"}, {\"name\": \"Offer B\", \"company\": \"Startup\", \"salary\": \"$140k\", \"benefits\": \"Equity\", \"hours\": \"Flexible\", \"location\": \"Remote\", \"risk\": \"High\"}]}",
+          "modification_type": "data_only"
+        },
+        "html_toggle": {
+          "generate_html": false
+        }
+      },
+      "reasoning": "Simple data correction - HTML OFF. User already has the visual, just update the number."
+    },
+    {
+      "turn": 4,
+      "user_input": "What do you think I should prioritize?",
+      "expected_html_toggle": false,
+      "actual_html_toggle": false,
+      "toggle_match": true,
+      "latency": 1667,
+      "model_response": {
+        "user_response": {
+          "text": "That's a great question. To help you prioritize, let's think about what's most important to you in a job. Are you leaning more towards financial security and stability, or are you more attracted to the potential growth and flexibility of the startup? What factors are weighing most heavily on your mind right now?",
+          "tone": "curious"
+        },
+        "internal_notes": {
+          "observations": "User is asking for prioritization advice. This requires understanding their personal values and priorities in relation to the job offers. The current artifact is a comparison card, which shows the data but doesn't explicitly weigh factors based on user preference.",
+          "context_updates": "User is seeking guidance on prioritizing between the two job offers.",
+          "reasoning": "The user is asking for advice on prioritization. To provide helpful guidance, I need to understand their personal values and what they deem most important. I will ask clarifying questions to gather this information. The artifact action is 'none' because the current request is for information gathering and advice, not an artifact modification. HTML toggle is false as no new visualization is being created or updated at this stage."
+        },
+        "artifact_action": {
+          "action": "none"
+        },
+        "html_toggle": {
+          "generate_html": false
+        }
+      },
+      "reasoning": "User asking question - HTML OFF. No artifact change needed, just conversation."
+    },
+    {
+      "turn": 5,
+      "user_input": "I care most about work-life balance and spending time with my kids",
+      "expected_html_toggle": false,
+      "actual_html_toggle": true,
+      "toggle_match": false,
+      "latency": 2058,
+      "model_response": {
+        "user_response": {
+          "text": "Thanks for sharing that. Knowing that work-life balance and time with your kids are your top priorities is really helpful. Let's look at how each offer aligns with that.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User has identified 'work-life balance' and 'spending time with kids' as their highest priorities. This information is crucial for advising on which job offer to prioritize.",
+          "context_updates": "User's top priorities are work-life balance and time with kids.",
+          "reasoning": "The user has now provided their core priorities. This allows me to evaluate the existing job offers against these priorities and offer more tailored advice. I will use this information to suggest which offer might be a better fit and potentially trigger an update to the visualization to highlight these aspects."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "job_comparison_1",
+          "data_json": "{\"job_offers\": [{\"name\": \"Offer A\", \"company\": \"Google\", \"salary\": \"$190k\", \"benefits\": \"Great\", \"hours\": \"60 hours/week\", \"location\": \"Relocate to SF\", \"risk\": \"Low\", \"work_life_balance\": \"Poor\"}, {\"name\": \"Offer B\", \"company\": \"Startup\", \"salary\": \"$140k\", \"benefits\": \"Equity\", \"hours\": \"Flexible\", \"location\": \"Remote\", \"risk\": \"High\", \"work_life_balance\": \"Good\"}], \"priorities\": {\"primary\": [\"work_life_balance\", \"time_with_kids\"], \"secondary\": []}}",
+          "modification_type": "data_and_ui"
+        },
+        "html_toggle": {
+          "generate_html": true,
+          "reason": "User has provided their priorities, which need to be incorporated into the visualization to help them compare the offers based on what matters most to them."
+        }
+      },
+      "reasoning": "Adding context/values - HTML OFF. Data update only, no visual regeneration needed."
+    },
+    {
+      "turn": 6,
+      "user_input": "Can you show me this as a pros/cons list instead?",
+      "expected_html_toggle": true,
+      "actual_html_toggle": false,
+      "toggle_match": false,
+      "latency": 3770,
+      "model_response": {
+        "user_response": {
+          "text": "Absolutely! A pros and cons list can be a very clear way to visualize this. Here it is, focusing on your priorities of work-life balance and time with your kids.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User wants to change the artifact type from a comparison card to a pros/cons list. They have previously indicated that work-life balance and time with kids are their top priorities.",
+          "context_updates": "User has requested a change in artifact type to a pros/cons list.",
+          "reasoning": "The user explicitly requested a change in the visualization format. The existing data about the job offers and their priorities can be repurposed into a pros/cons list. This requires a 'complete_overhaul' of the artifact, generating new HTML and updating the data structure if necessary to fit the new format."
+        },
+        "artifact_action": {
+          "action": "create",
+          "html": "<div class=\"artifact\" style=\"font-family: sans-serif; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;\">\n  <h2 style=\"color: #333; margin-bottom: 15px;\">Job Offer Pros and Cons</h2>\n  <div style=\"display: flex; justify-content: space-around; gap: 20px;\">\n    <div style=\"flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 5px; background-color: #fff;\">\n      <h3 style=\"color: #007bff; margin-top: 0;\">Offer A: Google</h3>\n      <h4 style=\"color: #28a745;\">Pros:</h4>\n      <ul style=\"list-style: disc; margin-left: 20px;\">\n        <li>Salary: $190k</li>\n        <li>Great Benefits</li>\n        <li>Low Risk</li>\n      </ul>\n      <h4 style=\"color: #dc3545;\">Cons:</h4>\n      <ul style=\"list-style: disc; margin-left: 20px;\">\n        <li>60 hours/week (Poor work-life balance)</li>\n        <li>Relocation to SF required</li>\n        <li>Less time with kids</li>\n      </ul>\n    </div>\n    <div style=\"flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 5px; background-color: #fff;\">\n      <h3 style=\"color: #28a745; margin-top: 0;\">Offer B: Startup</h3>\n      <h4 style=\"color: #28a745;\">Pros:</h4>\n      <ul style=\"list-style: disc; margin-left: 20px;\">\n        <li>$140k Salary</li>\n        <li>Equity</li>\n        <li>Flexible Hours (Good work-life balance)</li>\n        <li>Remote</li>\n        <li>More time with kids</li>\n      </ul>\n      <h4 style=\"color: #dc3545;\">Cons:</h4>\n      <ul style=\"list-style: disc; margin-left: 20px;\">\n        <li>High Risk</li>\n      </ul>\n    </div>\n  </div>\n</div>",
+          "artifact_id": "job_comparison_pros_cons_1",
+          "artifact_type": "comparison_card",
+          "data_json": "{\"job_offers\": [{\"name\": \"Offer A\", \"company\": \"Google\", \"salary\": \"$190k\", \"benefits\": \"Great\", \"hours\": \"60 hours/week\", \"location\": \"Relocate to SF\", \"risk\": \"Low\", \"work_life_balance\": \"Poor\", \"time_with_kids\": \"Less\"}, {\"name\": \"Offer B\", \"company\": \"Startup\", \"salary\": \"$140k\", \"benefits\": \"Equity\", \"hours\": \"Flexible\", \"location\": \"Remote\", \"risk\": \"High\", \"work_life_balance\": \"Good\", \"time_with_kids\": \"More\"}], \"priorities\": {\"primary\": [\"work_life_balance\", \"time_with_kids\"], \"secondary\": []}}",
+          "modification_type": "complete_overhaul"
+        }
+      },
+      "reasoning": "User requests visual redesign - TOGGLE HTML ON. Need to regenerate the entire visual."
+    },
+    {
+      "turn": 7,
+      "user_input": "Thanks, I think I'm leaning towards the startup",
+      "expected_html_toggle": false,
+      "actual_html_toggle": false,
+      "toggle_match": true,
+      "latency": 1261,
+      "model_response": {
+        "user_response": {
+          "text": "It sounds like the startup might be a better fit for you, given your priorities for work-life balance and time with your kids. That's great that you're feeling more clarity!",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is indicating a leaning towards the startup offer based on the previous pros/cons list and their stated priorities. This suggests the decision-making process is progressing.",
+          "context_updates": "User is leaning towards the startup job offer.",
+          "reasoning": "The user has expressed a leaning towards one of the options, indicating progress in their decision. The current artifact (pros/cons list) has already been generated and reflects their priorities. No further artifact action is needed at this moment, as the user is not asking for a new visualization or data update, but rather expressing their current leaning. HTML toggle is false as no new visualization is being created or updated."
+        },
+        "artifact_action": {
+          "action": "none"
+        },
+        "html_toggle": {
+          "generate_html": false
+        }
+      },
+      "reasoning": "User reflecting - HTML OFF. No artifact change needed."
+    },
+    {
+      "turn": 8,
+      "user_input": "Actually, can you add a third option? I just got an offer from Amazon - $200k, hybrid (3 days office), good benefits, stable but corporate culture",
+      "expected_html_toggle": true,
+      "actual_html_toggle": true,
+      "toggle_match": true,
+      "latency": 2355,
+      "model_response": {
+        "user_response": {
+          "text": "Okay, a third offer! Let's add Amazon to the mix. $200k, hybrid work, good benefits, but a corporate culture. We'll update the comparison to include this new option.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User has provided details for a third job offer (Amazon) and wants to add it to the comparison. The previous artifact was a pros/cons list for two offers. This requires updating the artifact to include a third option and potentially reformatting or regenerating the visualization.",
+          "context_updates": "A third job offer from Amazon has been received: $200k, hybrid (3 days office), good benefits, stable, corporate culture.",
+          "reasoning": "The user is adding a new option to their decision. The existing pros/cons list artifact needs to be updated to include this third offer. Since a new option is being added, and the user's priorities are known, the artifact will be updated to reflect all three offers, and the visualization will be regenerated to accommodate the new data. The modification type is 'data_and_ui' because new data is added and the UI will likely need adjustment to display three options clearly."
+        },
+        "artifact_action": {
+          "action": "update",
+          "artifact_id": "job_comparison_pros_cons_1",
+          "data_json": "{\"job_offers\": [{\"name\": \"Offer A\", \"company\": \"Google\", \"salary\": \"$190k\", \"benefits\": \"Great\", \"hours\": \"60 hours/week\", \"location\": \"Relocate to SF\", \"risk\": \"Low\", \"work_life_balance\": \"Poor\", \"time_with_kids\": \"Less\", \"culture\": \"Unknown\"}, {\"name\": \"Offer B\", \"company\": \"Startup\", \"salary\": \"$140k\", \"benefits\": \"Equity\", \"hours\": \"Flexible\", \"location\": \"Remote\", \"risk\": \"High\", \"work_life_balance\": \"Good\", \"time_with_kids\": \"More\", \"culture\": \"Startup\"}, {\"name\": \"Offer C\", \"company\": \"Amazon\", \"salary\": \"$200k\", \"benefits\": \"Good\", \"hours\": \"Hybrid (3 days office)\", \"location\": \"N/A\", \"risk\": \"Low\", \"work_life_balance\": \"Moderate\", \"time_with_kids\": \"Moderate\", \"culture\": \"Corporate\"}], \"priorities\": {\"primary\": [\"work_life_balance\", \"time_with_kids\"], \"secondary\": []}}",
+          "modification_type": "data_and_ui"
+        },
+        "html_toggle": {
+          "generate_html": true,
+          "reason": "User has added a third job offer, requiring an update to the existing pros/cons list to include the new option and potentially adjust the layout for three items."
+        }
+      },
+      "reasoning": "Adding third option changes layout - TOGGLE HTML ON. Need to regenerate visual to accommodate new column/row."
+    }
+  ],
+  "stats": {
+    "total_turns": 8,
+    "html_on_count": 3,
+    "html_off_count": 5,
+    "avg_latency_html_off": 2200,
+    "avg_latency_html_on": 1876
+  }
+}

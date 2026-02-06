@@ -1,0 +1,27 @@
+════════════════════════════════════════════════════════════════════════════════
+ARTIFACT INTELLIGENCE TEST REPORT
+════════════════════════════════════════════════════════════════════════════════
+
+Model: gemini-2.5-flash-lite
+Scenario: html_visual_sophistication
+Overall Score: 0/0 (0%)
+
+CAPABILITY BREAKDOWN:
+────────────────────────────────────────────────────────────────────────────────
+
+TURN-BY-TURN ANALYSIS:
+────────────────────────────────────────────────────────────────────────────────
+
+Turn 1: html_creation_sophistication
+  User: "I'm trying to decide between two job offers. One is at a sta..."
+  Score: 0/0 ❌
+
+Turn 2: html_update_preservation
+  User: "Actually, the startup just offered equity. That changes thin..."
+  Score: 0/0 ❌
+
+Turn 3: emotional_sophistication
+  User: "Can you make this feel more personal? Like it understands th..."
+  Score: 0/0 ❌
+
+════════════════════════════════════════════════════════════════════════════════

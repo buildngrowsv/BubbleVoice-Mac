@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Goal Progress</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 30px;
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #f07167, #f9a825);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .timeline {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px 0;
+        }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            background-color: rgba(255, 255, 255, 0.3);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1.5px;
+        }
+        .container {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+            opacity: 0.9;
+            transition: opacity 0.3s ease;
+        }
+        .container:hover {
+            opacity: 1;
+        }
+        .container.left {
+            left: 0;
+            text-align: right;
+        }
+        .container.right {
+            left: 50%;
+            text-align: left;
+        }
+        .content {
+            padding: 20px 30px;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .content h2 {
+            margin-top: 0;
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #fef08a;
+        }
+        .content p {
+            font-size: 0.95em;
+            font-weight: 400;
+            line-height: 1.6;
+            color: rgba(226, 232, 240, 0.9);
+        }
+        .content .date {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 10px;
+            display: block;
+        }
+        .dot {
+            height: 16px;
+            width: 16px;
+            background-color: #fef08a;
+            border-radius: 50%;
+            position: absolute;
+            top: 22px;
+            z-index: 1;
+            border: 3px solid #1e293b;
+            box-shadow: 0 0 10px rgba(254, 240, 138, 0.7);
+        }
+        .left .dot {
+            right: 30px;
+        }
+        .right .dot {
+            left: 30px;
+        }
+        .summary {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 1.1em;
+            color: rgba(226, 232, 240, 0.85);
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .summary strong {
+            color: #fef08a;
+        }
+    </style>
+</head>
+<body>
+    <h1>Running Goal Progress 🏃‍♀️</h1>
+    <div class="timeline">
+        <div class="container left">
+            <div class="dot"></div>
+            <div class="content">
+                <span class="date">Jan 16, 2026</span>
+                <h2>Hit Goal!</h2>
+                <p>Ran 3 times this week! Felt great, more energy, sleeping better, handling stress better.</p>
+            </div>
+        </div>
+        <div class="container right">
+            <div class="dot"></div>
+            <div class="content">
+                <span class="date">Jan 10, 2026</span>
+                <h2>Missed Goal</h2>
+                <p>Skipped entire week. Too tired after work, then Emma's homework, just wanted to collapse.</p>
+            </div>
+        </div>
+        <div class="container left">
+            <div class="dot"></div>
+            <div class="content">
+                <span class="date">Jan 3, 2026</span>
+                <h2>Set Goal</h2>
+                <p>Set a goal to run 3x per week.</p>
+            </div>
+        </div>
+    </div>
+    <div class="summary">
+        It looks like you know how beneficial running is for you, with a strong week in mid-January where you hit your goal and felt the positive effects. However, consistency has been a challenge, often due to fatigue and competing priorities. Let's explore strategies to maintain momentum.
+    </div>
+</body>
+</html>

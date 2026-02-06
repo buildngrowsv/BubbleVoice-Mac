@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emma's Reading Progress</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(245, 158, 11, 0.8) 100%);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .mind-map {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+        .mind-map h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .node {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: default;
+        }
+        .node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+        .node h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .node ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .node li {
+            margin-bottom: 8px;
+        }
+        .node li:last-child {
+            margin-bottom: 0;
+        }
+        .center-node {
+            background: linear-gradient(135deg, #ffffff, rgba(255, 255, 255, 0.8));
+            color: #e67e22;
+            font-weight: 700;
+            font-size: 1.8em;
+            padding: 25px;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .leaf-node {
+             background: rgba(255, 255, 255, 0.1);
+             color: #ffffff;
+             font-size: 1em;
+             padding: 10px;
+             border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mind-map">
+        <h1>Emma's Reading Journey 📚</h1>
+        
+        <div class="node center-node">Emma's Reading Progress</div>
+        
+        <div class="node">
+            <h2>Initial Concerns 😟</h2>
+            <ul>
+                <li>Decoding words, but poor comprehension.</li>
+                <li>Teacher (Ms. Johnson) noticed and emailed.</li>
+                <li>Homework meltdowns: frustration, "I'm stupid."</li>
+                <li>User felt heartbroken and worried.</li>
+            </ul>
+        </div>
+        
+        <div class="node">
+            <h2>Breakthroughs & Strategies ✨</h2>
+            <ul>
+                <li><strong>Graphic Novels:</strong> Dog Man series led to 20+ min reading.</li>
+                <li><strong>Reading Together:</strong> Positive experience.</li>
+                <li><strong>Praising Effort:</strong> Focus on trying, not just results.</li>
+                <li><strong>Book Choice:</strong> Friendship drama more engaging.</li>
+                <li><strong>Taking Breaks:</strong> Helpful during frustration.</li>
+            </ul>
+        </div>
+        
+        <div class="node">
+            <h2>Current Situation & User Feelings 😥</h2>
+            <ul>
+                <li>Recent homework was back to a struggle.</li>
+                <li>User worries about testing for learning differences.</li>
+                <li>Concerned about Emma feeling "broken" or "wrong."</li>
+                <li>Balancing desire to help with fear of labeling.</li>
+            </ul>
+        </div>
+        
+        <div class="node">
+             <h2>Key Discussion Points for Ms. Johnson 🗣️</h2>
+             <ul>
+                 <li>Confirm Emma's current reading level and specific comprehension gaps.</li>
+                 <li>Discuss the positive impact of graphic novels and visual aids.</li>
+                 <li>Explore testing options: what it entails, potential benefits, and how to frame it for Emma.</li>
+                 <li>Share strategies that have worked (reading together, effort praise).</li>
+                 <li>Ask about resources or support available at school.</li>
+             </ul>
+        </div>
+    </div>
+</body>
+</html>

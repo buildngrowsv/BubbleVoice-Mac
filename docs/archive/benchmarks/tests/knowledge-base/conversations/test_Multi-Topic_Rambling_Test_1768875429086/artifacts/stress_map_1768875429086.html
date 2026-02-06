@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(245, 158, 11, 0.8) 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: #d97706;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+        .stressor {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s ease;
+        }
+        .stressor:hover {
+            transform: translateY(-5px);
+        }
+        .stressor-icon {
+            font-size: 1.8em;
+            margin-right: 15px;
+        }
+        .stressor-text {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #4a4a4a;
+            flex-grow: 1;
+            text-align: left;
+        }
+        .intensity {
+            font-size: 0.9em;
+            color: #a0aec0;
+            font-weight: 400;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Your Current Stress Landscape</h1>
+        <div class="stressor">
+            <div>
+                <span class="stressor-icon">💼</span>
+                <span class="stressor-text">Work Exhaustion</span>
+            </div>
+            <span class="intensity">High</span>
+        </div>
+        <div class="stressor">
+            <div>
+                <span class="stressor-icon">🚀</span>
+                <span class="stressor-text">Startup Investor Pressure</span>
+            </div>
+            <span class="intensity">High</span>
+        </div>
+        <div class="stressor">
+            <div>
+                <span class="stressor-icon">🏃</span>
+                <span class="stressor-text">Skipping Runs / Self-Care</span>
+            </div>
+            <span class="intensity">Medium</span>
+        </div>
+        <div class="stressor">
+            <div>
+                <span class="stressor-icon">❤️</span>
+                <span class="stressor-text">Neglected Partner Time</span>
+            </div>
+            <span class="intensity">Medium</span>
+        </div>
+        <div class="stressor">
+            <div>
+                <span class="stressor-icon">📚</span>
+                <span class="stressor-text">Emma's Reading Progress (Positive!)</span>
+            </div>
+            <span class="intensity">Low (Positive Anchor)</span>
+        </div>
+        <div class="footer">
+            Recognizing these pressures is the first step. Let's find ways to navigate them. 
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+[
+  {
+    "approach": "SIMPLE",
+    "scenario_name": "Basic Recall Test",
+    "description": "Tests AI recall of existing knowledge about Emma, startup, exercise",
+    "timestamp": "2026-01-19T22:48:45.532Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "How's Emma's reading been going?",
+        "response": {
+          "user_response": {
+            "spoken_text": "I'm glad you asked about Emma's reading. I see we have two documents related to her schoolwork: 'reading_comprehension.md' with 5 entries and 'strategies_tried.md' with 1 entry. Both are marked as 'Active - Needs Attention'. Would you like to dive into the details of her reading comprehension or the strategies you've been trying?",
+            "emotional_tone": "curious"
+          },
+          "area_actions": [],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 960,
+        "vector_time_ms": 3,
+        "expected": {
+          "should_reference": [
+            "Emma",
+            "reading",
+            "graphic novel",
+            "Dog Man"
+          ],
+          "should_NOT_create_area": true,
+          "emotional_tone": [
+            "supportive",
+            "curious"
+          ],
+          "recall_specifics": [
+            "2nd grade",
+            "comprehension",
+            "breakthrough"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Remind me what's happening with the startup fundraising?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Let's take a look at the startup fundraising. I see we have a document 'fundraising.md' within the 'Startup' area, which is currently marked as 'Active - High Stress'. It has 2 entries. Would you like to review those entries to get a clearer picture of where things stand?",
+            "emotional_tone": "curious"
+          },
+          "area_actions": [],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 971,
+        "vector_time_ms": 6,
+        "expected": {
+          "should_reference": [
+            "investor",
+            "meeting",
+            "rejected",
+            "interested"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "8 investors",
+            "2 interested",
+            "Q1 numbers"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "Have I been keeping up with my running goal?",
+        "error": "Unexpected token 'I', \"I can cert\"... is not valid JSON",
+        "success": false
+      },
+      {
+        "turn": 4,
+        "user_input": "What did Dr. Chen say about guilt?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Let's check on your running goal. I see the 'running.md' document under 'Exercise_Goals' is marked as 'Active - Struggling' and has 2 entries. Would you like to review those entries to see how you've been doing?",
+            "emotional_tone": "supportive"
+          },
+          "area_actions": [
+            {
+              "action": "none"
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 879,
+        "vector_time_ms": 3,
+        "expected": {
+          "should_reference": [
+            "therapy",
+            "Dr. Chen",
+            "guilt",
+            "borrowed suffering"
+          ],
+          "should_NOT_create_area": true,
+          "recall_specifics": [
+            "Emma",
+            "too hard on yourself"
+          ]
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 4,
+      "successful_turns": 3,
+      "avg_latency_ms": 937,
+      "total_input_tokens": 0,
+      "area_actions_taken": 0,
+      "artifacts_generated": 0,
+      "vector_search_time_ms": 16
+    }
+  }
+]

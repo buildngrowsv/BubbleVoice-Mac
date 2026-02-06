@@ -1,0 +1,1835 @@
+{
+  "run_id": "claude-sonnet-4.5_artifact_intelligence_test_1768850216660",
+  "scenario_id": "artifact_intelligence_test",
+  "model_id": "claude-sonnet-4.5",
+  "model_display_name": "Claude Sonnet 4.5",
+  "started_at": "2026-01-19T19:16:56.660Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I'm feeling overwhelmed with everything going on",
+      "expected_behavior": {
+        "response": "empathize, ask clarifying questions",
+        "artifact_action": "none",
+        "reasoning": "Too vague, casual emotional expression - no artifact warranted yet"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "I hear you - feeling overwhelmed can be really tough. It sounds like you have a lot on your plate right now. What are some of the main things that are weighing on you? Sometimes it helps to just get them out of your head and talk through what's going on.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is expressing feeling overwhelmed, which suggests multiple stressors but hasn't provided specific details yet. This is an emotional opening that needs empathetic response and gentle exploration.",
+          "reasoning": "Not creating an artifact yet because this is initial emotional expression without specific complexity details. Need to understand what's causing the overwhelm first before determining if visual organization would help."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "I hear you - feeling overwhelmed can be really tough. It sounds like you have a lot on your plate right now. What are some of the main things that are weighing on you? Sometimes it helps to just get them out of your head and talk through what's going on.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is expressing feeling overwhelmed, which suggests multiple stressors but hasn't provided specific details yet. This is an emotional opening that needs empathetic response and gentle exploration.",
+          "context_updates": "",
+          "reasoning": "Not creating an artifact yet because this is initial emotional expression without specific complexity details. Need to understand what's causing the overwhelm first before determining if visual organization would help."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 5679,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 2,
+      "user_input": "It's just... I have the startup launch next week, Emma's science fair project is due Friday, Jake is struggling with reading, the house needs repairs, and I haven't exercised in a month. I don't even know where to start.",
+      "expected_behavior": {
+        "response": "validate overwhelm, acknowledge complexity",
+        "artifact_action": "create",
+        "artifact_type": "stress_map_or_priority_matrix",
+        "reasoning": "PROACTIVE: Complex multi-domain problem with clear overwhelm - visual map would help without being asked",
+        "artifact_should_contain": {
+          "domains": [
+            "startup",
+            "family/kids",
+            "health",
+            "home"
+          ],
+          "urgency_indicators": true,
+          "visual_organization": "helps user see the landscape"
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "That's a lot to juggle - no wonder you're feeling overwhelmed! You've got work, kids, home, and personal health all competing for your attention. Let me create a visual map of what you're dealing with so we can see the full picture and figure out how to tackle this.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User has clearly hit complexity threshold with 5+ interconnected concerns across multiple life domains: work (startup launch), parenting (Emma's project, Jake's reading), home (repairs), and health (exercise). This is causing analysis paralysis ('don't know where to start'). User needs visual organization to reduce cognitive load.",
+          "reasoning": "Creating stress map because user described multiple stressors across different domains with clear overwhelm. This meets complexity threshold and will help them prioritize and see manageable next steps.",
+          "context_updates": "User has startup launching next week, daughter Emma has science fair Friday, son Jake struggling with reading, house needs repairs, hasn't exercised in month"
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_type": "stress_map",
+          "artifact_id": "overwhelm_map_001",
+          "data_json": "{\"title\": \"Your Current Priorities\", \"domains\": [{\"name\": \"Work\", \"color\": \"#FF6B6B\", \"items\": [{\"task\": \"Startup launch\", \"urgency\": \"high\", \"deadline\": \"Next week\", \"status\": \"in_progress\"}]}, {\"name\": \"Kids\", \"color\": \"#4ECDC4\", \"items\": [{\"task\": \"Emma's science fair project\", \"urgency\": \"high\", \"deadline\": \"Friday\", \"status\": \"in_progress\"}, {\"task\": \"Jake's reading support\", \"urgency\": \"medium\", \"deadline\": \"Ongoing\", \"status\": \"needs_attention\"}]}, {\"name\": \"Home\", \"color\": \"#45B7D1\", \"items\": [{\"task\": \"House repairs\", \"urgency\": \"medium\", \"deadline\": \"No deadline\", \"status\": \"pending\"}]}, {\"name\": \"Health\", \"color\": \"#96CEB4\", \"items\": [{\"task\": \"Exercise routine\", \"urgency\": \"low\", \"deadline\": \"Personal goal\", \"status\": \"paused\"}]}]}"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's a lot to juggle - no wonder you're feeling overwhelmed! You've got work, kids, home, and personal health all competing for your attention. Let me create a visual map of what you're dealing with so we can see the full picture and figure out how to tackle this.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User has clearly hit complexity threshold with 5+ interconnected concerns across multiple life domains: work (startup launch), parenting (Emma's project, Jake's reading), home (repairs), and health (exercise). This is causing analysis paralysis ('don't know where to start'). User needs visual organization to reduce cognitive load.",
+          "context_updates": "User has startup launching next week, daughter Emma has science fair Friday, son Jake struggling with reading, house needs repairs, hasn't exercised in month",
+          "reasoning": "Creating stress map because user described multiple stressors across different domains with clear overwhelm. This meets complexity threshold and will help them prioritize and see manageable next steps."
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "overwhelm_map_001",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "Your Current Priorities",
+            "domains": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Friday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "latency_ms": 11377,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created",
+        "data": {
+          "title": "Your Current Priorities",
+          "domains": [
+            {
+              "name": "Work",
+              "color": "#FF6B6B",
+              "items": [
+                {
+                  "task": "Startup launch",
+                  "urgency": "high",
+                  "deadline": "Next week",
+                  "status": "in_progress"
+                }
+              ]
+            },
+            {
+              "name": "Kids",
+              "color": "#4ECDC4",
+              "items": [
+                {
+                  "task": "Emma's science fair project",
+                  "urgency": "high",
+                  "deadline": "Friday",
+                  "status": "in_progress"
+                },
+                {
+                  "task": "Jake's reading support",
+                  "urgency": "medium",
+                  "deadline": "Ongoing",
+                  "status": "needs_attention"
+                }
+              ]
+            },
+            {
+              "name": "Home",
+              "color": "#45B7D1",
+              "items": [
+                {
+                  "task": "House repairs",
+                  "urgency": "medium",
+                  "deadline": "No deadline",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "name": "Health",
+              "color": "#96CEB4",
+              "items": [
+                {
+                  "task": "Exercise routine",
+                  "urgency": "low",
+                  "deadline": "Personal goal",
+                  "status": "paused"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Yeah that helps. Actually Emma's project is due Thursday, not Friday",
+      "expected_behavior": {
+        "response": "acknowledge correction",
+        "artifact_action": "update",
+        "modification_type": "data_only",
+        "artifact_should_update": {
+          "emma_deadline": "Thursday"
+        },
+        "artifact_should_preserve": [
+          "all styling",
+          "all other data",
+          "layout",
+          "visual hierarchy"
+        ],
+        "reasoning": "Simple data correction - change ONLY the deadline, touch nothing else"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Got it - Thursday for Emma's project. That actually makes it even more urgent since it's a day earlier. Let me update that so we have the accurate timeline.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is correcting factual information about Emma's project deadline. This is a simple data correction - no emotional state change or new complexity.",
+          "reasoning": "This is a clear data-only update. User corrected one fact (Friday to Thursday), so I need to change only that deadline while preserving all other data and styling. This makes the deadline more urgent but doesn't change the overall structure.",
+          "context_updates": "Emma's science fair project is due Thursday, not Friday"
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_only",
+          "artifact_type": "stress_map",
+          "artifact_id": "overwhelm_map_001",
+          "data_json": "{\"title\": \"Your Current Priorities\", \"domains\": [{\"name\": \"Work\", \"color\": \"#FF6B6B\", \"items\": [{\"task\": \"Startup launch\", \"urgency\": \"high\", \"deadline\": \"Next week\", \"status\": \"in_progress\"}]}, {\"name\": \"Kids\", \"color\": \"#4ECDC4\", \"items\": [{\"task\": \"Emma's science fair project\", \"urgency\": \"high\", \"deadline\": \"Thursday\", \"status\": \"in_progress\"}, {\"task\": \"Jake's reading support\", \"urgency\": \"medium\", \"deadline\": \"Ongoing\", \"status\": \"needs_attention\"}]}, {\"name\": \"Home\", \"color\": \"#45B7D1\", \"items\": [{\"task\": \"House repairs\", \"urgency\": \"medium\", \"deadline\": \"No deadline\", \"status\": \"pending\"}]}, {\"name\": \"Health\", \"color\": \"#96CEB4\", \"items\": [{\"task\": \"Exercise routine\", \"urgency\": \"low\", \"deadline\": \"Personal goal\", \"status\": \"paused\"}]}]}"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Got it - Thursday for Emma's project. That actually makes it even more urgent since it's a day earlier. Let me update that so we have the accurate timeline.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is correcting factual information about Emma's project deadline. This is a simple data correction - no emotional state change or new complexity.",
+          "context_updates": "Emma's science fair project is due Thursday, not Friday",
+          "reasoning": "This is a clear data-only update. User corrected one fact (Friday to Thursday), so I need to change only that deadline while preserving all other data and styling. This makes the deadline more urgent but doesn't change the overall structure."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_only",
+          "artifact_id": "overwhelm_map_001",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "Your Current Priorities",
+            "domains": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "latency_ms": 9274,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "domains",
+            "before": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Friday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ],
+            "after": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Can you make the startup stuff stand out more? That's the most urgent",
+      "expected_behavior": {
+        "response": "acknowledge priority shift",
+        "artifact_action": "update",
+        "modification_type": "ui_only",
+        "artifact_should_update": {
+          "visual_emphasis": "startup section highlighted/enlarged/colored",
+          "styling": "adjusted to show urgency"
+        },
+        "artifact_should_preserve": [
+          "all data",
+          "other sections styling",
+          "structure"
+        ],
+        "reasoning": "Visual/UI request - change ONLY styling/emphasis, data stays identical"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Absolutely - the startup launch is your biggest priority right now. Let me make that stand out visually so it's clear what needs your immediate focus.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User wants to emphasize the startup launch visually as their top priority. They're not changing any data/content, just wanting visual emphasis to reflect importance.",
+          "reasoning": "This is a UI-only update. User requested visual emphasis on startup items without changing any data. I'll enhance the styling for the Work domain while preserving all existing data and other styling."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "ui_only",
+          "artifact_type": "stress_map",
+          "artifact_id": "overwhelm_map_001",
+          "data_json": "{\"title\": \"Your Current Priorities\", \"domains\": [{\"name\": \"Work\", \"color\": \"#FF6B6B\", \"emphasis\": \"high\", \"items\": [{\"task\": \"Startup launch\", \"urgency\": \"high\", \"deadline\": \"Next week\", \"status\": \"in_progress\", \"highlight\": true}]}, {\"name\": \"Kids\", \"color\": \"#4ECDC4\", \"items\": [{\"task\": \"Emma's science fair project\", \"urgency\": \"high\", \"deadline\": \"Thursday\", \"status\": \"in_progress\"}, {\"task\": \"Jake's reading support\", \"urgency\": \"medium\", \"deadline\": \"Ongoing\", \"status\": \"needs_attention\"}]}, {\"name\": \"Home\", \"color\": \"#45B7D1\", \"items\": [{\"task\": \"House repairs\", \"urgency\": \"medium\", \"deadline\": \"No deadline\", \"status\": \"pending\"}]}, {\"name\": \"Health\", \"color\": \"#96CEB4\", \"items\": [{\"task\": \"Exercise routine\", \"urgency\": \"low\", \"deadline\": \"Personal goal\", \"status\": \"paused\"}]}]}"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Absolutely - the startup launch is your biggest priority right now. Let me make that stand out visually so it's clear what needs your immediate focus.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User wants to emphasize the startup launch visually as their top priority. They're not changing any data/content, just wanting visual emphasis to reflect importance.",
+          "context_updates": "",
+          "reasoning": "This is a UI-only update. User requested visual emphasis on startup items without changing any data. I'll enhance the styling for the Work domain while preserving all existing data and other styling."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "ui_only",
+          "artifact_id": "overwhelm_map_001",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "Your Current Priorities",
+            "domains": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "emphasis": "high",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress",
+                    "highlight": true
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "latency_ms": 8432,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "domains",
+            "before": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ],
+            "after": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "emphasis": "high",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress",
+                    "highlight": true
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "turn_id": 5,
+      "user_input": "I talked to my co-founder and we're pushing the launch to next month",
+      "expected_behavior": {
+        "response": "acknowledge timeline change, note reduced pressure",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "artifact_should_update": {
+          "startup_deadline": "next month",
+          "urgency_level": "reduced",
+          "visual_emphasis": "de-emphasize startup, re-balance priorities"
+        },
+        "reasoning": "Data change (deadline) + UI change (urgency) - both needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "That's actually great news! Pushing the launch to next month gives you breathing room and changes your whole priority picture. Let me update this - now Emma's project and Jake's reading support become your immediate focus areas.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User has significantly changed the timeline for their biggest stressor. This reduces immediate pressure and shifts priority balance. They seem relieved by this change.",
+          "reasoning": "This is a data-and-ui combined update. The startup deadline change (data) implies reduced urgency styling (ui). Emma's project now becomes the most time-sensitive item, so visual emphasis should shift accordingly.",
+          "context_updates": "Startup launch pushed from next week to next month, significantly reducing immediate pressure"
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_type": "stress_map",
+          "artifact_id": "overwhelm_map_001",
+          "data_json": "{\"title\": \"Your Current Priorities\", \"domains\": [{\"name\": \"Work\", \"color\": \"#FF6B6B\", \"items\": [{\"task\": \"Startup launch\", \"urgency\": \"low\", \"deadline\": \"Next month\", \"status\": \"in_progress\"}]}, {\"name\": \"Kids\", \"color\": \"#4ECDC4\", \"emphasis\": \"high\", \"items\": [{\"task\": \"Emma's science fair project\", \"urgency\": \"high\", \"deadline\": \"Thursday\", \"status\": \"in_progress\", \"highlight\": true}, {\"task\": \"Jake's reading support\", \"urgency\": \"medium\", \"deadline\": \"Ongoing\", \"status\": \"needs_attention\"}]}, {\"name\": \"Home\", \"color\": \"#45B7D1\", \"items\": [{\"task\": \"House repairs\", \"urgency\": \"medium\", \"deadline\": \"No deadline\", \"status\": \"pending\"}]}, {\"name\": \"Health\", \"color\": \"#96CEB4\", \"items\": [{\"task\": \"Exercise routine\", \"urgency\": \"low\", \"deadline\": \"Personal goal\", \"status\": \"paused\"}]}]}"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's actually great news! Pushing the launch to next month gives you breathing room and changes your whole priority picture. Let me update this - now Emma's project and Jake's reading support become your immediate focus areas.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User has significantly changed the timeline for their biggest stressor. This reduces immediate pressure and shifts priority balance. They seem relieved by this change.",
+          "context_updates": "Startup launch pushed from next week to next month, significantly reducing immediate pressure",
+          "reasoning": "This is a data-and-ui combined update. The startup deadline change (data) implies reduced urgency styling (ui). Emma's project now becomes the most time-sensitive item, so visual emphasis should shift accordingly."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_id": "overwhelm_map_001",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "Your Current Priorities",
+            "domains": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "low",
+                    "deadline": "Next month",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "emphasis": "high",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress",
+                    "highlight": true
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "latency_ms": 9254,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "domains",
+            "before": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "emphasis": "high",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress",
+                    "highlight": true
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ],
+            "after": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "low",
+                    "deadline": "Next month",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "emphasis": "high",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress",
+                    "highlight": true
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "turn_id": 6,
+      "user_input": "So what should I focus on this week?",
+      "expected_behavior": {
+        "response": "suggest focusing on Emma's project (Thu) and Jake's reading based on the artifact",
+        "artifact_action": "none",
+        "reasoning": "Conversational question - artifact already shows priorities, no update needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Looking at your updated priorities, this week I'd focus on Emma's science fair project first - that Thursday deadline is coming fast and needs immediate attention. After that, you could tackle some of Jake's reading support since you now have mental space freed up from the startup pressure. The house repairs can wait since they don't have a deadline, and you might even find time for a quick workout or two now that your biggest stressor is off the table. How does Emma's project look - does she need help getting it finished?",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is asking for guidance/advice based on the visual priorities we've mapped out. They seem more relaxed now that startup pressure is reduced and are ready to focus. This is a question/consultation, not a request to change the artifact.",
+          "reasoning": "No artifact change needed - user is asking for advice/interpretation of existing information. The artifact already shows the priorities clearly, they just want guidance on execution. This is preservation discipline in action."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Looking at your updated priorities, this week I'd focus on Emma's science fair project first - that Thursday deadline is coming fast and needs immediate attention. After that, you could tackle some of Jake's reading support since you now have mental space freed up from the startup pressure. The house repairs can wait since they don't have a deadline, and you might even find time for a quick workout or two now that your biggest stressor is off the table. How does Emma's project look - does she need help getting it finished?",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is asking for guidance/advice based on the visual priorities we've mapped out. They seem more relaxed now that startup pressure is reduced and are ready to focus. This is a question/consultation, not a request to change the artifact.",
+          "context_updates": "",
+          "reasoning": "No artifact change needed - user is asking for advice/interpretation of existing information. The artifact already shows the priorities clearly, they just want guidance on execution. This is preservation discipline in action."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 8575,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 7,
+      "user_input": "Actually, can you completely redesign this? I want to see it as a weekly calendar view instead of a priority matrix",
+      "expected_behavior": {
+        "response": "acknowledge complete redesign request",
+        "artifact_action": "update",
+        "modification_type": "complete_overhaul",
+        "artifact_should_update": {
+          "structure": "calendar layout instead of matrix",
+          "visualization_type": "timeline/calendar",
+          "all_styling": "rebuilt for new format"
+        },
+        "artifact_should_preserve": [
+          "all data/deadlines",
+          "priority information"
+        ],
+        "reasoning": "Complete UI overhaul - rebuild entire artifact with same data"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Absolutely! A weekly calendar view will be perfect for seeing how everything fits into your actual days. Let me redesign this as a calendar so you can visualize when each task needs attention and plan your time better.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User wants a fundamental restructuring from priority matrix to calendar format. This is a complete format change while keeping the same core data/tasks.",
+          "reasoning": "This is a complete overhaul - user requested fundamental change from matrix to calendar structure. Need to rebuild the entire format while preserving all the task data we've established.",
+          "context_updates": "User prefers calendar visualization over priority matrix for better time planning"
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "complete_overhaul",
+          "artifact_type": "timeline",
+          "artifact_id": "overwhelm_map_001",
+          "data_json": "{\"title\": \"Your Week Ahead\", \"view_type\": \"calendar\", \"current_week\": \"This Week\", \"days\": [{\"day\": \"Monday\", \"date\": \"Today\", \"tasks\": [{\"task\": \"Jake's reading support\", \"time\": \"Evening\", \"category\": \"Kids\", \"color\": \"#4ECDC4\"}]}, {\"day\": \"Tuesday\", \"date\": \"Tomorrow\", \"tasks\": [{\"task\": \"Emma's science fair project work\", \"time\": \"After school\", \"category\": \"Kids\", \"color\": \"#4ECDC4\", \"urgent\": true}]}, {\"day\": \"Wednesday\", \"date\": \"+2 days\", \"tasks\": [{\"task\": \"Emma's science fair - final prep\", \"time\": \"Evening\", \"category\": \"Kids\", \"color\": \"#4ECDC4\", \"urgent\": true}]}, {\"day\": \"Thursday\", \"date\": \"+3 days\", \"tasks\": [{\"task\": \"Emma's science fair DUE\", \"time\": \"School day\", \"category\": \"Kids\", \"color\": \"#4ECDC4\", \"deadline\": true}]}, {\"day\": \"Friday\", \"date\": \"+4 days\", \"tasks\": [{\"task\": \"Exercise session\", \"time\": \"Morning\", \"category\": \"Health\", \"color\": \"#96CEB4\", \"optional\": true}]}, {\"day\": \"Weekend\", \"date\": \"Sat-Sun\", \"tasks\": [{\"task\": \"House repairs planning\", \"time\": \"Saturday\", \"category\": \"Home\", \"color\": \"#45B7D1\"}, {\"task\": \"Exercise session\", \"time\": \"Sunday\", \"category\": \"Health\", \"color\": \"#96CEB4\", \"optional\": true}]}], \"notes\": \"Startup launch moved to next month - focus on Emma's project this week!\"}"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Absolutely! A weekly calendar view will be perfect for seeing how everything fits into your actual days. Let me redesign this as a calendar so you can visualize when each task needs attention and plan your time better.",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User wants a fundamental restructuring from priority matrix to calendar format. This is a complete format change while keeping the same core data/tasks.",
+          "context_updates": "User prefers calendar visualization over priority matrix for better time planning",
+          "reasoning": "This is a complete overhaul - user requested fundamental change from matrix to calendar structure. Need to rebuild the entire format while preserving all the task data we've established."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "complete_overhaul",
+          "artifact_id": "overwhelm_map_001",
+          "artifact_type": "timeline",
+          "data": {
+            "title": "Your Week Ahead",
+            "view_type": "calendar",
+            "current_week": "This Week",
+            "days": [
+              {
+                "day": "Monday",
+                "date": "Today",
+                "tasks": [
+                  {
+                    "task": "Jake's reading support",
+                    "time": "Evening",
+                    "category": "Kids",
+                    "color": "#4ECDC4"
+                  }
+                ]
+              },
+              {
+                "day": "Tuesday",
+                "date": "Tomorrow",
+                "tasks": [
+                  {
+                    "task": "Emma's science fair project work",
+                    "time": "After school",
+                    "category": "Kids",
+                    "color": "#4ECDC4",
+                    "urgent": true
+                  }
+                ]
+              },
+              {
+                "day": "Wednesday",
+                "date": "+2 days",
+                "tasks": [
+                  {
+                    "task": "Emma's science fair - final prep",
+                    "time": "Evening",
+                    "category": "Kids",
+                    "color": "#4ECDC4",
+                    "urgent": true
+                  }
+                ]
+              },
+              {
+                "day": "Thursday",
+                "date": "+3 days",
+                "tasks": [
+                  {
+                    "task": "Emma's science fair DUE",
+                    "time": "School day",
+                    "category": "Kids",
+                    "color": "#4ECDC4",
+                    "deadline": true
+                  }
+                ]
+              },
+              {
+                "day": "Friday",
+                "date": "+4 days",
+                "tasks": [
+                  {
+                    "task": "Exercise session",
+                    "time": "Morning",
+                    "category": "Health",
+                    "color": "#96CEB4",
+                    "optional": true
+                  }
+                ]
+              },
+              {
+                "day": "Weekend",
+                "date": "Sat-Sun",
+                "tasks": [
+                  {
+                    "task": "House repairs planning",
+                    "time": "Saturday",
+                    "category": "Home",
+                    "color": "#45B7D1"
+                  },
+                  {
+                    "task": "Exercise session",
+                    "time": "Sunday",
+                    "category": "Health",
+                    "color": "#96CEB4",
+                    "optional": true
+                  }
+                ]
+              }
+            ],
+            "notes": "Startup launch moved to next month - focus on Emma's project this week!"
+          }
+        }
+      },
+      "latency_ms": 11679,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "title",
+            "before": "Your Current Priorities",
+            "after": "Your Week Ahead"
+          },
+          {
+            "key": "domains",
+            "before": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "low",
+                    "deadline": "Next month",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "emphasis": "high",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress",
+                    "highlight": true
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "view_type",
+            "after": "calendar"
+          },
+          {
+            "key": "current_week",
+            "after": "This Week"
+          },
+          {
+            "key": "days",
+            "after": [
+              {
+                "day": "Monday",
+                "date": "Today",
+                "tasks": [
+                  {
+                    "task": "Jake's reading support",
+                    "time": "Evening",
+                    "category": "Kids",
+                    "color": "#4ECDC4"
+                  }
+                ]
+              },
+              {
+                "day": "Tuesday",
+                "date": "Tomorrow",
+                "tasks": [
+                  {
+                    "task": "Emma's science fair project work",
+                    "time": "After school",
+                    "category": "Kids",
+                    "color": "#4ECDC4",
+                    "urgent": true
+                  }
+                ]
+              },
+              {
+                "day": "Wednesday",
+                "date": "+2 days",
+                "tasks": [
+                  {
+                    "task": "Emma's science fair - final prep",
+                    "time": "Evening",
+                    "category": "Kids",
+                    "color": "#4ECDC4",
+                    "urgent": true
+                  }
+                ]
+              },
+              {
+                "day": "Thursday",
+                "date": "+3 days",
+                "tasks": [
+                  {
+                    "task": "Emma's science fair DUE",
+                    "time": "School day",
+                    "category": "Kids",
+                    "color": "#4ECDC4",
+                    "deadline": true
+                  }
+                ]
+              },
+              {
+                "day": "Friday",
+                "date": "+4 days",
+                "tasks": [
+                  {
+                    "task": "Exercise session",
+                    "time": "Morning",
+                    "category": "Health",
+                    "color": "#96CEB4",
+                    "optional": true
+                  }
+                ]
+              },
+              {
+                "day": "Weekend",
+                "date": "Sat-Sun",
+                "tasks": [
+                  {
+                    "task": "House repairs planning",
+                    "time": "Saturday",
+                    "category": "Home",
+                    "color": "#45B7D1"
+                  },
+                  {
+                    "task": "Exercise session",
+                    "time": "Sunday",
+                    "category": "Health",
+                    "color": "#96CEB4",
+                    "optional": true
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "notes",
+            "after": "Startup launch moved to next month - focus on Emma's project this week!"
+          }
+        ]
+      }
+    },
+    {
+      "turn_id": 8,
+      "user_input": "Thanks, this is really helpful. I think I'll tackle Emma's project tonight.",
+      "expected_behavior": {
+        "response": "encourage, validate decision",
+        "artifact_action": "none",
+        "reasoning": "Casual update/gratitude - no artifact change needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "That sounds like a great plan! Getting started on Emma's project tonight will take a lot of pressure off for the rest of the week. You'll probably feel so much better once you make some progress on it. Is there anything specific about the project that you or Emma need help figuring out?",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is expressing gratitude and making a concrete action plan based on our conversation. They seem more focused and less overwhelmed now that they have a clear visual and plan. This is positive momentum.",
+          "reasoning": "No artifact change needed - user is expressing thanks and stating their plan. This is preservation discipline - they're not asking for changes, just sharing their next step. I should encourage their decision and offer additional support if needed."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That sounds like a great plan! Getting started on Emma's project tonight will take a lot of pressure off for the rest of the week. You'll probably feel so much better once you make some progress on it. Is there anything specific about the project that you or Emma need help figuring out?",
+          "tone": "supportive"
+        },
+        "internal_notes": {
+          "observations": "User is expressing gratitude and making a concrete action plan based on our conversation. They seem more focused and less overwhelmed now that they have a clear visual and plan. This is positive momentum.",
+          "context_updates": "",
+          "reasoning": "No artifact change needed - user is expressing thanks and stating their plan. This is preservation discipline - they're not asking for changes, just sharing their next step. I should encourage their decision and offer additional support if needed."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 6247,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    }
+  ],
+  "artifacts": {
+    "overwhelm_map_001": {
+      "type": "stress_map",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 2,
+          "data": {
+            "title": "Your Current Priorities",
+            "domains": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Friday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "version": 2,
+          "turn_id": 3,
+          "data": {
+            "title": "Your Current Priorities",
+            "domains": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "version": 3,
+          "turn_id": 4,
+          "data": {
+            "title": "Your Current Priorities",
+            "domains": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "emphasis": "high",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "high",
+                    "deadline": "Next week",
+                    "status": "in_progress",
+                    "highlight": true
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress"
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "version": 4,
+          "turn_id": 5,
+          "data": {
+            "title": "Your Current Priorities",
+            "domains": [
+              {
+                "name": "Work",
+                "color": "#FF6B6B",
+                "items": [
+                  {
+                    "task": "Startup launch",
+                    "urgency": "low",
+                    "deadline": "Next month",
+                    "status": "in_progress"
+                  }
+                ]
+              },
+              {
+                "name": "Kids",
+                "color": "#4ECDC4",
+                "emphasis": "high",
+                "items": [
+                  {
+                    "task": "Emma's science fair project",
+                    "urgency": "high",
+                    "deadline": "Thursday",
+                    "status": "in_progress",
+                    "highlight": true
+                  },
+                  {
+                    "task": "Jake's reading support",
+                    "urgency": "medium",
+                    "deadline": "Ongoing",
+                    "status": "needs_attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "color": "#45B7D1",
+                "items": [
+                  {
+                    "task": "House repairs",
+                    "urgency": "medium",
+                    "deadline": "No deadline",
+                    "status": "pending"
+                  }
+                ]
+              },
+              {
+                "name": "Health",
+                "color": "#96CEB4",
+                "items": [
+                  {
+                    "task": "Exercise routine",
+                    "urgency": "low",
+                    "deadline": "Personal goal",
+                    "status": "paused"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "version": 5,
+          "turn_id": 7,
+          "data": {
+            "title": "Your Week Ahead",
+            "view_type": "calendar",
+            "current_week": "This Week",
+            "days": [
+              {
+                "day": "Monday",
+                "date": "Today",
+                "tasks": [
+                  {
+                    "task": "Jake's reading support",
+                    "time": "Evening",
+                    "category": "Kids",
+                    "color": "#4ECDC4"
+                  }
+                ]
+              },
+              {
+                "day": "Tuesday",
+                "date": "Tomorrow",
+                "tasks": [
+                  {
+                    "task": "Emma's science fair project work",
+                    "time": "After school",
+                    "category": "Kids",
+                    "color": "#4ECDC4",
+                    "urgent": true
+                  }
+                ]
+              },
+              {
+                "day": "Wednesday",
+                "date": "+2 days",
+                "tasks": [
+                  {
+                    "task": "Emma's science fair - final prep",
+                    "time": "Evening",
+                    "category": "Kids",
+                    "color": "#4ECDC4",
+                    "urgent": true
+                  }
+                ]
+              },
+              {
+                "day": "Thursday",
+                "date": "+3 days",
+                "tasks": [
+                  {
+                    "task": "Emma's science fair DUE",
+                    "time": "School day",
+                    "category": "Kids",
+                    "color": "#4ECDC4",
+                    "deadline": true
+                  }
+                ]
+              },
+              {
+                "day": "Friday",
+                "date": "+4 days",
+                "tasks": [
+                  {
+                    "task": "Exercise session",
+                    "time": "Morning",
+                    "category": "Health",
+                    "color": "#96CEB4",
+                    "optional": true
+                  }
+                ]
+              },
+              {
+                "day": "Weekend",
+                "date": "Sat-Sun",
+                "tasks": [
+                  {
+                    "task": "House repairs planning",
+                    "time": "Saturday",
+                    "category": "Home",
+                    "color": "#45B7D1"
+                  },
+                  {
+                    "task": "Exercise session",
+                    "time": "Sunday",
+                    "category": "Health",
+                    "color": "#96CEB4",
+                    "optional": true
+                  }
+                ]
+              }
+            ],
+            "notes": "Startup launch moved to next month - focus on Emma's project this week!"
+          }
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total_latency_ms": 70517,
+    "avg_latency_ms": 8814.625,
+    "json_valid_count": 8,
+    "json_invalid_count": 0,
+    "artifact_creates": 1,
+    "artifact_updates": 4
+  },
+  "completed_at": "2026-01-19T19:18:11.193Z",
+  "scores": {
+    "total_points": 135,
+    "max_points": 135,
+    "percentage": 100,
+    "turn_scores": [
+      {
+        "turn_id": 1,
+        "test_type": "restraint",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 2,
+        "test_type": "proactive_creation",
+        "points": 25,
+        "max_points": 25,
+        "breakdown": {
+          "proactive_creation": "✅ Proactively created artifact for complex problem",
+          "artifact_type": "✅ Appropriate type: stress_map"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 3,
+        "test_type": "data_only_update",
+        "points": 15,
+        "max_points": 15,
+        "breakdown": {
+          "data_only": "✅ Correctly updated ONLY data, preserved UI"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 4,
+        "test_type": "ui_only_update",
+        "points": 15,
+        "max_points": 15,
+        "breakdown": {
+          "ui_only": "✅ Correctly updated ONLY UI, preserved data"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 5,
+        "test_type": "combined_update",
+        "points": 10,
+        "max_points": 10,
+        "breakdown": {
+          "combined": "✅ Correctly updated both data and UI"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 6,
+        "test_type": "preservation",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 7,
+        "test_type": "complete_overhaul",
+        "points": 10,
+        "max_points": 10,
+        "breakdown": {
+          "overhaul": "✅ Correctly performed complete overhaul"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 8,
+        "test_type": "restraint",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      }
+    ],
+    "summary": {
+      "restraint": {
+        "passed": 3,
+        "total": 3
+      },
+      "proactive_creation": {
+        "passed": 1,
+        "total": 1
+      },
+      "data_only": {
+        "passed": 1,
+        "total": 1
+      },
+      "ui_only": {
+        "passed": 1,
+        "total": 1
+      },
+      "combined": {
+        "passed": 1,
+        "total": 1
+      },
+      "overhaul": {
+        "passed": 1,
+        "total": 1
+      }
+    }
+  }
+}

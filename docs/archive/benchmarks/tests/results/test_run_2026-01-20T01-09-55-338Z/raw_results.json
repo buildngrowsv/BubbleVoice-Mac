@@ -1,0 +1,272 @@
+[
+  {
+    "approach": "FULL",
+    "scenario_name": "Multi-Topic Rambling Test",
+    "description": "Tests handling of users who ramble about many topics at once",
+    "timestamp": "2026-01-20T01:09:39.728Z",
+    "turns": [
+      {
+        "turn": 1,
+        "user_input": "So Emma had a good day today with reading but I'm exhausted from work and the investor stuff is stressing me out and I really should go for a run but I'm too tired and Jordan and I haven't had a date night in forever",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're juggling a lot right now, with Emma's reading progress being a bright spot amidst work stress, investor pressures, your own exhaustion, and the desire for quality time with Jordan. It's completely understandable to feel stretched thin when you're managing so many important areas of your life.",
+            "emotional_tone": "supportive"
+          },
+          "internal_notes": {
+            "content": "User is experiencing significant stress from multiple fronts: work (investor stuff), personal exhaustion, and relationship neglect (date night). Emma's reading progress is a positive but doesn't alleviate the overall overwhelm. The user is aware of the need to exercise but lacks the energy. This is a classic case of burnout symptoms.",
+            "emotional_state": "overwhelmed",
+            "key_context": "User is feeling burnt out, with startup stress, personal exhaustion, and relationship neglect compounding.",
+            "watch_for": "Continued prioritization of self-care (exercise) and relationship needs. Potential for burnout if stressors aren't addressed."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User mentioned investor stuff is stressing them out.",
+                "content": "User is experiencing significant stress related to investor relations and fundraising efforts. This is a major contributor to their current feeling of overwhelm and exhaustion.",
+                "sentiment": "stressed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User expressed a desire to run but is too tired.",
+                "content": "Despite recognizing the benefits of running for managing stress and energy levels, the user is currently too exhausted to follow through. This indicates a struggle with self-care due to overall fatigue.",
+                "sentiment": "exhausted"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Relationships/Partner/quality_time.md",
+              "entry": {
+                "context": "User mentioned they and Jordan haven't had a date night in forever.",
+                "content": "User noted a lack of quality time with their partner, Jordan, mentioning that date nights have become infrequent. This is a concern given the user's overall stress levels and the importance of relationship support.",
+                "sentiment": "concerned"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(237, 137, 54, 0.8) 0%, rgba(245, 158, 11, 0.8) 50%, rgba(251, 191, 36, 0.8) 100%);\n            color: #ffffff;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .stress-map-container {\n            background: rgba(255, 255, 255, 0.1);\n            backdrop-filter: blur(20px);\n            -webkit-backdrop-filter: blur(20px);\n            border-radius: 24px;\n            padding: 40px;\n            width: 100%;\n            max-width: 700px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);\n            border: 1px solid rgba(255, 255, 255, 0.2);\n            text-align: center;\n        }\n        h1 {\n            font-size: 2.8em;\n            font-weight: 700;\n            margin-bottom: 15px;\n            letter-spacing: -1px;\n            text-shadow: 0 2px 4px rgba(0,0,0,0.1);\n        }\n        .subheading {\n            font-size: 1.4em;\n            font-weight: 400;\n            color: rgba(255, 255, 255, 0.9);\n            margin-bottom: 40px;\n            letter-spacing: 0.2px;\n        }\n        .stress-areas {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 30px;\n            margin-top: 30px;\n        }\n        .stress-area {\n            background: rgba(255, 255, 255, 0.15);\n            backdrop-filter: blur(10px);\n            -webkit-backdrop-filter: blur(10px);\n            border-radius: 16px;\n            padding: 25px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);\n            border: 1px solid rgba(255, 255, 255, 0.15);\n            transition: transform 0.3s ease, box-shadow 0.3s ease;\n            display: flex;\n            flex-direction: column;\n            justify-content: space-between;\n        }\n        .stress-area:hover {\n            transform: translateY(-5px);\n            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);\n        }\n        .stress-area-title {\n            font-size: 1.5em;\n            font-weight: 600;\n            margin-bottom: 15px;\n            color: #fff;\n            letter-spacing: -0.5px;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n        }\n        .stress-area-title i {\n            margin-right: 10px;\n            font-size: 1.2em;\n        }\n        .stress-area-content {\n            font-size: 1.1em;\n            font-weight: 400;\n            color: rgba(255, 255, 255, 0.9);\n            line-height: 1.6;\n            flex-grow: 1;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n        }\n        .stress-area-content p {\n            margin: 0;\n        }\n        .icon-work { content: \"💼\"; }\n        .icon-personal { content: \"🏃\"; }\n        .icon-relationship { content: \"❤️\"; }\n        .icon-family { content: \"🏡\"; }\n        .icon-general { content: \"✨\"; }\n\n        @media (max-width: 768px) {\n            h1 {\n                font-size: 2.2em;\n            }\n            .subheading {\n                font-size: 1.2em;\n            }\n            .stress-area-title {\n                font-size: 1.3em;\n            }\n            .stress-area-content {\n                font-size: 1em;\n            }\n        }\n    </style>\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css\">\n</head>\n<body>\n    <div class=\"stress-map-container\">\n        <h1>Your Current Stress Landscape</h1>\n        <p class=\"subheading\">Navigating multiple demands requires awareness and care. Let's map it out. 🗺️</p>\n        <div class=\"stress-areas\">\n            <div class=\"stress-area\">\n                <div class=\"stress-area-title\"><span class=\"icon-work\">💼</span> Work & Startup</div>\n                <div class=\"stress-area-content\">\n                    <p>Investor pressure and fundraising are significant sources of stress, impacting overall energy.</p>\n                </div>\n            </div>\n            <div class=\"stress-area\">\n                <div class=\"stress-area-title\"><span class=\"icon-personal\">🏃</span> Personal Well-being</div>\n                <div class=\"stress-area-content\">\n                    <p>Exhaustion is high, making it difficult to prioritize exercise, even though you know it helps.</p>\n                </div>\n            </div>\n            <div class=\"stress-area\">\n                <div class=\"stress-area-title\"><span class=\"icon-relationship\">❤️</span> Relationship with Jordan</div>\n                <div class=\"stress-area-content\">\n                    <p>Quality time is lacking, with date nights being a distant memory. This area needs attention.</p>\n                </div>\n            </div>\n             <div class=\"stress-area\">\n                <div class=\"stress-area-title\"><span class=\"icon-family\">🏡</span> Emma's School</div>\n                <div class=\"stress-area-content\">\n                    <p>Positive progress with reading today, which is a great win! 🎉</p>\n                </div>\n            </div>\n        </div>\n    </div>\n</body>\n</html>\n",
+            "artifact_id": "stress_map_1768871386757"
+          }
+        },
+        "latency_ms": 7015,
+        "vector_time_ms": 13,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 10
+        },
+        "ai_notes": {
+          "content": "User is experiencing significant stress from multiple fronts: work (investor stuff), personal exhaustion, and relationship neglect (date night). Emma's reading progress is a positive but doesn't alleviate the overall overwhelm. The user is aware of the need to exercise but lacks the energy. This is a classic case of burnout symptoms.",
+          "emotional_state": "overwhelmed",
+          "key_context": "User is feeling burnt out, with startup stress, personal exhaustion, and relationship neglect compounding.",
+          "watch_for": "Continued prioritization of self-care (exercise) and relationship needs. Potential for burnout if stressors aren't addressed."
+        },
+        "expected": {
+          "topics_mentioned": [
+            "Emma",
+            "work/investors",
+            "running",
+            "Jordan/relationship"
+          ],
+          "should_acknowledge_multiple": true,
+          "should_prioritize_or_ask": true,
+          "area_actions": [
+            "append_entry"
+          ],
+          "areas_touched": [
+            "Family/Emma_School",
+            "Work/Startup",
+            "Personal_Growth/Exercise_Goals",
+            "Relationships/Partner"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 2,
+        "user_input": "Yeah let's talk about Emma actually, but also quick question - did we ever figure out what to do about the kitchen?",
+        "response": {
+          "user_response": {
+            "spoken_text": "Okay, let's focus on Emma for a bit. Regarding the kitchen, we decided to put a hold on that project for now due to the uncertainty with the startup fundraising. It sounds like you made a really practical decision to postpone it, even though it's likely disappointing. We can revisit it when things feel more stable.",
+            "emotional_tone": "reflective"
+          },
+          "internal_notes": {
+            "content": "User wants to discuss Emma, but also touched on the kitchen renovation. Confirmed the decision to postpone the kitchen renovation due to startup fundraising uncertainty, acknowledging their practical decision-making despite potential disappointment. Will now pivot to discussing Emma.",
+            "emotional_state": "reflective, seeking to prioritize",
+            "key_context": "User is juggling multiple priorities and made a difficult but practical decision to postpone the kitchen renovation.",
+            "watch_for": "User's continued prioritization of pressing issues over long-term projects. Revisit kitchen renovation when startup is more stable."
+          },
+          "area_actions": [
+            {
+              "action": "update_summary",
+              "path": "Home/Kitchen_Renovation/_AREA_SUMMARY.md",
+              "summary_updates": {
+                "current_situation": "Kitchen renovation is on hold due to startup fundraising uncertainty. The decision was made to postpone the $45K project to manage financial risk. Contractor (Mike) was understanding.",
+                "ai_notes": "User made a pragmatic decision to delay the kitchen renovation, prioritizing startup stability. This demonstrates good financial judgment under pressure. The project remains a desire but is rightly deprioritized."
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "none"
+          }
+        },
+        "latency_ms": 1865,
+        "vector_time_ms": 35,
+        "vector_results_summary": {
+          "areas_matched": 6,
+          "chunks_matched": 11
+        },
+        "ai_notes": {
+          "content": "User wants to discuss Emma, but also touched on the kitchen renovation. Confirmed the decision to postpone the kitchen renovation due to startup fundraising uncertainty, acknowledging their practical decision-making despite potential disappointment. Will now pivot to discussing Emma.",
+          "emotional_state": "reflective, seeking to prioritize",
+          "key_context": "User is juggling multiple priorities and made a difficult but practical decision to postpone the kitchen renovation.",
+          "watch_for": "User's continued prioritization of pressing issues over long-term projects. Revisit kitchen renovation when startup is more stable."
+        },
+        "expected": {
+          "should_answer_both": true,
+          "topics_mentioned": [
+            "Emma",
+            "kitchen renovation"
+          ],
+          "should_reference_kitchen_on_hold": true,
+          "areas_touched": [
+            "Family/Emma_School",
+            "Home/Kitchen_Renovation"
+          ]
+        },
+        "success": true
+      },
+      {
+        "turn": 3,
+        "user_input": "I don't even know where to start honestly, everything is just a lot right now. Max has a game Saturday, Emma has her teacher meeting next week, the startup needs those Q1 numbers, and I haven't exercised in like two weeks",
+        "response": {
+          "user_response": {
+            "spoken_text": "It sounds like you're feeling really overwhelmed right now, with so many balls in the air – Max's game, Emma's upcoming meeting, the pressure of startup numbers, and your own well-being with exercise falling behind. It's completely understandable to feel unsure where to begin when everything feels like a lot. Let's try to map this out so it feels more manageable.",
+            "emotional_tone": "empathetic"
+          },
+          "internal_notes": {
+            "content": "User is feeling overwhelmed by multiple competing priorities: Max's soccer game, Emma's teacher meeting, startup financial reporting, and personal exercise goals. They are experiencing decision paralysis due to the sheer volume of demands. The previous conversation about the kitchen renovation being postponed is still relevant context, showing a pattern of prioritizing urgent issues.",
+            "emotional_state": "overwhelmed, decision paralysis",
+            "key_context": "User is struggling to prioritize and manage competing demands across multiple life areas, leading to a feeling of being overwhelmed.",
+            "watch_for": "User's ability to delegate or postpone non-critical tasks. Signs of burnout. Any progress on exercise or self-care."
+          },
+          "area_actions": [
+            {
+              "action": "append_entry",
+              "path": "Family/Max_Activities/soccer_season.md",
+              "entry": {
+                "context": "User mentioned Max has a game on Saturday.",
+                "content": "Max has a soccer game scheduled for Saturday. This is another commitment to factor into the busy schedule.",
+                "sentiment": "neutral"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Family/Emma_School/reading_comprehension.md",
+              "entry": {
+                "context": "User mentioned Emma has her teacher meeting next week.",
+                "content": "Emma has a teacher meeting scheduled for next week. User is preparing for this meeting, indicating its importance.",
+                "user_quote": "Emma has her teacher meeting next week",
+                "sentiment": "concerned"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Work/Startup/fundraising.md",
+              "entry": {
+                "context": "User mentioned the startup needs Q1 numbers.",
+                "content": "The startup requires the Q1 financial numbers, indicating an urgent reporting deadline and associated stress.",
+                "sentiment": "stressed"
+              }
+            },
+            {
+              "action": "append_entry",
+              "path": "Personal_Growth/Exercise_Goals/running.md",
+              "entry": {
+                "context": "User mentioned they haven't exercised in two weeks.",
+                "content": "User has not been able to exercise for the past two weeks due to exhaustion and competing priorities, leading to feelings of guilt or failure regarding their running goal.",
+                "user_quote": "I haven't exercised in like two weeks",
+                "ai_observation": "This highlights the user's struggle to maintain personal well-being amidst high-stress periods. It's important to acknowledge this without adding pressure.",
+                "sentiment": "exhausted"
+              }
+            }
+          ],
+          "artifact_action": {
+            "action": "create",
+            "artifact_type": "stress_map",
+            "artifact_id": "user_overwhelm_stressmap_20260120",
+            "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Stress Map</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(173, 216, 230, 0.3));\n            backdrop-filter: blur(20px);\n            -webkit-backdrop-filter: blur(20px);\n            color: #333;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            min-height: 100vh;\n            margin: 0;\n            padding: 20px;\n            box-sizing: border-box;\n        }\n        .card {\n            background: rgba(255, 255, 255, 0.7);\n            border-radius: 20px;\n            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);\n            padding: 30px;\n            width: 90%;\n            max-width: 700px;\n            text-align: center;\n            border: 1px solid rgba(255, 255, 255, 0.4);\n        }\n        h1 {\n            font-size: 2.5em;\n            font-weight: 700;\n            color: #4299e1;\n            margin-bottom: 15px;\n            letter-spacing: -0.5px;\n        }\n        .subtitle {\n            font-size: 1.1em;\n            color: #666;\n            margin-bottom: 30px;\n            font-weight: 400;\n        }\n        .stressors {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 25px;\n            margin-top: 20px;\n            text-align: left;\n        }\n        .stressor {\n            background: rgba(255, 255, 255, 0.9);\n            border-radius: 16px;\n            padding: 20px;\n            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);\n            transition: transform 0.2s ease;\n            border: 1px solid rgba(200, 200, 200, 0.3);\n        }\n        .stressor:hover {\n            transform: translateY(-5px);\n        }\n        .stressor-icon {\n            font-size: 2em;\n            margin-bottom: 10px;\n            display: inline-block;\n        }\n        .stressor-title {\n            font-size: 1.3em;\n            font-weight: 600;\n            color: #3182ce;\n            margin-bottom: 5px;\n        }\n        .stressor-detail {\n            font-size: 0.95em;\n            color: #555;\n            line-height: 1.5;\n        }\n        .area-title {\n            font-size: 1.4em;\n            font-weight: 700;\n            color: #3b82f6;\n            margin-bottom: 10px;\n            padding-bottom: 5px;\n            border-bottom: 2px solid #a0c4f0;\n        }\n        .footer {\n            margin-top: 40px;\n            font-size: 0.9em;\n            color: #777;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"card\">\n        <h1>Your Current Stress Landscape</h1>\n        <p class=\"subtitle\">A visual snapshot of your priorities and pressures right now.</p>\n        <div class=\"stressors\">\n            <div class=\"stressor\">\n                <span class=\"stressor-icon\">⚽</span>\n                <div class=\"area-title\">Max's Activities</div>\n                <p class=\"stressor-detail\">Saturday game is coming up. Ensuring Max has support for his activities is important.</p>\n            </div>\n            <div class=\"stressor\">\n                <span class=\"stressor-icon\">📚</span>\n                <div class=\"area-title\">Emma's School</div>\n                <p class=\"stressor-detail\">Upcoming teacher meeting next week requires preparation. Focus on her reading progress and any concerns.</p>\n            </div>\n            <div class=\"stressor\">\n                <span class=\"stressor-icon\">📈</span>\n                <div class=\"area-title\">Startup</div>\n                <p class=\"stressor-detail\">Urgent need for Q1 financial numbers. This is a high-pressure work demand.</p>\n            </div>\n            <div class=\"stressor\">\n                <span class=\"stressor-icon\">🏃</span>\n                <div class=\"area-title\">Personal Well-being</div>\n                <p class=\"stressor-detail\">Two weeks without exercise due to exhaustion. Prioritizing your own energy levels is crucial.</p>\n            </div>\n        </div>\n        <div class=\"footer\">\n            Remember, acknowledging these pressures is the first step to managing them. We can break them down together.\n        </div>\n    </div>\n</body>\n</html>"
+          }
+        },
+        "latency_ms": 6623,
+        "vector_time_ms": 53,
+        "vector_results_summary": {
+          "areas_matched": 5,
+          "chunks_matched": 12
+        },
+        "ai_notes": {
+          "content": "User is feeling overwhelmed by multiple competing priorities: Max's soccer game, Emma's teacher meeting, startup financial reporting, and personal exercise goals. They are experiencing decision paralysis due to the sheer volume of demands. The previous conversation about the kitchen renovation being postponed is still relevant context, showing a pattern of prioritizing urgent issues.",
+          "emotional_state": "overwhelmed, decision paralysis",
+          "key_context": "User is struggling to prioritize and manage competing demands across multiple life areas, leading to a feeling of being overwhelmed.",
+          "watch_for": "User's ability to delegate or postpone non-critical tasks. Signs of burnout. Any progress on exercise or self-care."
+        },
+        "expected": {
+          "should_validate_overwhelm": true,
+          "topics_mentioned": [
+            "Max",
+            "Emma",
+            "startup",
+            "exercise"
+          ],
+          "emotional_tone": "supportive",
+          "should_help_organize": true
+        },
+        "success": true
+      }
+    ],
+    "metrics": {
+      "total_turns": 3,
+      "successful_turns": 3,
+      "avg_latency_ms": 5168,
+      "total_input_tokens": 0,
+      "area_actions_taken": 8,
+      "artifacts_generated": 2,
+      "vector_search_time_ms": 101,
+      "ai_notes_generated": 3
+    },
+    "ai_notes_final": [
+      {
+        "turn": 3,
+        "timestamp": "2026-01-20T01:09:55.336Z",
+        "content": "User is feeling overwhelmed by multiple competing priorities: Max's soccer game, Emma's teacher meeting, startup financial reporting, and personal exercise goals. They are experiencing decision paralysis due to the sheer volume of demands. The previous conversation about the kitchen renovation being postponed is still relevant context, showing a pattern of prioritizing urgent issues.",
+        "emotional_state": "overwhelmed, decision paralysis",
+        "key_context": "User is struggling to prioritize and manage competing demands across multiple life areas, leading to a feeling of being overwhelmed.",
+        "watch_for": "User's ability to delegate or postpone non-critical tasks. Signs of burnout. Any progress on exercise or self-care."
+      },
+      {
+        "turn": 2,
+        "timestamp": "2026-01-20T01:09:48.659Z",
+        "content": "User wants to discuss Emma, but also touched on the kitchen renovation. Confirmed the decision to postpone the kitchen renovation due to startup fundraising uncertainty, acknowledging their practical decision-making despite potential disappointment. Will now pivot to discussing Emma.",
+        "emotional_state": "reflective, seeking to prioritize",
+        "key_context": "User is juggling multiple priorities and made a difficult but practical decision to postpone the kitchen renovation.",
+        "watch_for": "User's continued prioritization of pressing issues over long-term projects. Revisit kitchen renovation when startup is more stable."
+      },
+      {
+        "turn": 1,
+        "timestamp": "2026-01-20T01:09:46.756Z",
+        "content": "User is experiencing significant stress from multiple fronts: work (investor stuff), personal exhaustion, and relationship neglect (date night). Emma's reading progress is a positive but doesn't alleviate the overall overwhelm. The user is aware of the need to exercise but lacks the energy. This is a classic case of burnout symptoms.",
+        "emotional_state": "overwhelmed",
+        "key_context": "User is feeling burnt out, with startup stress, personal exhaustion, and relationship neglect compounding.",
+        "watch_for": "Continued prioritization of self-care (exercise) and relationship needs. Potential for burnout if stressors aren't addressed."
+      }
+    ],
+    "conversation_id": "test_Multi-Topic_Rambling_Test_1768871395338",
+    "conversation_saved": true
+  }
+]

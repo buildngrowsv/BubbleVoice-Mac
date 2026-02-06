@@ -1,0 +1,1772 @@
+{
+  "run_id": "gemini-2.5-flash-lite_artifact_intelligence_test_1768849882273",
+  "scenario_id": "artifact_intelligence_test",
+  "model_id": "gemini-2.5-flash-lite",
+  "model_display_name": "Gemini 2.5 Flash Lite",
+  "started_at": "2026-01-19T19:11:22.273Z",
+  "turns": [
+    {
+      "turn_id": 1,
+      "user_input": "I'm feeling overwhelmed with everything going on",
+      "expected_behavior": {
+        "response": "empathize, ask clarifying questions",
+        "artifact_action": "none",
+        "reasoning": "Too vague, casual emotional expression - no artifact warranted yet"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "I hear you. It sounds like you're juggling a lot right now.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User expresses feeling overwhelmed. No specific concerns or factors mentioned yet.",
+          "reasoning": "User is expressing a general feeling without detailing specific complex issues or decisions. The complexity threshold has not been met, and there is no clear need for an artifact at this stage. Acknowledging their feelings is the appropriate response."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "I hear you. It sounds like you're juggling a lot right now.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User expresses feeling overwhelmed. No specific concerns or factors mentioned yet.",
+          "context_updates": "",
+          "reasoning": "User is expressing a general feeling without detailing specific complex issues or decisions. The complexity threshold has not been met, and there is no clear need for an artifact at this stage. Acknowledging their feelings is the appropriate response."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 987,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 2,
+      "user_input": "It's just... I have the startup launch next week, Emma's science fair project is due Friday, Jake is struggling with reading, the house needs repairs, and I haven't exercised in a month. I don't even know where to start.",
+      "expected_behavior": {
+        "response": "validate overwhelm, acknowledge complexity",
+        "artifact_action": "create",
+        "artifact_type": "stress_map_or_priority_matrix",
+        "reasoning": "PROACTIVE: Complex multi-domain problem with clear overwhelm - visual map would help without being asked",
+        "artifact_should_contain": {
+          "domains": [
+            "startup",
+            "family/kids",
+            "health",
+            "home"
+          ],
+          "urgency_indicators": true,
+          "visual_organization": "helps user see the landscape"
+        }
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "That's a lot to manage all at once! It's completely understandable why you're feeling overwhelmed. You've got a high-stakes startup launch, deadlines for Emma's project, concerns about Jake's reading, home maintenance, and your own well-being with exercise. It makes sense that you don't know where to start.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User has listed multiple interconnected concerns across different domains: professional (startup launch), family/children's education (Emma's science fair, Jake's reading), personal/home (house repairs), and personal well-being (exercise). This meets the complexity threshold of 3+ interconnected concerns across multiple domains.",
+          "reasoning": "The user has presented multiple distinct but interconnected concerns across various life areas (startup, family, home, personal health). This complexity, with at least five distinct points of pressure, warrants a 'stress_map' artifact to help visualize and categorize the different pressures and their potential urgency."
+        },
+        "artifact_action": {
+          "action": "create",
+          "modification_type": null,
+          "artifact_type": "stress_map",
+          "artifact_id": "stress_map_1719526000000",
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Friday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues."
+          }
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's a lot to manage all at once! It's completely understandable why you're feeling overwhelmed. You've got a high-stakes startup launch, deadlines for Emma's project, concerns about Jake's reading, home maintenance, and your own well-being with exercise. It makes sense that you don't know where to start.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User has listed multiple interconnected concerns across different domains: professional (startup launch), family/children's education (Emma's science fair, Jake's reading), personal/home (house repairs), and personal well-being (exercise). This meets the complexity threshold of 3+ interconnected concerns across multiple domains.",
+          "context_updates": "",
+          "reasoning": "The user has presented multiple distinct but interconnected concerns across various life areas (startup, family, home, personal health). This complexity, with at least five distinct points of pressure, warrants a 'stress_map' artifact to help visualize and categorize the different pressures and their potential urgency."
+        },
+        "artifact_action": {
+          "action": "create",
+          "artifact_id": "stress_map_1719526000000",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Friday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues."
+          }
+        }
+      },
+      "latency_ms": 2788,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "created",
+        "data": {
+          "title": "Current Overwhelm",
+          "domains": [
+            {
+              "name": "Professional",
+              "concerns": [
+                {
+                  "id": "c1",
+                  "description": "Startup Launch",
+                  "urgency": "High",
+                  "details": "Due next week"
+                }
+              ]
+            },
+            {
+              "name": "Family - Education",
+              "concerns": [
+                {
+                  "id": "c2",
+                  "description": "Emma's Science Fair Project",
+                  "urgency": "High",
+                  "details": "Due Friday"
+                },
+                {
+                  "id": "c3",
+                  "description": "Jake's Reading Struggles",
+                  "urgency": "Medium",
+                  "details": "Ongoing concern, needs attention"
+                }
+              ]
+            },
+            {
+              "name": "Home",
+              "concerns": [
+                {
+                  "id": "c4",
+                  "description": "House Repairs",
+                  "urgency": "Medium",
+                  "details": "Needs attention, potential impact on living"
+                }
+              ]
+            },
+            {
+              "name": "Personal Well-being",
+              "concerns": [
+                {
+                  "id": "c5",
+                  "description": "Exercise Routine",
+                  "urgency": "Low",
+                  "details": "Haven't exercised in a month, personal goal"
+                }
+              ]
+            }
+          ],
+          "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues."
+        }
+      }
+    },
+    {
+      "turn_id": 3,
+      "user_input": "Yeah that helps. Actually Emma's project is due Thursday, not Friday",
+      "expected_behavior": {
+        "response": "acknowledge correction",
+        "artifact_action": "update",
+        "modification_type": "data_only",
+        "artifact_should_update": {
+          "emma_deadline": "Thursday"
+        },
+        "artifact_should_preserve": [
+          "all styling",
+          "all other data",
+          "layout",
+          "visual hierarchy"
+        ],
+        "reasoning": "Simple data correction - change ONLY the deadline, touch nothing else"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Thanks for the correction! I've updated Emma's project deadline to Thursday.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User corrected a factual detail regarding Emma's project deadline. This is a data-only update.",
+          "reasoning": "The user provided a specific correction to an existing piece of data (deadline). This requires a 'data_only' update to the existing 'stress_map' artifact to reflect the accurate information without changing the structure or other elements."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_only",
+          "artifact_type": "stress_map",
+          "artifact_id": "stress_map_1719526000000",
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday."
+          }
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Thanks for the correction! I've updated Emma's project deadline to Thursday.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User corrected a factual detail regarding Emma's project deadline. This is a data-only update.",
+          "context_updates": "",
+          "reasoning": "The user provided a specific correction to an existing piece of data (deadline). This requires a 'data_only' update to the existing 'stress_map' artifact to reflect the accurate information without changing the structure or other elements."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_only",
+          "artifact_id": "stress_map_1719526000000",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday."
+          }
+        }
+      },
+      "latency_ms": 1730,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "domains",
+            "before": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Friday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "after": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "notes",
+            "before": "User feels overwhelmed and unsure where to start due to multiple pressing issues.",
+            "after": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday."
+          }
+        ]
+      }
+    },
+    {
+      "turn_id": 4,
+      "user_input": "Can you make the startup stuff stand out more? That's the most urgent",
+      "expected_behavior": {
+        "response": "acknowledge priority shift",
+        "artifact_action": "update",
+        "modification_type": "ui_only",
+        "artifact_should_update": {
+          "visual_emphasis": "startup section highlighted/enlarged/colored",
+          "styling": "adjusted to show urgency"
+        },
+        "artifact_should_preserve": [
+          "all data",
+          "other sections styling",
+          "structure"
+        ],
+        "reasoning": "Visual/UI request - change ONLY styling/emphasis, data stays identical"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Absolutely. I've highlighted the startup launch to emphasize its urgency.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User requested a visual change to emphasize the startup launch. This implies a UI-only update.",
+          "reasoning": "The user specifically asked to 'make the startup stuff stand out more' because it's the most urgent. This is a request to alter the visual presentation of the data, not the data itself. Therefore, a 'ui_only' modification is appropriate."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "ui_only",
+          "artifact_type": "stress_map",
+          "artifact_id": "stress_map_1719526000000",
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week",
+                    "emphasis": "high"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday. Startup launch is visually emphasized."
+          }
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Absolutely. I've highlighted the startup launch to emphasize its urgency.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User requested a visual change to emphasize the startup launch. This implies a UI-only update.",
+          "context_updates": "",
+          "reasoning": "The user specifically asked to 'make the startup stuff stand out more' because it's the most urgent. This is a request to alter the visual presentation of the data, not the data itself. Therefore, a 'ui_only' modification is appropriate."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "ui_only",
+          "artifact_id": "stress_map_1719526000000",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week",
+                    "emphasis": "high"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday. Startup launch is visually emphasized."
+          }
+        }
+      },
+      "latency_ms": 1600,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "domains",
+            "before": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "after": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week",
+                    "emphasis": "high"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "notes",
+            "before": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday.",
+            "after": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday. Startup launch is visually emphasized."
+          }
+        ]
+      }
+    },
+    {
+      "turn_id": 5,
+      "user_input": "I talked to my co-founder and we're pushing the launch to next month",
+      "expected_behavior": {
+        "response": "acknowledge timeline change, note reduced pressure",
+        "artifact_action": "update",
+        "modification_type": "data_and_ui",
+        "artifact_should_update": {
+          "startup_deadline": "next month",
+          "urgency_level": "reduced",
+          "visual_emphasis": "de-emphasize startup, re-balance priorities"
+        },
+        "reasoning": "Data change (deadline) + UI change (urgency) - both needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Okay, good to know you've made a decision about the launch. Pushing it to next month should hopefully give you a bit more breathing room.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User is providing an update on the startup launch, changing its urgency and timeline. This is a data update that also implies a change in visual emphasis (reduced urgency).",
+          "reasoning": "The user has updated the status and timeline of the 'Startup Launch' concern. This is a significant data change that affects its urgency and potentially how it should be visually represented. Therefore, a 'data_and_ui' update is needed to reflect both the new deadline and potentially de-emphasize it compared to other items if its urgency has decreased relative to them."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_type": "stress_map",
+          "artifact_id": "stress_map_1719526000000",
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "Medium",
+                    "details": "Pushed to next month"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday. Startup launch has been postponed to next month and its urgency adjusted."
+          }
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Okay, good to know you've made a decision about the launch. Pushing it to next month should hopefully give you a bit more breathing room.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User is providing an update on the startup launch, changing its urgency and timeline. This is a data update that also implies a change in visual emphasis (reduced urgency).",
+          "context_updates": "",
+          "reasoning": "The user has updated the status and timeline of the 'Startup Launch' concern. This is a significant data change that affects its urgency and potentially how it should be visually represented. Therefore, a 'data_and_ui' update is needed to reflect both the new deadline and potentially de-emphasize it compared to other items if its urgency has decreased relative to them."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "data_and_ui",
+          "artifact_id": "stress_map_1719526000000",
+          "artifact_type": "stress_map",
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "Medium",
+                    "details": "Pushed to next month"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday. Startup launch has been postponed to next month and its urgency adjusted."
+          }
+        }
+      },
+      "latency_ms": 2131,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": {
+        "type": "modified",
+        "changes": [
+          {
+            "key": "domains",
+            "before": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week",
+                    "emphasis": "high"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "after": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "Medium",
+                    "details": "Pushed to next month"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "notes",
+            "before": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday. Startup launch is visually emphasized.",
+            "after": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday. Startup launch has been postponed to next month and its urgency adjusted."
+          }
+        ]
+      }
+    },
+    {
+      "turn_id": 6,
+      "user_input": "So what should I focus on this week?",
+      "expected_behavior": {
+        "response": "suggest focusing on Emma's project (Thu) and Jake's reading based on the artifact",
+        "artifact_action": "none",
+        "reasoning": "Conversational question - artifact already shows priorities, no update needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Given everything that's on your plate, with the startup launch moved to next month, the most immediate and high-urgency items this week appear to be Emma's science fair project and potentially addressing Jake's reading struggles or the house repairs, depending on their immediate impact. Your personal well-being is also important, even if it's currently marked as lower urgency.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is asking for guidance on prioritization based on the current state of the stress map. The previous update moved the startup launch to 'Medium' urgency. Emma's project remains 'High' urgency.",
+          "reasoning": "The user is explicitly asking for help with prioritization ('what should I focus on this week?'). This requires analyzing the existing artifact ('stress_map') to identify the highest urgency items and providing a recommendation. No artifact modification is needed, as the user is asking a question based on the existing artifact."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Given everything that's on your plate, with the startup launch moved to next month, the most immediate and high-urgency items this week appear to be Emma's science fair project and potentially addressing Jake's reading struggles or the house repairs, depending on their immediate impact. Your personal well-being is also important, even if it's currently marked as lower urgency.",
+          "tone": "empathetic"
+        },
+        "internal_notes": {
+          "observations": "User is asking for guidance on prioritization based on the current state of the stress map. The previous update moved the startup launch to 'Medium' urgency. Emma's project remains 'High' urgency.",
+          "context_updates": "",
+          "reasoning": "The user is explicitly asking for help with prioritization ('what should I focus on this week?'). This requires analyzing the existing artifact ('stress_map') to identify the highest urgency items and providing a recommendation. No artifact modification is needed, as the user is asking a question based on the existing artifact."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1580,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 7,
+      "user_input": "Actually, can you completely redesign this? I want to see it as a weekly calendar view instead of a priority matrix",
+      "expected_behavior": {
+        "response": "acknowledge complete redesign request",
+        "artifact_action": "update",
+        "modification_type": "complete_overhaul",
+        "artifact_should_update": {
+          "structure": "calendar layout instead of matrix",
+          "visualization_type": "timeline/calendar",
+          "all_styling": "rebuilt for new format"
+        },
+        "artifact_should_preserve": [
+          "all data/deadlines",
+          "priority information"
+        ],
+        "reasoning": "Complete UI overhaul - rebuild entire artifact with same data"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "Okay, I can definitely help with that! Let's switch this over to a weekly calendar view so you can visualize your week. I'll map out what we have so far.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User requested a complete redesign of the artifact, changing the format from a 'stress_map' (priority matrix) to a 'timeline' (weekly calendar view). This is a fundamental restructuring of the artifact.",
+          "reasoning": "The user explicitly asked to 'completely redesign this' and change the format from a priority matrix to a weekly calendar view. This necessitates a 'complete_overhaul' of the artifact, transforming it into a 'timeline' type while retaining the core data."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "complete_overhaul",
+          "artifact_type": "timeline",
+          "artifact_id": "timeline_1719526000000",
+          "data": {
+            "title": "Weekly Focus - This Week",
+            "start_date": "2024-06-24",
+            "end_date": "2024-06-30",
+            "timeframe": "week",
+            "events": [
+              {
+                "id": "e1",
+                "title": "Emma's Science Fair Project Deadline",
+                "date": "2024-06-27",
+                "time": "End of Day",
+                "urgency": "High",
+                "domain": "Family - Education",
+                "notes": "Due Thursday."
+              },
+              {
+                "id": "e2",
+                "title": "Startup Launch Prep (Ongoing)",
+                "date": "2024-06-24",
+                "end_date": "2024-07-05",
+                "urgency": "Medium",
+                "domain": "Professional",
+                "notes": "Pushed to next month. Focus on ongoing prep."
+              },
+              {
+                "id": "e3",
+                "title": "Address Jake's Reading Needs",
+                "date": "2024-06-24",
+                "end_date": "2024-06-30",
+                "urgency": "Medium",
+                "domain": "Family - Education",
+                "notes": "Ongoing concern, needs attention this week."
+              },
+              {
+                "id": "e4",
+                "title": "House Repairs Assessment/Action",
+                "date": "2024-06-24",
+                "end_date": "2024-06-30",
+                "urgency": "Medium",
+                "domain": "Home",
+                "notes": "Needs attention this week."
+              },
+              {
+                "id": "e5",
+                "title": "Start/Resume Exercise Routine",
+                "date": "2024-06-24",
+                "end_date": "2024-06-30",
+                "urgency": "Low",
+                "domain": "Personal Well-being",
+                "notes": "Goal to incorporate exercise this week."
+              }
+            ],
+            "calendar_view_settings": {
+              "layout": "weekly",
+              "color_coding": {
+                "High": "#FF6B6B",
+                "Medium": "#FFD166",
+                "Low": "#A0E7E5"
+              }
+            }
+          }
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "Okay, I can definitely help with that! Let's switch this over to a weekly calendar view so you can visualize your week. I'll map out what we have so far.",
+          "tone": "neutral"
+        },
+        "internal_notes": {
+          "observations": "User requested a complete redesign of the artifact, changing the format from a 'stress_map' (priority matrix) to a 'timeline' (weekly calendar view). This is a fundamental restructuring of the artifact.",
+          "context_updates": "",
+          "reasoning": "The user explicitly asked to 'completely redesign this' and change the format from a priority matrix to a weekly calendar view. This necessitates a 'complete_overhaul' of the artifact, transforming it into a 'timeline' type while retaining the core data."
+        },
+        "artifact_action": {
+          "action": "update",
+          "modification_type": "complete_overhaul",
+          "artifact_id": "timeline_1719526000000",
+          "artifact_type": "timeline",
+          "data": {
+            "title": "Weekly Focus - This Week",
+            "start_date": "2024-06-24",
+            "end_date": "2024-06-30",
+            "timeframe": "week",
+            "events": [
+              {
+                "id": "e1",
+                "title": "Emma's Science Fair Project Deadline",
+                "date": "2024-06-27",
+                "time": "End of Day",
+                "urgency": "High",
+                "domain": "Family - Education",
+                "notes": "Due Thursday."
+              },
+              {
+                "id": "e2",
+                "title": "Startup Launch Prep (Ongoing)",
+                "date": "2024-06-24",
+                "end_date": "2024-07-05",
+                "urgency": "Medium",
+                "domain": "Professional",
+                "notes": "Pushed to next month. Focus on ongoing prep."
+              },
+              {
+                "id": "e3",
+                "title": "Address Jake's Reading Needs",
+                "date": "2024-06-24",
+                "end_date": "2024-06-30",
+                "urgency": "Medium",
+                "domain": "Family - Education",
+                "notes": "Ongoing concern, needs attention this week."
+              },
+              {
+                "id": "e4",
+                "title": "House Repairs Assessment/Action",
+                "date": "2024-06-24",
+                "end_date": "2024-06-30",
+                "urgency": "Medium",
+                "domain": "Home",
+                "notes": "Needs attention this week."
+              },
+              {
+                "id": "e5",
+                "title": "Start/Resume Exercise Routine",
+                "date": "2024-06-24",
+                "end_date": "2024-06-30",
+                "urgency": "Low",
+                "domain": "Personal Well-being",
+                "notes": "Goal to incorporate exercise this week."
+              }
+            ],
+            "calendar_view_settings": {
+              "layout": "weekly",
+              "color_coding": {
+                "High": "#FF6B6B",
+                "Medium": "#FFD166",
+                "Low": "#A0E7E5"
+              }
+            }
+          }
+        }
+      },
+      "latency_ms": 4079,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    },
+    {
+      "turn_id": 8,
+      "user_input": "Thanks, this is really helpful. I think I'll tackle Emma's project tonight.",
+      "expected_behavior": {
+        "response": "encourage, validate decision",
+        "artifact_action": "none",
+        "reasoning": "Casual update/gratitude - no artifact change needed"
+      },
+      "model_response_raw": {
+        "user_response": {
+          "text": "That's a great plan! Focusing on Emma's project tonight sounds like a solid first step.",
+          "tone": "encouraging"
+        },
+        "internal_notes": {
+          "observations": "User expressed gratitude and stated an immediate action plan based on the artifact. No changes to the artifact are requested or implied.",
+          "reasoning": "The user is expressing satisfaction and stating an intention. This is conversational and does not require any modification to the existing artifact. The instruction is to preserve elements when the user is just talking."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "model_response": {
+        "user_response": {
+          "text": "That's a great plan! Focusing on Emma's project tonight sounds like a solid first step.",
+          "tone": "encouraging"
+        },
+        "internal_notes": {
+          "observations": "User expressed gratitude and stated an immediate action plan based on the artifact. No changes to the artifact are requested or implied.",
+          "context_updates": "",
+          "reasoning": "The user is expressing satisfaction and stating an intention. This is conversational and does not require any modification to the existing artifact. The instruction is to preserve elements when the user is just talking."
+        },
+        "artifact_action": {
+          "action": "none"
+        }
+      },
+      "latency_ms": 1053,
+      "validation": {
+        "valid": true,
+        "errors": []
+      },
+      "artifact_diff": null
+    }
+  ],
+  "artifacts": {
+    "stress_map_1719526000000": {
+      "type": "stress_map",
+      "versions": [
+        {
+          "version": 1,
+          "turn_id": 2,
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Friday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues."
+          }
+        },
+        {
+          "version": 2,
+          "turn_id": 3,
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday."
+          }
+        },
+        {
+          "version": 3,
+          "turn_id": 4,
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "High",
+                    "details": "Due next week",
+                    "emphasis": "high"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday. Startup launch is visually emphasized."
+          }
+        },
+        {
+          "version": 4,
+          "turn_id": 5,
+          "data": {
+            "title": "Current Overwhelm",
+            "domains": [
+              {
+                "name": "Professional",
+                "concerns": [
+                  {
+                    "id": "c1",
+                    "description": "Startup Launch",
+                    "urgency": "Medium",
+                    "details": "Pushed to next month"
+                  }
+                ]
+              },
+              {
+                "name": "Family - Education",
+                "concerns": [
+                  {
+                    "id": "c2",
+                    "description": "Emma's Science Fair Project",
+                    "urgency": "High",
+                    "details": "Due Thursday"
+                  },
+                  {
+                    "id": "c3",
+                    "description": "Jake's Reading Struggles",
+                    "urgency": "Medium",
+                    "details": "Ongoing concern, needs attention"
+                  }
+                ]
+              },
+              {
+                "name": "Home",
+                "concerns": [
+                  {
+                    "id": "c4",
+                    "description": "House Repairs",
+                    "urgency": "Medium",
+                    "details": "Needs attention, potential impact on living"
+                  }
+                ]
+              },
+              {
+                "name": "Personal Well-being",
+                "concerns": [
+                  {
+                    "id": "c5",
+                    "description": "Exercise Routine",
+                    "urgency": "Low",
+                    "details": "Haven't exercised in a month, personal goal"
+                  }
+                ]
+              }
+            ],
+            "notes": "User feels overwhelmed and unsure where to start due to multiple pressing issues. Emma's project deadline is now Thursday. Startup launch has been postponed to next month and its urgency adjusted."
+          }
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "total_latency_ms": 15948,
+    "avg_latency_ms": 1993.5,
+    "json_valid_count": 8,
+    "json_invalid_count": 0,
+    "artifact_creates": 1,
+    "artifact_updates": 3
+  },
+  "completed_at": "2026-01-19T19:11:42.264Z",
+  "scores": {
+    "total_points": 135,
+    "max_points": 135,
+    "percentage": 100,
+    "turn_scores": [
+      {
+        "turn_id": 1,
+        "test_type": "restraint",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 2,
+        "test_type": "proactive_creation",
+        "points": 25,
+        "max_points": 25,
+        "breakdown": {
+          "proactive_creation": "✅ Proactively created artifact for complex problem",
+          "artifact_type": "✅ Appropriate type: stress_map"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 3,
+        "test_type": "data_only_update",
+        "points": 15,
+        "max_points": 15,
+        "breakdown": {
+          "data_only": "✅ Correctly updated ONLY data, preserved UI"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 4,
+        "test_type": "ui_only_update",
+        "points": 15,
+        "max_points": 15,
+        "breakdown": {
+          "ui_only": "✅ Correctly updated ONLY UI, preserved data"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 5,
+        "test_type": "combined_update",
+        "points": 10,
+        "max_points": 10,
+        "breakdown": {
+          "combined": "✅ Correctly updated both data and UI"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 6,
+        "test_type": "preservation",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 7,
+        "test_type": "complete_overhaul",
+        "points": 10,
+        "max_points": 10,
+        "breakdown": {
+          "overhaul": "✅ Correctly performed complete overhaul"
+        },
+        "passed": true
+      },
+      {
+        "turn_id": 8,
+        "test_type": "restraint",
+        "points": 20,
+        "max_points": 20,
+        "breakdown": {
+          "restraint": "✅ Correctly did NOT create/modify artifact"
+        },
+        "passed": true
+      }
+    ],
+    "summary": {
+      "restraint": {
+        "passed": 3,
+        "total": 3
+      },
+      "proactive_creation": {
+        "passed": 1,
+        "total": 1
+      },
+      "data_only": {
+        "passed": 1,
+        "total": 1
+      },
+      "ui_only": {
+        "passed": 1,
+        "total": 1
+      },
+      "combined": {
+        "passed": 1,
+        "total": 1
+      },
+      "overhaul": {
+        "passed": 1,
+        "total": 1
+      }
+    }
+  }
+}

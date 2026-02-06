@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Map</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; box-sizing: border-box; }
+        .artifact-container { width: 100%; max-width: 800px; background: rgba(255, 255, 255, 0.7); border-radius: 20px; padding: 30px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); display: flex; flex-direction: column; align-items: center; }
+        h1 { color: #2c5282; margin-bottom: 10px; font-size: 2.5em; font-weight: 700; text-align: center; }
+        p.subtitle { color: #4a5568; font-size: 1.1em; margin-bottom: 30px; text-align: center; }
+        .stress-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; width: 100%; }
+        .category { background: rgba(255, 255, 255, 0.85); border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
+        .category:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.15); }
+        .category-header { display: flex; align-items: center; margin-bottom: 15px; }
+        .category-header i { font-size: 2em; margin-right: 15px; color: #4299e1; }
+        .category-title { font-size: 1.5em; font-weight: 600; color: #2a4365; }
+        .stress-points { list-style: none; padding: 0; margin: 0; }
+        .stress-point { font-size: 1em; color: #4f5d73; margin-bottom: 12px; line-height: 1.6; }
+        .stress-point strong { color: #2c5282; font-weight: 600; }
+        .stress-point.positive { color: #38a169; }
+        .stress-point.positive strong { color: #276749; }
+        .footer { margin-top: 30px; font-size: 0.9em; color: #718096; text-align: center; }
+        .positive-note { font-style: italic; color: #38a169; margin-top: 15px; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="artifact-container">
+        <h1>Current Stressors</h1>
+        <p class="subtitle">A visual overview of what's weighing on your mind right now.</p>
+        <div class="stress-categories">
+            <div class="category">
+                <div class="category-header">
+                    <i class="fas fa-child"></i>
+                    <h2 class="category-title">Emma's School</h2>
+                </div>
+                <ul class="stress-points">
+                    <li class="stress-point positive"><strong>Progress:</strong> Good day with reading! 🎉</li>
+                    <li class="stress-point"><strong>Concern:</strong> Underlying reading challenges persist.</li>
+                    <li class="stress-point"><strong>Action:</strong> Parent-teacher conference upcoming.</li>
+                </ul>
+                <div class="positive-note">"She never asks to read more." - Acknowledge this win!</div>
+            </div>
+            <div class="category">
+                <div class="category-header">
+                    <i class="fas fa-briefcase"></i>
+                    <h2 class="category-title">Startup & Work</h2>
+                </div>
+                <ul class="stress-points">
+                    <li class="stress-point"><strong>Stress:</strong> Investor matters are causing significant pressure.</li>
+                    <li class="stress-point"><strong>Impact:</strong> Contributing heavily to exhaustion.</li>
+                    <li class="stress-point"><strong>Area:</strong> Fundraising is a key pressure point.</li>
+                </ul>
+            </div>
+            <div class="category">
+                <div class="category-header">
+                    <i class="fas fa-running"></i>
+                    <h2 class="category-title">Personal Well-being</h2>
+                </div>
+                <ul class="stress-points">
+                    <li class="stress-point"><strong>Goal:</strong> Running 3x/week.</li>
+                    <li class="stress-point"><strong>Current:</strong> Struggling to find energy to run.</li>
+                    <li class="stress-point"><strong>Pattern:</strong> Exercise is often deprioritized under stress.</li>
+                </ul>
+                 <div class="positive-note">Remember how energized you felt last week when you *did* run!</div>
+            </div>
+            <div class="category">
+                <div class="category-header">
+                    <i class="fas fa-heart"></i>
+                    <h2 class="category-title">Relationship with Jordan</h2>
+                </div>
+                <ul class="stress-points">
+                    <li class="stress-point"><strong>Status:</strong> No date nights recently.</li>
+                    <li class="stress-point"><strong>Need:</strong> Quality time is being neglected.</li>
+                    <li class="stress-point"><strong>Context:</strong> Both partners are exhausted.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer">
+            Balancing all these areas is tough. Let's focus on one step at a time. Remember to be kind to yourself. 
+        </div>
+    </div>
+</body>
+</html>
