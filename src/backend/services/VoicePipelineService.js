@@ -464,9 +464,10 @@ class VoicePipelineService extends EventEmitter {
         // at construction time (e.g., in tests), create them now as fallback.
         // In normal operation, these come from BackendServer's shared instances.
         if (!this.llmService) {
-          const LLMService = require('./LLMService');
-          this.llmService = new LLMService();
-          console.warn('[VoicePipelineService] Created fallback LLMService (not using server shared instance)');
+          // UPDATED (2026-02-06): Use UnifiedLLMService (Vercel AI SDK) instead of old LLMService
+          const UnifiedLLMService = require('./UnifiedLLMService');
+          this.llmService = new UnifiedLLMService();
+          console.warn('[VoicePipelineService] Created fallback UnifiedLLMService (not using server shared instance)');
         }
         if (!this.conversationService) {
           const ConversationService = require('./ConversationService');

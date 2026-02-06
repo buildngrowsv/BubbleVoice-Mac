@@ -59,7 +59,7 @@
 - **Risk:** Low — purely additive improvement
 
 ### 6. Vercel AI SDK Migration (Provider Unification)
-- [ ] **Replace 3 separate provider implementations with unified Vercel AI SDK**
+- [x] **Replace 3 separate provider implementations with unified Vercel AI SDK** ✅ DONE 2026-02-06
 - Current: `generateGeminiResponse()`, `generateAnthropicResponse()`, `generateOpenAIResponse()` — 3 separate streaming implementations (LLMService.js is 1053 lines)
 - OpenCode pattern: Uses `streamText()` from `ai` package with provider-specific model constructors
 - Benefits: Unified streaming, built-in tool calling, structured output, retry logic, abort signals
@@ -127,12 +127,14 @@ npm uninstall @google/generative-ai @anthropic-ai/sdk openai
 - **Dependency:** Requires item #6 (Vercel AI SDK) first
 
 ### 8. Add Context Compaction
-- [ ] **No mechanism for handling long conversations**
-- BubbleVoice conversations are designed to be long (ongoing personal reflection)
-- Currently sends ALL messages to LLM — will hit context limits
-- OpenCode has `SessionCompaction` that summarizes old messages when context overflows
-- **Fix:** Implement compaction: when conversation exceeds N tokens, summarize oldest turns into a compact context block
-- **Risk:** Medium — needed before long conversations are practical
+- [x] **No mechanism for handling long conversations** ✅ FIXED 2026-02-06
+- Created ContextCompactionService with configurable thresholds (default: compact at 60 messages, keep 20 recent)
+- Uses gemini-2.0-flash for fast/cheap summarization of older messages
+- Summary preserves personal names, emotional context, life area details, and commitments
+- Fallback to extractive summary when no LLM available
+- Summary cache prevents re-summarizing the same messages
+- Integrated into UnifiedLLMService.buildMessages() — transparent to callers
+- **Risk:** Resolved — long conversations now handled gracefully
 
 ---
 
@@ -237,14 +239,17 @@ npm uninstall @google/generative-ai @anthropic-ai/sdk openai
 8. ~~Remove dead code (#13)~~ ✅ BubbleGeneratorService removed from server.js, 24 test files archived, test data dirs moved
 9. Consolidate archived docs (#10)
 
-**Phase 3 — Architecture Evolution (Future Sessions)**
-10. Install Vercel AI SDK (#6)
-11. Convert to tool-calling pattern (#7)
-12. Add context compaction (#8)
-13. WebSocket session recovery (#14)
-14. Swift helper distribution (#16)
+**Phase 3 — Architecture Evolution** ✅ COMPLETE
+10. ~~Install Vercel AI SDK (#6)~~ ✅ UnifiedLLMService.js replaces 3 provider implementations with single generateObject() call
+11. Convert to tool-calling pattern (#7) — deferred to Phase 4
+12. ~~Add context compaction (#8)~~ ✅ ContextCompactionService summarizes older messages, keeps recent 20 intact
+
+**Phase 4 — Polish & Production (Future Sessions)**
+13. Convert to tool-calling pattern (#7)
+14. WebSocket session recovery (#14)
+15. Swift helper distribution (#16)
 
 ---
 
-**Last Updated:** February 6, 2026 (Phase 2 in progress)  
-**Next Review:** After Phase 2 completion
+**Last Updated:** February 6, 2026 (Phase 3 complete)  
+**Next Review:** After Phase 4 (tool-calling pattern)
