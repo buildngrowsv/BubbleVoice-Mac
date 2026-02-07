@@ -491,6 +491,16 @@ class UnifiedLLMService {
     const tools = createBubbleVoiceTools(toolResults);
     
     const startTime = Date.now();
+
+    // LLM API TIMEOUT (P0 UX FIX — 2026-02-06)
+    // WHY: LLM API calls can hang indefinitely if the provider is overloaded or
+    // experiencing an outage. Without a timeout, the user sees "Thinking..." forever.
+    // BECAUSE: We observed 30+ second hangs with Gemini and OpenAI during high traffic.
+    // 
+    // DESIGN: 45 second timeout is generous enough for complex artifact generation
+    // (which typically takes 5-15s) but catches genuine hangs. The user can also
+    // cancel manually via the UI cancel button (sends 'interrupt' message).
+    const LLM_TIMEOUT_MS = 45000;
     
     try {
       // GENERATE TEXT WITH TOOL CALLING
@@ -506,7 +516,9 @@ class UnifiedLLMService {
       //
       // AI SDK 6 NOTE: `maxSteps` was removed in v6, replaced by `stopWhen`.
       // `stepCountIs(N)` stops when the total number of steps reaches N.
-      const result = await generateText({
+      //
+      // WRAPPED WITH TIMEOUT: Promise.race against a timeout to prevent indefinite hangs.
+      const generatePromise = generateText({
         model,
         system: this.systemPrompt,
         messages,
@@ -524,6 +536,16 @@ class UnifiedLLMService {
           });
         },
       });
+
+      // Race the LLM call against a timeout
+      // WHY: This is the P0 fix for the "user stuck with Thinking..." forever issue
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(
+          `LLM response timed out after ${LLM_TIMEOUT_MS / 1000}s. The AI provider may be overloaded. Please try again.`
+        )), LLM_TIMEOUT_MS)
+      );
+
+      const result = await Promise.race([generatePromise, timeoutPromise]);
       
       const elapsed = Date.now() - startTime;
       const responseText = result.text || '';

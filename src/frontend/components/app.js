@@ -226,13 +226,15 @@ class BubbleVoiceApp {
       }
     });
 
-    // Welcome suggestion chips - populate input with suggestion
+    // Welcome suggestion chips - auto-send on click (P1 FIX)
+    // WHY: Same rationale as bubble auto-send - reduce friction for starter prompts
+    // BECAUSE: User clicks a suggestion because they want that conversation started
     document.querySelectorAll('.suggestion-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         const text = chip.textContent.replace(/['"]/g, '');
         this.elements.inputField.textContent = text;
         this.updateSendButtonState();
-        this.elements.inputField.focus();
+        this.sendMessage();
       });
     });
 
@@ -343,9 +345,14 @@ class BubbleVoiceApp {
   }
 
   /**
-   * SETUP KEYBOARD SHORTCUTS
+   * SETUP KEYBOARD SHORTCUTS (P2 ENHANCED)
    * 
    * Global keyboard shortcuts that work within the app.
+   * 
+   * ADDED (2026-02-06): 
+   * - Escape now also cancels AI generation (P0 fix)
+   * - Cmd+/ shows keyboard shortcuts help overlay (P2 fix)
+   * - Cmd+N creates new conversation
    */
   setupKeyboardShortcuts() {
     document.addEventListener('keydown', (e) => {
@@ -361,15 +368,139 @@ class BubbleVoiceApp {
         this.openSettings();
       }
 
-      // Escape - Close settings or stop voice
+      // Cmd/Ctrl + / - Show keyboard shortcuts help (P2 FIX)
+      // WHY: Users need a way to discover available shortcuts
+      // BECAUSE: Without discoverability, shortcuts go unused
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        e.preventDefault();
+        this.showKeyboardShortcutsHelp();
+      }
+
+      // Cmd/Ctrl + N - New conversation
+      // NOTE: ChatSidebar also handles this, but this ensures it works
+      // even if the sidebar is collapsed/hidden
+      if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
+        e.preventDefault();
+        this.startNewConversation();
+      }
+
+      // Escape - Close settings, stop voice, cancel generation, or close overlays
+      // PRIORITY ORDER: Settings > Shortcuts overlay > Generation > Voice
       if (e.key === 'Escape') {
         if (this.elements.settingsPanel.classList.contains('open')) {
           this.closeSettings();
+        } else if (document.querySelector('.shortcuts-overlay')) {
+          document.querySelector('.shortcuts-overlay').remove();
+        } else if (this.state.isProcessing) {
+          // P0 FIX: Escape cancels AI generation
+          this.cancelGeneration();
         } else if (this.state.isListening) {
           this.stopVoiceInput();
         }
       }
     });
+
+    // CANCEL BUTTON: Wire up the cancel generation button
+    const cancelBtn = document.getElementById('cancel-generation-btn');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        this.cancelGeneration();
+      });
+    }
+  }
+
+  /**
+   * KEYBOARD SHORTCUTS HELP OVERLAY (P2 FIX)
+   * 
+   * Shows a modal with all available keyboard shortcuts.
+   * WHY: Discoverability is key for power users who want to work faster.
+   * BECAUSE: Most shortcuts exist but users don't know about them.
+   * 
+   * Triggered by Cmd+/ or could be linked from a help button.
+   */
+  showKeyboardShortcutsHelp() {
+    // Don't show if already visible
+    if (document.querySelector('.shortcuts-overlay')) {
+      document.querySelector('.shortcuts-overlay').remove();
+      return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'shortcuts-overlay';
+    overlay.innerHTML = `
+      <div class="shortcuts-dialog">
+        <div class="shortcuts-title">
+          Keyboard Shortcuts
+          <button class="shortcuts-close" aria-label="Close shortcuts">×</button>
+        </div>
+
+        <div class="shortcuts-group">
+          <div class="shortcuts-group-title">General</div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Focus input</span>
+            <span class="shortcut-keys"><kbd>⌘</kbd><kbd>K</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Open settings</span>
+            <span class="shortcut-keys"><kbd>⌘</kbd><kbd>,</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Show shortcuts</span>
+            <span class="shortcut-keys"><kbd>⌘</kbd><kbd>/</kbd></span>
+          </div>
+        </div>
+
+        <div class="shortcuts-group">
+          <div class="shortcuts-group-title">Voice & Messages</div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Start voice input</span>
+            <span class="shortcut-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>Space</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Send message</span>
+            <span class="shortcut-keys"><kbd>Enter</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">New line in message</span>
+            <span class="shortcut-keys"><kbd>⇧</kbd><kbd>Enter</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Cancel AI response</span>
+            <span class="shortcut-keys"><kbd>Esc</kbd></span>
+          </div>
+        </div>
+
+        <div class="shortcuts-group">
+          <div class="shortcuts-group-title">Conversations</div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">New conversation</span>
+            <span class="shortcut-keys"><kbd>⌘</kbd><kbd>N</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Toggle sidebar</span>
+            <span class="shortcut-keys"><kbd>⌘</kbd><kbd>B</kbd></span>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Switch conversation 1-9</span>
+            <span class="shortcut-keys"><kbd>⌘</kbd><kbd>1</kbd>-<kbd>9</kbd></span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Close button handler
+    overlay.querySelector('.shortcuts-close').addEventListener('click', () => {
+      overlay.remove();
+    });
+
+    // Click outside to close
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+      }
+    });
+
+    document.body.appendChild(overlay);
   }
 
   /**
@@ -392,7 +523,18 @@ class BubbleVoiceApp {
    * Begins listening for voice input.
    * Shows visualization and updates UI state.
    */
-  startVoiceInput() {
+  /**
+   * START VOICE INPUT (P0 ENHANCED)
+   * 
+   * Begins listening for voice input.
+   * Shows visualization and updates UI state.
+   * 
+   * P0 FIX: Now catches errors (e.g., mic permission denied) and shows
+   * a clear toast with an action to open Settings, instead of silently failing.
+   * WHY: Users clicked the voice button and nothing happened with no explanation.
+   * BECAUSE: The error was only logged to console where users never look.
+   */
+  async startVoiceInput() {
     console.log('[App] Starting voice input');
     
     this.state.isListening = true;
@@ -405,8 +547,37 @@ class BubbleVoiceApp {
       this.elements.welcomeState.style.display = 'none';
     }
 
-    // Start voice controller
-    this.voiceController.startListening();
+    // Start voice controller with error handling for mic permission
+    try {
+      await this.voiceController.startListening();
+    } catch (error) {
+      console.error('[App] Voice input failed:', error);
+      
+      // Reset UI state since we failed to start
+      this.state.isListening = false;
+      this.elements.voiceButton.classList.remove('active');
+      this.elements.voiceVisualization.classList.remove('active');
+      this.updateStatus('Ready', 'connected');
+
+      // Show helpful error with action to open settings (P0 FIX)
+      // WHY: Users need to know WHY voice isn't working and HOW to fix it
+      const isPermissionError = error.message?.toLowerCase().includes('permission') ||
+                                error.message?.toLowerCase().includes('microphone') ||
+                                error.message?.toLowerCase().includes('not allowed');
+      
+      if (isPermissionError) {
+        this.showToast('Microphone access required. Grant permission in Settings.', 'warning', {
+          duration: 8000,
+          actionLabel: 'Open Settings',
+          onAction: () => this.openSettings()
+        });
+      } else {
+        this.showError('Voice input failed: ' + (error.message || 'Unknown error'), {
+          actionLabel: 'Retry',
+          onAction: () => this.startVoiceInput()
+        });
+      }
+    }
   }
 
   /**
@@ -438,8 +609,20 @@ class BubbleVoiceApp {
    * 
    * Sends the current input text to the AI.
    * Clears input and adds message to conversation.
+   * 
+   * P0 FIX: Added thinking indicator (animated dots bubble) while waiting.
+   * P2 FIX: Added debounce to prevent double-sends from rapid Enter presses.
+   * P2 FIX: Added max message length validation (10,000 chars).
    */
   async sendMessage() {
+    // DEBOUNCE: Prevent double-sends from rapid Enter key or button clicks.
+    // WHY: Without this, rapid Enter presses send the same message multiple times.
+    // BECAUSE: The input clear + send is async and there's a race window.
+    if (this.state.isProcessing) {
+      console.log('[App] Already processing, ignoring send');
+      return;
+    }
+
     // CRITICAL FIX (2026-01-28): Use innerText instead of textContent
     // WHY: textContent doesn't preserve line breaks from contenteditable elements
     // BECAUSE: When user presses Shift+Enter, contenteditable creates <br> tags
@@ -452,9 +635,21 @@ class BubbleVoiceApp {
       return;
     }
 
+    // MAX LENGTH VALIDATION (P2 FIX): Prevent extremely long messages
+    // WHY: Messages over 10K chars can overflow LLM context limits and break layout.
+    // BECAUSE: Users may paste enormous text blocks without realizing the impact.
+    const MAX_MESSAGE_LENGTH = 10000;
+    if (text.length > MAX_MESSAGE_LENGTH) {
+      this.showError(`Message too long (${text.length.toLocaleString()} chars). Maximum is ${MAX_MESSAGE_LENGTH.toLocaleString()} characters.`);
+      return;
+    }
+
     if (!this.state.isConnected) {
       console.error('[App] Not connected to backend');
-      this.showError('Not connected to backend. Please check your connection.');
+      this.showError('Not connected to backend. Please check your connection.', {
+        actionLabel: 'Retry',
+        onAction: () => this.websocketClient.scheduleReconnect()
+      });
       return;
     }
 
@@ -470,9 +665,15 @@ class BubbleVoiceApp {
     this.elements.inputField.textContent = '';
     this.updateSendButtonState();
 
-    // Update status
+    // Update status and show cancel button
     this.state.isProcessing = true;
     this.updateStatus('Thinking...', 'processing');
+    this.showCancelButton(true);
+
+    // THINKING INDICATOR (P0 FIX): Show animated dots while waiting for AI
+    // WHY: Without this, the user stares at empty space for 2-5+ seconds
+    // BECAUSE: LLM API calls take variable time and visual feedback is critical
+    this.conversationManager.showThinkingIndicator();
 
     // Send to backend via WebSocket
     // Backend will send back user_message event which will add it to UI
@@ -491,6 +692,51 @@ class BubbleVoiceApp {
       this.showError('Failed to send message. Please try again.');
       this.state.isProcessing = false;
       this.updateStatus('Ready', 'connected');
+      this.showCancelButton(false);
+      this.conversationManager.removeThinkingIndicator();
+    }
+  }
+
+  /**
+   * CANCEL AI GENERATION (P0 FIX)
+   * 
+   * Cancels the current AI response generation.
+   * WHY: Users need an escape hatch when LLM takes too long (10+ seconds).
+   * BECAUSE: Without this, users feel trapped with "Thinking..." showing forever.
+   * 
+   * TECHNICAL: Sends an interrupt message to backend and resets UI state.
+   */
+  cancelGeneration() {
+    console.log('[App] Cancelling AI generation');
+
+    // Send interrupt to backend
+    if (this.websocketClient && this.websocketClient.isConnected) {
+      this.websocketClient.sendMessage({
+        type: 'interrupt',
+        data: { reason: 'user_cancelled' }
+      });
+    }
+
+    // Reset UI state
+    this.state.isProcessing = false;
+    this.updateStatus('Ready', 'connected');
+    this.showCancelButton(false);
+    this.conversationManager.removeThinkingIndicator();
+
+    this.showToast('Response cancelled', 'info', { duration: 2000 });
+  }
+
+  /**
+   * SHOW/HIDE CANCEL BUTTON (P0 FIX)
+   * 
+   * Toggles visibility of the cancel generation button in the status bar.
+   * 
+   * @param {boolean} visible - Whether to show the cancel button
+   */
+  showCancelButton(visible) {
+    const cancelBtn = document.getElementById('cancel-generation-btn');
+    if (cancelBtn) {
+      cancelBtn.classList.toggle('visible', visible);
     }
   }
 
@@ -499,10 +745,54 @@ class BubbleVoiceApp {
    * 
    * Enables/disables send button based on input content.
    */
+  /**
+   * UPDATE SEND BUTTON STATE (P2 ENHANCED)
+   * 
+   * Enables/disables send button based on input content.
+   * Also updates character count indicator when approaching limit.
+   * 
+   * P2 FIX: Added character count indicator near max length.
+   * WHY: Users should see they're approaching the limit before hitting it.
+   */
   updateSendButtonState() {
     // FIX (2026-01-28): Use innerText to properly capture text with line breaks
-    const hasText = this.elements.inputField.innerText.trim().length > 0;
+    const text = this.elements.inputField.innerText.trim();
+    const hasText = text.length > 0;
     this.elements.sendButton.disabled = !hasText;
+
+    // Update character count indicator when approaching limit
+    const MAX_MESSAGE_LENGTH = 10000;
+    const SHOW_AT = 8000; // Show counter when 80% of limit reached
+    let charCountEl = document.getElementById('char-count-indicator');
+    
+    if (!charCountEl) {
+      // Create it if it doesn't exist
+      charCountEl = document.createElement('div');
+      charCountEl.className = 'char-count-indicator';
+      charCountEl.id = 'char-count-indicator';
+      const inputWrapper = this.elements.inputField.closest('.input-wrapper');
+      if (inputWrapper) {
+        inputWrapper.style.position = 'relative';
+        inputWrapper.appendChild(charCountEl);
+      }
+    }
+
+    if (text.length >= SHOW_AT) {
+      charCountEl.classList.add('visible');
+      charCountEl.textContent = `${text.length.toLocaleString()} / ${MAX_MESSAGE_LENGTH.toLocaleString()}`;
+      
+      if (text.length > MAX_MESSAGE_LENGTH) {
+        charCountEl.classList.add('danger');
+        charCountEl.classList.remove('warning');
+      } else if (text.length >= MAX_MESSAGE_LENGTH * 0.9) {
+        charCountEl.classList.add('warning');
+        charCountEl.classList.remove('danger');
+      } else {
+        charCountEl.classList.remove('warning', 'danger');
+      }
+    } else {
+      charCountEl.classList.remove('visible');
+    }
   }
 
   /**
@@ -546,6 +836,11 @@ class BubbleVoiceApp {
   handleAIResponse(data) {
     console.log('[App] Received AI response:', data.text ? data.text.substring(0, 50) + '...' : '(no text)');
 
+    // CRITICAL: Remove thinking indicator before adding the real response
+    // WHY: The thinking dots should be replaced by actual AI text
+    this.conversationManager.removeThinkingIndicator();
+    this.showCancelButton(false);
+
     // Add AI message to conversation
     // Use backend's timestamp for accurate ordering
     this.conversationManager.addMessage({
@@ -580,6 +875,18 @@ class BubbleVoiceApp {
    * 
    * @param {Array} bubbles - Array of bubble text strings
    */
+  /**
+   * DISPLAY BUBBLES
+   * 
+   * Shows proactive bubble suggestions above the input.
+   * 
+   * P1 FIX: Bubbles now auto-send on click instead of just populating the input.
+   * WHY: For a voice-first app, bubble taps should feel instant and proactive.
+   * BECAUSE: Extra friction (having to click Send after tapping a bubble) defeats
+   * the purpose of contextual suggestions. ChatGPT's suggestion chips send immediately.
+   * 
+   * @param {Array} bubbles - Array of bubble text strings
+   */
   displayBubbles(bubbles) {
     // Clear existing bubbles
     this.elements.bubblesContainer.innerHTML = '';
@@ -590,11 +897,14 @@ class BubbleVoiceApp {
       bubble.className = 'bubble';
       bubble.textContent = bubbleText;
       
-      // Click to populate input
+      // AUTO-SEND ON CLICK (P1 FIX): Clicking a bubble sends it immediately
+      // WHY: Reduces friction - users expect bubble taps to trigger action
+      // BECAUSE: The old behavior (populate input, require Enter) was confusing
       bubble.addEventListener('click', () => {
         this.elements.inputField.textContent = bubbleText;
         this.updateSendButtonState();
-        this.elements.inputField.focus();
+        // Auto-send the bubble text directly
+        this.sendMessage();
       });
 
       this.elements.bubblesContainer.appendChild(bubble);
@@ -612,6 +922,18 @@ class BubbleVoiceApp {
    * 
    * @param {string} conversationId - Conversation ID to load
    */
+  /**
+   * LOAD CONVERSATION (P1 ENHANCED)
+   * 
+   * Loads a conversation from history and displays it.
+   * Now shows a loading skeleton while waiting for data.
+   * 
+   * P1 FIX: Added loading skeleton placeholder while conversation data loads.
+   * WHY: Empty chat area during load makes the app feel broken.
+   * BECAUSE: Backend takes 100-500ms to retrieve and send conversation data.
+   * 
+   * @param {string} conversationId - Conversation ID to load
+   */
   async loadConversation(conversationId) {
     try {
       console.log(`[App] Loading conversation: ${conversationId}`);
@@ -623,6 +945,10 @@ class BubbleVoiceApp {
       if (this.elements.welcomeState) {
         this.elements.welcomeState.style.display = 'none';
       }
+
+      // Show loading skeleton while waiting for data (P1 FIX)
+      this.conversationManager.clearMessages();
+      this.conversationManager.showLoadingSkeleton();
       
       // Get conversation data from backend via WebSocket
       // The WebSocket client will handle loading messages when the backend responds
@@ -637,6 +963,7 @@ class BubbleVoiceApp {
       
     } catch (error) {
       console.error('[App] Failed to load conversation:', error);
+      this.conversationManager.removeLoadingSkeleton();
       this.showError('Failed to load conversation');
     }
   }
@@ -1081,11 +1408,16 @@ class BubbleVoiceApp {
       const newModel = e.target.value;
       const availability = this.checkModelAvailability(newModel);
       
-      // Warn user if model needs API key
+      // WARN USER if model needs API key (P2 FIX)
+      // WHY: Users need clear guidance on why a model won't work
+      // BECAUSE: Previously, selecting an unavailable model showed no feedback
       if (!availability.available) {
         console.log(`[App] Model ${newModel} requires ${availability.provider} API key`);
-        // Still allow selection - backend will handle gracefully
-        // Could show a toast/notification here
+        this.showToast(`${newModel} requires a ${availability.provider} API key. Add it in Settings.`, 'warning', {
+          duration: 5000,
+          actionLabel: 'Settings',
+          onAction: () => this.openSettings()
+        });
       }
       
       this.state.settings.model = newModel;
@@ -1311,13 +1643,195 @@ class BubbleVoiceApp {
   }
 
   /**
-   * ERROR HANDLING
+   * TOAST NOTIFICATION SYSTEM (P0 UX FIX)
+   * 
+   * Replaces all native alert()/confirm() dialogs with non-blocking toasts.
+   * WHY: Native alert() blocks the UI thread and looks out of place in Electron.
+   * BECAUSE: User feedback showed the app felt "janky" with system dialogs 
+   * appearing over a translucent Liquid Glass window.
+   * 
+   * TYPES: 'error', 'success', 'warning', 'info'
+   * AUTO-DISMISS: errors=6s, others=4s
+   * 
+   * @param {string} message - The message to display
+   * @param {string} type - Toast type: 'error'|'success'|'warning'|'info'
+   * @param {Object} [options] - Optional config
+   * @param {number} [options.duration] - Custom dismiss duration in ms
+   * @param {string} [options.actionLabel] - Label for action button (e.g., "Retry")
+   * @param {Function} [options.onAction] - Callback when action button is clicked
    */
+  showToast(message, type = 'info', options = {}) {
+    const container = document.getElementById('toast-container');
+    if (!container) {
+      console.error('[App] Toast container not found, falling back to console:', message);
+      return;
+    }
 
-  showError(message) {
-    // TODO: Implement proper error UI
+    // Icon map for each toast type
+    // WHY: Visual icons help users instantly identify severity
+    const icons = {
+      error: '✕',
+      success: '✓',
+      warning: '⚠',
+      info: 'ℹ'
+    };
+
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.setAttribute('role', 'alert');
+
+    // Build toast inner HTML
+    let actionHTML = '';
+    if (options.actionLabel) {
+      actionHTML = `<button class="toast-action">${options.actionLabel}</button>`;
+    }
+
+    toast.innerHTML = `
+      <span class="toast-icon">${icons[type] || icons.info}</span>
+      <span class="toast-message">${message}</span>
+      ${actionHTML}
+      <button class="toast-close" aria-label="Dismiss notification">×</button>
+    `;
+
+    // Attach action handler if provided
+    if (options.actionLabel && options.onAction) {
+      toast.querySelector('.toast-action').addEventListener('click', () => {
+        options.onAction();
+        this.dismissToast(toast);
+      });
+    }
+
+    // Attach close handler
+    toast.querySelector('.toast-close').addEventListener('click', () => {
+      this.dismissToast(toast);
+    });
+
+    // Add to container (newest on top)
+    container.prepend(toast);
+
+    // Auto-dismiss: errors get longer (6s), success/info get 4s
+    // WHY: Errors are more important and need more reading time
+    const duration = options.duration || (type === 'error' ? 6000 : 4000);
+    setTimeout(() => {
+      this.dismissToast(toast);
+    }, duration);
+  }
+
+  /**
+   * DISMISS TOAST
+   * 
+   * Removes a toast with a smooth exit animation.
+   * WHY: Abrupt removal feels jarring; animation signals intentional UI change.
+   * 
+   * @param {HTMLElement} toast - The toast element to remove
+   */
+  dismissToast(toast) {
+    if (!toast || toast.classList.contains('removing')) return;
+    toast.classList.add('removing');
+    setTimeout(() => {
+      toast.remove();
+    }, 200);
+  }
+
+  /**
+   * SHOW ERROR (updated - now uses toast system)
+   * 
+   * Displays an error toast notification. This replaces the old alert()-based
+   * error handler. All existing showError() call sites automatically benefit.
+   * 
+   * HISTORY: Previously used alert() which blocked the UI thread. Changed to
+   * toast system 2026-02-06 as part of P0 UX fixes.
+   * 
+   * @param {string} message - Error message to display
+   * @param {Object} [options] - Optional config passed through to showToast
+   */
+  showError(message, options = {}) {
     console.error('[App] Error:', message);
-    alert(message);
+    this.showToast(message, 'error', options);
+  }
+
+  /**
+   * SHOW SUCCESS
+   * 
+   * Displays a success toast notification.
+   * WHY: Users need positive feedback when actions succeed (save, delete, etc.)
+   * 
+   * @param {string} message - Success message to display
+   */
+  showSuccess(message) {
+    console.log('[App] Success:', message);
+    this.showToast(message, 'success');
+  }
+
+  /**
+   * SHOW CUSTOM CONFIRM DIALOG (P0 UX FIX)
+   * 
+   * Replaces native confirm() with a styled, non-blocking modal dialog.
+   * Returns a Promise that resolves to true/false based on user choice.
+   * 
+   * WHY: Native confirm() blocks the thread and looks ugly in Electron.
+   * BECAUSE: We need a confirm dialog for destructive actions (delete, reset)
+   * but it must match the Liquid Glass aesthetic.
+   * 
+   * @param {string} title - Dialog title
+   * @param {string} message - Dialog body text
+   * @param {string} [confirmLabel='Delete'] - Label for confirm button
+   * @returns {Promise<boolean>} True if user confirmed, false if cancelled
+   */
+  showConfirm(title, message, confirmLabel = 'Delete') {
+    return new Promise((resolve) => {
+      // Create overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'confirm-overlay';
+
+      overlay.innerHTML = `
+        <div class="confirm-dialog">
+          <div class="confirm-title">${title}</div>
+          <div class="confirm-message">${message}</div>
+          <div class="confirm-actions">
+            <button class="confirm-btn confirm-btn-cancel">Cancel</button>
+            <button class="confirm-btn confirm-btn-confirm">${confirmLabel}</button>
+          </div>
+        </div>
+      `;
+
+      // Handle cancel
+      overlay.querySelector('.confirm-btn-cancel').addEventListener('click', () => {
+        overlay.remove();
+        resolve(false);
+      });
+
+      // Handle confirm
+      overlay.querySelector('.confirm-btn-confirm').addEventListener('click', () => {
+        overlay.remove();
+        resolve(true);
+      });
+
+      // Handle Escape key to cancel
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          overlay.remove();
+          document.removeEventListener('keydown', handleEscape);
+          resolve(false);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+
+      // Handle click outside dialog to cancel
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.remove();
+          document.removeEventListener('keydown', handleEscape);
+          resolve(false);
+        }
+      });
+
+      document.body.appendChild(overlay);
+
+      // Focus confirm button for keyboard accessibility
+      overlay.querySelector('.confirm-btn-cancel').focus();
+    });
   }
 
   /**
@@ -1328,7 +1842,15 @@ class BubbleVoiceApp {
 
   onConnected() {
     console.log('[App] Connected to backend');
+    
+    // If we were previously disconnected, show a reconnection toast
+    // WHY: Users need to know their connection was restored
+    if (this.state.isConnected === false && this._wasDisconnected) {
+      this.showToast('Connection restored', 'success', { duration: 3000 });
+    }
+    
     this.state.isConnected = true;
+    this._wasDisconnected = false;
     this.updateStatus('Ready', 'connected');
     
     // Send API keys to backend if they exist
@@ -1349,10 +1871,29 @@ class BubbleVoiceApp {
     }
   }
 
+  /**
+   * ON DISCONNECTED (P2 ENHANCED)
+   * 
+   * Called when WebSocket connection drops.
+   * Now shows a toast with reconnection status instead of just updating the dot.
+   * WHY: The status dot alone was too subtle for users to notice.
+   */
   onDisconnected() {
     console.log('[App] Disconnected from backend');
     this.state.isConnected = false;
+    this._wasDisconnected = true;
     this.updateStatus('Disconnected', 'disconnected');
+    
+    // Show disconnection toast with action (P2 FIX)
+    this.showToast('Connection lost. Reconnecting...', 'warning', {
+      duration: 6000,
+      actionLabel: 'Retry Now',
+      onAction: () => {
+        if (this.websocketClient) {
+          this.websocketClient.scheduleReconnect();
+        }
+      }
+    });
   }
 
   onReconnecting() {

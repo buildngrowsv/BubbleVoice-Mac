@@ -134,10 +134,70 @@ class ChatSidebar {
     // WHY: Power users prefer keyboard navigation
     // BECAUSE: It's faster than mouse clicking
     document.addEventListener('keydown', this.handleKeyboardShortcut);
+
+    // SEARCH INPUT (P2 UX FIX)
+    // WHY: Users with many conversations need to find specific ones quickly
+    // BECAUSE: Scrolling through a long list is slow and frustrating
+    this.searchInput = document.getElementById('sidebar-search-input');
+    if (this.searchInput) {
+      // Debounced search to avoid filtering on every keystroke
+      let searchTimeout = null;
+      this.searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          this.filterConversations(this.searchInput.value.trim().toLowerCase());
+        }, 200);
+      });
+    }
     
     // Load conversations from backend
     // This will be populated when we receive conversation list from WebSocket
     this.loadConversations();
+  }
+
+  /**
+   * FILTER CONVERSATIONS (P2 UX FIX)
+   * 
+   * Filters the conversation list based on search query.
+   * Matches against title and preview text.
+   * 
+   * WHY: With 20+ conversations, visual scanning is too slow.
+   * BECAUSE: Search provides instant access to any conversation.
+   * 
+   * @param {string} query - Lowercase search query
+   */
+  filterConversations(query) {
+    if (!this.conversationsList) return;
+
+    const items = this.conversationsList.querySelectorAll('.conversation-item');
+    let visibleCount = 0;
+
+    items.forEach(item => {
+      const title = item.querySelector('.conversation-title')?.textContent?.toLowerCase() || '';
+      const preview = item.querySelector('.conversation-preview')?.textContent?.toLowerCase() || '';
+      
+      if (!query || title.includes(query) || preview.includes(query)) {
+        item.style.display = '';
+        visibleCount++;
+      } else {
+        item.style.display = 'none';
+      }
+    });
+
+    // Show "no results" message if nothing matches
+    let noResultsEl = this.conversationsList.querySelector('.search-no-results');
+    if (visibleCount === 0 && query) {
+      if (!noResultsEl) {
+        noResultsEl = document.createElement('div');
+        noResultsEl.className = 'search-no-results';
+        noResultsEl.style.cssText = 'padding: 20px; text-align: center; color: rgba(255,255,255,0.4); font-size: 13px;';
+        this.conversationsList.appendChild(noResultsEl);
+      }
+      noResultsEl.textContent = `No conversations matching "${query}"`;
+      noResultsEl.style.display = '';
+    } else if (noResultsEl) {
+      noResultsEl.style.display = 'none';
+    }
   }
   
   /**
@@ -473,17 +533,31 @@ class ChatSidebar {
    * If deleting the active conversation, we switch to another one.
    * If no conversations remain, we create a new one.
    */
-  handleDeleteConversation(conversationId) {
+  /**
+   * HANDLE DELETE CONVERSATION (P0 UX FIX)
+   * 
+   * Deletes a conversation after confirmation using styled confirm dialog.
+   * 
+   * HISTORY: Previously used native confirm() which blocked the thread and
+   * looked ugly. Now uses the app's custom confirm dialog matching Liquid Glass.
+   * 
+   * @param {string} conversationId - ID of conversation to delete
+   */
+  async handleDeleteConversation(conversationId) {
     console.log('[ChatSidebar] Deleting conversation', conversationId);
     
     // Get conversation for confirmation message
     const conversation = this.conversations.get(conversationId);
     const title = conversation?.title || 'this conversation';
     
-    // Ask for confirmation
-    // WHY: Deletion is permanent (for now)
-    // BECAUSE: We don't have undo or archive yet
-    const confirmed = confirm(`Delete ${title}? This cannot be undone.`);
+    // Use custom confirm dialog instead of native confirm() (P0 FIX)
+    // WHY: Native confirm() blocks the thread and looks broken in Electron
+    // BECAUSE: The custom dialog matches our Liquid Glass aesthetic
+    const confirmed = await window.app.showConfirm(
+      'Delete Conversation',
+      `Are you sure you want to delete "${title}"? This cannot be undone.`,
+      'Delete'
+    );
     if (!confirmed) {
       return;
     }
@@ -537,6 +611,11 @@ class ChatSidebar {
           this.showEmptyState();
         }
       }, 200);
+    }
+
+    // Show success toast
+    if (window.app) {
+      window.app.showToast(`"${title}" deleted`, 'info', { duration: 3000 });
     }
   }
   

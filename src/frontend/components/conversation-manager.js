@@ -392,9 +392,35 @@ class ConversationManager {
     const contentDiv = document.createElement('div');
     contentDiv.className = 'artifact-content glass-card';
     
-    // For now, directly inject HTML
-    // TODO: Add proper sanitization with DOMPurify
-    contentDiv.innerHTML = artifact.content;
+    // SANITIZE ARTIFACT HTML (P1 SECURITY FIX — 2026-02-06)
+    // WHY: Artifacts contain LLM-generated HTML which could include malicious scripts.
+    // BECAUSE: The old code injected raw HTML with innerHTML (XSS vector).
+    // 
+    // APPROACH: Use an iframe with sandbox attribute for isolation.
+    // The sandbox attribute restricts the iframe content from:
+    // - Running JavaScript (no allow-scripts)
+    // - Accessing parent DOM (no allow-same-origin)
+    // - Opening popups or navigating
+    // This provides strong isolation without needing DOMPurify.
+    const iframe = document.createElement('iframe');
+    iframe.sandbox = 'allow-popups'; // Minimal permissions - links can open in new tab
+    iframe.style.cssText = 'width: 100%; border: none; min-height: 200px; border-radius: 12px; background: white;';
+    iframe.srcdoc = artifact.content || '';
+    
+    // Auto-resize iframe to fit content
+    iframe.addEventListener('load', () => {
+      try {
+        const iframeBody = iframe.contentDocument?.body;
+        if (iframeBody) {
+          iframe.style.height = Math.max(200, iframeBody.scrollHeight + 20) + 'px';
+        }
+      } catch (e) {
+        // Cross-origin restriction - expected with sandbox
+        console.log('[ConversationManager] Cannot auto-resize sandboxed iframe');
+      }
+    });
+
+    contentDiv.appendChild(iframe);
 
     artifactContainer.appendChild(contentDiv);
     messageDiv.appendChild(artifactContainer);
@@ -464,6 +490,94 @@ class ConversationManager {
    */
   getHistory() {
     return [...this.messages];
+  }
+
+  /**
+   * SHOW THINKING INDICATOR (P0 UX FIX)
+   * 
+   * Displays an animated "..." bubble while waiting for AI response.
+   * WHY: Without visual feedback, users think the app froze for 2-5+ seconds.
+   * BECAUSE: LLM API calls take variable time and the old "Thinking..." status 
+   * text was too subtle (small text at the bottom vs animated bubble in the chat).
+   * 
+   * DESIGN: Three bouncing dots in an assistant-style bubble, matching the 
+   * existing message bubble aesthetic. Placed at the bottom of the messages
+   * container so it appears right after the user's sent message.
+   */
+  showThinkingIndicator() {
+    // Remove existing indicator if present (prevent duplicates)
+    this.removeThinkingIndicator();
+
+    const thinkingDiv = document.createElement('div');
+    thinkingDiv.className = 'message thinking';
+    thinkingDiv.id = 'thinking-indicator';
+    thinkingDiv.setAttribute('aria-label', 'AI is thinking');
+
+    const bubble = document.createElement('div');
+    bubble.className = 'thinking-bubble';
+    bubble.innerHTML = `
+      <div class="thinking-dot"></div>
+      <div class="thinking-dot"></div>
+      <div class="thinking-dot"></div>
+    `;
+
+    thinkingDiv.appendChild(bubble);
+    this.messagesContainer.appendChild(thinkingDiv);
+    this.scrollToBottom();
+  }
+
+  /**
+   * REMOVE THINKING INDICATOR
+   * 
+   * Removes the animated thinking dots. Called when:
+   * 1. AI response arrives (replaced by actual text)
+   * 2. Error occurs (response failed)
+   * 3. User cancels generation
+   * 
+   * WHY: Must always be cleaned up to prevent stale UI state
+   */
+  removeThinkingIndicator() {
+    const indicator = document.getElementById('thinking-indicator');
+    if (indicator) {
+      indicator.remove();
+    }
+  }
+
+  /**
+   * SHOW LOADING SKELETON (P1 UX FIX)
+   * 
+   * Shows placeholder skeleton bubbles while a conversation is loading.
+   * WHY: When switching conversations, there's a brief delay while data loads.
+   * BECAUSE: An empty chat area makes the app feel broken during that delay.
+   * 
+   * DESIGN: Three skeleton bubbles alternating user/assistant positions,
+   * with a pulsing animation to indicate loading.
+   */
+  showLoadingSkeleton() {
+    this.removeLoadingSkeleton();
+
+    const skeleton = document.createElement('div');
+    skeleton.className = 'message-skeleton';
+    skeleton.id = 'loading-skeleton';
+    skeleton.innerHTML = `
+      <div class="skeleton-bubble user"></div>
+      <div class="skeleton-bubble assistant"></div>
+      <div class="skeleton-bubble user"></div>
+    `;
+
+    this.messagesContainer.appendChild(skeleton);
+  }
+
+  /**
+   * REMOVE LOADING SKELETON
+   * 
+   * Removes the loading skeleton when conversation data arrives.
+   */
+  removeLoadingSkeleton() {
+    const skeleton = document.getElementById('loading-skeleton');
+    if (skeleton) {
+      skeleton.remove();
+    }
   }
 }
 

@@ -180,6 +180,18 @@
         </div>
       </div>
 
+      <!-- Conversation Search (P2 UX FIX)
+           WHY: Users with 20+ conversations need to quickly find specific ones.
+           BECAUSE: Scrolling through a long list is slow and frustrating. -->
+      <div class="sidebar-search" data-testid="sidebar-search">
+        <input type="text"
+               class="sidebar-search-input"
+               id="sidebar-search-input"
+               data-testid="sidebar-search-input"
+               placeholder="Search conversations..."
+               aria-label="Search conversations">
+      </div>
+
       <!-- Conversations List -->
       <!-- TEST ID: conversations-list - Scrollable list of all conversations -->
       <div class="conversations-list"
@@ -411,6 +423,20 @@
         <span class="status-dot" data-testid="status-dot"></span>
         <!-- TEST ID: status-text - Text description of current status -->
         <span class="status-text" data-testid="status-text">Ready</span>
+        <!-- CANCEL GENERATION BUTTON (P0 UX FIX)
+             Shows while AI is thinking so users can abort long-running requests.
+             WHY: LLM calls can take 10+ seconds and users need an escape hatch.
+             BECAUSE: Without this, users feel trapped while "Thinking..." shows. -->
+        <button class="cancel-generation-btn"
+                id="cancel-generation-btn"
+                data-testid="cancel-generation-btn"
+                title="Cancel AI response (Esc)"
+                aria-label="Cancel AI response">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M9 3L3 9M3 3l6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Stop
+        </button>
       </div>
 
     </div>
@@ -765,6 +791,12 @@
 
     </div>
   </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER (P0 UX FIX)
+       Toasts stack here instead of using native alert() dialogs.
+       WHY: alert() blocks the thread and looks out of place in a polished app.
+       BECAUSE: Toasts are non-blocking, styled, and provide better UX. -->
+  <div class="toast-container" id="toast-container" role="alert" aria-live="polite"></div>
 
   <!-- SCRIPTS -->
   <script src="components/artifact-viewer.js"></script>

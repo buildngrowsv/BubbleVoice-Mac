@@ -636,11 +636,49 @@ class BackendServer {
       }
 
       // Add AI response to conversation
+      const aiMessageTimestamp = Date.now();
       await this.conversationService.addMessage(conversation.id, {
         role: 'assistant',
         content: fullResponse,
-        timestamp: Date.now()
+        timestamp: aiMessageTimestamp
       });
+
+      // AUTO-TITLE GENERATION (P1 UX FIX — 2026-02-06)
+      // WHY: New conversations get a generic "New Conversation" title which makes it
+      // impossible to distinguish between conversations in the sidebar.
+      // BECAUSE: ChatGPT and other AI apps auto-generate titles from the first message
+      // (e.g., "Summarize this document" becomes the conversation title).
+      //
+      // DESIGN: Generate title from the first user message (truncated to 50 chars).
+      // We use the user's first message rather than calling the LLM to generate a title
+      // (which would add latency and cost). Simple, fast, and effective.
+      if (isNewConversation && content) {
+        try {
+          // Create a title from the first user message (max 50 chars)
+          // Strip quotes and clean up whitespace
+          let autoTitle = content.replace(/['"]/g, '').trim();
+          if (autoTitle.length > 50) {
+            autoTitle = autoTitle.substring(0, 47) + '...';
+          }
+          
+          // Update conversation title
+          await this.conversationService.updateConversationTitle(conversation.id, autoTitle);
+          
+          // Notify frontend about the title update
+          this.sendMessage(ws, {
+            type: 'conversation_title_updated',
+            data: {
+              conversationId: conversation.id,
+              title: autoTitle
+            }
+          });
+          
+          console.log(`[Backend] Auto-generated title for new conversation: "${autoTitle}"`);
+        } catch (titleError) {
+          // Non-fatal: if title generation fails, keep default title
+          console.warn('[Backend] Failed to auto-generate title:', titleError.message);
+        }
+      }
 
       // Process structured outputs (NEW: area_actions and artifact_action)
       let processingResult = null;

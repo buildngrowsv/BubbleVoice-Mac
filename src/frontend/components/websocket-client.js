@@ -220,7 +220,15 @@ class WebSocketClient {
   scheduleReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('[WebSocketClient] Max reconnect attempts reached');
-      this.app.showError('Lost connection to backend. Please restart the app.');
+      // P2 FIX: Show error with retry action instead of just a message
+      this.app.showError('Lost connection to backend.', {
+        duration: 10000,
+        actionLabel: 'Restart Connection',
+        onAction: () => {
+          this.reconnectAttempts = 0;
+          this.scheduleReconnect();
+        }
+      });
       return;
     }
 
@@ -445,6 +453,10 @@ class WebSocketClient {
   }
 
   handleAIResponseStreamStart(data) {
+    // Remove thinking indicator when actual streaming begins
+    // WHY: The dots should be replaced by real streaming text
+    this.app.conversationManager.removeThinkingIndicator();
+    this.app.showCancelButton(false);
     this.app.conversationManager.startStreamingMessage('assistant');
   }
 
@@ -532,8 +544,25 @@ class WebSocketClient {
     }
   }
 
+  /**
+   * HANDLE ERROR (P2 ENHANCED)
+   * 
+   * Handles error messages from the backend.
+   * Now also removes thinking indicator and cancel button since the response failed.
+   * WHY: If backend sends an error, the thinking indicator should stop.
+   * BECAUSE: Without cleanup, the dots keep bouncing even after an error.
+   */
   handleError(data) {
     console.error('[WebSocketClient] Backend error:', data);
+    
+    // Clean up thinking state if we were waiting for a response
+    if (this.app.state.isProcessing) {
+      this.app.state.isProcessing = false;
+      this.app.updateStatus('Ready', 'connected');
+      this.app.showCancelButton(false);
+      this.app.conversationManager.removeThinkingIndicator();
+    }
+    
     this.app.showError(data.message || 'An error occurred');
   }
 
@@ -628,10 +657,19 @@ class WebSocketClient {
    * SOLUTION:
    * Only clear and reload if the conversation has different messages than what's displayed.
    */
+  /**
+   * HANDLE CONVERSATION LOADED (P1 ENHANCED)
+   * 
+   * Called when switching to a different conversation.
+   * Now removes loading skeleton before populating messages.
+   */
   handleConversationLoaded(data) {
     console.log('[WebSocketClient] Conversation loaded:', data.conversation?.id);
     
     if (window.app && window.app.conversationManager) {
+      // CRITICAL: Remove loading skeleton first (P1 FIX)
+      window.app.conversationManager.removeLoadingSkeleton();
+
       // Get current messages in UI
       const currentMessages = window.app.conversationManager.messages;
       const loadedMessages = data.conversation?.messages || [];
@@ -674,10 +712,31 @@ class WebSocketClient {
    * Called when a conversation title is updated.
    * Updates the sidebar display.
    */
+  /**
+   * HANDLE CONVERSATION TITLE UPDATED (P1 ENHANCED)
+   * 
+   * Called when a conversation title changes (e.g., auto-generated from first message).
+   * Now updates the sidebar DOM to reflect the new title.
+   * 
+   * P1 FIX: Previously did nothing ("ChatSidebar handles this locally") but auto-titles
+   * from the backend need to propagate to the UI.
+   */
   handleConversationTitleUpdated(data) {
     console.log('[WebSocketClient] Conversation title updated:', data.conversationId, data.title);
     
-    // ChatSidebar handles this locally, no need to update
+    // Update sidebar UI with new title
+    if (window.app && window.app.chatSidebar) {
+      const conv = window.app.chatSidebar.conversations.get(data.conversationId);
+      if (conv) {
+        conv.title = data.title;
+      }
+      
+      // Update DOM element
+      const item = document.querySelector(`[data-conversation-id="${data.conversationId}"] .conversation-title`);
+      if (item) {
+        item.textContent = data.title;
+      }
+    }
   }
 }
 

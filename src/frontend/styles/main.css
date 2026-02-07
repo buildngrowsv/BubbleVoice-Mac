@@ -1787,3 +1787,548 @@ input[type="range"]::-webkit-slider-thumb:hover {
     font-size: 11px;
   }
 }
+
+/* =========================================================================
+ * TOAST NOTIFICATION SYSTEM (P0 UX FIX)
+ *
+ * Replaces all native alert()/confirm() dialogs with non-blocking toasts.
+ * WHY: Native dialogs block the UI thread and feel broken in a polished 
+ * Electron app with a Liquid Glass aesthetic.
+ * BECAUSE: Users reported the app felt "janky" when errors appeared as 
+ * system alerts on top of the translucent window.
+ *
+ * TYPES: success (green), error (red), warning (amber), info (blue)
+ * POSITION: Top-center, stacked with newest on top
+ * BEHAVIOR: Auto-dismiss after 4s (errors 6s), manual dismiss via X
+ * ========================================================================= */
+.toast-container {
+  position: fixed;
+  top: 56px; /* Below title bar (44px) + some spacing */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none; /* Allow clicks to pass through container */
+  max-width: 480px;
+  width: 90%;
+}
+
+.toast {
+  pointer-events: auto; /* Re-enable clicks on individual toasts */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-size: 13px;
+  line-height: 1.4;
+  color: white;
+  width: 100%;
+  animation: toast-slide-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.toast.removing {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.toast-message {
+  flex: 1;
+  font-weight: 500;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: background 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+
+.toast-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Toast type variants */
+.toast.toast-error {
+  background: rgba(220, 38, 38, 0.85);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+.toast.toast-success {
+  background: rgba(22, 163, 74, 0.85);
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.toast.toast-warning {
+  background: rgba(217, 119, 6, 0.85);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+.toast.toast-info {
+  background: rgba(37, 99, 235, 0.85);
+  border-color: rgba(96, 165, 250, 0.3);
+}
+
+/* Toast action button (e.g., "Retry" or "Undo") */
+.toast-action {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+
+.toast-action:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* =========================================================================
+ * CONFIRM DIALOG (P0 UX FIX)
+ *
+ * Replaces native confirm() with a styled modal dialog.
+ * WHY: Native confirm() is ugly and blocks the thread.
+ * DESIGN: Matches the Liquid Glass aesthetic of the rest of the app.
+ * ========================================================================= */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: confirm-fade-in 0.2s ease;
+}
+
+@keyframes confirm-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.confirm-dialog {
+  background: rgba(30, 30, 50, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  padding: 24px;
+  max-width: 380px;
+  width: 90%;
+  animation: confirm-scale-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  -webkit-app-region: no-drag;
+}
+
+@keyframes confirm-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.confirm-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.confirm-message {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.confirm-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+
+.confirm-btn-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.confirm-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.confirm-btn-confirm {
+  background: rgba(220, 38, 38, 0.8);
+  color: white;
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+.confirm-btn-confirm:hover {
+  background: rgba(220, 38, 38, 1);
+}
+
+/* =========================================================================
+ * AI THINKING INDICATOR (P0 UX FIX)
+ *
+ * Shows animated dots in a bubble while waiting for AI response.
+ * WHY: Without this, the app looks frozen for 2-5+ seconds after sending.
+ * BECAUSE: LLM API calls take variable time and users need visual feedback.
+ * DESIGN: Matches the assistant message bubble style with animated dots.
+ * ========================================================================= */
+.message.thinking {
+  align-items: flex-start;
+}
+
+.thinking-bubble {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 20px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px 16px 16px 4px;
+  min-width: 60px;
+}
+
+.thinking-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  animation: thinking-bounce 1.4s ease-in-out infinite;
+}
+
+.thinking-dot:nth-child(1) { animation-delay: 0s; }
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes thinking-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+/* =========================================================================
+ * CANCEL BUTTON (P0 UX FIX)
+ *
+ * Shows a cancel/stop button while AI is processing.
+ * WHY: Users need a way to abort long-running LLM requests.
+ * ========================================================================= */
+.cancel-generation-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(220, 38, 38, 0.7);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 8px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+
+.cancel-generation-btn.visible {
+  display: inline-flex;
+}
+
+.cancel-generation-btn:hover {
+  background: rgba(220, 38, 38, 0.9);
+}
+
+/* =========================================================================
+ * MESSAGE LENGTH INDICATOR (P2 UX FIX)
+ *
+ * Shows character count when approaching the max message length.
+ * WHY: Users should know there's a limit before hitting it.
+ * ========================================================================= */
+.char-count-indicator {
+  position: absolute;
+  bottom: 42px;
+  right: 12px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  transition: color 0.2s ease;
+  display: none;
+}
+
+.char-count-indicator.visible {
+  display: block;
+}
+
+.char-count-indicator.warning {
+  color: rgba(251, 191, 36, 0.8);
+}
+
+.char-count-indicator.danger {
+  color: rgba(248, 113, 113, 0.8);
+}
+
+/* =========================================================================
+ * CONVERSATION SEARCH (P2 UX FIX)
+ *
+ * Search input in the sidebar for filtering conversations.
+ * WHY: With 20+ conversations, finding a specific one is painful.
+ * ========================================================================= */
+.sidebar-search {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: white;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  -webkit-app-region: no-drag;
+}
+
+.sidebar-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.sidebar-search-input:focus {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================================================
+ * KEYBOARD SHORTCUT HELP OVERLAY (P2 UX FIX)
+ *
+ * Shows available keyboard shortcuts when user presses Cmd+/
+ * WHY: Discoverability - power users want to know what shortcuts exist.
+ * ========================================================================= */
+.shortcuts-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: confirm-fade-in 0.2s ease;
+}
+
+.shortcuts-dialog {
+  background: rgba(30, 30, 50, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  padding: 28px;
+  max-width: 420px;
+  width: 90%;
+  max-height: 70vh;
+  overflow-y: auto;
+  animation: confirm-scale-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  -webkit-app-region: no-drag;
+}
+
+.shortcuts-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shortcuts-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.15s ease;
+  -webkit-app-region: no-drag;
+}
+
+.shortcuts-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.shortcuts-group {
+  margin-bottom: 16px;
+}
+
+.shortcuts-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 8px;
+}
+
+.shortcut-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.shortcut-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.shortcut-keys {
+  display: flex;
+  gap: 4px;
+}
+
+.shortcut-keys kbd {
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Model selector tooltip for missing API keys */
+.model-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  background: rgba(30, 30, 50, 0.95);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+.inline-model-selector:hover .model-tooltip.visible {
+  opacity: 1;
+}
+
+/* Loading skeleton for conversation switching */
+.message-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 var(--spacing-lg);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-bubble {
+  height: 40px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  max-width: 70%;
+}
+
+.skeleton-bubble.user {
+  align-self: flex-end;
+  max-width: 50%;
+}
+
+.skeleton-bubble.assistant {
+  align-self: flex-start;
+}
+
+.skeleton-bubble:nth-child(1) { width: 45%; }
+.skeleton-bubble:nth-child(2) { width: 65%; }
+.skeleton-bubble:nth-child(3) { width: 40%; }
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}

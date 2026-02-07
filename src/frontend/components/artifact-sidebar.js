@@ -1135,7 +1135,7 @@ class ArtifactSidebar {
             switch (action) {
                 case 'export-png':
                     // TODO: Implement with html2canvas
-                    alert('PNG export coming soon');
+                    if (window.app) { window.app.showToast('PNG export coming soon', 'info'); }
                     break;
 
                 case 'export-html':

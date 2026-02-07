@@ -250,7 +250,9 @@ class ArtifactViewer {
             }
         } catch (error) {
             console.error('[ArtifactViewer] Export failed:', error);
-            alert(`Export failed: ${error.message}`);
+            if (window.app) {
+                window.app.showError(`Export failed: ${error.message}`);
+            }
         }
     }
 
@@ -258,21 +260,24 @@ class ArtifactViewer {
      * Export as PNG
      * 
      * Uses html2canvas to capture artifact as image.
+     * TODO: Implement with html2canvas library
      */
     async exportAsPNG() {
-        // This would require html2canvas library
-        // For now, show not implemented message
-        alert('PNG export will be implemented with html2canvas library');
+        if (window.app) {
+            window.app.showToast('PNG export coming soon', 'info');
+        }
     }
 
     /**
      * Export as PDF
      * 
      * Uses jsPDF to generate PDF.
+     * TODO: Implement with jsPDF library
      */
     async exportAsPDF() {
-        // This would require jsPDF library
-        alert('PDF export will be implemented with jsPDF library');
+        if (window.app) {
+            window.app.showToast('PDF export coming soon', 'info');
+        }
     }
 
     /**
@@ -301,7 +306,9 @@ class ArtifactViewer {
      */
     async exportAsJSON() {
         if (!this.jsonData) {
-            alert('This artifact has no data to export');
+            if (window.app) {
+                window.app.showToast('This artifact has no data to export', 'warning');
+            }
             return;
         }
         

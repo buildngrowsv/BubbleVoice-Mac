@@ -631,7 +631,13 @@ class AdminPanel {
      * Resets the current section to default.
      */
     async resetCurrentSection() {
-        if (!confirm('Reset this section to default?')) return;
+        // P0 FIX: Use styled confirm instead of native confirm()
+        const confirmed = await window.app?.showConfirm(
+          'Reset Section',
+          'Reset this section to its default content?',
+          'Reset'
+        );
+        if (!confirmed) return;
         
         try {
             await window.electronAPI.adminPanel.resetPromptSection(this.currentSection);
@@ -699,7 +705,13 @@ class AdminPanel {
      * Resets all prompts to defaults.
      */
     async resetAllPrompts() {
-        if (!confirm('Reset ALL prompts to defaults? This cannot be undone.')) return;
+        // P0 FIX: Use styled confirm instead of native confirm()
+        const confirmed = await window.app?.showConfirm(
+          'Reset All Prompts',
+          'Reset ALL prompts to defaults? This cannot be undone.',
+          'Reset All'
+        );
+        if (!confirmed) return;
         
         try {
             await window.electronAPI.adminPanel.resetAllPrompts();
@@ -761,7 +773,13 @@ class AdminPanel {
      * Resets context assembly config to defaults.
      */
     async resetConfiguration() {
-        if (!confirm('Reset configuration to defaults?')) return;
+        // P0 FIX: Use styled confirm instead of native confirm()
+        const confirmed = await window.app?.showConfirm(
+          'Reset Configuration',
+          'Reset context assembly configuration to defaults?',
+          'Reset'
+        );
+        if (!confirmed) return;
         
         try {
             await window.electronAPI.adminPanel.resetContextConfig();

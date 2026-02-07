@@ -688,9 +688,22 @@ class VoicePipelineService extends EventEmitter {
         // Generate and play TTS
         this.generateTTS(session.cachedResponses.llm.text, session.settings, session);
       } else {
+        // TIMER 3 TIMEOUT - LLM didn't respond in time (P2 UX FIX — 2026-02-06)
+        // WHY: User sees their message but no AI response, with no explanation.
+        // BECAUSE: The LLM API was too slow or hung. We need to tell the user.
         console.error('[VoicePipelineService] Timer 3 timed out waiting for LLM response');
+        
         // Send user message anyway so they see something
         this.sendUserMessageToFrontend(session, session.latestTranscription);
+        
+        // Send error notification to frontend (P2 FIX)
+        // WHY: Without this, the user just sees their message with no reply
+        if (session.sendToFrontend) {
+          session.sendToFrontend({
+            type: 'error',
+            data: { message: 'AI response timed out. Please try again.' }
+          });
+        }
       }
     }, this.timerConfig.playbackStart);
   }

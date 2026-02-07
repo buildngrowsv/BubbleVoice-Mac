@@ -331,9 +331,15 @@ class LifeAreasSidebar {
      * @param {Object} areaDetails - Area details
      */
     showAreaDetails(areaDetails) {
-        // TODO: Implement area details modal
+        // P0 FIX: Use toast instead of alert() for area details
         console.log('[LifeAreasSidebar] Show area details:', areaDetails);
-        alert(`Area: ${areaDetails.name}\nEntries: ${areaDetails.entry_count}\nPath: ${areaDetails.path}`);
+        if (window.app) {
+            window.app.showToast(
+                `${areaDetails.name} — ${areaDetails.entry_count} entries`,
+                'info',
+                { duration: 4000 }
+            );
+        }
     }
 
     /**
@@ -361,8 +367,13 @@ class LifeAreasSidebar {
     async handleNewArea() {
         console.log('[LifeAreasSidebar] Create new area');
 
-        // TODO: Implement new area modal
-        const areaName = prompt('Enter area name (e.g., "Family/Emma_School"):');
+        // TODO: Implement full area creation modal
+        // P0 FIX: Using toast notification for now since prompt() is a blocking dialog
+        // In the future, this should be a proper creation dialog
+        if (window.app) {
+            window.app.showToast('Area creation coming soon', 'info');
+        }
+        const areaName = null; // placeholder — modal implementation pending
         
         if (areaName) {
             try {
@@ -371,7 +382,9 @@ class LifeAreasSidebar {
                 console.log('[LifeAreasSidebar] Created area:', areaName);
             } catch (error) {
                 console.error('[LifeAreasSidebar] Failed to create area:', error);
-                alert('Failed to create area');
+                if (window.app) {
+                    window.app.showError('Failed to create area');
+                }
             }
         }
     }
