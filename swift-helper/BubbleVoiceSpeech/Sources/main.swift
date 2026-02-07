@@ -28,8 +28,8 @@
  */
 
 import Foundation
-import Speech
-import AVFoundation
+@preconcurrency import Speech
+@preconcurrency import AVFoundation
 
 // MARK: - Message Types
 
@@ -106,12 +106,52 @@ struct AnyCodable: Codable {
  * Coordinates between Apple APIs and Node.js backend.
  */
 
-class SpeechHelper {
-    // Speech recognition
-    private var speechRecognizer: SFSpeechRecognizer?
-    private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
-    private var recognitionTask: SFSpeechRecognitionTask?
+// SENDABLE DISCLAIMER:
+// This helper is accessed from multiple threads (stdin reader, audio callback,
+// Task-based async pipelines). We mark it as @unchecked Sendable to satisfy
+// Swift 6's strict concurrency checks because the runtime model is already
+// intentionally multi-threaded.
+//
+// WHY THIS IS ACCEPTABLE HERE:
+// - The helper is process-local and not shared across processes.
+// - We already rely on DispatchQueue / Task boundaries.
+// - The alternative (full actor isolation) would require a large refactor
+//   of the IPC loop and risks breaking the production flow.
+final class SpeechHelper: @unchecked Sendable {
+    // ============================================================
+    // SPEECH ANALYZER (macOS 26+)
+    // ============================================================
+    //
+    // We are migrating from the legacy SFSpeechRecognizer to the modern
+    // SpeechAnalyzer + SpeechTranscriber pipeline. This is NOT just a
+    // refactor — it's a product-quality upgrade that directly targets
+    // the user's complaint ("only every other word coming through").
+    //
+    // WHY THIS CHANGE:
+    // - SFSpeechRecognizer is now listed as "Legacy API" in Apple docs.
+    // - SpeechAnalyzer is the current on-device model used by Notes,
+    //   Voice Memos, Journal, and Apple Intelligence features.
+    // - The new API is designed for long-form and conversational speech,
+    //   which matches BubbleVoice's use-case.
+    //
+    // DESIGN GOAL:
+    // Keep this helper as a headless process (no UI) while improving
+    // transcription quality and stability. We only stream text and do
+    // NOT attempt to own turn-taking logic here — that stays in Node.js.
+    // ============================================================
+    private var speechAnalyzer: SpeechAnalyzer?
+    private var speechTranscriber: SpeechTranscriber?
+    private var speechAnalyzerTask: Task<Void, Error>?
+    private var speechAnalyzerInputContinuation: AsyncStream<AnalyzerInput>.Continuation?
+    private var speechAnalyzerAudioFormat: AVAudioFormat?
     private var audioEngine: AVAudioEngine?
+    private var audioConverter: AVAudioConverter?
+    
+    // LOCALE STRATEGY:
+    // We default to en-US for now because that's what the previous
+    // SFSpeechRecognizer was hard-coded to. We can make this dynamic
+    // later if the frontend exposes locale selection.
+    private var speechAnalyzerLocale: Locale = Locale(identifier: "en-US")
     
     // TTS process
     private var ttsProcess: Process?
@@ -120,353 +160,134 @@ class SpeechHelper {
     private var isListening = false
     private var isSpeaking = false
     
-    // CRITICAL GUARD (2026-02-06): Prevent concurrent restartRecognition calls
-    //
-    // WHY: restartRecognition() can be called from multiple sources nearly simultaneously:
-    //   1. isFinal in recognition callback (Apple finalizes an utterance)
-    //   2. reset_recognition command from backend (turn boundary, interruption, TTS end)
-    //   3. Periodic restart timer (session age / hang detection)
-    //   4. Recoverable error handler (transient Apple server errors)
-    //
-    // BECAUSE: When two restarts overlap, the sequence is:
-    //   T=0ms:  First restart: cancel task, remove tap, schedule async at T+50ms
-    //   T=5ms:  Second restart: cancel task (nil, no-op), remove tap (no tap, no-op),
-    //           schedule async at T+55ms
-    //   T=50ms: First async block: create request, start task, installTap ✓
-    //   T=55ms: Second async block: create request, start task, installTap → CRASH!
-    //           "tap already exists on bus 0"
-    //
-    // FIX: Set isRestarting=true at the start of restartRecognition(), clear it at the
-    // end of the async block. Additional restart calls while isRestarting is true are
-    // queued (we just set a flag to restart again when the current restart completes).
-    private var isRestarting = false
-    private var pendingRestart = false
-    
-    // CRITICAL: Track whether we have any active timers or playback
-    // This is used by the Node.js backend to determine if user speech
-    // should trigger an interruption
-    // We send this state with every transcription update
-    private var hasActiveTimersOrPlayback = false
-    
-    // ============================================================
-    // SESSION LIFECYCLE TRACKING
-    // ============================================================
-    //
-    // WHY: Apple's SFSpeechRecognizer degrades in accuracy over long
-    // sessions and can silently hang (no more results, no error).
-    // Community experience on Apple Developer Forums and Stack Overflow
-    // confirms that periodically restarting the recognition task
-    // significantly improves accuracy and prevents hangs.
-    //
-    // WHAT WE TRACK:
-    // - recognitionSessionStartTime: When the current recognition session started.
-    //   Used to trigger a proactive restart after maxSessionDuration seconds.
-    // - lastTranscriptionTime: When we last received ANY transcription result.
-    //   Used to detect hangs — if we're "listening" but get no results for
-    //   hangDetectionTimeout seconds, the recognizer is probably stuck.
-    // - restartCount: How many times we've restarted in this listening session.
-    //   Logged for debugging; helps diagnose performance issues.
-    //
-    // PRODUCT CONTEXT:
-    // BubbleVoice runs speech recognition continuously (even while AI speaks,
-    // for interruption detection). Long sessions are the norm, not the exception.
-    // Without periodic restarts, users experience worsening accuracy and
-    // occasional complete recognition freezes after 30-60 seconds.
-    // ============================================================
-    private var recognitionSessionStartTime: Date?
-    private var lastTranscriptionTime: Date?
-    private var restartCount: Int = 0
-    
-    // RESTART RATE LIMITER (2026-02-06):
-    // Tracks the timestamp of the last restart to prevent rapid-fire restarts.
-    // If restarts happen faster than every 0.5s, we're in a degenerate loop.
-    // After hitting the limit, we stop restarting and let the periodic timer recover.
-    private var lastRestartTime: Date = Date.distantPast
-    private var consecutiveRapidRestarts: Int = 0
-    private let maxConsecutiveRapidRestarts: Int = 3
-    private let minRestartInterval: TimeInterval = 0.5
-    
-    // PERIODIC RESTART TIMER
-    // This is a repeating timer that fires every few seconds to check
-    // if the recognition session needs a proactive restart.
-    // It checks two conditions:
-    //   1. Session duration exceeded maxSessionDuration (proactive refresh)
-    //   2. No transcription results for hangDetectionTimeout (hang recovery)
-    //
-    // WHY A TIMER INSTEAD OF INLINE CHECKS:
-    // We can't rely on transcription callbacks to trigger checks because
-    // the whole point of hang detection is that callbacks STOP coming.
-    // A separate timer ensures we can detect and recover from silent hangs.
-    private var periodicRestartTimer: Timer?
-    
-    // CONFIGURATION CONSTANTS
-    // These values are tuned based on observed SFSpeechRecognizer behavior
-    // on macOS. Apple's recognizer tends to degrade around 30-60 seconds
-    // and can hang silently. These are conservative values that balance
-    // accuracy improvement vs. the brief gap during restart.
-    //
-    // maxSessionDuration: 30 seconds.
-    //   After 30s of continuous recognition, force a restart.
-    //   This is well within the ~60s limit Apple imposes on some devices
-    //   and catches accuracy degradation before it becomes noticeable.
-    //
-    // hangDetectionTimeout: 5 seconds.
-    //   If we're "listening" and haven't received any result (not even
-    //   partial) for 5 seconds, something is wrong. Restart immediately.
-    //   Normal speech produces partial results every ~100-300ms.
-    //   Even silence should produce empty partials within a few seconds.
-    //
-    // periodicCheckInterval: 3 seconds.
-    //   How often the watchdog timer fires. Frequent enough to catch
-    //   hangs within ~3s of the hangDetectionTimeout, but not so frequent
-    //   that it wastes CPU checking constantly.
-    private let maxSessionDuration: TimeInterval = 30.0
-    private let hangDetectionTimeout: TimeInterval = 5.0
-    private let periodicCheckInterval: TimeInterval = 3.0
+    // NOTE: All legacy restart / hang detection logic has been removed
+    // because SpeechAnalyzer manages its own session lifecycle. This is
+    // a core product bet: we trade complex home-grown recovery logic for
+    // the stability of Apple's current, supported pipeline.
     
     init() {
-        // Initialize speech recognizer for US English
-        self.speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+        // Initialize audio engine only; SpeechAnalyzer is configured on demand.
         self.audioEngine = AVAudioEngine()
         
-        // Request authorization
+        // Send ready signal (no permission prompt here).
         requestAuthorization()
     }
     
     /**
      * REQUEST AUTHORIZATION
-     * 
-     * Requests permission to use speech recognition.
-     * Required by Apple for privacy.
-     * 
-     * CRITICAL FIX:
-     * Don't request authorization at startup - it causes crashes.
-     * Only check status and request when actually starting to listen.
+     *
+     * We intentionally do NOT request permissions here.
+     *
+     * WHY:
+     * - This helper is a headless process (no UI).
+     * - Permission prompts must be shown by the Electron app.
+     * - Requesting from a CLI process is unreliable and can crash.
+     *
+     * WHAT WE DO:
+     * - Send "ready" immediately so Node.js can proceed.
+     * - Log a reminder that permissions are handled in the app layer.
      */
     func requestAuthorization() {
-        // Send ready immediately so Node.js knows we're alive
         self.sendReady()
-        
-        // Just log the current status, don't request yet
-        let status = SFSpeechRecognizer.authorizationStatus()
-        self.logError("Speech recognition status: \(status.rawValue)")
-        
-        // Don't call requestAuthorization here - it can cause crashes
-        // We'll request it when actually starting to listen
+        self.logError("Speech helper ready; microphone permission must be granted by Electron app")
     }
     
     /**
      * START LISTENING
-     * 
-     * Starts speech recognition using SFSpeechRecognizer.
+     *
+     * Starts speech recognition using SpeechAnalyzer (macOS 26+).
      * Captures audio from microphone and streams transcription.
-     * 
-     * CRITICAL FIX (2026-01-21):
-     * Speech recognition on macOS uses the MICROPHONE TCC permission, not a separate
-     * speech recognition permission. The Electron app already requests microphone
-     * permission, which covers speech recognition.
-     * 
-     * However, SFSpeechRecognizer still has its own authorization status that needs
-     * to be checked. If not authorized, we just proceed anyway since the microphone
-     * permission is what actually matters for TCC.
-     * 
-     * TECHNICAL NOTES:
-     * - DO NOT call SFSpeechRecognizer.requestAuthorization() from a command-line tool
-     *   as it will crash (SIGABRT) trying to show a UI dialog
-     * - The microphone permission (already granted by Electron) is sufficient
-     * - We log the status but proceed regardless
-     * - If there's an actual permission issue, the audio engine will fail with a clear error
+     *
+     * PERMISSIONS STRATEGY:
+     * We do NOT request permissions here. This helper is a headless process.
+     * The Electron app must request microphone permission in the UI layer.
+     * If permissions are missing, AVAudioEngine will fail and we report the error.
      */
     func startListening() {
-        // Check authorization status but don't block on it
-        let authStatus = SFSpeechRecognizer.authorizationStatus()
-        logError("Speech recognition authorization status: \(authStatus.rawValue)")
-        
-        // Log a warning if not authorized, but proceed anyway
-        // The microphone permission (from Electron) is what actually matters
-        if authStatus != .authorized {
-            logError("Note: SFSpeechRecognizer status is not .authorized, but proceeding anyway since microphone permission is granted by Electron app")
+        // Start asynchronously because SpeechAnalyzer uses async/await APIs.
+        Task { [weak self] in
+            await self?.startListeningInternal()
         }
-        
-        // Start listening regardless of SFSpeechRecognizer auth status
-        // If there's a real permission issue, the audio engine will fail
-        startListeningInternal()
     }
     
     /**
      * START LISTENING INTERNAL
-     * 
-     * Internal method that actually starts the speech recognition.
-     * This is called after authorization is confirmed.
-     * 
-     * TECHNICAL NOTES:
-     * - Assumes authorization is already granted
-     * - Sets up audio engine and recognition task
-     * - Streams partial and final transcriptions to Node.js backend
+     *
+     * This uses the new SpeechAnalyzer pipeline:
+     * - Prepare SpeechTranscriber + SpeechAnalyzer
+     * - Install a mic tap and convert audio to analyzer format
+     * - Stream AnalyzerInput buffers into the analyzer
+     * - Consume transcriber results asynchronously
      */
-    private func startListeningInternal() {
-        
-        guard let speechRecognizer = speechRecognizer, speechRecognizer.isAvailable else {
-            sendError("Speech recognizer not available. Make sure you have an internet connection.")
-            return
-        }
-        
+    private func startListeningInternal() async {
         if isListening {
             logError("Already listening")
             return
         }
         
         do {
-            // Cancel any existing task
-            recognitionTask?.cancel()
-            recognitionTask = nil
+            // Ensure analyzer + assets are ready before touching the mic.
+            try await configureSpeechAnalyzerIfNeeded()
             
-            // Note: AVAudioSession is iOS-only. On macOS, audio configuration
-            // is handled automatically by the system.
-            
-            // Create recognition request
-            recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
-            guard let recognitionRequest = recognitionRequest else {
-                sendError("Unable to create recognition request")
+            guard let audioEngine = audioEngine,
+                  let transcriber = speechTranscriber,
+                  let analyzer = speechAnalyzer,
+                  let analyzerFormat = speechAnalyzerAudioFormat else {
+                sendError("Speech analyzer not configured correctly")
                 return
             }
             
-            recognitionRequest.shouldReportPartialResults = true
+            // Build the input stream for live audio.
+            // The AsyncStream bridges the synchronous audio tap callback
+            // to the async SpeechAnalyzer pipeline.
+            let (stream, continuation) = AsyncStream<AnalyzerInput>.makeStream()
+            speechAnalyzerInputContinuation = continuation
             
-            // Get audio input node
-            guard let audioEngine = audioEngine else {
-                sendError("Audio engine not available")
-                return
-            }
+            // Start task that consumes results.
+            startSpeechAnalyzerResultTask(transcriber: transcriber)
             
+            // Install audio tap.
+            // The tap captures raw PCM from the mic, converts it to the
+            // analyzer's required format (16kHz Int16), and yields it
+            // into the AsyncStream for analysis.
             let inputNode = audioEngine.inputNode
+            let inputFormat = inputNode.outputFormat(forBus: 0)
             
-            // LIFECYCLE TRACKING: Record when this recognition session started
-            // and initialize the "last transcription" time so the hang detector
-            // doesn't immediately fire on a fresh session (it would see zero
-            // time since last transcription and think we're hung).
-            recognitionSessionStartTime = Date()
-            lastTranscriptionTime = Date()
-            restartCount = 0
+            audioConverter = AVAudioConverter(from: inputFormat, to: analyzerFormat)
+            if audioConverter == nil {
+                sendError("Failed to create audio converter for SpeechAnalyzer format")
+                return
+            }
+            // CRITICAL: Set primeMethod to .none to avoid timestamp drift.
+            // Without this, the converter may prepend silence or use a "priming"
+            // frame that shifts all subsequent audio, causing the analyzer to
+            // receive misaligned samples and produce garbage or nothing.
+            // Both the Apple sample code and community examples set this.
+            audioConverter?.primeMethod = .none
             
-            // Start recognition task
-            // CRITICAL CHANGE (2026-01-21): Keep recognition running continuously
-            // This enables interruption detection - if user speaks while AI is responding,
-            // we'll get partial transcription results that trigger interruption
-            recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { [weak self] result, error in
+            inputNode.installTap(onBus: 0, bufferSize: 4096, format: inputFormat) { [weak self] buffer, _ in
                 guard let self = self else { return }
-                
-                if let error = error {
-                    // Only stop on actual errors, not on normal completion
-                    let nsError = error as NSError
-                    // Error code 216 is "speech recognition cancelled" - this is normal
-                    // when we cancel the task ourselves (e.g., during restart)
-                    if nsError.domain == "kAFAssistantErrorDomain" && nsError.code == 216 {
-                        self.logError("Recognition task cancelled (normal)")
-                        return
-                    }
-                    
-                    // RECOVERABLE vs IGNORABLE ERRORS (2026-02-06 fix):
-                    //
-                    // ERROR 1110 "No speech detected" — IGNORABLE, NOT recoverable!
-                    // This fires when the recognition session times out during silence.
-                    // It is a NORMAL expected state. Previously, treating 1110 as recoverable
-                    // caused an infinite restart loop: restart → 1110 → restart → 1110...
-                    // reaching 68+ restarts in seconds, burning CPU and degrading audio.
-                    // The periodic watchdog timer (every 3s) handles stuck sessions.
-                    //
-                    // ERROR 209 "No speech detected" (variant) — Same as 1110, ignorable.
-                    //
-                    // ERROR 301 "request was canceled" — Normal during restart, ignorable.
-                    //
-                    // ERROR 203 "Retry" — Transient server error, worth restarting ONCE.
-                    //
-                    // DESIGN: Separate truly recoverable errors (restart) from normal
-                    // states (ignore). The periodic timer handles long-term recovery.
-                    
-                    // IGNORABLE: Normal states that should NOT trigger a restart
-                    let ignorableCodes = [1110, 209, 301]
-                    if nsError.domain == "kAFAssistantErrorDomain" && ignorableCodes.contains(nsError.code) {
-                        self.logError("Ignorable recognition state (code \(nsError.code)): \(error.localizedDescription) — not restarting (periodic timer will handle)")
-                        return
-                    }
-                    
-                    // RECOVERABLE: Transient errors worth restarting for (with limit)
-                    let recoverableCodes = [203]
-                    if nsError.domain == "kAFAssistantErrorDomain" && recoverableCodes.contains(nsError.code) {
-                        self.logError("Recoverable recognition error (code \(nsError.code)): \(error.localizedDescription) — restarting recognition")
-                        self.restartRecognition()
-                        return
-                    }
-                    
-                    self.sendError("Recognition error: \(error.localizedDescription)")
-                    self.stopListening()
-                    return
-                }
-                
-                if let result = result {
-                    let transcription = result.bestTranscription.formattedString
-                    let isFinal = result.isFinal
-                    
-                    // LIFECYCLE TRACKING: Update the last transcription time
-                    // This is used by the hang detector to know we're still
-                    // receiving results. ANY result (partial or final) resets
-                    // the hang detection clock.
-                    self.lastTranscriptionTime = Date()
-                    
-                    // Send transcription with current speaking state
-                    // This allows backend to detect interruptions
-                    self.sendTranscription(text: transcription, isFinal: isFinal)
-                    
-                    // CRITICAL: DO NOT stop listening on isFinal
-                    // We need to keep listening to detect user interruptions
-                    // The backend will manage the turn detection via timers
-                    
-                    // Instead, if isFinal, we restart recognition to get a fresh session
-                    // This prevents the recognizer from timing out
-                    if isFinal {
-                        self.logError("Got final transcription, restarting recognition for next utterance")
-                        self.restartRecognition()
-                    }
+                do {
+                    let converted = try self.convertBufferForAnalyzer(buffer, targetFormat: analyzerFormat)
+                    continuation.yield(AnalyzerInput(buffer: converted, bufferStartTime: nil))
+                } catch {
+                    self.logError("Audio buffer conversion failed: \(error.localizedDescription)")
                 }
             }
             
-            // Configure audio tap
-            let recordingFormat = inputNode.outputFormat(forBus: 0)
-            inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { buffer, _ in
-                recognitionRequest.append(buffer)
-            }
-            
-            // Start audio engine
+            // Start the audio engine and analyzer.
+            // NOTE: analyzer.start() returns quickly — it schedules
+            // processing in the background. Results arrive asynchronously
+            // via the transcriber.results AsyncSequence.
             audioEngine.prepare()
             try audioEngine.start()
+            try await analyzer.start(inputSequence: stream)
             
             isListening = true
-            logError("Started listening")
+            logError("Started listening (SpeechAnalyzer, format: \(analyzerFormat))")
             
-            // VISUAL FEEDBACK (2026-02-06): Notify the backend that audio engine is
-            // running and recognition is active. The backend forwards this to the
-            // frontend so the mic button can show a "listening" animation.
-            // WHY: The user reported "no visual feedback on when transcription starts
-            // so I have to repeat myself." This event bridges the gap between the
-            // mic button click and actual audio capture.
+            // Notify frontend for visual mic feedback.
             sendResponse(type: "listening_active", data: ["status": AnyCodable("listening")])
-            
-            // START THE PERIODIC RESTART WATCHDOG TIMER
-            // This timer runs every periodicCheckInterval seconds and checks:
-            //   1. Has the session been running too long? (maxSessionDuration)
-            //   2. Has recognition gone silent / hung? (hangDetectionTimeout)
-            // If either condition is met, it proactively restarts recognition.
-            //
-            // WHY: We can't rely solely on isFinal to trigger restarts because:
-            //   - SFSpeechRecognizer may never produce isFinal if it hangs
-            //   - Long sessions degrade accuracy even if results keep coming
-            //   - Some edge cases (background noise, etc.) can keep the
-            //     recognizer "alive" but producing garbage results
-            //
-            // IMPORTANT: Must be scheduled on RunLoop.main because Timer
-            // requires a run loop, and our main.swift uses RunLoop.main.run()
-            startPeriodicRestartTimer()
             
         } catch {
             sendError("Failed to start listening: \(error.localizedDescription)")
@@ -474,373 +295,214 @@ class SpeechHelper {
     }
     
     // ============================================================
-    // PERIODIC RESTART TIMER (WATCHDOG)
+    // SPEECH ANALYZER SUPPORT UTILITIES
     // ============================================================
     //
-    // This timer is the core of the "restart after each step" strategy.
-    // It fires every periodicCheckInterval seconds and checks two conditions:
+    // These utilities replace the legacy restart/watchdog logic. SpeechAnalyzer
+    // owns its own lifecycle and handles long-form transcription internally.
     //
-    // CONDITION 1 — SESSION TOO OLD (proactive accuracy refresh):
-    //   If recognitionSessionStartTime is older than maxSessionDuration,
-    //   restart to get a fresh session. This is the primary mechanism for
-    //   improving accuracy: Apple's recognizer builds up internal state
-    //   that degrades over time. A fresh session starts clean.
-    //
-    // CONDITION 2 — HANG DETECTION (recovery from silent failure):
-    //   If lastTranscriptionTime is older than hangDetectionTimeout,
-    //   the recognizer is probably stuck. This happens in practice when:
-    //   - The audio engine disconnects silently (rare but observed)
-    //   - Apple's server-side recognition fails without error callback
-    //   - The recognition task enters a bad state after an error
-    //
-    // Both conditions trigger restartRecognition(), which cleanly tears
-    // down the old session and creates a fresh one, keeping the audio
-    // engine running so there's minimal gap.
-    //
-    // PRODUCT CONTEXT:
-    // Users of BubbleVoice have reported that after ~30-60 seconds of
-    // continuous listening, the recognizer "stops working" or produces
-    // increasingly inaccurate results. This watchdog prevents both issues.
+    // Our responsibility is to:
+    // 1) Ensure assets are installed for the chosen locale
+    // 2) Provide a correctly formatted audio stream
+    // 3) Consume transcription results and forward them to Node.js
     // ============================================================
     
     /**
-     * START PERIODIC RESTART TIMER
+     * CONFIGURE SPEECH ANALYZER IF NEEDED
      *
-     * Creates and schedules the watchdog timer on the main run loop.
-     * Called once when listening starts. Automatically invalidated
-     * when listening stops.
+     * Creates a fresh SpeechTranscriber + SpeechAnalyzer for each session.
+     * We always re-create rather than reuse because:
+     *   - SpeechAnalyzer docs state that once finished, it can't be reused
+     *   - Fresh instances give us clean, deterministic state per turn
+     *   - The creation cost is negligible vs. the quality benefit
+     *
+     * ASSET MANAGEMENT:
+     * On first use, the locale's speech model may need downloading.
+     * This is handled via AssetInventory, which downloads on-device
+     * models from Apple's servers. Once installed, they persist.
+     *
+     * TRANSCRIBER OPTIONS:
+     * - transcriptionOptions: [] (default, no special modes)
+     * - reportingOptions: [.volatileResults] — gives us real-time partial
+     *   results that update progressively as the user speaks
+     * - attributeOptions: [] — we don't need confidence scores or timing
+     *   since the Node.js backend handles turn detection via timers
      */
-    private func startPeriodicRestartTimer() {
-        // Invalidate any existing timer first (safety)
-        stopPeriodicRestartTimer()
+    private func configureSpeechAnalyzerIfNeeded() async throws {
+        let transcriber = SpeechTranscriber(
+            locale: speechAnalyzerLocale,
+            transcriptionOptions: [],
+            reportingOptions: [.volatileResults],
+            attributeOptions: []
+        )
+        speechTranscriber = transcriber
         
-        logError("Starting periodic restart watchdog (check every \(periodicCheckInterval)s, max session \(maxSessionDuration)s, hang detect \(hangDetectionTimeout)s)")
+        // Ensure locale is supported and assets are installed.
+        let supportedLocales = await SpeechTranscriber.supportedLocales
+        let supportedIds = supportedLocales.map({ $0.identifier(.bcp47) })
         
-        // Create a repeating timer on the main run loop
-        // WHY main run loop: Our Swift helper uses RunLoop.main.run()
-        // as its event loop. Timers must be on an active run loop to fire.
-        periodicRestartTimer = Timer.scheduledTimer(withTimeInterval: periodicCheckInterval, repeats: true) { [weak self] _ in
-            self?.checkAndRestartIfNeeded()
+        if !supportedIds.contains(speechAnalyzerLocale.identifier(.bcp47)) {
+            throw NSError(
+                domain: "SpeechAnalyzer",
+                code: -100,
+                userInfo: [NSLocalizedDescriptionKey: "Locale not supported: \(speechAnalyzerLocale.identifier)"]
+            )
         }
-    }
-    
-    /**
-     * STOP PERIODIC RESTART TIMER
-     *
-     * Invalidates and clears the watchdog timer.
-     * Called when listening stops or before creating a new timer.
-     */
-    private func stopPeriodicRestartTimer() {
-        periodicRestartTimer?.invalidate()
-        periodicRestartTimer = nil
-    }
-    
-    /**
-     * CHECK AND RESTART IF NEEDED
-     *
-     * The watchdog check that runs every periodicCheckInterval seconds.
-     * Evaluates both conditions (session age and hang detection) and
-     * restarts recognition if either is met.
-     *
-     * CRITICAL: This method must be safe to call repeatedly and must
-     * handle the case where a restart is already in progress (the
-     * restartRecognition method handles this via the isListening guard).
-     *
-     * LOGGING: We log every check at debug level and every restart at
-     * info level so we can diagnose issues from the Swift stderr logs.
-     */
-    private func checkAndRestartIfNeeded() {
-        guard isListening else { return }
         
-        let now = Date()
+        // Download locale assets if not already installed.
+        // The system manages these models — once downloaded, they persist
+        // across app launches until the user or system cleans them up.
+        let installedLocales = await SpeechTranscriber.installedLocales
+        let installedIds = installedLocales.map({ $0.identifier(.bcp47) })
+        let isInstalled = installedIds.contains(speechAnalyzerLocale.identifier(.bcp47))
         
-        // CONDITION 1: Session too old — proactive accuracy refresh
-        // WHY 30 seconds: Apple's recognizer starts losing accuracy
-        // around 30-60 seconds. 30s is conservative and catches the
-        // problem before users notice degraded results.
-        if let sessionStart = recognitionSessionStartTime {
-            let sessionAge = now.timeIntervalSince(sessionStart)
-            if sessionAge >= maxSessionDuration {
-                logError("⏰ Periodic restart: Session aged out at \(String(format: "%.1f", sessionAge))s (max \(maxSessionDuration)s) — restarting for accuracy (restart #\(restartCount + 1))")
-                
-                // Notify the backend that we're proactively restarting
-                // This is informational — the backend doesn't need to do anything,
-                // but it helps with debugging and logging on the Node.js side
-                sendResponse(type: "recognition_restarted", data: [
-                    "reason": AnyCodable("session_aged_out"),
-                    "sessionAge": AnyCodable(sessionAge),
-                    "restartCount": AnyCodable(restartCount + 1)
-                ])
-                
-                restartRecognition()
-                return
+        if !isInstalled {
+            logError("Downloading speech assets for locale: \(speechAnalyzerLocale.identifier(.bcp47))")
+            if let request = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
+                try await request.downloadAndInstall()
+                logError("Speech assets installed successfully")
             }
         }
         
-        // CONDITION 2: Hang detection — no results for too long
-        // WHY 5 seconds: Normal speech produces partial results every
-        // ~100-300ms. Even during silence, the recognizer typically
-        // sends empty partials within 1-2 seconds. 5 seconds of complete
-        // silence from the recognizer strongly suggests it's hung.
-        //
-        // NOTE: We only check this if we have a lastTranscriptionTime.
-        // On a fresh session that hasn't received any results yet, we
-        // rely on the session age check instead (which will catch it
-        // at maxSessionDuration).
-        if let lastTranscription = lastTranscriptionTime {
-            let timeSinceLastResult = now.timeIntervalSince(lastTranscription)
-            if timeSinceLastResult >= hangDetectionTimeout {
-                logError("🔄 Hang detection: No results for \(String(format: "%.1f", timeSinceLastResult))s (threshold \(hangDetectionTimeout)s) — restarting recognition (restart #\(restartCount + 1))")
-                
-                // Notify the backend about the hang recovery
-                sendResponse(type: "recognition_restarted", data: [
-                    "reason": AnyCodable("hang_detected"),
-                    "timeSinceLastResult": AnyCodable(timeSinceLastResult),
-                    "restartCount": AnyCodable(restartCount + 1)
-                ])
-                
-                restartRecognition()
-                return
-            }
+        let analyzer = SpeechAnalyzer(modules: [transcriber])
+        speechAnalyzer = analyzer
+        
+        guard let format = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber]) else {
+            throw NSError(
+                domain: "SpeechAnalyzer",
+                code: -101,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to obtain compatible audio format"]
+            )
         }
+        speechAnalyzerAudioFormat = format
     }
     
     /**
-     * RESTART RECOGNITION
-     * 
-     * Restarts speech recognition after a final result.
-     * This keeps the recognition running continuously to detect interruptions.
-     * 
-     * CRITICAL FIX (2026-01-23):
-     * The audio tap captures the recognitionRequest variable at install time.
-     * When we create a new recognitionRequest, the tap is still appending to the OLD one!
-     * This causes transcription accumulation across restarts.
-     * 
-     * SOLUTION: Remove and reinstall the audio tap with the new request.
-     * This is what Accountability AI does - it stops and restarts the entire recording.
-     * 
-     * ADDITIONAL FIX (2026-01-23):
-     * Apple's SFSpeechRecognizer returns the FULL transcription from the start of
-     * the recognition session, not incremental text. Even with a fresh request,
-     * we need to ensure we're not getting accumulated text from the audio buffer.
-     * 
-     * The solution is to add a small delay after removing the tap to let the
-     * audio pipeline flush, then reinstall with a completely fresh request.
-     * 
-     * PRODUCT CONTEXT:
-     * In the Accountability app, speech recognition runs continuously even while
-     * the AI is speaking. This allows immediate detection of user interruptions.
-     * We restart the recognition task AND the audio tap to get a fresh session.
+     * START SPEECH ANALYZER RESULT TASK
+     *
+     * Creates a background Task that consumes the transcriber.results
+     * AsyncSequence. Each result is forwarded to Node.js as a
+     * transcription_update message via stdout.
+     *
+     * LIFECYCLE:
+     * - The task runs until the results stream ends (analyzer finalized)
+     *   or it's cancelled (stopListening called).
+     * - CancellationError is expected and silenced.
+     * - Any other error is reported to the backend.
+     *
+     * PRODUCT NOTE:
+     * The volatile results (.volatileResults in reportingOptions) give
+     * us real-time partial text that updates progressively as the user
+     * speaks. This is what powers the live transcription display.
+     * Final results come when the analyzer detects a natural pause or
+     * sentence boundary.
      */
-    /**
-     * RESTART RECOGNITION
-     *
-     * Tears down the current recognition task and audio tap, then creates
-     * a fresh session after a brief pipeline flush delay.
-     *
-     * This is the CORE method for the periodic restart strategy. It's called:
-     *   1. After every isFinal result (natural utterance boundary)
-     *   2. By the periodic watchdog timer (session age / hang detection)
-     *   3. By the backend's reset_recognition command (after AI finishes speaking)
-     *   4. On recoverable recognition errors (transient server issues)
-     *
-     * CRITICAL FIX (2026-01-23):
-     * The audio tap captures the recognitionRequest variable at install time.
-     * When we create a new recognitionRequest, the tap is still appending to the OLD one!
-     * This causes transcription accumulation across restarts.
-     *
-     * SOLUTION: Remove and reinstall the audio tap with the new request.
-     * This is what Accountability AI does - it stops and restarts the entire recording.
-     *
-     * ADDITIONAL FIX (2026-01-23):
-     * Apple's SFSpeechRecognizer returns the FULL transcription from the start of
-     * the recognition session, not incremental text. Even with a fresh request,
-     * we need to ensure we're not getting accumulated text from the audio buffer.
-     *
-     * The solution is to add a small delay after removing the tap to let the
-     * audio pipeline flush, then reinstall with a completely fresh request.
-     *
-     * ROBUSTNESS IMPROVEMENTS (2026-02-06):
-     * - Tracks restart count and session start time for lifecycle monitoring
-     * - Handles errors in the new recognition task with the same recoverable
-     *   error logic as the initial task (prevents cascading failures)
-     * - Resets lastTranscriptionTime so the hang detector doesn't immediately
-     *   fire on the fresh session
-     * - Logs the restart reason trail for debugging
-     *
-     * PRODUCT CONTEXT:
-     * In the Accountability app, speech recognition runs continuously even while
-     * the AI is speaking. This allows immediate detection of user interruptions.
-     * We restart the recognition task AND the audio tap to get a fresh session.
-     */
-    private func restartRecognition() {
-        guard isListening else { return }
-        guard let audioEngine = audioEngine else { return }
-        
-        // RATE LIMITER (2026-02-06): Prevent rapid-fire restart loops.
-        // If restarts are happening faster than minRestartInterval, something is wrong.
-        // After maxConsecutiveRapidRestarts, stop restarting and let the periodic timer
-        // handle recovery at a sane cadence. This prevents the 68+ restart loops
-        // the user observed from error 1110 (and any future degenerate error patterns).
-        let now = Date()
-        let timeSinceLastRestart = now.timeIntervalSince(lastRestartTime)
-        if timeSinceLastRestart < minRestartInterval {
-            consecutiveRapidRestarts += 1
-            if consecutiveRapidRestarts >= maxConsecutiveRapidRestarts {
-                logError("⛔ Rate limit hit: \(consecutiveRapidRestarts) rapid restarts in a row — pausing restarts, periodic timer will recover")
-                consecutiveRapidRestarts = 0  // Reset for next cycle
-                isRestarting = false
-                pendingRestart = false
-                return
-            }
-        } else {
-            // Reset the counter if enough time has passed
-            consecutiveRapidRestarts = 0
-        }
-        lastRestartTime = now
-        
-        // CONCURRENT RESTART GUARD (2026-02-06):
-        // If a restart is already in progress, queue it instead of overlapping.
-        //
-        // WHY: Multiple sources can trigger restartRecognition nearly simultaneously
-        // (isFinal, reset_recognition command, periodic timer, error recovery).
-        // When two restarts overlap, the second async block calls installTap(onBus: 0)
-        // when the first already installed a tap — crashing with "tap already exists on bus 0".
-        //
-        // FIX: Queue the restart. When the current restart completes, check pendingRestart
-        // and restart again if needed. This serializes all restarts safely.
-        if isRestarting {
-            logError("⏸ Restart already in progress — queuing pending restart")
-            pendingRestart = true
-            return
-        }
-        
-        isRestarting = true
-        
-        // INCREMENT RESTART COUNTER
-        // This counter tracks total restarts in the current listening session.
-        // Useful for debugging: if restartCount is unusually high, it may
-        // indicate a problem (e.g., recognizer immediately failing after restart).
-        restartCount += 1
-        logError("Restarting recognition task (restart #\(restartCount)) for continuous listening")
-        
-        // Cancel the old task
-        recognitionTask?.cancel()
-        recognitionTask = nil
-        
-        // CRITICAL: Remove the old audio tap
-        // This prevents it from appending to the old recognitionRequest
-        let inputNode = audioEngine.inputNode
-        inputNode.removeTap(onBus: 0)
-        
-        // CRITICAL: Add a small delay to let the audio pipeline flush
-        // This prevents accumulated audio from being processed by the new request
-        // WHY: The audio engine may have buffered audio that hasn't been processed yet
-        // BECAUSE: Without this delay, the new tap immediately starts receiving
-        // buffered audio from before the restart, causing accumulation
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+    private func startSpeechAnalyzerResultTask(transcriber: SpeechTranscriber) {
+        speechAnalyzerTask?.cancel()
+        speechAnalyzerTask = Task { [weak self] in
             guard let self = self else { return }
-            guard self.isListening else {
-                self.isRestarting = false
-                return
-            }
-            
-            // LIFECYCLE: Reset the session start time for this fresh session
-            // This is critical — without this, the watchdog timer would see
-            // the OLD start time and immediately trigger another restart.
-            self.recognitionSessionStartTime = Date()
-            self.lastTranscriptionTime = Date()
-            
-            // Create a new recognition request
-            self.recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
-            guard let recognitionRequest = self.recognitionRequest,
-                  let speechRecognizer = self.speechRecognizer else {
-                self.sendError("Failed to create new recognition request")
-                self.isRestarting = false
-                return
-            }
-            
-            recognitionRequest.shouldReportPartialResults = true
-            
-            // Start a new recognition task
-            // CRITICAL: Use the SAME error handling logic as startListeningInternal
-            // so that recoverable errors trigger another restart instead of killing
-            // the entire listening pipeline.
-            self.recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { [weak self] result, error in
-                guard let self = self else { return }
-                
-                if let error = error {
-                    let nsError = error as NSError
-                    
-                    // Error 216 = "speech recognition cancelled" — normal during restart
-                    if nsError.domain == "kAFAssistantErrorDomain" && nsError.code == 216 {
-                        self.logError("Recognition task cancelled (normal)")
-                        return
-                    }
-                    
-                    // IGNORABLE: Normal states (same list as startListeningInternal)
-                    let ignorableCodes = [1110, 209, 301]
-                    if nsError.domain == "kAFAssistantErrorDomain" && ignorableCodes.contains(nsError.code) {
-                        self.logError("Ignorable recognition state in restarted task (code \(nsError.code)): \(error.localizedDescription) — not restarting")
-                        return
-                    }
-                    
-                    // RECOVERABLE: Transient errors worth one restart
-                    let recoverableCodes = [203]
-                    if nsError.domain == "kAFAssistantErrorDomain" && recoverableCodes.contains(nsError.code) {
-                        self.logError("Recoverable error in restarted task (code \(nsError.code)): \(error.localizedDescription) — restarting")
-                        self.restartRecognition()
-                        return
-                    }
-                    
-                    self.sendError("Recognition error: \(error.localizedDescription)")
-                    self.stopListening()
-                    return
+            do {
+                for try await result in transcriber.results {
+                    let text = String(result.text.characters)
+                    self.sendTranscription(text: text, isFinal: result.isFinal)
                 }
-                
-                if let result = result {
-                    let transcription = result.bestTranscription.formattedString
-                    let isFinal = result.isFinal
-                    
-                    // LIFECYCLE: Update last transcription time for hang detection
-                    self.lastTranscriptionTime = Date()
-                    
-                    self.sendTranscription(text: transcription, isFinal: isFinal)
-                    
-                    if isFinal {
-                        self.logError("Got final transcription, restarting recognition for next utterance")
-                        self.restartRecognition()
-                    }
+                self.logError("Transcriber results stream ended")
+            } catch {
+                if !(error is CancellationError) {
+                    self.sendError("SpeechAnalyzer result stream error: \(error.localizedDescription)")
                 }
-            }
-            
-            // SAFETY (2026-02-06): Always remove any existing tap before installing new one.
-            // This is a defense-in-depth measure. Even though we removed the tap above,
-            // the async delay means another code path could have installed one in the meantime.
-            // removeTap is safe to call when no tap exists (it's a no-op).
-            inputNode.removeTap(onBus: 0)
-            
-            // CRITICAL: Install the audio tap with the NEW recognitionRequest
-            // This ensures audio buffers go to the new request, not the old one
-            let recordingFormat = inputNode.outputFormat(forBus: 0)
-            inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
-                // Use self?.recognitionRequest to get the CURRENT request
-                // This way if we restart again, it will use the new one
-                self?.recognitionRequest?.append(buffer)
-            }
-            
-            self.logError("Audio tap reinstalled with new recognition request after flush delay (restart #\(self.restartCount))")
-            
-            // CONCURRENT RESTART: Mark restart as complete
-            // Then check if another restart was requested while we were busy.
-            // If so, restart again to process the queued request.
-            self.isRestarting = false
-            if self.pendingRestart {
-                self.pendingRestart = false
-                self.logError("Processing queued pending restart")
-                self.restartRecognition()
             }
         }
+    }
+    
+    /**
+     * CONVERT BUFFER FOR ANALYZER
+     *
+     * Converts an AVAudioPCMBuffer from the mic's native format (typically
+     * 48kHz Float32) to the SpeechAnalyzer's required format (16kHz Int16).
+     *
+     * CRITICAL FIX (2026-02-07):
+     * Previously used .endOfStream as the inputStatus, which tells the
+     * converter that the entire audio source is done. This caused the
+     * converter to either produce empty/corrupted output or reset its
+     * internal state on every call, leading to ZERO transcription results.
+     *
+     * The correct pattern (from Apple's sample code and multiple working
+     * implementations) is:
+     *   - First callback invocation: .haveData + return the buffer
+     *   - Subsequent invocations: .noDataNow + return nil
+     *
+     * This tells the converter "here's one buffer, no more right now" without
+     * signaling that the stream itself is over.
+     *
+     * Also added primeMethod = .none on the converter (set at creation time)
+     * to prevent timestamp drift from priming samples.
+     */
+    private func convertBufferForAnalyzer(_ buffer: AVAudioPCMBuffer, targetFormat: AVAudioFormat) throws -> AVAudioPCMBuffer {
+        guard let converter = audioConverter else {
+            throw NSError(
+                domain: "SpeechAnalyzer",
+                code: -102,
+                userInfo: [NSLocalizedDescriptionKey: "Audio converter not configured"]
+            )
+        }
+        
+        if buffer.format == targetFormat {
+            return buffer
+        }
+        
+        let sampleRateRatio = converter.outputFormat.sampleRate / converter.inputFormat.sampleRate
+        let scaledInputFrameLength = Double(buffer.frameLength) * sampleRateRatio
+        let frameCapacity = AVAudioFrameCount(scaledInputFrameLength.rounded(.up))
+        
+        guard let convertedBuffer = AVAudioPCMBuffer(pcmFormat: converter.outputFormat, frameCapacity: frameCapacity) else {
+            throw NSError(
+                domain: "SpeechAnalyzer",
+                code: -103,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to create conversion buffer"]
+            )
+        }
+        
+        var conversionError: NSError?
+        // CRITICAL: We use a nonisolated(unsafe) flag to track whether the
+        // buffer has already been provided. This is the pattern used in Apple's
+        // own sample code and confirmed working by community implementations.
+        //
+        // WHY nonisolated(unsafe):
+        // The closure passed to converter.convert is @Sendable, but the
+        // converter calls it synchronously on the same thread. Using
+        // nonisolated(unsafe) is safe here because there is no actual
+        // concurrent access — the closure is invoked sequentially by the
+        // converter within this single function call.
+        nonisolated(unsafe) var bufferProvided = false
+        let status = converter.convert(to: convertedBuffer, error: &conversionError) { _, inputStatus in
+            if bufferProvided {
+                // Already gave the converter our buffer; no more data right now.
+                inputStatus.pointee = .noDataNow
+                return nil
+            }
+            bufferProvided = true
+            inputStatus.pointee = .haveData
+            return buffer
+        }
+        
+        if status == .error {
+            throw conversionError ?? NSError(
+                domain: "SpeechAnalyzer",
+                code: -104,
+                userInfo: [NSLocalizedDescriptionKey: "Audio conversion failed"]
+            )
+        }
+        
+        return convertedBuffer
+    }
+    
+    private func resetSpeechAnalyzerSession() async {
+        // WHY: We want a clean transcription boundary after AI speech or interruptions.
+        // This mirrors the old "restart recognition" behavior but uses the new
+        // SpeechAnalyzer pipeline: stop everything, then start fresh.
+        stopListening()
+        await startListeningInternal()
     }
     
     /**
@@ -850,23 +512,31 @@ class SpeechHelper {
      */
     func stopListening() {
         guard isListening else { return }
-        
-        // CRITICAL: Stop the periodic restart watchdog FIRST
-        // If we don't, it could fire after we've stopped and try to restart
-        // a recognition session that we're intentionally shutting down.
-        stopPeriodicRestartTimer()
-        
+        // Stop feeding audio to the analyzer.
         audioEngine?.stop()
         audioEngine?.inputNode.removeTap(onBus: 0)
-        recognitionRequest?.endAudio()
-        recognitionTask?.cancel()
+        
+        // Finish the input stream and cancel result consumption.
+        speechAnalyzerInputContinuation?.finish()
+        speechAnalyzerInputContinuation = nil
+        
+        speechAnalyzerTask?.cancel()
+        speechAnalyzerTask = nil
+        
+        // Finalize the analyzer session asynchronously.
+        if let analyzer = speechAnalyzer {
+            Task {
+                try? await analyzer.finalizeAndFinishThroughEndOfInput()
+            }
+        }
+        
+        speechAnalyzer = nil
+        speechTranscriber = nil
+        speechAnalyzerAudioFormat = nil
+        audioConverter = nil
         
         isListening = false
-        
-        // LIFECYCLE: Log the session summary for debugging
-        // This helps diagnose issues by showing how many restarts occurred
-        // and how long the total listening session lasted.
-        logError("Stopped listening (total restarts in session: \(restartCount))")
+        logError("Stopped listening (SpeechAnalyzer session finalized)")
     }
     
     /**
@@ -1052,25 +722,19 @@ class SpeechHelper {
             stopListening()
             
         case "reset_recognition":
-            // CRITICAL: Explicitly reset the recognition session
-            // This is called by the backend at several lifecycle points:
-            //   1. After the AI finishes speaking (speech_ended) — ensures fresh
-            //      session for the next user utterance
-            //   2. After an interruption is detected — gives the recognizer a
-            //      clean slate so the interrupting speech is captured accurately
-            //   3. After the timer cascade completes — prepares for next turn
+            // CRITICAL: Explicitly reset the recognition session.
             //
-            // WHY THIS EXISTS (separate from periodic restart):
-            // The periodic restart runs on a fixed timer and doesn't know about
-            // the conversation turn structure. This command is the backend's way
-            // of saying "a logical conversation boundary just happened, start fresh."
+            // This is called by the backend at key lifecycle points:
+            //   1) After AI finishes speaking (speech_ended)
+            //   2) After an interruption is detected
+            //   3) After the timer cascade completes (turn boundary)
             //
-            // TOGETHER, they cover both scenarios:
-            // - Periodic restart: handles long continuous listening (accuracy + hang)
-            // - reset_recognition: handles turn boundaries (clean transcription state)
-            logError("Received reset_recognition command from backend (restart #\(restartCount + 1))")
+            // With SpeechAnalyzer, we implement this as a clean stop + restart.
+            logError("Received reset_recognition command from backend (SpeechAnalyzer reset)")
             if isListening {
-                restartRecognition()
+                Task { [weak self] in
+                    await self?.resetSpeechAnalyzerSession()
+                }
             }
             
         case "speak":
@@ -1156,12 +820,16 @@ let helper = SpeechHelper()
 
 // Read commands from stdin in background
 DispatchQueue.global(qos: .userInitiated).async {
-    helper.logError("Starting stdin reader loop")
+    DispatchQueue.main.async {
+        helper.logError("Starting stdin reader loop")
+    }
     
     while let line = readLine() {
         guard !line.isEmpty else { continue }
         
-        helper.logError("Received command: \(line.prefix(50))...")
+        DispatchQueue.main.async {
+            helper.logError("Received command: \(line.prefix(50))...")
+        }
         
         do {
             let decoder = JSONDecoder()
@@ -1171,15 +839,17 @@ DispatchQueue.global(qos: .userInitiated).async {
                 helper.handleCommand(command)
             }
         } catch {
-            helper.logError("Failed to parse command: \(error.localizedDescription)")
             DispatchQueue.main.async {
+                helper.logError("Failed to parse command: \(error.localizedDescription)")
                 helper.sendError("Failed to parse command: \(error.localizedDescription)")
             }
         }
     }
     
     // stdin closed
-    helper.logError("stdin closed")
+    DispatchQueue.main.async {
+        helper.logError("stdin closed")
+    }
     
     // Don't exit immediately - let the run loop continue
     // The parent process will kill us when needed

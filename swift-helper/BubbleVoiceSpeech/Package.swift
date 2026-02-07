@@ -1,4 +1,4 @@
-// swift-tools-version: 5.9
+// swift-tools-version: 6.1
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 /**
@@ -10,7 +10,7 @@
  * ARCHITECTURE:
  * - Runs as a separate process spawned by Node.js
  * - Communicates via JSON over stdin/stdout
- * - Uses Apple's SFSpeechRecognizer for STT
+ * - Uses Apple's SpeechAnalyzer + SpeechTranscriber for STT
  * - Uses `say` command for TTS (or NSSpeechSynthesizer)
  * 
  * PRODUCT CONTEXT:
@@ -24,7 +24,7 @@ import PackageDescription
 let package = Package(
     name: "BubbleVoiceSpeech",
     platforms: [
-        .macOS(.v14) // macOS Sonoma or later
+        .macOS("26") // macOS 26 or later (SpeechAnalyzer)
     ],
     products: [
         .executable(

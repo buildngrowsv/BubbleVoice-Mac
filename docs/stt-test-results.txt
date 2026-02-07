@@ -1,0 +1,185 @@
+STT Direct Test Results — 2026-02-07 12:22:12
+Helper binary: /Users/ak/UserRoot/Github/researching-callkit-repos/BubbleVoice-Mac/swift-helper/BubbleVoiceSpeech/.build/debug/BubbleVoiceSpeech
+
+
+============================================================
+  TEST 0: Smoke Test — Does the helper start?
+============================================================
+[12:22:12.810] Helper process started
+[12:22:12.833] PASS: Helper sent 'ready' signal
+
+============================================================
+  TEST 1: Startup Latency + TTS-to-STT (say → mic → STT)
+============================================================
+[12:22:13.339] Sent start_listening
+[12:22:16.351] Playing via say: 'one two three four five six seven eight nine ten'
+[12:22:26.589] Say finished in 10.21s
+[12:22:30.647] 
+=== TEST 1 RESULTS (23 updates) ===
+[12:22:30.648]   [partial] 'One'
+[12:22:30.650]   [partial] 'One,'
+[12:22:30.651]   [partial] 'One, two'
+[12:22:30.651]   [partial] 'One, two,'
+[12:22:30.652]   [partial] 'One, two, three'
+[12:22:30.652]   [partial] 'One, two, three,'
+[12:22:30.652]   [partial] 'One, two, three, four'
+[12:22:30.652]   [partial] 'One, two, three, four,'
+[12:22:30.653]   [partial] 'One, two, three, four, five'
+[12:22:30.653]   [partial] 'One, two, three, four, five,'
+[12:22:30.653]   [partial] 'One, two, three, four, five, six'
+[12:22:30.653]   [partial] 'One, two, three, four, five, six,'
+[12:22:30.653]   [partial] 'One, two, three, four, five, six, buddy'
+[12:22:30.653]   [partial] 'One, two, three, four, five, six, buddy.'
+[12:22:30.653]   [partial] 'One, two, three, four, five, six, buddy. 9'
+[12:22:30.653]   [partial] 'One, two, three, four, five, six, buddy. 91'
+[12:22:30.654]   [partial] 'One, two, three, four, five, six, buddy. 910.'
+[12:22:30.654]   [partial] 'One, two, three, four, five, six, buddy. 910..'
+[12:22:30.654]   [partial] 'One, two, three, four, five, six, buddy. 910.. Mm'
+[12:22:30.654]   [partial] 'One, two, three, four, five, six, buddy. 910.. Mm h'
+[12:22:30.654]   [partial] 'One, two, three, four, five, six, buddy. 910.. Mm hmm'
+[12:22:30.654]   [partial] 'One, two, three, four, five, six, buddy. 910.. Mm hmm.'
+[12:22:30.654]   [FINAL] 'One, two, three, four, five, six, seven, nine, 10. Mm hmm.'
+[12:22:30.654] 
+  First transcription latency (from say start): 9.514s
+[12:22:30.654]   Expected words: 10
+[12:22:30.654]   Got words: 11
+[12:22:30.654]   Matched: 0/10
+[12:22:30.655]   FAIL: Most words missed
+
+============================================================
+  TEST 2: Session Reset — Text Bleed Check
+============================================================
+[12:22:32.665] Sent start_listening (session 2)
+[12:22:35.671] Playing via say: 'banana chocolate strawberry'
+[12:23:03.912] 
+=== TEST 2 RESULTS (52 updates) ===
+[12:23:03.913]   [partial] 'got'
+[12:23:03.913]   [partial] 'got col'
+[12:23:03.914]   [partial] 'got colog'
+[12:23:03.914]   [partial] 'got cologna'
+[12:23:03.914]   [partial] 'got cologna fart'
+[12:23:03.914]   [partial] 'got cologna farts'
+[12:23:03.914]   [partial] 'got cologna farts you'
+[12:23:03.914]   [partial] 'got cologna farts youhu'
+[12:23:03.914]   [partial] 'got cologna farts youhu won'
+[12:23:03.914]   [partial] 'got cologna farts youhu won''
+[12:23:03.914]   [partial] 'got cologna farts youhu won't'
+[12:23:03.914]   [partial] 'got cologna farts youhu won't.'
+[12:23:03.914]   [FINAL] 'I mean, I got cologne and farts, which you won't.'
+[12:23:03.914]   [partial] ' Well'
+[12:23:03.914]   [partial] ' Well,'
+[12:23:03.914]   [partial] ' Well, you'
+[12:23:03.914]   [partial] ' Well, you did'
+[12:23:03.914]   [partial] ' Well, you did a'
+[12:23:03.914]   [partial] ' Well, you did a pretty'
+[12:23:03.915]   [partial] ' Well, you did a pretty bad'
+[12:23:03.915]   [partial] ' Well, you did a pretty bad job'
+[12:23:03.915]   [partial] ' Well, you did a pretty bad job upstairs'
+[12:23:03.915]   [partial] ' Well, you did a pretty bad job upstairs too'
+[12:23:03.915]   [partial] ' Well, you did a pretty bad job upstairs too.'
+[12:23:03.915]   [FINAL] ' Well, you did a pretty bad job upstairs, too.'
+[12:23:03.915]   [partial] ' Huh'
+[12:23:03.915]   [partial] ' You'
+[12:23:03.916]   [partial] ' You did'
+[12:23:03.916]   [partial] ' You did a'
+[12:23:03.916]   [partial] ' You did a pretty'
+[12:23:03.916]   [partial] ' You did a pretty bad'
+[12:23:03.916]   [partial] ' You did a pretty bad job'
+[12:23:03.916]   [partial] ' You did a pretty bad job upstairs'
+[12:23:03.916]   [partial] ' You did a pretty bad job upstairs in'
+[12:23:03.916]   [partial] ' You did a pretty bad job upstairs in front'
+[12:23:03.916]   [partial] ' You did a pretty bad job upstairs in front of'
+[12:23:03.917]   [partial] ' You did a pretty bad job upstairs in front of my'
+[12:23:03.917]   [partial] ' You did a pretty bad job upstairs in front of my mother'
+[12:23:03.917]   [partial] ' You did a pretty bad job upstairs in front of my mother.'
+[12:23:03.917]   [FINAL] ' Huh? You did a pretty bad job upstairs in front of my mother.'
+[12:23:03.917]   [partial] '.'
+[12:23:03.917]   [FINAL] ' Oh, I did, what's the game?'
+[12:23:03.917]   [partial] ' B'
+[12:23:03.917]   [partial] ' Ban'
+[12:23:03.917]   [partial] ' Banana'
+[12:23:03.917]   [partial] ' Banana chocolate'
+[12:23:03.917]   [partial] ' Banana chocolate st'
+[12:23:03.918]   [partial] ' Banana chocolate straw'
+[12:23:03.918]   [partial] ' Banana chocolate strawberry'
+[12:23:03.918]   [partial] ' Banana chocolate strawberry.'
+[12:23:03.918]   [FINAL] ' Banana chocolate strawberry.'
+[12:23:03.918]   [partial] '.'
+[12:23:03.919]   PASS: No text bleed from session 1
+
+============================================================
+  TEST 3: Echo Test — Helper speak command while STT runs
+============================================================
+[12:23:05.922] Sent start_listening (session 3)
+[12:23:08.927] Sending speak command: 'Hello I am the AI assistant how are you doing today'
+[12:23:08.936]   speech_started received
+[12:23:16.322]   speech_ended received
+[12:23:18.332] 
+=== TEST 3 ECHO RESULTS (28 updates) ===
+[12:23:18.332]   [partial] 'osh' (TTS active)
+[12:23:18.333]   [partial] 'osh,' (TTS active)
+[12:23:18.333]   [partial] 'osh, it' (TTS active)
+[12:23:18.333]   [partial] 'osh, it'' (TTS active)
+[12:23:18.333]   [partial] 'osh, it's' (TTS active)
+[12:23:18.333]   [partial] 'osh, it's so' (TTS active)
+[12:23:18.333]   [partial] 'osh, it's so bad' (TTS active)
+[12:23:18.333]   [partial] 'osh, it's so bad,' (TTS active)
+[12:23:18.333]   [partial] 'osh, it's so bad, Adam' (TTS active)
+[12:23:18.333]   [partial] 'osh, it's so bad, Adam.' (TTS active)
+[12:23:18.333]   [FINAL] 'Gosh, it's so bad, Adam.' (TTS active)
+[12:23:18.333]   [partial] ' Hello'
+[12:23:18.334]   [partial] ' Hello,'
+[12:23:18.334]   [partial] ' Hello, I'
+[12:23:18.334]   [partial] ' Hello, I am'
+[12:23:18.334]   [partial] ' Hello, I am the'
+[12:23:18.334]   [partial] ' Hello, I am the A'
+[12:23:18.334]   [partial] ' Hello, I am the AI'
+[12:23:18.334]   [partial] ' Hello, I am the AI assistant'
+[12:23:18.334]   [partial] ' Hello, I am the AI assistant.'
+[12:23:18.334]   [FINAL] ' Hello, I am the AI assistant.'
+[12:23:18.334]   [partial] ' How'
+[12:23:18.334]   [partial] ' How are'
+[12:23:18.334]   [partial] ' How are you'
+[12:23:18.334]   [partial] ' How are you doing'
+[12:23:18.334]   [partial] ' How are you doing today'
+[12:23:18.334]   [partial] ' How are you doing today?'
+[12:23:18.334]   [FINAL] ' How are you doing today?'
+[12:23:18.334] 
+  Transcriptions with isSpeaking=true: 11/28
+[12:23:18.335]   PARTIAL: Some echo transcriptions flagged
+
+============================================================
+  TEST 4: Sentence Accuracy
+============================================================
+[12:23:20.336] 
+Sentence 1: 'The quick brown fox jumps over the lazy dog'
+[12:23:31.874]   Expected: 'The quick brown fox jumps over the lazy dog'
+[12:23:31.874]   Got:      ' The quick brown fox jumps over the lazy dog.'
+[12:23:31.874]   Word match: 7/8 (88%)
+[12:23:31.874]   PASS
+[12:23:33.875] 
+Sentence 2: 'She sells seashells by the seashore'
+[12:23:45.882]   Expected: 'She sells seashells by the seashore'
+[12:23:45.883]   Got:      ' She sells seashells by the seashore.'
+[12:23:45.883]   Word match: 5/6 (83%)
+[12:23:45.883]   PASS
+[12:23:47.884] 
+Sentence 3: 'How much wood would a woodchuck chuck if a woodchuck could chuck wood'
+[12:23:59.439]   Expected: 'How much wood would a woodchuck chuck if a woodchuck could chuck wood'
+[12:23:59.440]   Got:      'How much wood would a woodchuck chuck if a woodchuck could chuck wood'
+[12:23:59.440]   Word match: 9/9 (100%)
+[12:23:59.440]   PASS
+
+============================================================
+  TEST 5: Rapid Reset — reset_recognition command
+============================================================
+[12:24:01.448] Sent start_listening
+[12:24:04.451] Playing: 'alpha bravo charlie'
+[12:24:10.221]   Pre-reset transcriptions: 6
+[12:24:10.247]   [partial] 'Al'
+[12:24:10.279]   [partial] 'Alp'
+[12:24:10.279]   [partial] 'Alpha'
+[12:24:10.280]   [partial] 'Alpha Bra'
+[12:24:10.280]   [partial] 'Alpha Brav'
+[12:24:10.280]   [partial] 'Alpha Bravo'
+[12:24:10.280] Sent reset_recognition
