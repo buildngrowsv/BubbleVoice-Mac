@@ -207,6 +207,29 @@ final class SpeechHelper: @unchecked Sendable {
     private var consecutiveSilentFrames: Int = 0
     private let maxConsecutiveSilentFrames: Int = 15
     
+    // SINGLE-WORD FLUSH MECHANISM (2026-02-07):
+    // Testing revealed that single-word utterances ("yes", "no", "ok") RELIABLY
+    // produce ZERO transcription results because SpeechAnalyzer processes audio
+    // in ~4-second chunks. A 0.3-second word leaves too little signal in the
+    // 4-second window for the analyzer to commit to a transcription.
+    //
+    // FIX: Track whether we detected speech energy (via VAD) and then silence.
+    // If we saw speech followed by sustained silence (>2 seconds), we "flush"
+    // the analyzer by finishing the input stream and immediately restarting.
+    // This forces the analyzer to emit any buffered results.
+    //
+    // Without this fix, users saying "yes" or "no" get:
+    //   - No visual feedback in the input field
+    //   - The silence timer never starts (no transcription to trigger it)
+    //   - The turn hangs until they speak more or the session times out
+    private var speechEnergyDetectedSinceLastResult = false
+    private var flushCheckTimer: Task<Void, Never>?
+    // How many silent frames after speech before we flush.
+    // 25 frames at 4096 samples/48kHz ≈ 2.1 seconds — long enough
+    // to confirm the user actually stopped, short enough to not feel laggy.
+    private let flushAfterSilentFrames: Int = 25
+    private var silentFramesSinceSpeech: Int = 0
+    
     // NOTE: All legacy restart / hang detection logic has been removed
     // because SpeechAnalyzer manages its own session lifecycle. This is
     // a core product bet: we trade complex home-grown recovery logic for
@@ -407,14 +430,57 @@ final class SpeechHelper: @unchecked Sendable {
                 
                 if rms < self.vadEnergyThreshold {
                     self.consecutiveSilentFrames += 1
+                    
+                    // SINGLE-WORD FLUSH (2026-02-07):
+                    // If we previously detected speech energy but haven't received
+                    // any transcription results, and we've now been silent long enough,
+                    // force the analyzer to flush by resetting the session.
+                    // This handles "yes", "no", "ok" and other quick responses
+                    // that the 4-second processing window would otherwise swallow.
+                    if self.speechEnergyDetectedSinceLastResult {
+                        self.silentFramesSinceSpeech += 1
+                        
+                        if self.silentFramesSinceSpeech >= self.flushAfterSilentFrames {
+                            self.logError("VAD: Speech then silence detected (\(self.silentFramesSinceSpeech) silent frames) — flushing analyzer for possible short utterance")
+                            self.speechEnergyDetectedSinceLastResult = false
+                            self.silentFramesSinceSpeech = 0
+                            
+                            // Notify backend that we detected "speech then silence"
+                            // so it can handle short-utterance fallback behavior
+                            // (e.g., start a shorter timer to wait for the delayed result)
+                            self.sendResponse(type: "speech_energy_silence", data: [
+                                "silentFrames": AnyCodable(self.flushAfterSilentFrames),
+                                "estimatedSilenceDurationMs": AnyCodable(Int(Double(self.flushAfterSilentFrames) * 4096.0 / 48000.0 * 1000.0))
+                            ])
+                        }
+                    }
+                    
                     // Still feed audio during brief pauses (word boundaries)
                     // but stop after sustained silence to save processing.
                     if self.consecutiveSilentFrames > self.maxConsecutiveSilentFrames {
+                        // TIMESTAMP FIX (2026-02-07):
+                        // Even though we're not feeding this buffer to the analyzer,
+                        // we MUST still count its frames for timeline accuracy.
+                        // Without this, the next speech buffer would have a timestamp
+                        // that "jumped back" to the time of the PREVIOUS speech,
+                        // confusing the analyzer's audioTimeRange correlation.
+                        //
+                        // Example without this fix:
+                        //   Buffer 100 (speech) → totalFrames = 409600 → time = 8.53s
+                        //   Buffer 101-130 (silence, skipped) → totalFrames stays 409600
+                        //   Buffer 131 (speech) → time = 8.53s ← WRONG, should be ~11.2s
+                        self.totalFramesProcessed += UInt64(buffer.frameLength)
                         return
                     }
                 } else {
                     // Speech detected — reset the silence counter
                     self.consecutiveSilentFrames = 0
+                    
+                    // SINGLE-WORD FLUSH TRACKING (2026-02-07):
+                    // Mark that we've seen speech energy so the flush mechanism
+                    // knows to activate when silence returns.
+                    self.speechEnergyDetectedSinceLastResult = true
+                    self.silentFramesSinceSpeech = 0
                 }
                 
                 do {
@@ -612,6 +678,14 @@ final class SpeechHelper: @unchecked Sendable {
             do {
                 for try await result in transcriber.results {
                     let text = String(result.text.characters)
+                    
+                    // RESET FLUSH TRACKING (2026-02-07):
+                    // We got a transcription result, so the analyzer DID process
+                    // the speech. No need to flush — clear the "speech detected" flag.
+                    // This prevents redundant flushes when the analyzer already
+                    // emitted results for the speech it heard.
+                    self.speechEnergyDetectedSinceLastResult = false
+                    self.silentFramesSinceSpeech = 0
                     
                     // EXTRACT AUDIO TIMESTAMPS (2026-02-07):
                     // The audioTimeRange attribute gives us the precise audio
@@ -848,6 +922,12 @@ final class SpeechHelper: @unchecked Sendable {
         totalFramesProcessed = 0
         consecutiveSilentFrames = 0
         
+        // Reset single-word flush tracking
+        speechEnergyDetectedSinceLastResult = false
+        silentFramesSinceSpeech = 0
+        flushCheckTimer?.cancel()
+        flushCheckTimer = nil
+        
         isListening = false
         logError("Stopped listening (SpeechAnalyzer session fully finalized)")
     }
@@ -890,6 +970,12 @@ final class SpeechHelper: @unchecked Sendable {
         // Reset audio timeline tracking
         totalFramesProcessed = 0
         consecutiveSilentFrames = 0
+        
+        // Reset single-word flush tracking
+        speechEnergyDetectedSinceLastResult = false
+        silentFramesSinceSpeech = 0
+        flushCheckTimer?.cancel()
+        flushCheckTimer = nil
         
         isListening = false
         logError("Stopped listening (SpeechAnalyzer session finalized)")

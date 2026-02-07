@@ -350,6 +350,17 @@ class WebSocketClient {
           this.handleError(message.data);
           break;
 
+        case 'api_keys_updated':
+          // API KEY CONFIRMATION (2026-02-07):
+          // We handle this explicitly because the backend confirms when it
+          // receives API keys. Without this case, we log "Unknown message type"
+          // which can look like an error even though everything is fine.
+          // We route it through the status handler so the logging is consistent.
+          this.handleStatus({
+            message: message.data?.message || 'API keys updated successfully'
+          });
+          break;
+
         case 'status':
           this.handleStatus(message.data);
           break;
@@ -388,6 +399,21 @@ class WebSocketClient {
           // is running and recognition is active. Show the user that we're
           // now actively listening (mic pulse animation, status text, etc.)
           this.handleListeningActive(message.data);
+          break;
+        
+        // SINGLE-WORD UTTERANCE FEEDBACK (2026-02-07):
+        // The Swift helper detected speech energy followed by silence, but the
+        // SpeechAnalyzer didn't produce any transcription (Finding #11 from testing).
+        // This typically happens with very short utterances like "yes", "no", "ok"
+        // that fall within the analyzer's ~4-second processing window.
+        //
+        // PRODUCT IMPACT: Without this handler, the user says "yes" and gets
+        // zero feedback — no text appears, no response comes. That feels broken.
+        // With this handler, we show a brief, polite hint that encourages them
+        // to add a word or two, which the analyzer CAN reliably capture.
+        case 'speech_not_captured':
+          console.log('[WebSocketClient] Speech not captured:', message.data);
+          this.handleSpeechNotCaptured(message.data);
           break;
 
         default:
@@ -428,6 +454,54 @@ class WebSocketClient {
   handleListeningActive(data) {
     console.log('[WebSocketClient] ✅ Listening is active — audio engine confirmed running');
     this.app.handleListeningActive(data);
+  }
+
+  /**
+   * HANDLE SPEECH NOT CAPTURED (2026-02-07)
+   *
+   * Called when the Swift helper detected speech energy followed by silence
+   * but the SpeechAnalyzer produced no transcription results. This is the
+   * "single-word utterance" problem documented in Finding #11.
+   *
+   * WHAT WE DO:
+   * Show a brief, subtle hint in the input field that fades away.
+   * This gives the user feedback that we DID hear them, but couldn't
+   * transcribe what they said. The hint encourages them to speak more.
+   *
+   * PRODUCT DESIGN DECISION:
+   * We intentionally DON'T show a modal or alert. This is a gentle nudge,
+   * not an error state. The user is still in the flow of conversation.
+   *
+   * WHY NOT AUTO-RETRY:
+   * The analyzer already processed the audio and decided it wasn't enough
+   * to commit to a transcription. Replaying the same audio won't help.
+   * The user needs to provide more signal (speak more words).
+   *
+   * @param {Object} data - Data from backend
+   * @param {string} data.reason - Why speech wasn't captured
+   * @param {string} data.hint - User-facing hint text
+   */
+  handleSpeechNotCaptured(data) {
+    console.log('[WebSocketClient] Speech not captured:', data.reason);
+    
+    const inputField = this.app.elements.inputField;
+    if (inputField && !inputField.textContent.trim()) {
+      // Show a subtle placeholder-style hint that fades away after 3 seconds
+      inputField.textContent = data.hint || "Didn't catch that — try saying a bit more";
+      inputField.style.opacity = '0.4';
+      inputField.style.fontStyle = 'italic';
+      inputField.style.transition = 'opacity 0.3s ease-out';
+      
+      // Clear the hint after 3 seconds so the field is ready for new input
+      setTimeout(() => {
+        // Only clear if the hint text is still there (user hasn't spoken new text)
+        if (inputField.textContent === (data.hint || "Didn't catch that — try saying a bit more")) {
+          inputField.textContent = '';
+          inputField.style.opacity = '1.0';
+          inputField.style.fontStyle = 'normal';
+        }
+      }, 3000);
+    }
   }
 
   /**

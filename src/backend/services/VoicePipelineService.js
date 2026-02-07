@@ -16,10 +16,10 @@
  * This service spawns a Swift helper process to handle native APIs,
  * then communicates via IPC (stdin/stdout).
  * 
- * THREE-TIMER SYSTEM (ported from Accountability app):
- * - Timer 1 (0.5s): Start LLM processing (cached, not visible)
- * - Timer 2 (1.5s): Start TTS generation (uses cached LLM result)
- * - Timer 3 (2.0s): Start audio playback
+ * THREE-TIMER SYSTEM (ported from Accountability app, tuned 2026-02-07):
+ * - Timer 1 (1.2s): Start LLM processing (cached, not visible)
+ * - Timer 2 (2.2s): Start TTS generation (uses cached LLM result)
+ * - Timer 3 (3.2s): Start audio playback
  * 
  * This creates a buffered pipeline that feels instant while allowing
  * natural pauses in conversation without premature cutoffs.
@@ -709,7 +709,7 @@ class VoicePipelineService extends EventEmitter {
         // 
         // Accountability pattern:
         // 1. EVERY transcription (even empty partial) resets the silence timer
-        // 2. If no transcriptions come for 0.5s, LLM timer fires
+        // 2. If no transcriptions come for 1.2s, LLM timer fires (configurable)
         // 3. This creates natural turn detection based on actual silence
         //
         // This is fundamentally different from waiting for isFinal!
@@ -724,7 +724,7 @@ class VoicePipelineService extends EventEmitter {
         // evaluated to false — the silence timer was NEVER restarted from this transcription.
         //
         // BECAUSE: This caused the voice pipeline to go dead after interruptions.
-        // Timer 1 fires (0.5s pause between words), sets isInResponsePipeline=true.
+        // Timer 1 fires (1.2s pause between words), sets isInResponsePipeline=true.
         // Next word triggers interruption + clears state. But the silence timer doesn't
         // restart. No new timer cascade. User keeps speaking but backend ignores it.
         // STT appears to "hang" because transcriptions arrive but are never processed.
@@ -775,20 +775,21 @@ class VoicePipelineService extends EventEmitter {
         
         // TIMER-RESET PATTERN (from Accountability AI):
         // Reset the timer on EVERY transcription update. Timer only fires when
-        // updates STOP coming for 0.5s. This naturally handles:
+        // updates STOP coming for 1.2s (llmStart config). This naturally handles:
         // - New speech: Updates keep coming → Timer keeps resetting
-        // - Silence: Updates stop → Timer fires after 0.5s
+        // - Silence: Updates stop → Timer fires after 1.2s (+adaptive delay)
         // - Refinements: Still updates → Timer resets (doesn't matter!)
         // - Post-interruption: Pipeline was just cleared → Timer starts immediately
         //
-        // Apple's SFSpeechRecognizer sends updates continuously while user speaks.
-        // When user stops, updates stop. Timer fires 0.5s after last update.
+        // SpeechAnalyzer sends updates in bursts (Finding #2 from testing).
+        // Timer coalescing (50ms debounce) collapses burst resets into one cascade.
+        // When user stops, updates stop. Timer fires 1.2s after last burst.
         if (!isCurrentlyInPipeline) {
           const hasMeaningfulText = mergedTranscription.trim().length > 0;
           const hasExistingTranscription = (session.latestTranscription || '').trim().length > 0;
           if (hasMeaningfulText || hasExistingTranscription) {
             // Reset the timer on EVERY update (Accountability AI pattern)
-            // The timer will only fire if updates stop for 0.5s
+            // The timer will only fire if updates stop for 1.2s (+ adaptive delay)
             this.resetSilenceTimer(session);
           }
         }
@@ -804,13 +805,16 @@ class VoicePipelineService extends EventEmitter {
         session.isTTSPlaying = false;
         session.isInResponsePipeline = false;
         
-        // CRITICAL FIX (2026-01-23): Reset the transcription state after AI finishes speaking
-        // WHY: After the AI finishes, we need to be ready for the next user utterance
-        // BECAUSE: Without this, the next transcription will include text from before
-        // the AI started speaking, causing accumulation
-        // 
-        // PRODUCT CONTEXT: When AI finishes speaking, we're ready for a fresh user turn.
-        // Clear the transcription so the next utterance starts clean.
+        // RESET TRANSCRIPTION STATE AFTER AI FINISHES SPEAKING (2026-01-23, updated 2026-02-07):
+        //
+        // WHY: After the AI finishes, we need a clean slate for the next user turn.
+        // BECAUSE: SpeechAnalyzer accumulates text across a session (Finding #1 from
+        // turn detection testing). Without a reset, the next transcription will include
+        // leftover text from the previous utterance (e.g., "Thank you I want to order pizza"
+        // instead of just "I want to order pizza").
+        //
+        // PRODUCT CONTEXT: This is the conversational turn boundary. The AI just
+        // finished its response, now we listen fresh for the user's next utterance.
         session.latestTranscription = '';
         session.currentTranscription = '';
         session.textAtLastTimerReset = '';
@@ -819,15 +823,82 @@ class VoicePipelineService extends EventEmitter {
         session.lastTranscriptionAt = 0;
         session.awaitingSilenceConfirmation = false;
         
-        // CRITICAL: Tell Swift helper to reset the recognition session
-        // This ensures the next transcription starts completely fresh
-        // without any accumulated text from previous utterances
+        // CRITICAL: Tell Swift helper to reset the recognition session.
+        // This destroys the current SpeechAnalyzer instance and creates a fresh one.
+        // Validated by turn detection testing (Finding #1): SpeechAnalyzer accumulates
+        // all transcription text within a session, so we MUST reset between turns.
+        // The reset does: stopListeningAsync() → startListeningInternal() in Swift,
+        // which properly awaits analyzer finalization before starting clean.
         this.sendSwiftCommand(session, {
           type: 'reset_recognition',
           data: null
         });
         
         console.log('[VoicePipelineService] Transcription state reset and Swift recognition restarted after TTS ended');
+        break;
+      
+      // SINGLE-WORD FLUSH HANDLER (2026-02-07):
+      //
+      // The Swift helper sends this when it detects speech energy followed by
+      // sustained silence (~2.1 seconds). This addresses Finding #11 from our
+      // turn detection testing: single-word utterances like "yes", "no", "ok"
+      // RELIABLY produce ZERO transcription results because SpeechAnalyzer
+      // processes audio in ~4-second chunks. A 0.3-second word doesn't provide
+      // enough signal for the analyzer to commit to a transcription.
+      //
+      // HOW THIS HELPS:
+      // Without this, the user says "yes" and nothing happens:
+      //   - No transcription_update arrives → no timer cascade starts
+      //   - No visual feedback in the input field
+      //   - Turn hangs indefinitely until they speak more
+      //
+      // With this, when Swift detects "speech then silence":
+      //   - If we already have transcription text → start the timer cascade now
+      //     (the analyzer DID emit something, we just need to fire the response)
+      //   - If we have NO transcription text → the analyzer swallowed the word.
+      //     We notify the frontend so the user gets feedback ("I didn't catch that")
+      //     and reset to listen again.
+      //
+      // PRODUCT IMPACT: Users can say "yes" and get a response instead of silence.
+      case 'speech_energy_silence':
+        console.log('[VoicePipelineService] 🎤 Speech energy then silence detected by Swift VAD');
+        
+        const currentText = (session.latestTranscription || '').trim();
+        const hasText = currentText.length > 0;
+        const isIdle = !session.isInResponsePipeline && !session.isTTSPlaying && !session.isProcessingResponse;
+        
+        if (hasText && isIdle) {
+          // We have text and no timers are running — this means the transcription
+          // arrived but the timer cascade hasn't started yet (possible if updates
+          // came without triggering resetSilenceTimer). Start the cascade now.
+          console.log(`[VoicePipelineService] 🎤 Have text "${currentText}" but no active timers — starting timer cascade`);
+          this.resetSilenceTimer(session);
+        } else if (!hasText && isIdle) {
+          // The analyzer swallowed the utterance entirely. Let the user know.
+          console.log('[VoicePipelineService] 🎤 No transcription text despite speech energy — short utterance likely swallowed by analyzer');
+          
+          // Send a subtle notification to frontend that we detected speech
+          // but couldn't transcribe it. The frontend can show a brief hint.
+          if (this.server && this.server.connections) {
+            for (const ws of this.server.connections.values()) {
+              ws.send(JSON.stringify({
+                type: 'speech_not_captured',
+                data: {
+                  reason: 'short_utterance',
+                  hint: 'Try speaking a bit more — short responses like "yes" or "no" may need a follow-up word'
+                }
+              }));
+            }
+          }
+          
+          // Reset Swift recognition so it's clean for the next attempt
+          this.sendSwiftCommand(session, {
+            type: 'reset_recognition',
+            data: null
+          });
+        } else {
+          console.log(`[VoicePipelineService] 🎤 Speech energy silence detected but pipeline busy (inPipeline=${session.isInResponsePipeline}, tts=${session.isTTSPlaying}) — no action needed`);
+        }
         break;
 
       case 'recognition_restarted':
@@ -942,28 +1013,53 @@ class VoicePipelineService extends EventEmitter {
    * CRITICAL INSIGHT:
    * Silence is detected by ABSENCE of transcriptions, not by isFinal flag.
    * Every time we get a transcription, we reset the timer.
-   * If no transcriptions come for 0.5s, the LLM timer fires.
+   * If no transcriptions come for 1.2s, the LLM timer fires.
    * 
    * This creates natural turn detection based on actual silence in the audio stream.
+   * 
+   * TIMER COALESCING (2026-02-07):
+   * Testing revealed (Finding #2) that SpeechAnalyzer sends results in BURSTS —
+   * 10+ updates arriving within 1-2ms. Each call to resetSilenceTimer was:
+   *   1) Clearing all timers (clearAllTimers)
+   *   2) Creating 3 new timers (startTimerCascade)
+   * That's 30+ timer create/destroy cycles per burst, all redundant.
+   *
+   * FIX: Debounce the actual timer cascade creation with a short 50ms window.
+   * This collapses an entire burst into a single timer cascade start, which:
+   *   - Reduces overhead (30x fewer timer operations per burst)
+   *   - Ensures the timer window starts AFTER the last update in the burst
+   *     (more accurate silence detection)
+   *   - Still responds instantly to isolated updates (50ms is imperceptible)
    * 
    * @param {Object} session - Voice session
    */
   resetSilenceTimer(session) {
-    console.log(`[VoicePipelineService] Resetting silence timer for ${session.id}`);
-
-    // Update timing markers for this utterance
+    // Update timing markers for this utterance (always, no debounce)
     session.lastTranscriptionAt = Date.now();
     if (!session.firstTranscriptionAt) {
       session.firstTranscriptionAt = session.lastTranscriptionAt;
     }
     session.awaitingSilenceConfirmation = false;
     
-    // Clear any existing timers (like Accountability's timerManager.invalidateTimer())
+    // Clear any existing silence timers (like Accountability's timerManager.invalidateTimer())
     this.clearAllTimers(session);
     
-    // Start the timer cascade
-    // These timers will fire if no new transcriptions come in
-    this.startTimerCascade(session);
+    // DEBOUNCE TIMER CASCADE (2026-02-07):
+    // Instead of immediately starting the cascade (which gets thrashed by burst updates),
+    // schedule it with a 50ms delay. If another transcription arrives within 50ms,
+    // the previous schedule is cancelled and a new one starts.
+    // 50ms is chosen because:
+    //   - Burst updates arrive in <5ms, so 50ms collapses the entire burst
+    //   - 50ms is imperceptible to the user (no added latency to turn detection)
+    //   - The actual silence thresholds are 1200-3200ms, so 50ms is negligible
+    if (session._timerCoalesceTimeout) {
+      clearTimeout(session._timerCoalesceTimeout);
+    }
+    session._timerCoalesceTimeout = setTimeout(() => {
+      session._timerCoalesceTimeout = null;
+      console.log(`[VoicePipelineService] Starting timer cascade for ${session.id} (coalesced)`);
+      this.startTimerCascade(session);
+    }, 50);
   }
 
   /**
@@ -973,8 +1069,8 @@ class VoicePipelineService extends EventEmitter {
    * This is called after clearing existing timers in resetSilenceTimer.
    * 
    * TIMER CASCADE:
-   * 1. 0.5s: Start LLM processing (cached, user doesn't see this yet)
-   * 2. 1.5s: Start TTS generation (uses cached LLM result)
+   * 1. 1.2s: Start LLM processing (cached, user doesn't see this yet)
+   * 2. 2.2s: Start TTS generation (uses cached LLM result)
    * 3. 2.0s: Start audio playback (uses cached TTS result)
    * 
    * If user speaks again before any timer fires, all timers are cleared
@@ -986,7 +1082,7 @@ class VoicePipelineService extends EventEmitter {
     console.log(`[VoicePipelineService] Starting timer cascade for ${session.id}`);
     
     // CRITICAL: Do NOT set isInResponsePipeline here!
-    // We only set it when the LLM timer actually fires (after 0.5s of silence)
+    // We only set it when the LLM timer actually fires (after 1.2s+ of silence)
     // This prevents false interruption detection while user is still speaking
 
     // ADAPTIVE SILENCE BUFFER (2026-02-07):
@@ -995,8 +1091,9 @@ class VoicePipelineService extends EventEmitter {
     // briefly pauses mid-sentence (no partial updates for a moment).
     //
     // WHY: Users reported messages sending before they finished speaking.
-    // BECAUSE: Apple STT can go quiet for >0.5s mid-utterance, which
-    // our previous timers interpreted as "silence".
+    // BECAUSE: SpeechAnalyzer processes audio in ~4-second chunks (Finding #10)
+    // and results arrive in bursts (Finding #2), creating gaps >1s mid-utterance
+    // that our timers could misinterpret as silence.
     const currentText = (session.latestTranscription || '').trim();
     const wordCount = currentText.length > 0 ? currentText.split(/\s+/).length : 0;
     let adaptiveDelayMs = 0;
@@ -1281,23 +1378,24 @@ class VoicePipelineService extends EventEmitter {
       session.isTTSPlaying = false;
     }
     
-    // CRITICAL (2026-02-06): Reset recognition on interruption for accuracy
+    // CRITICAL (2026-02-06, updated 2026-02-07): Reset recognition on interruption
     //
-    // WHY: When the user interrupts the AI, the recognition session may have
-    // been running for a while (the entire AI response duration). The accumulated
-    // internal state in SFSpeechRecognizer can cause the interrupting speech
-    // to be transcribed less accurately.
+    // WHY: SpeechAnalyzer accumulates all transcription text within a session
+    // (Finding #1 from turn detection testing). When the user interrupts, we
+    // need a clean session so the interrupting speech doesn't get merged with
+    // the pre-interruption text.
     //
     // WHAT THIS DOES: Tells the Swift helper to tear down the current
-    // recognition task and create a fresh one. This ensures the interrupting
-    // user's speech is recognized with a clean slate.
+    // SpeechAnalyzer instance and create a fresh one. This calls
+    // stopListeningAsync() → startListeningInternal() which properly
+    // awaits analyzer finalization before starting clean.
     //
     // TIMING: We do this AFTER stopping TTS so the restart doesn't race
     // with the audio pipeline changes from stopping playback.
     //
     // PRODUCT CONTEXT: If a user interrupts mid-AI-response with "wait, actually..."
     // we want "wait, actually" to be captured with maximum accuracy. A fresh
-    // recognition session helps ensure that.
+    // SpeechAnalyzer session gives us a clean transcription slate.
     this.sendSwiftCommand(session, {
       type: 'reset_recognition',
       data: null
@@ -1331,6 +1429,13 @@ class VoicePipelineService extends EventEmitter {
     if (session.silenceTimers.confirm) {
       clearTimeout(session.silenceTimers.confirm);
       session.silenceTimers.confirm = null;
+    }
+    
+    // TIMER COALESCING (2026-02-07): Also clear the debounce timeout
+    // that batches burst updates before starting the timer cascade.
+    if (session._timerCoalesceTimeout) {
+      clearTimeout(session._timerCoalesceTimeout);
+      session._timerCoalesceTimeout = null;
     }
   }
 

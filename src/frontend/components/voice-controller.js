@@ -12,7 +12,7 @@
  * 
  * ARCHITECTURE NOTE:
  * The actual speech recognition happens on the backend using
- * Apple's native APIs (SFSpeechRecognizer). This frontend controller
+ * Apple's native SpeechAnalyzer API (macOS 26+). This frontend controller
  * just manages the UI state and communicates with the backend.
  * 
  * WHY BACKEND PROCESSING:
@@ -59,7 +59,7 @@ class VoiceController {
    * 
    * FLOW:
    * 1. Frontend sends 'start_listening' command to backend
-   * 2. Backend starts Apple SFSpeechRecognizer
+   * 2. Backend starts Apple SpeechAnalyzer (via Swift helper)
    * 3. Backend streams transcription back to frontend
    * 4. Frontend displays transcription in real-time
    */
