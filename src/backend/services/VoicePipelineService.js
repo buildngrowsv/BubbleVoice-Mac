@@ -79,9 +79,9 @@ class VoicePipelineService extends EventEmitter {
     // Timer configuration (in milliseconds)
     // These values are from the Accountability app's battle-tested system
     this.timerConfig = {
-      llmStart: 500,    // 0.5s - Start LLM processing
-      ttsStart: 1500,   // 1.5s - Start TTS generation
-      playbackStart: 2000  // 2.0s - Start audio playback
+      llmStart: 1200,    // 1.2s - Start LLM processing (slower to avoid mid-sentence cutoff)
+      ttsStart: 2200,    // 2.2s - Start TTS generation (buffered for natural pauses)
+      playbackStart: 3200  // 3.2s - Start audio playback (prevents premature send)
     };
     
     // CRITICAL: Track playback state for interruption detection
@@ -116,6 +116,224 @@ class VoicePipelineService extends EventEmitter {
     this._ensureSwiftHelper().catch(err => {
       console.error('[VoicePipelineService] Failed to pre-warm Swift helper:', err);
     });
+  }
+
+  /**
+   * MERGE TRANSCRIPTION TEXT
+   *
+   * Normalizes speech recognition updates into a single growing utterance.
+   *
+   * WHY THIS EXISTS:
+   * Apple speech recognition sometimes restarts or emits short fragments.
+   * When that happens, `text` can regress from a full sentence to a single
+   * word. If we overwrite the session text each time, the final user message
+   * becomes just the last fragment ("Fly"), which is what you're seeing.
+   *
+   * BECAUSE:
+   * We rely on silence-based timers, not isFinal, so we must preserve
+   * the full utterance across recognition resets and partial updates.
+   *
+   * @param {string} currentText - The current accumulated transcription
+   * @param {string} incomingText - The latest transcription update
+   * @returns {string} The merged, normalized transcription
+   */
+  mergeTranscriptionText(currentText, incomingText) {
+    const current = (currentText || '').trim();
+    const incoming = (incomingText || '').trim();
+
+    if (!incoming) return current;
+    if (!current) return incoming;
+
+    // Common case: recognizer provides a longer cumulative string.
+    if (incoming.startsWith(current)) {
+      return incoming;
+    }
+
+    // If the incoming text is shorter but already contained, keep current.
+    if (current.includes(incoming)) {
+      return current;
+    }
+
+    // Otherwise, treat as a new segment (recognizer restart) and append.
+    return `${current} ${incoming}`.trim();
+  }
+
+  /**
+   * NORMALIZE TEXT FOR ECHO COMPARISON
+   *
+   * We compare short transcription fragments against the AI's spoken text
+   * to detect microphone echo. This normalization strips punctuation and
+   * collapses whitespace so small fragments ("it", "it looks") match even
+   * if the recognizer inserts or removes punctuation.
+   *
+   * @param {string} text - Raw text to normalize
+   * @returns {string} Normalized text (lowercase, whitespace-collapsed)
+   */
+  normalizeTextForEchoComparison(text) {
+    return (text || '')
+      .toLowerCase()
+      .replace(/[\u2018\u2019']/g, '') // normalize apostrophes
+      .replace(/[^a-z0-9\s]/g, ' ') // remove punctuation but keep alphanumerics
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  /**
+   * DETECT LIKELY ECHO FRAGMENT
+   *
+   * This is a heuristic that tries to answer: "Is this transcription
+   * probably the AI's TTS being picked up by the mic?"
+   *
+   * We only classify as echo if:
+   * - The AI is actively speaking, AND
+   * - The fragment is SHORT or looks like a PREFIX of the spoken text, AND
+   * - The fragment is contained in (or aligned with) the AI's spoken text.
+   *
+   * IMPORTANT REFINEMENT (2026-02-07):
+   * We saw echo fragments like "It looks like" — longer than 1-2 words —
+   * still causing interruptions. We now treat short PREFIX matches as echo,
+   * because TTS bleed often captures the first few words of the AI reply.
+   *
+   * If the fragment is longer or clearly not part of the AI's speech,
+   * we treat it as a real user interruption.
+   *
+   * @param {string} incomingText - Current transcription fragment
+   * @param {string} lastSpokenText - Last TTS text sent to Swift
+   * @returns {boolean} True if likely echo
+   */
+  isLikelyEchoFragment(incomingText, lastSpokenText) {
+    const incomingNormalized = this.normalizeTextForEchoComparison(incomingText);
+    const spokenNormalized = this.normalizeTextForEchoComparison(lastSpokenText);
+
+    if (!incomingNormalized || !spokenNormalized) return false;
+
+    // Short fragments are the most likely echo candidates.
+    const isShortFragment = incomingNormalized.length <= 18;
+    const isPrefixFragment = spokenNormalized.startsWith(incomingNormalized);
+
+    // Count words for a more human-aligned cutoff.
+    const incomingWordCount = incomingNormalized.split(' ').filter(Boolean).length;
+    const isShortWordCount = incomingWordCount <= 5;
+
+    // Only treat as echo if it's short OR a short prefix.
+    if (!isShortFragment && !(isPrefixFragment && isShortWordCount)) {
+      return false;
+    }
+
+    return spokenNormalized.includes(incomingNormalized);
+  }
+
+  /**
+   * SHOULD IGNORE ECHO TRANSCRIPTION
+   *
+   * Decides whether to ignore a transcription update because it is likely
+   * the AI's voice being picked up by the microphone.
+   *
+   * WHY THIS MATTERS:
+   * Echo transcriptions were triggering the interruption logic and restarting
+   * the timer cascade mid-response. That creates a "choppy" feel and causes
+   * tiny user messages like "It" to appear while the AI is speaking.
+   *
+   * BECAUSE:
+   * The macOS `say` TTS can leak into the mic if the user has open speakers
+   * or a sensitive microphone. We need a defensive, heuristic filter.
+   *
+   * @param {Object} session - Voice session state
+   * @param {string} incomingText - Transcription update text
+   * @param {boolean} swiftIsSpeaking - Whether Swift reports TTS is speaking
+   * @returns {boolean} True if we should ignore this update
+   */
+  shouldIgnoreEchoTranscription(session, incomingText, swiftIsSpeaking) {
+    if (!swiftIsSpeaking) return false;
+
+    const trimmed = (incomingText || '').trim();
+    if (!trimmed) return true;
+
+    const timeSinceSpoken = Date.now() - (session.lastSpokenAt || 0);
+
+    // Only apply echo suppression shortly after we started speaking.
+    // We extend the window a bit because "say" playback can lag on longer
+    // responses, and the mic can keep picking up the tail end.
+    if (timeSinceSpoken > 7000) return false;
+
+    const lastSpoken = session.lastSpokenText || '';
+
+    // If this fragment is clearly part of the AI's spoken text, ignore it.
+    if (this.isLikelyEchoFragment(trimmed, lastSpoken)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * SCHEDULE FRONTEND TRANSCRIPTION UPDATE
+   *
+   * Debounces transcription updates to the UI to avoid "choppy" flicker.
+   * We still process every update for timer logic, but only emit to the
+   * frontend at a controlled cadence.
+   *
+   * DESIGN CHOICE:
+   * - Send immediately if `isFinal` or if we've waited too long.
+   * - Otherwise, delay slightly to coalesce rapid partial updates.
+   *
+   * @param {Object} session - Voice session state
+   * @param {string} text - Merged transcription text
+   * @param {boolean} isFinal - Whether this is a final update
+   */
+  scheduleFrontendTranscriptionUpdate(session, text, isFinal) {
+    if (!session || !session.transcriptionCallback) return;
+
+    const now = Date.now();
+    const lastSentAt = session.lastFrontendTranscriptionSentAt || 0;
+    const timeSinceLast = now - lastSentAt;
+
+    // If text hasn't changed and it's not final, don't spam the UI.
+    if (!isFinal && text === session.lastFrontendTranscriptionText) {
+      return;
+    }
+
+    // Store pending update so the timer can flush the latest.
+    session.pendingFrontendTranscriptionText = text;
+    session.pendingFrontendTranscriptionIsFinal = isFinal;
+
+    const minIntervalMs = 260;
+    const maxWaitMs = 650;
+
+    const shouldSendImmediately = isFinal || timeSinceLast >= maxWaitMs;
+
+    if (shouldSendImmediately) {
+      if (session.pendingFrontendTranscriptionTimer) {
+        clearTimeout(session.pendingFrontendTranscriptionTimer);
+        session.pendingFrontendTranscriptionTimer = null;
+      }
+
+      session.transcriptionCallback({
+        text: session.pendingFrontendTranscriptionText,
+        isFinal: session.pendingFrontendTranscriptionIsFinal
+      });
+
+      session.lastFrontendTranscriptionText = session.pendingFrontendTranscriptionText;
+      session.lastFrontendTranscriptionSentAt = Date.now();
+      return;
+    }
+
+    if (session.pendingFrontendTranscriptionTimer) {
+      return;
+    }
+
+    const delay = Math.max(40, minIntervalMs - timeSinceLast);
+    session.pendingFrontendTranscriptionTimer = setTimeout(() => {
+      session.pendingFrontendTranscriptionTimer = null;
+
+      session.transcriptionCallback({
+        text: session.pendingFrontendTranscriptionText,
+        isFinal: session.pendingFrontendTranscriptionIsFinal
+      });
+
+      session.lastFrontendTranscriptionText = session.pendingFrontendTranscriptionText;
+      session.lastFrontendTranscriptionSentAt = Date.now();
+    }, delay);
   }
 
   /**
@@ -276,7 +494,8 @@ class VoicePipelineService extends EventEmitter {
       silenceTimers: {
         llm: null,
         tts: null,
-        playback: null
+        playback: null,
+        confirm: null
       },
       cachedResponses: {
         llm: null,
@@ -294,7 +513,38 @@ class VoicePipelineService extends EventEmitter {
       // CANCELLATION FLAG (2026-02-06): Set to true when voice is stopped.
       // Timer 3's polling loop checks this to abort early, preventing
       // stale LLM calls and duplicate messages after the user stops voice.
-      isCancelled: false
+      isCancelled: false,
+      // FRONTEND TRANSCRIPTION SMOOTHING (2026-02-07):
+      // We don't want to spam the frontend with every single partial result.
+      // The STT can update every ~100ms (sometimes faster), which makes the
+      // UI feel jittery and "choppy". We debounce outgoing updates so the
+      // UI sees a smoother, more legible stream of text.
+      //
+      // IMPORTANT: This does NOT change the backend's timer logic. We still
+      // use EVERY transcription update to reset the silence timers. This is
+      // purely a presentation smoothing layer for the UI.
+      lastFrontendTranscriptionText: '',
+      lastFrontendTranscriptionSentAt: 0,
+      pendingFrontendTranscriptionText: '',
+      pendingFrontendTranscriptionIsFinal: false,
+      pendingFrontendTranscriptionTimer: null,
+      // TURN BOUNDARY TRACKING (2026-02-07):
+      // We track when we first heard speech in the current utterance and
+      // when we last received any transcription update. This lets us
+      // enforce minimum utterance duration and a two-step silence check
+      // before sending a message.
+      firstTranscriptionAt: 0,
+      lastTranscriptionAt: 0,
+      awaitingSilenceConfirmation: false,
+      // ECHO SUPPRESSION (2026-02-07):
+      // When the AI speaks, the microphone can pick up TTS audio.
+      // That echo can be misclassified as user speech and triggers
+      // interruption + new timer cascades, which creates "choppy" turns.
+      //
+      // We store the last TTS text + timestamp so we can ignore tiny
+      // echo fragments that match the AI's spoken words.
+      lastSpokenText: '',
+      lastSpokenAt: 0
     };
 
     try {
@@ -398,8 +648,61 @@ class VoicePipelineService extends EventEmitter {
         const isFinal = response.data?.isFinal || false;
         const swiftIsSpeaking = response.data?.isSpeaking || false;
         
-        // Log transcription for debugging
-        console.log(`[VoicePipelineService] Transcription: "${text}" (final: ${isFinal}, swiftSpeaking: ${swiftIsSpeaking})`);
+        // AUDIO TIMESTAMPS (2026-02-07):
+        // The Swift helper now sends audioStartTime and audioEndTime with each
+        // transcription, representing when in the audio stream the speech occurred.
+        // These are in seconds relative to the start of the listening session.
+        // A value of -1 means "not available" (e.g., no audioTimeRange attribute).
+        //
+        // WHY THIS MATTERS:
+        // Previously, we measured silence using Date.now() (wall-clock time of
+        // when the IPC message arrived). This has ~50-200ms of jitter from:
+        //   - Audio buffer processing delay
+        //   - AVAudioConverter overhead
+        //   - IPC serialization (JSON encode -> stdout -> read -> parse)
+        //   - Node.js event loop scheduling
+        //
+        // Audio timestamps are computed from the actual audio stream position,
+        // which is more accurate and consistent. We use them to:
+        //   1) Track the actual audio time of the last spoken word
+        //   2) Correlate with TTS playback timing for better echo suppression
+        //   3) Potentially improve silence detection precision in the future
+        const audioStartTime = response.data?.audioStartTime ?? -1;
+        const audioEndTime = response.data?.audioEndTime ?? -1;
+        
+        // TURN TRACKING (2026-02-07):
+        // Record when we last received any transcription update, and
+        // set the start time for the current utterance if this is the
+        // first update after silence.
+        session.lastTranscriptionAt = Date.now();
+        if (!session.firstTranscriptionAt) {
+          session.firstTranscriptionAt = session.lastTranscriptionAt;
+        }
+        session.awaitingSilenceConfirmation = false;
+        
+        // AUDIO TIMELINE TRACKING (2026-02-07):
+        // Store the audio-stream-relative timestamps alongside the wall-clock
+        // timestamps. These are used by the echo suppression and can be used
+        // in the future for more precise silence detection.
+        if (audioEndTime > 0) {
+          session.lastAudioEndTime = audioEndTime;
+          if (!session.firstAudioStartTime || session.firstAudioStartTime < 0) {
+            session.firstAudioStartTime = audioStartTime;
+          }
+        }
+        
+        // Log transcription for debugging (now includes audio timestamps)
+        const audioInfo = audioEndTime > 0 ? `, audio: ${audioStartTime.toFixed(2)}-${audioEndTime.toFixed(2)}s` : '';
+        console.log(`[VoicePipelineService] Transcription: "${text}" (final: ${isFinal}, swiftSpeaking: ${swiftIsSpeaking}${audioInfo})`);
+
+        // ECHO SUPPRESSION CHECK (2026-02-07):
+        // If the AI is speaking and this looks like a short echo fragment,
+        // ignore it entirely so we don't trigger interruptions or timer resets.
+        // This keeps the conversation flow smooth and prevents "choppy" turns.
+        if (this.shouldIgnoreEchoTranscription(session, text, swiftIsSpeaking)) {
+          console.log('[VoicePipelineService] 🔇 Ignoring likely echo transcription while AI is speaking');
+          return;
+        }
         
         // CRITICAL FIX (2026-01-23): Implement Accountability's TIMER-RESET pattern
         // The key insight: Silence is detected by ABSENCE of transcriptions, not by isFinal
@@ -431,7 +734,7 @@ class VoicePipelineService extends EventEmitter {
         // backend is ready to process the next user utterance without waiting for another
         // transcription update.
         const hasActiveTimersBefore = session.silenceTimers.llm || session.silenceTimers.tts || session.silenceTimers.playback;
-        const wasInResponsePipeline = session.isInResponsePipeline || session.isTTSPlaying || hasActiveTimersBefore;
+        const wasInResponsePipeline = session.isInResponsePipeline || session.isTTSPlaying || swiftIsSpeaking || hasActiveTimersBefore;
         
         // Check for interruption if we're in response pipeline
         if (wasInResponsePipeline && text.trim().length > 0) {
@@ -444,16 +747,31 @@ class VoicePipelineService extends EventEmitter {
           this.handleSpeechDetected(session);
         }
         
-        // Send transcription to frontend
-        if (session.transcriptionCallback) {
-          session.transcriptionCallback(response.data);
+        // Merge transcription to avoid "one word per update" regressions
+        // (e.g., after recognition restarts or short-fragment updates).
+        const mergedTranscription = this.mergeTranscriptionText(
+          session.currentTranscription,
+          text
+        );
+        session.currentTranscription = mergedTranscription;
+
+        // Keep latestTranscription aligned with the merged full utterance.
+        if (mergedTranscription.trim().length > 0) {
+          session.latestTranscription = mergedTranscription;
         }
+
+        // Send transcription to frontend (debounced for smoother UI)
+        this.scheduleFrontendTranscriptionUpdate(
+          session,
+          mergedTranscription,
+          isFinal
+        );
         
         // RE-EVALUATE pipeline state AFTER interruption handler may have cleared it.
         // This is the critical fix — we check the CURRENT session state, not the stale
         // local variable from before the interruption.
         const hasActiveTimersAfter = session.silenceTimers.llm || session.silenceTimers.tts || session.silenceTimers.playback;
-        const isCurrentlyInPipeline = session.isInResponsePipeline || session.isTTSPlaying || hasActiveTimersAfter;
+        const isCurrentlyInPipeline = session.isInResponsePipeline || session.isTTSPlaying || swiftIsSpeaking || hasActiveTimersAfter;
         
         // TIMER-RESET PATTERN (from Accountability AI):
         // Reset the timer on EVERY transcription update. Timer only fires when
@@ -465,13 +783,14 @@ class VoicePipelineService extends EventEmitter {
         //
         // Apple's SFSpeechRecognizer sends updates continuously while user speaks.
         // When user stops, updates stop. Timer fires 0.5s after last update.
-        if (!isCurrentlyInPipeline && text.trim().length > 0) {
-          // Update the latest transcription
-          session.latestTranscription = text;
-          
-          // Reset the timer on EVERY update (Accountability AI pattern)
-          // The timer will only fire if updates stop for 0.5s
-          this.resetSilenceTimer(session);
+        if (!isCurrentlyInPipeline) {
+          const hasMeaningfulText = mergedTranscription.trim().length > 0;
+          const hasExistingTranscription = (session.latestTranscription || '').trim().length > 0;
+          if (hasMeaningfulText || hasExistingTranscription) {
+            // Reset the timer on EVERY update (Accountability AI pattern)
+            // The timer will only fire if updates stop for 0.5s
+            this.resetSilenceTimer(session);
+          }
         }
         break;
 
@@ -496,6 +815,9 @@ class VoicePipelineService extends EventEmitter {
         session.currentTranscription = '';
         session.textAtLastTimerReset = '';
         session.isProcessingResponse = false;
+        session.firstTranscriptionAt = 0;
+        session.lastTranscriptionAt = 0;
+        session.awaitingSilenceConfirmation = false;
         
         // CRITICAL: Tell Swift helper to reset the recognition session
         // This ensures the next transcription starts completely fresh
@@ -570,6 +892,17 @@ class VoicePipelineService extends EventEmitter {
     // Clear all timers
     this.clearAllTimers(session);
 
+    // Clear any pending frontend transcription updates
+    if (session.pendingFrontendTranscriptionTimer) {
+      clearTimeout(session.pendingFrontendTranscriptionTimer);
+      session.pendingFrontendTranscriptionTimer = null;
+    }
+    session.pendingFrontendTranscriptionText = '';
+    session.pendingFrontendTranscriptionIsFinal = false;
+    session.firstTranscriptionAt = 0;
+    session.lastTranscriptionAt = 0;
+    session.awaitingSilenceConfirmation = false;
+
     // Send stop command to Swift helper — but DON'T kill the process!
     // SINGLETON PATTERN (2026-02-06): The Swift helper stays alive for instant
     // re-use next time. Only send stop_listening to pause recognition.
@@ -617,6 +950,13 @@ class VoicePipelineService extends EventEmitter {
    */
   resetSilenceTimer(session) {
     console.log(`[VoicePipelineService] Resetting silence timer for ${session.id}`);
+
+    // Update timing markers for this utterance
+    session.lastTranscriptionAt = Date.now();
+    if (!session.firstTranscriptionAt) {
+      session.firstTranscriptionAt = session.lastTranscriptionAt;
+    }
+    session.awaitingSilenceConfirmation = false;
     
     // Clear any existing timers (like Accountability's timerManager.invalidateTimer())
     this.clearAllTimers(session);
@@ -649,39 +989,128 @@ class VoicePipelineService extends EventEmitter {
     // We only set it when the LLM timer actually fires (after 0.5s of silence)
     // This prevents false interruption detection while user is still speaking
 
-    // Timer 1: Start LLM processing (0.5s)
-    // This happens in the background, user doesn't see anything yet
-    session.silenceTimers.llm = setTimeout(async () => {
-      console.log(`[VoicePipelineService] Timer 1 (LLM) fired for ${session.id} - 0.5s of actual silence detected!`);
-      
-      // CANCELLATION CHECK (2026-02-06)
-      if (session.isCancelled) {
-        console.log('[VoicePipelineService] ⛔ Timer 1 aborted — session was cancelled');
-        return;
-      }
-      
-      // CRITICAL: NOW we enter the response pipeline
-      // This is when we've detected 0.5s of actual silence
+    // ADAPTIVE SILENCE BUFFER (2026-02-07):
+    // If the user only spoke a few words, we wait a little longer before
+    // triggering the LLM. This reduces "premature send" when the recognizer
+    // briefly pauses mid-sentence (no partial updates for a moment).
+    //
+    // WHY: Users reported messages sending before they finished speaking.
+    // BECAUSE: Apple STT can go quiet for >0.5s mid-utterance, which
+    // our previous timers interpreted as "silence".
+    const currentText = (session.latestTranscription || '').trim();
+    const wordCount = currentText.length > 0 ? currentText.split(/\s+/).length : 0;
+    let adaptiveDelayMs = 0;
+    if (wordCount <= 3) {
+      adaptiveDelayMs = 600;
+    } else if (wordCount <= 6) {
+      adaptiveDelayMs = 300;
+    }
+
+    const llmDelay = this.timerConfig.llmStart + adaptiveDelayMs;
+    const ttsDelay = this.timerConfig.ttsStart + adaptiveDelayMs;
+    const playbackDelay = this.timerConfig.playbackStart + adaptiveDelayMs;
+    const ttsDelayFromLlm = Math.max(0, ttsDelay - llmDelay);
+    const playbackDelayFromLlm = Math.max(0, playbackDelay - llmDelay);
+    const confirmWindowMs = 800;
+    const minUtteranceMs = 1800;
+
+    const runLlmProcessing = async () => {
       session.isInResponsePipeline = true;
-      
-      // Check if already processing (prevent duplicate calls)
+
       if (session.isProcessingResponse) {
         console.log('[VoicePipelineService] Already processing response, skipping LLM');
         return;
       }
-      
+
       session.isProcessingResponse = true;
-      
-      // Start LLM processing
-      // Cache the result but don't show it yet
+
+      session.silenceTimers.tts = setTimeout(async () => {
+        console.log(`[VoicePipelineService] Timer 2 (TTS) fired for ${session.id}`);
+        if (!session.isInResponsePipeline) {
+          console.log('[VoicePipelineService] Timer 2 cancelled by interruption');
+          return;
+        }
+        console.log('[VoicePipelineService] TTS will be generated in Timer 3 (playback)');
+      }, ttsDelayFromLlm);
+
+      session.silenceTimers.playback = setTimeout(async () => {
+        console.log(`[VoicePipelineService] Timer 3 (Playback) fired for ${session.id}`);
+        if (session.isCancelled) {
+          console.log('[VoicePipelineService] ⛔ Timer 3 aborted at entry — session was cancelled');
+          return;
+        }
+
+        const maxWaitTime = 10000;
+        const pollInterval = 200;
+        const startTime = Date.now();
+
+        while (!session.cachedResponses.llm && (Date.now() - startTime) < maxWaitTime) {
+          if (session.isCancelled) {
+            console.log('[VoicePipelineService] ⛔ Timer 3 aborted during polling — session was cancelled');
+            return;
+          }
+          await new Promise(resolve => setTimeout(resolve, pollInterval));
+        }
+
+        if (session.cachedResponses.llm) {
+          const responseText = (session.cachedResponses.llm.text || '').trim();
+          console.log('[VoicePipelineService] Sending messages to frontend');
+          this.sendUserMessageToFrontend(session, session.latestTranscription);
+
+          if (responseText.length > 0) {
+            this.sendResponseToFrontend(session, session.cachedResponses.llm);
+          } else {
+            console.warn('[VoicePipelineService] ⚠️ LLM returned empty text — not sending blank AI response');
+            if (this.server && this.server.connections) {
+              for (const [ws, connectionState] of this.server.connections) {
+                if (connectionState.id === session.id) {
+                  this.server.sendMessage(ws, {
+                    type: 'error',
+                    data: { message: 'AI response was empty. Please try again.' }
+                  });
+                  break;
+                }
+              }
+            }
+          }
+
+          this.sendSwiftCommand(session, {
+            type: 'reset_recognition',
+            data: null
+          });
+          console.log('[VoicePipelineService] Sent reset_recognition at turn completion (before TTS playback)');
+
+          if (responseText.length > 0) {
+            session.isTTSPlaying = true;
+            this.generateTTS(responseText, session.settings, session);
+          } else {
+            console.log('[VoicePipelineService] Skipping TTS for empty response — resetting pipeline immediately');
+            session.isTTSPlaying = false;
+            session.isInResponsePipeline = false;
+            session.latestTranscription = '';
+            session.currentTranscription = '';
+            session.textAtLastTimerReset = '';
+            session.isProcessingResponse = false;
+            session.firstTranscriptionAt = 0;
+            session.lastTranscriptionAt = 0;
+            session.awaitingSilenceConfirmation = false;
+          }
+        } else {
+          console.error('[VoicePipelineService] Timer 3 timed out waiting for LLM response');
+          this.sendUserMessageToFrontend(session, session.latestTranscription);
+          if (session.sendToFrontend) {
+            session.sendToFrontend({
+              type: 'error',
+              data: { message: 'AI response timed out. Please try again.' }
+            });
+          }
+        }
+      }, playbackDelayFromLlm);
+
       try {
         console.log(`[VoicePipelineService] Processing transcription: "${session.latestTranscription}"`);
-        
-        // LAZY INIT GUARD (2026-02-06): If services weren't available from server
-        // at construction time (e.g., in tests), create them now as fallback.
-        // In normal operation, these come from BackendServer's shared instances.
+
         if (!this.llmService) {
-          // UPDATED (2026-02-06): Use UnifiedLLMService (Vercel AI SDK) instead of old LLMService
           const UnifiedLLMService = require('./UnifiedLLMService');
           this.llmService = new UnifiedLLMService();
           console.warn('[VoicePipelineService] Created fallback UnifiedLLMService (not using server shared instance)');
@@ -691,39 +1120,29 @@ class VoicePipelineService extends EventEmitter {
           this.conversationService = new ConversationService();
           console.warn('[VoicePipelineService] Created fallback ConversationService (not using server shared instance)');
         }
-        
-        // Get or create conversation for this session
+
         let conversation = session.conversation;
         if (!conversation) {
           conversation = await this.conversationService.createConversation();
           session.conversation = conversation;
-          
-          // CRITICAL FIX: Notify frontend about new conversation
-          // WHY: The sidebar needs to know about voice-created conversations
-          // BECAUSE: Without this event, conversations are "invisible" in the UI
-          // HISTORY: Bug discovered 2026-01-24 via comprehensive testing
           this.sendConversationCreatedToFrontend(session, conversation);
         }
-        
-        // Add user message to conversation history
+
         await this.conversationService.addMessage(conversation.id, {
           role: 'user',
           content: session.latestTranscription,
           timestamp: Date.now()
         });
-        
-        // Generate AI response using LLM service
-        // This will stream the response, but we'll collect it all for caching
+
         let fullResponse = '';
         let bubbles = [];
         let artifact = null;
-        
+
         await this.llmService.generateResponse(
           conversation,
           session.settings || {},
           {
             onChunk: (chunk) => {
-              // Accumulate chunks for caching
               fullResponse += chunk;
             },
             onBubbles: (generatedBubbles) => {
@@ -734,236 +1153,84 @@ class VoicePipelineService extends EventEmitter {
             }
           }
         );
-        
-        // Cache the complete response
+
         session.cachedResponses.llm = {
           text: fullResponse,
           bubbles: bubbles,
           artifact: artifact
         };
-        
+
         console.log(`[VoicePipelineService] LLM response cached: "${fullResponse.substring(0, 50)}..."`);
-        
-        // CRITICAL FIX (2026-01-24): Save AI response to conversation history
-        // WHY: Without this, the AI forgets what IT said in previous turns!
-        // BECAUSE: The conversation.messages array only had user messages, not assistant responses.
-        // This caused the AI to lose context of the entire conversation flow.
-        // 
-        // EXAMPLE OF THE BUG:
-        // - User: "show me a timeline" → AI: "What kind?" (not saved)
-        // - User: "pick one" → AI sees only user messages, doesn't know it asked "What kind?"
-        // - AI responds as if starting fresh: "Hello! What would you like to explore?"
-        //
-        // THE FIX:
-        // After generating the response, add it to conversation.messages so the AI
-        // can see its own previous responses when processing the next user message.
-        //
-        // HISTORY: Bug discovered from user screenshot showing AI repeatedly forgetting context.
+
         await this.conversationService.addMessage(conversation.id, {
           role: 'assistant',
           content: fullResponse,
           timestamp: Date.now()
         });
-        
+
         console.log(`[VoicePipelineService] AI response saved to conversation history`);
-        
       } catch (error) {
         console.error('[VoicePipelineService] Error in LLM processing:', error);
-        
-        // Fallback to a simple error response
+
         session.cachedResponses.llm = {
           text: "I'm having trouble processing that right now. Could you try again?",
           bubbles: ['try again?', 'tell me more'],
           artifact: null
         };
-        
+
         session.isProcessingResponse = false;
       }
-    }, this.timerConfig.llmStart);
+    };
 
-    // Timer 2: Start TTS generation (1.5s)
-    // Uses the cached LLM result from Timer 1
-    // 
-    // WHY THIS TIMER:
-    // We pre-generate TTS before playback so it's ready when Timer 3 fires.
-    // This reduces the perceived latency - by the time the user sees the response,
-    // the audio is already generated and ready to play.
-    // 
-    // TECHNICAL NOTE:
-    // We don't actually need to cache TTS audio because the Swift helper
-    // generates and plays it in one step. This timer is mainly for consistency
-    // with the three-timer pattern and could be used for pre-generation in the future.
-    session.silenceTimers.tts = setTimeout(async () => {
-      console.log(`[VoicePipelineService] Timer 2 (TTS) fired for ${session.id}`);
-      
-      // Check if we were interrupted before timer fired
-      if (!session.isInResponsePipeline) {
-        console.log('[VoicePipelineService] Timer 2 cancelled by interruption');
-        return;
-      }
-      
-      // TTS generation happens in Timer 3 when we call generateTTS()
-      // This timer is kept for consistency with the three-timer pattern
-      // and for potential future pre-generation optimization
-      console.log('[VoicePipelineService] TTS will be generated in Timer 3 (playback)');
-      
-    }, this.timerConfig.ttsStart);
+    session.silenceTimers.llm = setTimeout(async () => {
+      console.log(`[VoicePipelineService] Timer 1 (LLM) fired for ${session.id} - ${llmDelay}ms of silence detected (adaptive=${adaptiveDelayMs}ms)!`);
 
-    // Timer 3: Start audio playback (2.0s)
-    // Uses the cached LLM result from Timer 1
-    // 
-    // CRITICAL FIX: Timer 3 may fire before LLM response is ready (race condition)
-    // WHY: LLM generation can take 2-5 seconds, but Timer 3 fires at 2.0s
-    // SOLUTION: Poll for LLM response with timeout, don't just check once
-    session.silenceTimers.playback = setTimeout(async () => {
-      console.log(`[VoicePipelineService] Timer 3 (Playback) fired for ${session.id}`);
-      
-      // CANCELLATION CHECK (2026-02-06): Abort immediately if session was stopped.
       if (session.isCancelled) {
-        console.log('[VoicePipelineService] ⛔ Timer 3 aborted at entry — session was cancelled');
+        console.log('[VoicePipelineService] ⛔ Timer 1 aborted — session was cancelled');
         return;
       }
-      
-      // Check if we were interrupted before timer fired
-      if (!session.isInResponsePipeline) {
-        console.log('[VoicePipelineService] Timer 3 cancelled by interruption');
-        return;
-      }
-      
-      // Wait for LLM response to be ready (with timeout)
-      // Poll every 100ms for up to 5 seconds
-      const maxWaitTime = 5000; // 5 seconds max
-      const pollInterval = 100; // Check every 100ms
-      const startTime = Date.now();
-      
-      while (!session.cachedResponses.llm && (Date.now() - startTime) < maxWaitTime) {
-        // CANCELLATION CHECK (2026-02-06): Abort if voice was stopped.
-        // WHY: stopVoiceInput sets isCancelled=true, but clearTimeout can't stop
-        // this already-executing async callback. This flag catches it.
-        if (session.isCancelled) {
-          console.log('[VoicePipelineService] ⛔ Timer 3 aborted — session was cancelled');
-          return;
+
+      const now = Date.now();
+      const latestText = (session.latestTranscription || '').trim();
+      const wordCountNow = latestText.length > 0 ? latestText.split(/\s+/).length : 0;
+      const timeSinceFirst = session.firstTranscriptionAt ? (now - session.firstTranscriptionAt) : 0;
+      const shouldConfirmSilence = wordCountNow <= 6 || (timeSinceFirst > 0 && timeSinceFirst < minUtteranceMs);
+
+      if (shouldConfirmSilence && !session.awaitingSilenceConfirmation) {
+        session.awaitingSilenceConfirmation = true;
+
+        if (session.silenceTimers.tts) {
+          clearTimeout(session.silenceTimers.tts);
+          session.silenceTimers.tts = null;
         }
-        
-        // Check if interrupted while waiting
-        if (!session.isInResponsePipeline) {
-          console.log('[VoicePipelineService] Interrupted while waiting for LLM response');
-          return;
+        if (session.silenceTimers.playback) {
+          clearTimeout(session.silenceTimers.playback);
+          session.silenceTimers.playback = null;
         }
-        
-        // Wait a bit before checking again
-        await new Promise(resolve => setTimeout(resolve, pollInterval));
-      }
-      
-      // Start playback
-      // This is when the user actually sees/hears the response
-      if (session.cachedResponses.llm) {
-        const responseText = (session.cachedResponses.llm.text || '').trim();
-        
-        console.log('[VoicePipelineService] Sending messages to frontend');
-        
-        // FIRST: Send the user's message as a sent bubble
-        // This shows what the user said after 2s of silence
-        this.sendUserMessageToFrontend(session, session.latestTranscription);
-        
-        // GUARD: Only send AI response if there's actual text
-        // CRITICAL FIX (2026-02-06): Don't send blank assistant bubbles
-        //
-        // WHY: If the LLM returned empty text (e.g., multi-step tool calling
-        // where result.text only had last step's text), sending an empty
-        // ai_response creates a blank bubble in the UI and confuses users.
-        //
-        // BECAUSE: The user saw "Hello" → blank AI bubble → app appeared stuck.
-        // The empty bubble + pipeline state getting stuck made it look frozen.
-        if (responseText.length > 0) {
-          // Send the AI response as a response bubble
-          this.sendResponseToFrontend(session, session.cachedResponses.llm);
-        } else {
-          console.warn('[VoicePipelineService] ⚠️ LLM returned empty text — not sending blank AI response');
-          // Send an error notification so the user knows something went wrong
-          if (this.server && this.server.connections) {
-            for (const [ws, connectionState] of this.server.connections) {
-              if (connectionState.id === session.id) {
-                this.server.sendMessage(ws, {
-                  type: 'error',
-                  data: { message: 'AI response was empty. Please try again.' }
-                });
-                break;
-              }
-            }
+        if (session.silenceTimers.confirm) {
+          clearTimeout(session.silenceTimers.confirm);
+          session.silenceTimers.confirm = null;
+        }
+
+        session.silenceTimers.confirm = setTimeout(() => {
+          if (session.isCancelled) {
+            return;
           }
-        }
-        
-        // CRITICAL (2026-02-06): Reset recognition at turn completion
-        //
-        // WHY: This is a natural conversation boundary — the user finished
-        // speaking, the LLM responded, and we're about to play TTS. The
-        // recognition session has been running since the user started speaking
-        // (or since the last restart). Resetting here ensures that:
-        //   1. Any speech during AI playback starts from a fresh session
-        //   2. Interruption detection is maximally accurate
-        //   3. The recognizer doesn't accumulate stale state across turns
-        //
-        // TOGETHER WITH speech_ended reset:
-        // This creates a double-restart pattern at turn boundaries:
-        //   Turn start → user speaks → turn complete → RESET HERE (before TTS)
-        //   → AI speaks → speech_ended → RESET AGAIN (after TTS)
-        // Both resets are intentional and safe. The first ensures clean
-        // interruption detection during playback. The second ensures clean
-        // recognition for the next user turn.
-        this.sendSwiftCommand(session, {
-          type: 'reset_recognition',
-          data: null
-        });
-        console.log('[VoicePipelineService] Sent reset_recognition at turn completion (before TTS playback)');
-        
-        // CRITICAL FIX (2026-02-06): Handle empty TTS text gracefully
-        //
-        // WHY: If responseText is empty, the Swift helper's speak command
-        // receives empty text and may never fire speech_ended. This leaves the
-        // session permanently stuck in isInResponsePipeline=true / isTTSPlaying=true,
-        // which means ALL subsequent transcriptions trigger the interruption handler
-        // instead of starting a new timer cascade — effectively freezing the voice pipeline.
-        //
-        // BECAUSE: User experienced "app didn't reply" — the pipeline was stuck waiting
-        // for speech_ended that never came because TTS had nothing to say.
-        //
-        // FIX: If text is empty, skip TTS entirely and immediately reset pipeline state
-        // as if speech_ended had fired. This makes the pipeline ready for the next turn.
-        if (responseText.length > 0) {
-          // Mark TTS as playing (will be cleared by speech_ended from Swift)
-          session.isTTSPlaying = true;
-          // Generate and play TTS
-          this.generateTTS(responseText, session.settings, session);
-        } else {
-          console.log('[VoicePipelineService] Skipping TTS for empty response — resetting pipeline immediately');
-          // Immediately reset pipeline state (mimics what speech_ended handler does)
-          session.isTTSPlaying = false;
-          session.isInResponsePipeline = false;
-          session.latestTranscription = '';
-          session.currentTranscription = '';
-          session.textAtLastTimerReset = '';
-          session.isProcessingResponse = false;
-        }
-      } else {
-        // TIMER 3 TIMEOUT - LLM didn't respond in time (P2 UX FIX — 2026-02-06)
-        // WHY: User sees their message but no AI response, with no explanation.
-        // BECAUSE: The LLM API was too slow or hung. We need to tell the user.
-        console.error('[VoicePipelineService] Timer 3 timed out waiting for LLM response');
-        
-        // Send user message anyway so they see something
-        this.sendUserMessageToFrontend(session, session.latestTranscription);
-        
-        // Send error notification to frontend (P2 FIX)
-        // WHY: Without this, the user just sees their message with no reply
-        if (session.sendToFrontend) {
-          session.sendToFrontend({
-            type: 'error',
-            data: { message: 'AI response timed out. Please try again.' }
-          });
-        }
+          const confirmNow = Date.now();
+          const timeSinceLast = confirmNow - (session.lastTranscriptionAt || 0);
+          const timeSinceFirstConfirm = session.firstTranscriptionAt ? (confirmNow - session.firstTranscriptionAt) : 0;
+          if (timeSinceLast < confirmWindowMs || (timeSinceFirstConfirm > 0 && timeSinceFirstConfirm < minUtteranceMs)) {
+            session.awaitingSilenceConfirmation = false;
+            return;
+          }
+          session.awaitingSilenceConfirmation = false;
+          runLlmProcessing();
+        }, confirmWindowMs);
+        return;
       }
-    }, this.timerConfig.playbackStart);
+
+      runLlmProcessing();
+    }, llmDelay);
   }
 
   /**
@@ -1002,6 +1269,9 @@ class VoicePipelineService extends EventEmitter {
     // will start a new timer immediately (since timerIsRunning will be false
     // after clearAllTimers above)
     session.textAtLastTimerReset = '';
+    session.firstTranscriptionAt = 0;
+    session.lastTranscriptionAt = 0;
+    session.awaitingSilenceConfirmation = false;
     
     // CRITICAL: Stop any ongoing TTS playback
     // This is the actual interruption - stop the AI from speaking
@@ -1057,6 +1327,11 @@ class VoicePipelineService extends EventEmitter {
       clearTimeout(session.silenceTimers.playback);
       session.silenceTimers.playback = null;
     }
+
+    if (session.silenceTimers.confirm) {
+      clearTimeout(session.silenceTimers.confirm);
+      session.silenceTimers.confirm = null;
+    }
   }
 
   /**
@@ -1097,8 +1372,25 @@ class VoicePipelineService extends EventEmitter {
     session.cachedResponses.llm = null;
     session.cachedResponses.tts = null;
 
+    // Reset pipeline state so new speech is accepted immediately
+    session.isInResponsePipeline = false;
+    session.isProcessingResponse = false;
+    session.isTTSPlaying = false;
+    session.latestTranscription = '';
+    session.currentTranscription = '';
+    session.textAtLastTimerReset = '';
+    session.firstTranscriptionAt = 0;
+    session.lastTranscriptionAt = 0;
+    session.awaitingSilenceConfirmation = false;
+
     // Stop any ongoing TTS playback
     await this.stopSpeaking(session);
+
+    // Ensure recognition restarts after a manual interrupt
+    this.sendSwiftCommand(session, {
+      type: 'reset_recognition',
+      data: null
+    });
   }
 
   /**
@@ -1233,6 +1525,14 @@ class VoicePipelineService extends EventEmitter {
       console.warn('[VoicePipelineService] No Swift session for TTS, using fallback');
       return null;
     }
+
+    // ECHO SUPPRESSION CONTEXT (2026-02-07):
+    // Store the exact text we're about to speak so we can detect
+    // short echo fragments that show up in transcription while
+    // the AI is talking. This lets us ignore mic bleed without
+    // breaking real user interruptions.
+    session.lastSpokenText = text || '';
+    session.lastSpokenAt = Date.now();
 
     // Calculate rate from voice speed (default 200 wpm)
     const rate = Math.round((settings?.voiceSpeed || 1.0) * 200);

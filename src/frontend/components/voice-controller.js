@@ -160,6 +160,34 @@ class VoiceController {
    * @param {string} data.text - Transcribed text
    * @param {boolean} data.isFinal - Whether this is final transcription
    */
+  /**
+   * HANDLE TRANSCRIPTION
+   *
+   * Processes transcription updates from the backend and updates the input field.
+   *
+   * VOLATILE vs FINAL RESULTS (2026-02-07 — based on SpeechAnalyzer research):
+   * Apple's SpeechAnalyzer with .volatileResults reporting option sends two types:
+   *
+   * 1) VOLATILE (isFinal=false): Rough, real-time guesses that update progressively
+   *    as the user speaks. These may change as the model gets more context.
+   *    Example: "The qu" → "The quick" → "The quick brown" → "The quick brown fox"
+   *
+   * 2) FINAL (isFinal=true): Committed text segments at sentence boundaries
+   *    (periods, question marks, extended pauses). These are immutable.
+   *
+   * VISUAL TREATMENT:
+   * - Volatile: 0.65 opacity with a subtle CSS transition for smooth updates.
+   *   Lower opacity signals to the user "I'm still listening, this may change."
+   * - Final: Full 1.0 opacity with a brief transition to "lock in" the text.
+   *   This gives a polished feeling when the sentence is committed.
+   *
+   * WHY THIS MATTERS FOR PRODUCT:
+   * The progressive word-by-word display powered by volatile results is what
+   * makes BubbleVoice feel responsive and "alive" — the user sees their words
+   * appearing in real-time, which builds trust that the system is listening.
+   * Research confirmed SpeechAnalyzer delivers these updates every ~200-500ms
+   * with excellent accuracy even in the volatile/partial state.
+   */
   handleTranscription(data) {
     console.log('[VoiceController] Transcription:', data.text, 'Final:', data.isFinal);
 
@@ -177,10 +205,20 @@ class VoiceController {
         // This is safer when the element has focus
         inputField.textContent = data.text;
         
-        // If not final, add visual indicator by styling the element itself
+        // VOLATILE vs FINAL VISUAL TREATMENT (2026-02-07):
+        // Based on SpeechAnalyzer research, volatile results should be
+        // visually distinct from finalized text. We use opacity + a smooth
+        // CSS transition to create a polished "locking in" effect.
+        //
+        // The transition is set via CSS, but we ensure it's applied here
+        // for cases where styles might be overridden.
+        inputField.style.transition = 'opacity 0.15s ease-out';
+        
         if (!data.isFinal) {
-          inputField.style.opacity = '0.7';
+          // Volatile/partial: lower opacity signals "still listening"
+          inputField.style.opacity = '0.65';
         } else {
+          // Final: full opacity signals "committed text"
           inputField.style.opacity = '1.0';
         }
       } catch (error) {

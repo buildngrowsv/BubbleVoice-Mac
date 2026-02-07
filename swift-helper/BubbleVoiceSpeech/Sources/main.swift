@@ -30,6 +30,7 @@
 import Foundation
 @preconcurrency import Speech
 @preconcurrency import AVFoundation
+import CoreMedia
 
 // MARK: - Message Types
 
@@ -160,6 +161,52 @@ final class SpeechHelper: @unchecked Sendable {
     private var isListening = false
     private var isSpeaking = false
     
+    // PRE-WARM STATE (2026-02-07):
+    // Based on research showing 2-3 second startup delay for SpeechAnalyzer
+    // creation + asset verification, we pre-warm the locale assets on init
+    // so the first "start_listening" command doesn't have that cold-start cost.
+    // The pre-warm downloads/verifies assets but does NOT create an analyzer
+    // instance (those can't be reused once finalized).
+    private var localeAssetsVerified = false
+    
+    // AUDIO TIMELINE TRACKING (2026-02-07):
+    // Track the host time when the audio engine starts to compute correct
+    // buffer timestamps for SpeechAnalyzer's timeline correlation feature.
+    // This was identified as a gap in our implementation — we were passing
+    // nil for bufferStartTime, which means the analyzer can't accurately
+    // correlate audio timestamps with transcription results.
+    // Research (WWDC 2025 session, Anton's Substack) confirmed that proper
+    // timeline management enables precise word-level timing and better
+    // finalization behavior.
+    private var audioEngineStartHostTime: UInt64 = 0
+    private var audioSampleRate: Double = 0
+    private var totalFramesProcessed: UInt64 = 0
+    
+    // ENERGY-BASED VAD GATE (2026-02-07):
+    // Research (our Quirks doc #14, production testing) showed SpeechAnalyzer
+    // is extremely sensitive to ambient noise — it transcribes EVERYTHING the
+    // mic picks up including TV, background conversations, etc.
+    // This energy threshold filters silence and very quiet ambient noise
+    // BEFORE feeding buffers to the analyzer, reducing false transcriptions
+    // and saving processing power on the Neural Engine.
+    //
+    // Note: Apple's SpeechDetector module was supposed to do this but has a
+    // known bug (doesn't conform to SpeechModule — Quirk #4), so we implement
+    // a simple energy gate ourselves.
+    //
+    // The threshold is in RMS (root mean square) amplitude. Values below this
+    // are considered "silence" and not sent to the analyzer.
+    // 0.008 is conservative — catches dead silence and very quiet hum
+    // without filtering soft speech. Based on testing where the `say` command
+    // at normal volume produces RMS of ~0.05-0.2 and room silence is ~0.001-0.005.
+    private let vadEnergyThreshold: Float = 0.008
+    
+    // Track consecutive silent frames to avoid cutting off speech at word boundaries.
+    // We only stop feeding audio after sustained silence (not brief pauses between words).
+    // 15 consecutive silent frames at 4096 samples/48kHz ≈ 1.3 seconds of silence.
+    private var consecutiveSilentFrames: Int = 0
+    private let maxConsecutiveSilentFrames: Int = 15
+    
     // NOTE: All legacy restart / hang detection logic has been removed
     // because SpeechAnalyzer manages its own session lifecycle. This is
     // a core product bet: we trade complex home-grown recovery logic for
@@ -171,6 +218,16 @@ final class SpeechHelper: @unchecked Sendable {
         
         // Send ready signal (no permission prompt here).
         requestAuthorization()
+        
+        // PRE-WARM LOCALE ASSETS (2026-02-07):
+        // Research showed 2-3 second startup delay for asset verification.
+        // By doing this eagerly on init (while the app is loading), the first
+        // "start_listening" command skips the asset check entirely.
+        // This is a product improvement: the user presses the mic button and
+        // transcription starts immediately instead of after a noticeable pause.
+        Task {
+            await self.preWarmLocaleAssets()
+        }
     }
     
     /**
@@ -190,6 +247,65 @@ final class SpeechHelper: @unchecked Sendable {
     func requestAuthorization() {
         self.sendReady()
         self.logError("Speech helper ready; microphone permission must be granted by Electron app")
+    }
+    
+    /**
+     * PRE-WARM LOCALE ASSETS
+     *
+     * Downloads and verifies speech model assets for the configured locale
+     * BEFORE the user ever starts listening. This eliminates the 2-3 second
+     * cold-start delay on the first "start_listening" command.
+     *
+     * PRODUCT IMPACT:
+     * Without pre-warming, the user presses the mic button and waits 2-3
+     * seconds before transcription begins. With pre-warming, the delay is
+     * eliminated because assets are already verified/downloaded.
+     *
+     * CALLED FROM: init() — runs asynchronously in the background while
+     * the app is still loading. Does not block the ready signal.
+     *
+     * WHY NOT CREATE THE ANALYZER HERE:
+     * SpeechAnalyzer instances can't be reused after finalization (Quirk doc).
+     * We only pre-verify assets; the analyzer itself is created fresh per session.
+     */
+    private func preWarmLocaleAssets() async {
+        do {
+            // Check if locale is supported
+            let supportedLocales = await SpeechTranscriber.supportedLocales
+            let supportedIds = supportedLocales.map({ $0.identifier(.bcp47) })
+            
+            guard supportedIds.contains(speechAnalyzerLocale.identifier(.bcp47)) else {
+                logError("Pre-warm: locale not supported: \(speechAnalyzerLocale.identifier(.bcp47))")
+                return
+            }
+            
+            // Check if assets are already installed
+            let installedLocales = await SpeechTranscriber.installedLocales
+            let installedIds = installedLocales.map({ $0.identifier(.bcp47) })
+            let isInstalled = installedIds.contains(speechAnalyzerLocale.identifier(.bcp47))
+            
+            if !isInstalled {
+                logError("Pre-warm: downloading speech assets for \(speechAnalyzerLocale.identifier(.bcp47))...")
+                // Create a temporary transcriber just for the asset download
+                let tempTranscriber = SpeechTranscriber(
+                    locale: speechAnalyzerLocale,
+                    transcriptionOptions: [],
+                    reportingOptions: [],
+                    attributeOptions: []
+                )
+                if let request = try await AssetInventory.assetInstallationRequest(supporting: [tempTranscriber]) {
+                    try await request.downloadAndInstall()
+                    logError("Pre-warm: speech assets installed successfully")
+                }
+            } else {
+                logError("Pre-warm: speech assets already installed for \(speechAnalyzerLocale.identifier(.bcp47))")
+            }
+            
+            localeAssetsVerified = true
+        } catch {
+            logError("Pre-warm: asset verification failed (non-fatal): \(error.localizedDescription)")
+            // Non-fatal: configureSpeechAnalyzerIfNeeded will retry
+        }
     }
     
     /**
@@ -265,11 +381,67 @@ final class SpeechHelper: @unchecked Sendable {
             // Both the Apple sample code and community examples set this.
             audioConverter?.primeMethod = .none
             
+            // AUDIO TIMELINE SETUP (2026-02-07):
+            // Record the audio engine's sample rate so we can compute proper
+            // buffer start times for the SpeechAnalyzer timeline. This enables
+            // audioTimeRange on results, which we use for precise turn detection
+            // and echo suppression timing in the backend.
+            audioSampleRate = analyzerFormat.sampleRate
+            totalFramesProcessed = 0
+            consecutiveSilentFrames = 0
+            
             inputNode.installTap(onBus: 0, bufferSize: 4096, format: inputFormat) { [weak self] buffer, _ in
                 guard let self = self else { return }
+                
+                // ENERGY-BASED VAD GATE (2026-02-07):
+                // Filter out silence and very quiet ambient noise BEFORE feeding
+                // to the analyzer. This was added because our research (Quirk #14)
+                // showed SpeechAnalyzer transcribes ALL audio including TV,
+                // background conversations, etc. By gating on energy, we reduce
+                // false transcriptions without affecting real speech.
+                //
+                // Note: We still feed audio after a brief silent gap (up to
+                // maxConsecutiveSilentFrames) to avoid cutting off speech at
+                // natural word boundaries where energy briefly drops.
+                let rms = self.computeRMSEnergy(buffer: buffer)
+                
+                if rms < self.vadEnergyThreshold {
+                    self.consecutiveSilentFrames += 1
+                    // Still feed audio during brief pauses (word boundaries)
+                    // but stop after sustained silence to save processing.
+                    if self.consecutiveSilentFrames > self.maxConsecutiveSilentFrames {
+                        return
+                    }
+                } else {
+                    // Speech detected — reset the silence counter
+                    self.consecutiveSilentFrames = 0
+                }
+                
                 do {
                     let converted = try self.convertBufferForAnalyzer(buffer, targetFormat: analyzerFormat)
-                    continuation.yield(AnalyzerInput(buffer: converted, bufferStartTime: nil))
+                    
+                    // BUFFER TIMESTAMP (2026-02-07):
+                    // Compute the audio timeline position for this buffer as a CMTime.
+                    // Previously we passed nil, which means the analyzer couldn't
+                    // accurately correlate audio timestamps with results.
+                    // Now we track cumulative frames processed and compute
+                    // the time in the analyzer's format sample rate.
+                    // This enables audioTimeRange on transcription results,
+                    // which we send to the backend for precise timing.
+                    //
+                    // CMTime is Apple's precise time representation used throughout
+                    // AV frameworks. We use the frame count as the value and the
+                    // sample rate as the timescale for maximum precision.
+                    let bufferStartCMTime = CMTime(
+                        value: CMTimeValue(self.totalFramesProcessed),
+                        timescale: CMTimeScale(self.audioSampleRate)
+                    )
+                    self.totalFramesProcessed += UInt64(converted.frameLength)
+                    
+                    continuation.yield(AnalyzerInput(
+                        buffer: converted,
+                        bufferStartTime: bufferStartCMTime
+                    ))
                 } catch {
                     self.logError("Audio buffer conversion failed: \(error.localizedDescription)")
                 }
@@ -321,47 +493,73 @@ final class SpeechHelper: @unchecked Sendable {
      * This is handled via AssetInventory, which downloads on-device
      * models from Apple's servers. Once installed, they persist.
      *
-     * TRANSCRIBER OPTIONS:
+     * TRANSCRIBER OPTIONS (Updated 2026-02-07 based on deep research):
      * - transcriptionOptions: [] (default, no special modes)
      * - reportingOptions: [.volatileResults] — gives us real-time partial
-     *   results that update progressively as the user speaks
-     * - attributeOptions: [] — we don't need confidence scores or timing
-     *   since the Node.js backend handles turn detection via timers
+     *   results that update progressively as the user speaks. Research confirmed
+     *   volatile results are "rough, real-time guesses; iteratively refined" that
+     *   get replaced by final results. This is what powers the live transcription
+     *   display in the frontend (shown at 0.7 opacity until finalized).
+     * - attributeOptions: [.audioTimeRange] — ADDED based on research.
+     *   This gives us per-result audio timestamp ranges that tell us EXACTLY
+     *   when speech occurred in the audio timeline. This is critical for:
+     *     1) Precise turn detection: We can compute the actual audio time of
+     *        the last spoken word, not just "when we received the update."
+     *     2) Echo suppression: We can correlate transcription timestamps with
+     *        TTS playback timing to distinguish user speech from mic bleed.
+     *     3) Frontend word timing: Enables potential word-by-word animation.
+     *   WWDC 2025 demo and community posts (Davide Dmiston) confirm this is
+     *   how production apps handle timeline synchronization.
+     *
+     * NOTE ON PRESETS:
+     * Our Quirks doc (Quirk #5) notes that .progressiveLiveTranscription
+     * preset may not compile in the release. We use explicit options which
+     * is equivalent and more reliable. The research confirmed this approach
+     * matches what community implementations use.
      */
     private func configureSpeechAnalyzerIfNeeded() async throws {
         let transcriber = SpeechTranscriber(
             locale: speechAnalyzerLocale,
             transcriptionOptions: [],
             reportingOptions: [.volatileResults],
-            attributeOptions: []
+            attributeOptions: [.audioTimeRange]
         )
         speechTranscriber = transcriber
         
-        // Ensure locale is supported and assets are installed.
-        let supportedLocales = await SpeechTranscriber.supportedLocales
-        let supportedIds = supportedLocales.map({ $0.identifier(.bcp47) })
-        
-        if !supportedIds.contains(speechAnalyzerLocale.identifier(.bcp47)) {
-            throw NSError(
-                domain: "SpeechAnalyzer",
-                code: -100,
-                userInfo: [NSLocalizedDescriptionKey: "Locale not supported: \(speechAnalyzerLocale.identifier)"]
-            )
-        }
-        
-        // Download locale assets if not already installed.
-        // The system manages these models — once downloaded, they persist
-        // across app launches until the user or system cleans them up.
-        let installedLocales = await SpeechTranscriber.installedLocales
-        let installedIds = installedLocales.map({ $0.identifier(.bcp47) })
-        let isInstalled = installedIds.contains(speechAnalyzerLocale.identifier(.bcp47))
-        
-        if !isInstalled {
-            logError("Downloading speech assets for locale: \(speechAnalyzerLocale.identifier(.bcp47))")
-            if let request = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
-                try await request.downloadAndInstall()
-                logError("Speech assets installed successfully")
+        // FAST PATH (2026-02-07): If pre-warm already verified assets, skip
+        // the async locale/asset check entirely. This eliminates 2-3 seconds
+        // of startup delay on the first listen command.
+        if !localeAssetsVerified {
+            // Ensure locale is supported and assets are installed.
+            let supportedLocales = await SpeechTranscriber.supportedLocales
+            let supportedIds = supportedLocales.map({ $0.identifier(.bcp47) })
+            
+            if !supportedIds.contains(speechAnalyzerLocale.identifier(.bcp47)) {
+                throw NSError(
+                    domain: "SpeechAnalyzer",
+                    code: -100,
+                    userInfo: [NSLocalizedDescriptionKey: "Locale not supported: \(speechAnalyzerLocale.identifier)"]
+                )
             }
+            
+            // Download locale assets if not already installed.
+            // The system manages these models — once downloaded, they persist
+            // across app launches until the user or system cleans them up.
+            let installedLocales = await SpeechTranscriber.installedLocales
+            let installedIds = installedLocales.map({ $0.identifier(.bcp47) })
+            let isInstalled = installedIds.contains(speechAnalyzerLocale.identifier(.bcp47))
+            
+            if !isInstalled {
+                logError("Downloading speech assets for locale: \(speechAnalyzerLocale.identifier(.bcp47))")
+                if let request = try await AssetInventory.assetInstallationRequest(supporting: [transcriber]) {
+                    try await request.downloadAndInstall()
+                    logError("Speech assets installed successfully")
+                }
+            }
+            
+            localeAssetsVerified = true
+        } else {
+            logError("Skipping asset check (pre-warmed)")
         }
         
         let analyzer = SpeechAnalyzer(modules: [transcriber])
@@ -396,6 +594,16 @@ final class SpeechHelper: @unchecked Sendable {
      * speaks. This is what powers the live transcription display.
      * Final results come when the analyzer detects a natural pause or
      * sentence boundary.
+     *
+     * AUDIO TIME RANGE (2026-02-07):
+     * With .audioTimeRange in attributeOptions, each result now includes
+     * timing information that tells us when in the audio stream the speech
+     * occurred. We extract this and send it to the backend as audioStartTime
+     * and audioEndTime. The backend uses these for:
+     *   1) Precise silence detection (time since last spoken word in audio,
+     *      not time since last IPC message arrived)
+     *   2) Echo suppression (correlate speech timestamps with TTS playback)
+     *   3) Future: word-level timing for frontend animations
      */
     private func startSpeechAnalyzerResultTask(transcriber: SpeechTranscriber) {
         speechAnalyzerTask?.cancel()
@@ -404,7 +612,43 @@ final class SpeechHelper: @unchecked Sendable {
             do {
                 for try await result in transcriber.results {
                     let text = String(result.text.characters)
-                    self.sendTranscription(text: text, isFinal: result.isFinal)
+                    
+                    // EXTRACT AUDIO TIMESTAMPS (2026-02-07):
+                    // The audioTimeRange attribute gives us the precise audio
+                    // timeline range where this speech occurred. We send these
+                    // to the backend for timing-aware turn detection and echo
+                    // suppression. If the attribute is not available (e.g., the
+                    // result doesn't have timing info), we send -1 as a sentinel.
+                    var audioStartTime: Double = -1
+                    var audioEndTime: Double = -1
+                    
+                    // Access audioTimeRange from the result's text attributes.
+                    // The AttributedString may contain .audioTimeRange attributes
+                    // on character runs. We extract the overall range.
+                    //
+                    // CMTimeRange has .start (CMTime) and .duration (CMTime).
+                    // End time = start + duration. We convert to seconds (Double)
+                    // for JSON transmission to the Node.js backend.
+                    let attrString = result.text
+                    for run in attrString.runs {
+                        if let timeRange = run.audioTimeRange {
+                            let startSec = CMTimeGetSeconds(timeRange.start)
+                            let endSec = CMTimeGetSeconds(timeRange.start + timeRange.duration)
+                            if audioStartTime < 0 || startSec < audioStartTime {
+                                audioStartTime = startSec
+                            }
+                            if endSec > audioEndTime {
+                                audioEndTime = endSec
+                            }
+                        }
+                    }
+                    
+                    self.sendTranscription(
+                        text: text,
+                        isFinal: result.isFinal,
+                        audioStartTime: audioStartTime,
+                        audioEndTime: audioEndTime
+                    )
                 }
                 self.logError("Transcriber results stream ended")
             } catch {
@@ -497,18 +741,123 @@ final class SpeechHelper: @unchecked Sendable {
         return convertedBuffer
     }
     
+    /**
+     * COMPUTE RMS ENERGY
+     *
+     * Computes the Root Mean Square energy of an audio buffer.
+     * Used for the energy-based VAD gate to filter silence/noise.
+     *
+     * WHY RMS:
+     * RMS is the standard measure of audio signal power. It's more
+     * representative of perceived loudness than peak amplitude because
+     * it accounts for the full waveform shape, not just spikes.
+     *
+     * RETURNS:
+     * Float in range [0, 1] where 0 is perfect silence and 1 is max volume.
+     * Typical values:
+     *   - Room silence: 0.001 - 0.005
+     *   - Soft background: 0.005 - 0.02
+     *   - Normal speech (say command): 0.05 - 0.2
+     *   - Loud speech (close to mic): 0.2 - 0.5
+     */
+    private func computeRMSEnergy(buffer: AVAudioPCMBuffer) -> Float {
+        guard let channelData = buffer.floatChannelData else { return 0.0 }
+        
+        let channelDataPointer = channelData[0]
+        let frameLength = Int(buffer.frameLength)
+        
+        guard frameLength > 0 else { return 0.0 }
+        
+        var sumOfSquares: Float = 0.0
+        for i in 0..<frameLength {
+            let sample = channelDataPointer[i]
+            sumOfSquares += sample * sample
+        }
+        
+        return sqrt(sumOfSquares / Float(frameLength))
+    }
+    
+    /**
+     * RESET SPEECH ANALYZER SESSION
+     *
+     * Cleanly stops the current session and starts a fresh one.
+     *
+     * CALLED BY: "reset_recognition" command from backend at key lifecycle points:
+     *   1) After AI finishes speaking (speech_ended)
+     *   2) After an interruption is detected
+     *   3) After the timer cascade completes (turn boundary)
+     *
+     * FIX (2026-02-07): Previously this called the synchronous stopListening()
+     * followed by startListeningInternal(). Now we use stopListeningAsync()
+     * which properly awaits the analyzer finalization before starting a new
+     * session. This prevents race conditions where the old analyzer is still
+     * cleaning up when the new one starts, which could cause audio tap conflicts.
+     */
     private func resetSpeechAnalyzerSession() async {
         // WHY: We want a clean transcription boundary after AI speech or interruptions.
         // This mirrors the old "restart recognition" behavior but uses the new
         // SpeechAnalyzer pipeline: stop everything, then start fresh.
-        stopListening()
+        await stopListeningAsync()
         await startListeningInternal()
     }
     
     /**
-     * STOP LISTENING
-     * 
-     * Stops speech recognition and cleans up resources.
+     * STOP LISTENING (ASYNC)
+     *
+     * Async version that properly awaits analyzer finalization.
+     * Used by resetSpeechAnalyzerSession to ensure clean teardown
+     * before starting a new session.
+     *
+     * FIX (2026-02-07): The old synchronous stopListening() used a
+     * fire-and-forget Task for finalization, which meant the analyzer
+     * might still be cleaning up when a new session starts. This caused
+     * intermittent issues where the audio tap from the old session
+     * conflicted with the new one.
+     */
+    private func stopListeningAsync() async {
+        guard isListening else { return }
+        
+        // Stop feeding audio to the analyzer.
+        audioEngine?.stop()
+        audioEngine?.inputNode.removeTap(onBus: 0)
+        
+        // Finish the input stream and cancel result consumption.
+        speechAnalyzerInputContinuation?.finish()
+        speechAnalyzerInputContinuation = nil
+        
+        speechAnalyzerTask?.cancel()
+        speechAnalyzerTask = nil
+        
+        // PROPERLY AWAIT FINALIZATION (2026-02-07):
+        // This ensures the analyzer has fully cleaned up before we nil it out.
+        // The old code used Task { try? await ... } which was fire-and-forget.
+        if let analyzer = speechAnalyzer {
+            do {
+                try await analyzer.finalizeAndFinishThroughEndOfInput()
+            } catch {
+                logError("Analyzer finalization error (non-fatal): \(error.localizedDescription)")
+            }
+        }
+        
+        speechAnalyzer = nil
+        speechTranscriber = nil
+        speechAnalyzerAudioFormat = nil
+        audioConverter = nil
+        
+        // Reset audio timeline tracking for the next session
+        totalFramesProcessed = 0
+        consecutiveSilentFrames = 0
+        
+        isListening = false
+        logError("Stopped listening (SpeechAnalyzer session fully finalized)")
+    }
+    
+    /**
+     * STOP LISTENING (SYNC)
+     *
+     * Synchronous stop for use from non-async contexts (handleCommand).
+     * Uses fire-and-forget for finalization since we can't await here.
+     * For clean session transitions, use stopListeningAsync() instead.
      */
     func stopListening() {
         guard isListening else { return }
@@ -524,6 +873,9 @@ final class SpeechHelper: @unchecked Sendable {
         speechAnalyzerTask = nil
         
         // Finalize the analyzer session asynchronously.
+        // NOTE: This is fire-and-forget because we're in a sync context.
+        // For session resets (start->stop->start), use stopListeningAsync()
+        // which properly awaits finalization.
         if let analyzer = speechAnalyzer {
             Task {
                 try? await analyzer.finalizeAndFinishThroughEndOfInput()
@@ -534,6 +886,10 @@ final class SpeechHelper: @unchecked Sendable {
         speechTranscriber = nil
         speechAnalyzerAudioFormat = nil
         audioConverter = nil
+        
+        // Reset audio timeline tracking
+        totalFramesProcessed = 0
+        consecutiveSilentFrames = 0
         
         isListening = false
         logError("Stopped listening (SpeechAnalyzer session finalized)")
@@ -767,7 +1123,28 @@ final class SpeechHelper: @unchecked Sendable {
         sendResponse(type: "ready", data: nil)
     }
     
-    func sendTranscription(text: String, isFinal: Bool) {
+    /**
+     * SEND TRANSCRIPTION
+     *
+     * Sends a transcription_update message to Node.js via stdout.
+     *
+     * FIELDS (2026-02-07 — expanded based on research):
+     * - text: The transcribed text (may be partial/volatile or final)
+     * - isFinal: Whether this is a finalized segment (sentence boundary)
+     * - isSpeaking: Whether TTS is currently active (for echo suppression)
+     * - audioStartTime: Audio timeline start of this speech segment (seconds, -1 if unavailable)
+     * - audioEndTime: Audio timeline end of this speech segment (seconds, -1 if unavailable)
+     *
+     * The audio timestamps enable the backend to:
+     *   1) Compute precise silence duration (audioEndTime vs current time)
+     *   2) Correlate with TTS playback timing for echo filtering
+     *   3) Track conversation pacing and response times
+     *
+     * These were added after research showed that timer-based silence detection
+     * (measuring time between IPC messages) is less reliable than audio-timeline-
+     * based detection (measuring time since last spoken word in the audio stream).
+     */
+    func sendTranscription(text: String, isFinal: Bool, audioStartTime: Double = -1, audioEndTime: Double = -1) {
         // CRITICAL: Include isSpeaking state with every transcription
         // This allows the backend to detect interruptions
         // If isSpeaking is true and we get a transcription, it means
@@ -775,7 +1152,9 @@ final class SpeechHelper: @unchecked Sendable {
         sendResponse(type: "transcription_update", data: [
             "text": AnyCodable(text),
             "isFinal": AnyCodable(isFinal),
-            "isSpeaking": AnyCodable(isSpeaking)
+            "isSpeaking": AnyCodable(isSpeaking),
+            "audioStartTime": AnyCodable(audioStartTime),
+            "audioEndTime": AnyCodable(audioEndTime)
         ])
     }
     
