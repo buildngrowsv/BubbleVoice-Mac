@@ -119,43 +119,68 @@ class VoicePipelineService extends EventEmitter {
   }
 
   /**
-   * MERGE TRANSCRIPTION TEXT
+   * MERGE TRANSCRIPTION TEXT — VOLATILE-AWARE (2026-02-07)
    *
-   * Normalizes speech recognition updates into a single growing utterance.
+   * Normalizes speech recognition updates into a single growing utterance,
+   * properly handling the volatile vs final result distinction from SpeechAnalyzer.
    *
-   * WHY THIS EXISTS:
-   * Apple speech recognition sometimes restarts or emits short fragments.
-   * When that happens, `text` can regress from a full sentence to a single
-   * word. If we overwrite the session text each time, the final user message
-   * becomes just the last fragment ("Fly"), which is what you're seeing.
+   * BUG FIX (2026-02-07):
+   * E2E testing revealed that the old merge function caused garbled text like:
+   *   "Hello, I am testing. Can Can you Can you tell Can you tell me..."
+   * 
+   * ROOT CAUSE:
+   * SpeechAnalyzer sends results as individual segments, not cumulative text.
+   * Within a segment, volatile results are PROGRESSIVE — each one REPLACES
+   * the previous volatile text:
+   *   "Can" → "Can you" → "Can you tell" → "Can you tell me"
+   * 
+   * The old function treated each volatile update as a "new segment" and APPENDED
+   * because incoming.startsWith(current) was false (current included finalized text
+   * from previous segments).
    *
-   * BECAUSE:
-   * We rely on silence-based timers, not isFinal, so we must preserve
-   * the full utterance across recognition resets and partial updates.
+   * FIX:
+   * Use a separate `finalizedText` field on the session that accumulates only
+   * finalized (isFinal=true) segments. Volatile results REPLACE each other —
+   * they don't accumulate. The displayed/sent text is: finalizedText + latestVolatile.
    *
-   * @param {string} currentText - The current accumulated transcription
-   * @param {string} incomingText - The latest transcription update
-   * @returns {string} The merged, normalized transcription
+   * WHY THIS APPROACH:
+   * SpeechAnalyzer's results are structured as:
+   *   1. Volatile: "The" → "The quick" → "The quick brown" (each replaces previous)
+   *   2. Final: "The quick brown fox." (committed, immutable)
+   *   3. Volatile: "jumped" → "jumped over" (new segment, replaces previous volatile)
+   *   4. Final: "jumped over the lazy dog." (committed)
+   *
+   * Our display: finalizedText + currentVolatile
+   *   After step 1: "" + "The quick brown" = "The quick brown"
+   *   After step 2: "The quick brown fox." + "" = "The quick brown fox."
+   *   After step 3: "The quick brown fox." + "jumped over" = "The quick brown fox. jumped over"
+   *   After step 4: "The quick brown fox. jumped over the lazy dog." + "" = full text
+   *
+   * @param {Object} session - The voice session (we now read session.finalizedText)
+   * @param {string} incomingText - The latest transcription text from SpeechAnalyzer
+   * @param {boolean} isFinal - Whether this result is finalized
+   * @returns {string} The full merged transcription text
    */
-  mergeTranscriptionText(currentText, incomingText) {
-    const current = (currentText || '').trim();
+  mergeTranscriptionText(session, incomingText, isFinal) {
     const incoming = (incomingText || '').trim();
+    if (!incoming) return ((session.finalizedText || '') + ' ' + (session.currentVolatile || '')).trim();
 
-    if (!incoming) return current;
-    if (!current) return incoming;
-
-    // Common case: recognizer provides a longer cumulative string.
-    if (incoming.startsWith(current)) {
-      return incoming;
+    
+    if (isFinal) {
+      // FINALIZED: Append to the permanent finalized text.
+      // Clear the volatile buffer since this segment is now committed.
+      const prevFinalized = (session.finalizedText || '').trim();
+      session.finalizedText = prevFinalized ? `${prevFinalized} ${incoming}` : incoming;
+      session.currentVolatile = '';
+      return session.finalizedText.trim();
+    } else {
+      // VOLATILE: Replace the current volatile text entirely.
+      // The incoming text is the SpeechAnalyzer's latest progressive guess
+      // for the current segment — it already includes all previous volatiles.
+      session.currentVolatile = incoming;
+      const finalized = (session.finalizedText || '').trim();
+      return finalized ? `${finalized} ${incoming}` : incoming;
     }
-
-    // If the incoming text is shorter but already contained, keep current.
-    if (current.includes(incoming)) {
-      return current;
-    }
-
-    // Otherwise, treat as a new segment (recognizer restart) and append.
-    return `${current} ${incoming}`.trim();
   }
 
   /**
@@ -254,12 +279,32 @@ class VoicePipelineService extends EventEmitter {
     // Only apply echo suppression shortly after we started speaking.
     // We extend the window a bit because "say" playback can lag on longer
     // responses, and the mic can keep picking up the tail end.
-    if (timeSinceSpoken > 7000) return false;
+    if (timeSinceSpoken > 15000) return false;
 
     const lastSpoken = session.lastSpokenText || '';
 
     // If this fragment is clearly part of the AI's spoken text, ignore it.
     if (this.isLikelyEchoFragment(trimmed, lastSpoken)) {
+      return true;
+    }
+    
+    // AGGRESSIVE ECHO CHECK (2026-02-07):
+    // E2E testing showed that even longer fragments (6+ words) can be echo when
+    // the AI is actively speaking. The old check only caught fragments up to 5 words,
+    // but TTS bleed can generate 10+ word fragments that pass the short check.
+    //
+    // FIX: If the AI is actively speaking (swiftIsSpeaking=true) AND the normalized
+    // transcription text is fully contained in the AI's last spoken text, treat it
+    // as echo regardless of length. A real user interruption would include words
+    // NOT in the AI's response.
+    //
+    // EDGE CASE: If the user repeats part of the AI's response, this could
+    // suppress a legitimate interruption. But this is extremely rare in practice
+    // and far less damaging than the false interruption + crash cascade.
+    const incomingNormalized = this.normalizeTextForEchoComparison(trimmed);
+    const spokenNormalized = this.normalizeTextForEchoComparison(lastSpoken);
+    if (incomingNormalized && spokenNormalized && spokenNormalized.includes(incomingNormalized)) {
+      console.log(`[VoicePipelineService] 🔇 Echo (contained in AI response): "${trimmed.substring(0, 50)}"`);
       return true;
     }
 
@@ -491,6 +536,15 @@ class VoicePipelineService extends EventEmitter {
       latestTranscription: '',  // Store latest transcription for timer reset pattern
       textAtLastTimerReset: '',  // Store text at the time we last started/reset the timer
                                  // Used to compare growth since last reset (not since last update)
+      
+      // VOLATILE-AWARE TEXT TRACKING (2026-02-07):
+      // SpeechAnalyzer sends two types of results:
+      //   - Volatile (isFinal=false): progressive guesses that REPLACE each other
+      //   - Final (isFinal=true): committed segments that ACCUMULATE
+      // These fields track them separately so mergeTranscriptionText can
+      // properly handle both without garbling the text.
+      finalizedText: '',        // Accumulated finalized segments (immutable once set)
+      currentVolatile: '',      // Latest volatile text (replaced on each volatile update)
       silenceTimers: {
         llm: null,
         tts: null,
@@ -747,11 +801,14 @@ class VoicePipelineService extends EventEmitter {
           this.handleSpeechDetected(session);
         }
         
-        // Merge transcription to avoid "one word per update" regressions
-        // (e.g., after recognition restarts or short-fragment updates).
+        // VOLATILE-AWARE MERGE (2026-02-07):
+        // Pass the session and isFinal flag so the merge function can properly
+        // distinguish volatile results (which replace each other) from final
+        // results (which accumulate). See mergeTranscriptionText for full docs.
         const mergedTranscription = this.mergeTranscriptionText(
-          session.currentTranscription,
-          text
+          session,
+          text,
+          isFinal
         );
         session.currentTranscription = mergedTranscription;
 
@@ -818,6 +875,8 @@ class VoicePipelineService extends EventEmitter {
         session.latestTranscription = '';
         session.currentTranscription = '';
         session.textAtLastTimerReset = '';
+        session.finalizedText = '';
+        session.currentVolatile = '';
         session.isProcessingResponse = false;
         session.firstTranscriptionAt = 0;
         session.lastTranscriptionAt = 0;
@@ -1187,6 +1246,8 @@ class VoicePipelineService extends EventEmitter {
             session.latestTranscription = '';
             session.currentTranscription = '';
             session.textAtLastTimerReset = '';
+            session.finalizedText = '';
+            session.currentVolatile = '';
             session.isProcessingResponse = false;
             session.firstTranscriptionAt = 0;
             session.lastTranscriptionAt = 0;
@@ -1366,6 +1427,8 @@ class VoicePipelineService extends EventEmitter {
     // will start a new timer immediately (since timerIsRunning will be false
     // after clearAllTimers above)
     session.textAtLastTimerReset = '';
+    session.finalizedText = '';
+    session.currentVolatile = '';
     session.firstTranscriptionAt = 0;
     session.lastTranscriptionAt = 0;
     session.awaitingSilenceConfirmation = false;
@@ -1484,6 +1547,8 @@ class VoicePipelineService extends EventEmitter {
     session.latestTranscription = '';
     session.currentTranscription = '';
     session.textAtLastTimerReset = '';
+    session.finalizedText = '';
+    session.currentVolatile = '';
     session.firstTranscriptionAt = 0;
     session.lastTranscriptionAt = 0;
     session.awaitingSilenceConfirmation = false;

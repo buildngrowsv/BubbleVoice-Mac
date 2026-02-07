@@ -161,6 +161,18 @@ final class SpeechHelper: @unchecked Sendable {
     private var isListening = false
     private var isSpeaking = false
     
+    // RESET SERIALIZATION LOCK (2026-02-07):
+    // E2E testing revealed that multiple reset_recognition commands arriving
+    // in rapid succession (from interruption + echo + speech_ended) cause a
+    // FATAL crash: "required condition is false: nullptr == Tap()".
+    // This happens because each reset calls stopListeningAsync() + startListeningInternal(),
+    // and when they race, the second startListeningInternal tries to installTap
+    // on a node that already has a tap from the first start.
+    //
+    // FIX: Use a boolean flag to serialize resets. If a reset is in progress,
+    // subsequent reset requests are queued (or skipped with a log).
+    private var isResetting = false
+    
     // PRE-WARM STATE (2026-02-07):
     // Based on research showing 2-3 second startup delay for SpeechAnalyzer
     // creation + asset verification, we pre-warm the locale assets on init
@@ -390,6 +402,15 @@ final class SpeechHelper: @unchecked Sendable {
             // analyzer's required format (16kHz Int16), and yields it
             // into the AsyncStream for analysis.
             let inputNode = audioEngine.inputNode
+            
+            // SAFETY: Remove any existing tap before installing a new one.
+            // E2E testing (2026-02-07) showed that if a previous session's tap
+            // wasn't fully cleaned up (e.g., due to race conditions in rapid resets),
+            // installing a second tap crashes with:
+            //   "required condition is false: nullptr == Tap()"
+            // By defensively removing first, we prevent this crash entirely.
+            inputNode.removeTap(onBus: 0)
+            
             let inputFormat = inputNode.outputFormat(forBus: 0)
             
             audioConverter = AVAudioConverter(from: inputFormat, to: analyzerFormat)
@@ -868,11 +889,23 @@ final class SpeechHelper: @unchecked Sendable {
      * cleaning up when the new one starts, which could cause audio tap conflicts.
      */
     private func resetSpeechAnalyzerSession() async {
+        // SERIALIZATION CHECK (2026-02-07):
+        // E2E testing showed that 3 reset commands can arrive within milliseconds
+        // (interruption + echo detection + speech_ended). Without this guard,
+        // concurrent resets race and crash on double tap installation.
+        guard !isResetting else {
+            logError("Reset already in progress — skipping duplicate reset request")
+            return
+        }
+        isResetting = true
+        
         // WHY: We want a clean transcription boundary after AI speech or interruptions.
         // This mirrors the old "restart recognition" behavior but uses the new
         // SpeechAnalyzer pipeline: stop everything, then start fresh.
         await stopListeningAsync()
         await startListeningInternal()
+        
+        isResetting = false
     }
     
     /**
