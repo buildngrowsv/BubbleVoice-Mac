@@ -649,18 +649,41 @@ class VoicePipelineService extends EventEmitter {
       // Start playback
       // This is when the user actually sees/hears the response
       if (session.cachedResponses.llm) {
+        const responseText = (session.cachedResponses.llm.text || '').trim();
+        
         console.log('[VoicePipelineService] Sending messages to frontend');
         
         // FIRST: Send the user's message as a sent bubble
         // This shows what the user said after 2s of silence
         this.sendUserMessageToFrontend(session, session.latestTranscription);
         
-        // THEN: Send the AI response as a response bubble
-        // The server will handle sending it to the correct client
-        this.sendResponseToFrontend(session, session.cachedResponses.llm);
-        
-        // Mark TTS as playing
-        session.isTTSPlaying = true;
+        // GUARD: Only send AI response if there's actual text
+        // CRITICAL FIX (2026-02-06): Don't send blank assistant bubbles
+        //
+        // WHY: If the LLM returned empty text (e.g., multi-step tool calling
+        // where result.text only had last step's text), sending an empty
+        // ai_response creates a blank bubble in the UI and confuses users.
+        //
+        // BECAUSE: The user saw "Hello" → blank AI bubble → app appeared stuck.
+        // The empty bubble + pipeline state getting stuck made it look frozen.
+        if (responseText.length > 0) {
+          // Send the AI response as a response bubble
+          this.sendResponseToFrontend(session, session.cachedResponses.llm);
+        } else {
+          console.warn('[VoicePipelineService] ⚠️ LLM returned empty text — not sending blank AI response');
+          // Send an error notification so the user knows something went wrong
+          if (this.server && this.server.connections) {
+            for (const [ws, connectionState] of this.server.connections) {
+              if (connectionState.id === session.id) {
+                this.server.sendMessage(ws, {
+                  type: 'error',
+                  data: { message: 'AI response was empty. Please try again.' }
+                });
+                break;
+              }
+            }
+          }
+        }
         
         // CRITICAL (2026-02-06): Reset recognition at turn completion
         //
@@ -685,8 +708,34 @@ class VoicePipelineService extends EventEmitter {
         });
         console.log('[VoicePipelineService] Sent reset_recognition at turn completion (before TTS playback)');
         
-        // Generate and play TTS
-        this.generateTTS(session.cachedResponses.llm.text, session.settings, session);
+        // CRITICAL FIX (2026-02-06): Handle empty TTS text gracefully
+        //
+        // WHY: If responseText is empty, the Swift helper's speak command
+        // receives empty text and may never fire speech_ended. This leaves the
+        // session permanently stuck in isInResponsePipeline=true / isTTSPlaying=true,
+        // which means ALL subsequent transcriptions trigger the interruption handler
+        // instead of starting a new timer cascade — effectively freezing the voice pipeline.
+        //
+        // BECAUSE: User experienced "app didn't reply" — the pipeline was stuck waiting
+        // for speech_ended that never came because TTS had nothing to say.
+        //
+        // FIX: If text is empty, skip TTS entirely and immediately reset pipeline state
+        // as if speech_ended had fired. This makes the pipeline ready for the next turn.
+        if (responseText.length > 0) {
+          // Mark TTS as playing (will be cleared by speech_ended from Swift)
+          session.isTTSPlaying = true;
+          // Generate and play TTS
+          this.generateTTS(responseText, session.settings, session);
+        } else {
+          console.log('[VoicePipelineService] Skipping TTS for empty response — resetting pipeline immediately');
+          // Immediately reset pipeline state (mimics what speech_ended handler does)
+          session.isTTSPlaying = false;
+          session.isInResponsePipeline = false;
+          session.latestTranscription = '';
+          session.currentTranscription = '';
+          session.textAtLastTimerReset = '';
+          session.isProcessingResponse = false;
+        }
       } else {
         // TIMER 3 TIMEOUT - LLM didn't respond in time (P2 UX FIX — 2026-02-06)
         // WHY: User sees their message but no AI response, with no explanation.

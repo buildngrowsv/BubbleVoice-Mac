@@ -834,18 +834,36 @@ class BubbleVoiceApp {
    * @param {number} data.timestamp - Response timestamp
    */
   handleAIResponse(data) {
-    console.log('[App] Received AI response:', data.text ? data.text.substring(0, 50) + '...' : '(no text)');
+    const responseText = (data.text || data.content || '').trim();
+    console.log('[App] Received AI response:', responseText ? responseText.substring(0, 50) + '...' : '(no text)');
 
     // CRITICAL: Remove thinking indicator before adding the real response
     // WHY: The thinking dots should be replaced by actual AI text
     this.conversationManager.removeThinkingIndicator();
     this.showCancelButton(false);
 
+    // GUARD: Don't display blank assistant bubbles
+    // CRITICAL FIX (2026-02-06): If the AI response has no text, don't add an empty
+    // message bubble to the conversation. This prevents the confusing blank bubble
+    // that made the app appear frozen.
+    //
+    // WHY: The voice pipeline's multi-step tool calling could produce empty text
+    // (result.text from last step was empty). Backend now guards against this too,
+    // but this is a defense-in-depth check on the frontend.
+    //
+    // BECAUSE: User saw "Hello" → blank AI bubble → no further replies (appeared stuck).
+    if (!responseText) {
+      console.warn('[App] Received empty AI response — not displaying blank bubble');
+      this.state.isProcessing = false;
+      this.updateStatus('Ready', 'connected');
+      return;
+    }
+
     // Add AI message to conversation
     // Use backend's timestamp for accurate ordering
     this.conversationManager.addMessage({
       role: 'assistant',
-      content: data.text || data.content || '', // Support both 'text' and 'content' for backwards compatibility
+      content: responseText,
       timestamp: data.timestamp || Date.now()
     });
 

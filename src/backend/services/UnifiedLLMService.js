@@ -548,7 +548,43 @@ class UnifiedLLMService {
       const result = await Promise.race([generatePromise, timeoutPromise]);
       
       const elapsed = Date.now() - startTime;
-      const responseText = result.text || '';
+      
+      // CRITICAL FIX (2026-02-06): Collect text from ALL steps, not just result.text
+      //
+      // WHY: In multi-step tool calling, result.text only contains the LAST step's text.
+      // When the model generates its response text in step 1 and calls tools (suggest_bubbles,
+      // remember_info), step 2 processes tool results and may produce NO additional text.
+      // This means result.text is empty even though step 1 had perfectly good response text.
+      //
+      // BECAUSE: This caused the voice pipeline to receive an empty AI response, sending
+      // a blank assistant bubble to the user. The user saw "Hello" → empty reply.
+      //
+      // FIX: Iterate through result.steps and concatenate all non-empty text segments.
+      // This captures the model's actual response regardless of which step produced it.
+      //
+      // EXAMPLE:
+      //   Step 1: text="Hi there! How are you?" + toolCalls=[suggest_bubbles]
+      //   Step 2: text="" (just processed tool results)
+      //   result.text = "" (WRONG - misses step 1's text)
+      //   Correct: "Hi there! How are you?" (from step 1)
+      let responseText = '';
+      if (result.steps && result.steps.length > 0) {
+        // Collect text from all steps, filtering empty ones
+        const stepTexts = result.steps
+          .map(step => (step.text || '').trim())
+          .filter(text => text.length > 0);
+        responseText = stepTexts.join(' ');
+        
+        if (stepTexts.length > 1) {
+          console.log(`[UnifiedLLMService] Collected text from ${stepTexts.length} steps (multi-step response)`);
+        }
+      }
+      
+      // Fallback to result.text if steps didn't yield anything
+      // (safety net for single-step responses or different SDK versions)
+      if (!responseText && result.text) {
+        responseText = result.text;
+      }
       
       console.log(`[UnifiedLLMService] Response generated in ${elapsed}ms (${result.steps.length} steps)`);
       console.log(`[UnifiedLLMService] Tokens: ${result.usage?.totalTokens || 'unknown'}`);

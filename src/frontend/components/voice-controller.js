@@ -84,11 +84,27 @@ class VoiceController {
 
     try {
       // Send command to backend to start native speech recognition
+      // CRITICAL FIX (2026-02-06): Include the user's selected model and voice settings
+      //
+      // WHY: Previously, only { language, continuous } was sent. The voice pipeline's
+      // Timer 1 calls llmService.generateResponse(conversation, session.settings, callbacks)
+      // where session.settings is exactly what we send here. Without 'model', the LLM
+      // defaults to gemini-2.5-flash regardless of what the user selected in settings.
+      //
+      // BECAUSE: User selected a specific model but voice responses used the default.
+      // Also, voiceSpeed was missing so TTS always played at 1.0x speed.
+      //
+      // FIX: Merge the user's app settings (model, voiceSpeed, voice) with the
+      // voice-specific settings (language, continuous).
+      const appSettings = this.app.state.settings || {};
       await this.app.websocketClient.sendMessage({
         type: 'start_voice_input',
         settings: {
           language: 'en-US',
-          continuous: true
+          continuous: true,
+          model: appSettings.model || 'gemini-2.5-flash',
+          voiceSpeed: appSettings.voiceSpeed || 1.0,
+          voice: appSettings.voice || null
         }
       });
     } catch (error) {
