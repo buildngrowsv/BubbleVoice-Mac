@@ -120,6 +120,28 @@ class SpeechHelper {
     private var isListening = false
     private var isSpeaking = false
     
+    // CRITICAL GUARD (2026-02-06): Prevent concurrent restartRecognition calls
+    //
+    // WHY: restartRecognition() can be called from multiple sources nearly simultaneously:
+    //   1. isFinal in recognition callback (Apple finalizes an utterance)
+    //   2. reset_recognition command from backend (turn boundary, interruption, TTS end)
+    //   3. Periodic restart timer (session age / hang detection)
+    //   4. Recoverable error handler (transient Apple server errors)
+    //
+    // BECAUSE: When two restarts overlap, the sequence is:
+    //   T=0ms:  First restart: cancel task, remove tap, schedule async at T+50ms
+    //   T=5ms:  Second restart: cancel task (nil, no-op), remove tap (no tap, no-op),
+    //           schedule async at T+55ms
+    //   T=50ms: First async block: create request, start task, installTap ✓
+    //   T=55ms: Second async block: create request, start task, installTap → CRASH!
+    //           "tap already exists on bus 0"
+    //
+    // FIX: Set isRestarting=true at the start of restartRecognition(), clear it at the
+    // end of the async block. Additional restart calls while isRestarting is true are
+    // queued (we just set a flag to restart again when the current restart completes).
+    private var isRestarting = false
+    private var pendingRestart = false
+    
     // CRITICAL: Track whether we have any active timers or playback
     // This is used by the Node.js backend to determine if user speech
     // should trigger an interruption
@@ -627,6 +649,29 @@ class SpeechHelper {
         guard isListening else { return }
         guard let audioEngine = audioEngine else { return }
         
+        // CONCURRENT RESTART GUARD (2026-02-06):
+        // If a restart is already in progress, queue it instead of overlapping.
+        //
+        // WHY: Multiple sources can trigger restartRecognition nearly simultaneously
+        // (isFinal, reset_recognition command, periodic timer, error recovery).
+        // When two restarts overlap, the second async block calls installTap(onBus: 0)
+        // when the first already installed a tap — crashing with "tap already exists on bus 0".
+        //
+        // BECAUSE: User reported STT "hangs and stops working" after 2 words. The 0.5s
+        // silence timer fires between words, starts LLM processing, and when the next word
+        // arrives, triggers an interruption + reset_recognition. If Apple also sends isFinal
+        // around the same time, two restarts overlap and crash the Swift helper.
+        //
+        // FIX: Queue the restart. When the current restart completes, check pendingRestart
+        // and restart again if needed. This serializes all restarts safely.
+        if isRestarting {
+            logError("⏸ Restart already in progress — queuing pending restart")
+            pendingRestart = true
+            return
+        }
+        
+        isRestarting = true
+        
         // INCREMENT RESTART COUNTER
         // This counter tracks total restarts in the current listening session.
         // Useful for debugging: if restartCount is unusually high, it may
@@ -650,7 +695,10 @@ class SpeechHelper {
         // buffered audio from before the restart, causing accumulation
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
             guard let self = self else { return }
-            guard self.isListening else { return }
+            guard self.isListening else {
+                self.isRestarting = false
+                return
+            }
             
             // LIFECYCLE: Reset the session start time for this fresh session
             // This is critical — without this, the watchdog timer would see
@@ -663,6 +711,7 @@ class SpeechHelper {
             guard let recognitionRequest = self.recognitionRequest,
                   let speechRecognizer = self.speechRecognizer else {
                 self.sendError("Failed to create new recognition request")
+                self.isRestarting = false
                 return
             }
             
@@ -716,7 +765,13 @@ class SpeechHelper {
                 }
             }
             
-            // CRITICAL: Reinstall the audio tap with the NEW recognitionRequest
+            // SAFETY (2026-02-06): Always remove any existing tap before installing new one.
+            // This is a defense-in-depth measure. Even though we removed the tap above,
+            // the async delay means another code path could have installed one in the meantime.
+            // removeTap is safe to call when no tap exists (it's a no-op).
+            inputNode.removeTap(onBus: 0)
+            
+            // CRITICAL: Install the audio tap with the NEW recognitionRequest
             // This ensures audio buffers go to the new request, not the old one
             let recordingFormat = inputNode.outputFormat(forBus: 0)
             inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
@@ -726,6 +781,16 @@ class SpeechHelper {
             }
             
             self.logError("Audio tap reinstalled with new recognition request after flush delay (restart #\(self.restartCount))")
+            
+            // CONCURRENT RESTART: Mark restart as complete
+            // Then check if another restart was requested while we were busy.
+            // If so, restart again to process the queued request.
+            self.isRestarting = false
+            if self.pendingRestart {
+                self.pendingRestart = false
+                self.logError("Processing queued pending restart")
+                self.restartRecognition()
+            }
         }
     }
     

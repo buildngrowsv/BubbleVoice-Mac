@@ -252,13 +252,32 @@ class VoicePipelineService extends EventEmitter {
         //
         // This is fundamentally different from waiting for isFinal!
         
-        const hasActiveTimers = session.silenceTimers.llm || session.silenceTimers.tts || session.silenceTimers.playback;
-        const isInResponsePipeline = session.isInResponsePipeline || session.isTTSPlaying || hasActiveTimers;
+        // CRITICAL FIX (2026-02-06): Evaluate pipeline state TWICE — once before
+        // interruption and once after — instead of caching in a local variable.
+        //
+        // WHY: Previously, `isInResponsePipeline` was computed once (line ~256) and
+        // used for BOTH the interruption check AND the silence timer restart check.
+        // After handleSpeechDetected() cleared session.isInResponsePipeline, the
+        // local variable was still true, so the silence timer check (!isInResponsePipeline)
+        // evaluated to false — the silence timer was NEVER restarted from this transcription.
+        //
+        // BECAUSE: This caused the voice pipeline to go dead after interruptions.
+        // Timer 1 fires (0.5s pause between words), sets isInResponsePipeline=true.
+        // Next word triggers interruption + clears state. But the silence timer doesn't
+        // restart. No new timer cascade. User keeps speaking but backend ignores it.
+        // STT appears to "hang" because transcriptions arrive but are never processed.
+        //
+        // FIX: Re-evaluate session state AFTER the interruption handler runs. This
+        // ensures the silence timer restarts immediately after an interruption, so the
+        // backend is ready to process the next user utterance without waiting for another
+        // transcription update.
+        const hasActiveTimersBefore = session.silenceTimers.llm || session.silenceTimers.tts || session.silenceTimers.playback;
+        const wasInResponsePipeline = session.isInResponsePipeline || session.isTTSPlaying || hasActiveTimersBefore;
         
         // Check for interruption if we're in response pipeline
-        if (isInResponsePipeline && text.trim().length > 0) {
+        if (wasInResponsePipeline && text.trim().length > 0) {
           console.log('‼️ [VOICE INTERRUPT] User is speaking while AI is in response pipeline - triggering interruption');
-          console.log(`   - Active timers: ${hasActiveTimers}`);
+          console.log(`   - Active timers: ${hasActiveTimersBefore}`);
           console.log(`   - In pipeline: ${session.isInResponsePipeline}`);
           console.log(`   - TTS playing: ${session.isTTSPlaying}`);
           
@@ -271,33 +290,23 @@ class VoicePipelineService extends EventEmitter {
           session.transcriptionCallback(response.data);
         }
         
-        // CRITICAL FIX (2026-01-23): Simple timer-reset pattern from Accountability AI
-        //
-        // LESSON LEARNED: Don't overthink it! Accountability AI simply resets the
-        // timer on EVERY transcription update. The timer only fires when updates
-        // STOP coming for 0.5 seconds. This naturally handles:
+        // RE-EVALUATE pipeline state AFTER interruption handler may have cleared it.
+        // This is the critical fix — we check the CURRENT session state, not the stale
+        // local variable from before the interruption.
+        const hasActiveTimersAfter = session.silenceTimers.llm || session.silenceTimers.tts || session.silenceTimers.playback;
+        const isCurrentlyInPipeline = session.isInResponsePipeline || session.isTTSPlaying || hasActiveTimersAfter;
+        
+        // TIMER-RESET PATTERN (from Accountability AI):
+        // Reset the timer on EVERY transcription update. Timer only fires when
+        // updates STOP coming for 0.5s. This naturally handles:
         // - New speech: Updates keep coming → Timer keeps resetting
         // - Silence: Updates stop → Timer fires after 0.5s
         // - Refinements: Still updates → Timer resets (doesn't matter!)
+        // - Post-interruption: Pipeline was just cleared → Timer starts immediately
         //
-        // WHY THIS WORKS:
         // Apple's SFSpeechRecognizer sends updates continuously while user speaks.
         // When user stops, updates stop. Timer fires 0.5s after last update.
-        // Simple, reliable, proven in Accountability AI.
-        //
-        // PREVIOUS ATTEMPTS FAILED BECAUSE:
-        // - Tried to detect "significant" text growth → Too complex, broke
-        // - Tried to filter refinements → Impossible to distinguish reliably
-        // - Tried to be "smart" → Made it worse
-        //
-        // THE ACCOUNTABILITY AI WAY:
-        // Just reset the timer on every update. Let the timer do its job.
-        // If updates stop (user silent), timer fires. If updates continue (user
-        // speaking or Apple refining), timer resets. Perfect.
-        //
-        // PRODUCT CONTEXT: User speaks → Updates come → Timer resets continuously.
-        // User stops → Updates stop → Timer fires after 0.5s → LLM processes.
-        if (!isInResponsePipeline && text.trim().length > 0) {
+        if (!isCurrentlyInPipeline && text.trim().length > 0) {
           // Update the latest transcription
           session.latestTranscription = text;
           
