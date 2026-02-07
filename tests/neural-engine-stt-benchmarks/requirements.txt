@@ -1,0 +1,39 @@
+# ============================================================
+# NEURAL ENGINE STT BENCHMARK DEPENDENCIES
+# ============================================================
+#
+# These are the Python packages needed to run the benchmark
+# tests for various local STT engines on Apple Silicon.
+#
+# INSTALL:
+#   pip install -r tests/neural-engine-stt-benchmarks/requirements.txt
+#
+# SYSTEM DEPENDENCIES (install via brew):
+#   brew install portaudio ffmpeg cmake
+#
+# NOTE: These packages are Apple Silicon optimized. Most require
+# macOS 14+ and an M-series chip. They will NOT work on Intel Macs.
+#
+# CREATED: 2026-02-07 as part of Neural Engine STT research
+# ============================================================
+
+# Core dependencies (needed by ALL tests)
+numpy
+pyaudio          # Microphone capture — requires `brew install portaudio`
+soundfile        # WAV/AIFF file I/O
+
+# MLX-Whisper test (test-mlx-whisper-realtime.py)
+# Uses Apple's MLX framework for GPU-accelerated Whisper inference
+mlx-whisper
+
+# Lightning-Whisper-MLX / vayu-whisper test (test-lightning-whisper-mlx-realtime.py)
+# Batched decoding variant of mlx-whisper — 3-10x faster
+vayu-whisper
+
+# Sherpa-ONNX test (test-sherpa-onnx-realtime.py)
+# ONNX Runtime based STT with true streaming support
+sherpa-onnx
+
+# whisper.cpp CoreML test (test-whisper-cpp-coreml.py)
+# No Python package needed — uses the whisper.cpp CLI binary
+# Built from source via setup-models.sh
