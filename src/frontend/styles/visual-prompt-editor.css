@@ -1,0 +1,1105 @@
+/**
+ * VISUAL PROMPT EDITOR STYLES
+ * 
+ * Styles for the block-based visual prompt editor and template library.
+ * Follows the Liquid Glass aesthetic and integrates with the admin panel.
+ * 
+ * DESIGN PHILOSOPHY:
+ * - Text blocks: clean white cards with subtle borders
+ * - Programmatic blocks: gradient-accented cards that feel "special"
+ * - Variable chips: colorful pills that stand out from regular text
+ * - Drag-and-drop: smooth transitions and clear drop indicators
+ * - Mobile-friendly: works at any admin panel width
+ * 
+ * Created: 2026-02-06
+ */
+
+/* ============================================================
+   EDITOR CONTAINER
+   ============================================================ */
+
+.visual-prompt-editor {
+    position: relative;
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+}
+
+/* ============================================================
+   TOOLBAR
+   Top bar with mode toggle, counters, and action buttons.
+   ============================================================ */
+
+.vpe-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.vpe-toolbar-left {
+    display: flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 10px;
+    padding: 3px;
+}
+
+.vpe-mode-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vpe-mode-btn:hover {
+    color: #444;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.vpe-mode-btn.active {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.vpe-mode-icon {
+    font-size: 14px;
+}
+
+.vpe-toolbar-center {
+    flex: 1;
+    text-align: center;
+}
+
+.vpe-block-count {
+    font-size: 12px;
+    color: #999;
+    font-weight: 500;
+}
+
+.vpe-toolbar-right {
+    display: flex;
+    gap: 8px;
+}
+
+.vpe-action-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vpe-add-text-btn {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.vpe-add-text-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.vpe-reset-btn {
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+}
+
+.vpe-reset-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+/* ============================================================
+   BLOCK LIST
+   Container for all prompt blocks in edit mode.
+   ============================================================ */
+
+.vpe-body {
+    min-height: 400px;
+}
+
+.vpe-block-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ============================================================
+   BLOCK COMMON STYLES
+   Shared styles for both text and programmatic blocks.
+   ============================================================ */
+
+.vpe-block {
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    background: white;
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.vpe-block:hover {
+    border-color: rgba(102, 126, 234, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* Dragging state */
+.vpe-block.vpe-dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+    border-color: #667eea;
+}
+
+/* Drop indicators — colored lines showing where the block will land */
+.vpe-block.vpe-drop-before {
+    border-top: 3px solid #667eea;
+    margin-top: -1px;
+}
+
+.vpe-block.vpe-drop-before::before {
+    content: '';
+    display: block;
+    height: 0;
+    border-top: 3px dashed rgba(102, 126, 234, 0.4);
+    margin: -3px -2px 0 -2px;
+    border-radius: 16px 16px 0 0;
+}
+
+.vpe-block.vpe-drop-after {
+    border-bottom: 3px solid #667eea;
+    margin-bottom: -1px;
+}
+
+/* Collapsed state */
+.vpe-block.collapsed .vpe-block-body {
+    display: none;
+}
+
+/* ============================================================
+   BLOCK HEADER
+   Contains drag handle, icon, label, and control buttons.
+   ============================================================ */
+
+.vpe-block-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    gap: 10px;
+    cursor: default;
+    user-select: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.vpe-drag-handle {
+    cursor: grab;
+    color: #ccc;
+    font-size: 16px;
+    letter-spacing: -2px;
+    padding: 4px 2px;
+    border-radius: 4px;
+    transition: color 0.2s ease;
+    line-height: 1;
+}
+
+.vpe-drag-handle:hover {
+    color: #667eea;
+}
+
+.vpe-drag-handle:active {
+    cursor: grabbing;
+}
+
+.vpe-block-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.vpe-block-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2d3748;
+    flex: 1;
+}
+
+.vpe-var-badge {
+    padding: 2px 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.vpe-block-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.vpe-insert-var-btn {
+    padding: 4px 10px;
+    background: rgba(102, 126, 234, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'SF Mono', Monaco, monospace;
+}
+
+.vpe-insert-var-btn:hover {
+    background: rgba(102, 126, 234, 0.15);
+    border-color: #667eea;
+}
+
+.vpe-collapse-btn {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #999;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.vpe-collapse-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #666;
+}
+
+.vpe-delete-btn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    opacity: 0.5;
+}
+
+.vpe-delete-btn:hover {
+    opacity: 1;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* ============================================================
+   TEXT BLOCK BODY
+   Contains description, textarea, and variable chips.
+   ============================================================ */
+
+.vpe-block-body {
+    padding: 16px;
+}
+
+.vpe-block-description {
+    margin: 0 0 12px 0;
+    font-size: 12px;
+    color: #999;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.vpe-textarea-wrapper {
+    position: relative;
+}
+
+.vpe-block-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 14px 16px;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #2d3748;
+    background: rgba(0, 0, 0, 0.01);
+    resize: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.vpe-block-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: white;
+}
+
+.vpe-block-textarea::placeholder {
+    color: #ccc;
+    font-style: italic;
+}
+
+/* Variable chips display below textarea */
+.vpe-variable-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(102, 126, 234, 0.04);
+    border-radius: 10px;
+}
+
+.vpe-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: #667eea;
+    cursor: default;
+}
+
+/* ============================================================
+   PROGRAMMATIC BLOCK STYLES
+   Special styling for runtime-injected blocks (RAG, vectors, etc.)
+   ============================================================ */
+
+.vpe-block-programmatic {
+    border-left: 4px solid;
+    border-image: linear-gradient(180deg, #667eea, #764ba2) 1;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+}
+
+.vpe-block-programmatic .vpe-block-header {
+    background: rgba(102, 126, 234, 0.04);
+}
+
+.vpe-block-programmatic.disabled {
+    opacity: 0.5;
+    border-image: none;
+    border-left-color: #ddd;
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.vpe-block-programmatic.conditional {
+    border-image: linear-gradient(180deg, #f093fb, #f5576c) 1;
+}
+
+.vpe-conditional-badge {
+    padding: 2px 8px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+/* Toggle switch for enabling/disabling programmatic blocks */
+.vpe-toggle-switch {
+    width: 44px;
+    height: 24px;
+    background: #ddd;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+}
+
+.vpe-toggle-switch.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.vpe-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.vpe-toggle-switch.active .vpe-toggle-thumb {
+    transform: translateX(20px);
+}
+
+/* Programmatic block metadata */
+.vpe-prog-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 10px;
+    font-size: 12px;
+}
+
+.vpe-meta-label {
+    font-weight: 600;
+    color: #666;
+    margin-right: 6px;
+}
+
+.vpe-prog-meta code {
+    padding: 2px 6px;
+    background: rgba(102, 126, 234, 0.08);
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 11px;
+    color: #667eea;
+}
+
+.vpe-prog-behavior span {
+    color: #666;
+    font-size: 12px;
+}
+
+/* Programmatic block preview (expandable) */
+.vpe-prog-preview {
+    margin-top: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.vpe-prog-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.02);
+    font-size: 12px;
+    color: #999;
+}
+
+.vpe-expand-preview-btn {
+    background: none;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vpe-expand-preview-btn:hover {
+    background: rgba(102, 126, 234, 0.08);
+}
+
+.vpe-prog-preview-content {
+    display: none;
+    padding: 12px;
+    margin: 0;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: #555;
+    background: rgba(0, 0, 0, 0.01);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.vpe-prog-preview.expanded .vpe-prog-preview-content {
+    display: block;
+}
+
+/* ============================================================
+   VARIABLE PALETTE (floating dropdown)
+   Shows available variables for insertion into text blocks.
+   ============================================================ */
+
+.vpe-variable-palette {
+    position: absolute;
+    z-index: 100;
+    width: 320px;
+    max-height: 400px;
+    background: white;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    animation: vpe-palette-enter 0.2s ease;
+}
+
+@keyframes vpe-palette-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.vpe-palette-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.vpe-palette-header h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.vpe-palette-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 20px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+}
+
+.vpe-palette-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.vpe-palette-body {
+    max-height: 340px;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.vpe-palette-group {
+    margin-bottom: 8px;
+}
+
+.vpe-palette-group-label {
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vpe-palette-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+}
+
+.vpe-palette-item:hover {
+    background: rgba(102, 126, 234, 0.08);
+}
+
+.vpe-palette-item-chip {
+    padding: 2px 8px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.25);
+    border-radius: 8px;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: #667eea;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.vpe-palette-item-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d3748;
+    flex: 1;
+}
+
+.vpe-palette-item-example {
+    font-size: 11px;
+    color: #999;
+    font-style: italic;
+    flex-shrink: 0;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ============================================================
+   PREVIEW MODE
+   Shows the assembled prompt with rendered variables and blocks.
+   ============================================================ */
+
+.vpe-preview {
+    min-height: 400px;
+}
+
+.vpe-preview-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.vpe-preview-section {
+    padding: 16px 20px;
+    border-radius: 12px;
+    animation: vpe-preview-fadein 0.3s ease;
+}
+
+@keyframes vpe-preview-fadein {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.vpe-preview-text {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.vpe-preview-programmatic {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.06) 0%, rgba(118, 75, 162, 0.06) 100%);
+    border: 1px solid rgba(102, 126, 234, 0.15);
+    border-left: 4px solid #667eea;
+}
+
+.vpe-preview-programmatic.conditional {
+    border-left-color: #f093fb;
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.06) 0%, rgba(245, 87, 108, 0.06) 100%);
+    border-color: rgba(240, 147, 251, 0.15);
+}
+
+.vpe-preview-disabled {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px dashed rgba(0, 0, 0, 0.1);
+    opacity: 0.5;
+}
+
+.vpe-preview-section-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vpe-preview-section-content {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #2d3748;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+}
+
+.vpe-preview-chip {
+    display: inline;
+    padding: 1px 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.vpe-preview-chip.unknown {
+    background: #ef4444;
+}
+
+.vpe-conditional-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: #f093fb;
+    background: rgba(240, 147, 251, 0.1);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.vpe-always-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.vpe-disabled-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: #999;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* ============================================================
+   TEMPLATE LIBRARY STYLES
+   Grid of template cards with filtering and apply buttons.
+   ============================================================ */
+
+.template-library {
+    margin-top: 24px;
+}
+
+.tpl-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.tpl-description {
+    margin: 0 0 20px 0;
+    font-size: 13px;
+    color: #999;
+    line-height: 1.5;
+}
+
+/* Category filter pills */
+.tpl-categories {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.tpl-category-btn {
+    padding: 8px 16px;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tpl-category-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.tpl-category-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+}
+
+/* Template grid */
+.tpl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* Template card */
+.tpl-card {
+    background: white;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tpl-card:hover {
+    border-color: rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.tpl-card.custom {
+    border-left: 4px solid #f093fb;
+}
+
+.tpl-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tpl-card-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.tpl-card-title-area {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tpl-card-name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.tpl-custom-badge {
+    padding: 1px 6px;
+    background: rgba(240, 147, 251, 0.1);
+    color: #f093fb;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    width: fit-content;
+}
+
+.tpl-card-description {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.tpl-card-preview {
+    padding: 10px 14px;
+    background: rgba(102, 126, 234, 0.04);
+    border-radius: 10px;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.tpl-card-preview em {
+    font-style: italic;
+}
+
+.tpl-card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tpl-tag {
+    padding: 2px 10px;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+}
+
+.tpl-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 4px;
+}
+
+.tpl-apply-btn {
+    flex: 1;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tpl-apply-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.tpl-delete-btn {
+    padding: 10px;
+    background: rgba(239, 68, 68, 0.08);
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tpl-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+/* Save as template footer */
+.tpl-footer {
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.tpl-save-current-btn {
+    padding: 12px 24px;
+    background: white;
+    border: 2px dashed rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    color: #667eea;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.tpl-save-current-btn:hover {
+    background: rgba(102, 126, 234, 0.04);
+    border-color: #667eea;
+}
+
+/* Save template modal */
+.tpl-save-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 12000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tpl-save-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+}
+
+.tpl-save-content {
+    position: relative;
+    width: 90%;
+    max-width: 440px;
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.tpl-save-content h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.tpl-save-content p {
+    margin: 0 0 20px 0;
+    color: #999;
+    font-size: 13px;
+}
+
+.tpl-save-field {
+    margin-bottom: 16px;
+}
+
+.tpl-save-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.tpl-save-field input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.tpl-save-field input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.tpl-save-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.tpl-save-actions .btn-secondary {
+    flex: 1;
+}
+
+.tpl-save-actions .btn-primary {
+    flex: 1;
+}
+
+/* ============================================================
+   SCROLLBAR STYLING
+   ============================================================ */
+
+.vpe-palette-body::-webkit-scrollbar,
+.vpe-prog-preview-content::-webkit-scrollbar,
+.vpe-block-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.vpe-palette-body::-webkit-scrollbar-track,
+.vpe-prog-preview-content::-webkit-scrollbar-track,
+.vpe-block-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.vpe-palette-body::-webkit-scrollbar-thumb,
+.vpe-prog-preview-content::-webkit-scrollbar-thumb,
+.vpe-block-list::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 3px;
+}
+
+.vpe-palette-body::-webkit-scrollbar-thumb:hover,
+.vpe-prog-preview-content::-webkit-scrollbar-thumb:hover,
+.vpe-block-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.4);
+}

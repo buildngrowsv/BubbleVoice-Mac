@@ -1,33 +1,44 @@
 /**
  * PROMPT MANAGEMENT SERVICE
  * 
- * **Purpose**: Centralized management of all system prompts with customization support
+ * **Purpose**: Centralized management of all system prompts with customization support,
+ * block-based visual editing, template management, and variable substitution.
  * 
  * **Why This Exists**:
  * - All prompts were hardcoded in LLMService
  * - Users couldn't customize AI behavior
  * - No way to A/B test different prompts
  * - No version control for prompt changes
+ * - (2026-02-06) Added block-based config, templates, and variables for the
+ *   visual prompt editor that shows programmatic/RAG sections inline
  * 
  * **What It Does**:
  * 1. Stores default prompts (from code)
  * 2. Loads custom prompts (from user_data/config/)
- * 3. Provides variable substitution
+ * 3. Provides variable substitution (resolves {{variableName}} at runtime)
  * 4. Tracks prompt versions
  * 5. Allows reset to defaults
+ * 6. (NEW) Stores block-based config for visual editor (block ordering, toggles)
+ * 7. (NEW) Manages custom prompt templates (save/load/delete)
+ * 8. (NEW) Resolves runtime variables before prompt is sent to LLM
  * 
  * **Architecture**:
  * - Default prompts: Loaded from this file (source of truth)
  * - Custom prompts: Stored in user_data/config/prompts.json
+ * - Block config: Stored in user_data/config/prompt-blocks.json
+ * - Custom templates: Stored in user_data/config/prompt-templates.json
  * - Active prompt: Custom if exists, otherwise default
+ * - Variable resolution: Happens at getSystemPrompt() call time
  * 
  * **Integration**:
  * - LLMService calls getSystemPrompt() instead of buildSystemPrompt()
  * - Admin UI calls updateSection() to modify prompts
+ * - Visual Editor saves/loads block config via getBlockConfig()/saveBlockConfig()
+ * - Template Library saves/loads via getCustomTemplates()/saveCustomTemplates()
  * - Changes are persisted immediately
  * 
  * **Created**: 2026-01-24
- * **Last Modified**: 2026-01-24
+ * **Last Modified**: 2026-02-06
  */
 
 const fs = require('fs');
@@ -37,18 +48,42 @@ class PromptManagementService {
     /**
      * CONSTRUCTOR
      * 
-     * Initializes the prompt management service with default and custom prompts.
+     * Initializes the prompt management service with default and custom prompts,
+     * block configuration, and custom templates.
      * 
      * @param {string} userDataDir - Path to user_data directory
      * 
-     * **Technical**: Creates config directory if it doesn't exist
-     * **Why**: User data dir is passed from server.js, ensures consistent storage
-     * **Product**: All user customizations are stored in their user_data folder
+     * **Technical**: Creates config directory if it doesn't exist. Loads all
+     * config files: prompts.json, prompt-blocks.json, prompt-templates.json.
+     * 
+     * **Why**: User data dir is passed from server.js, ensures consistent storage.
+     * Block config and templates are stored separately from prompts for clean separation.
+     * 
+     * **Product**: All user customizations are stored in their user_data folder.
+     * The visual editor's block ordering, programmatic block toggles, and saved
+     * templates all persist across app restarts.
      */
     constructor(userDataDir) {
         this.userDataDir = userDataDir;
         this.configDir = path.join(userDataDir, 'config');
         this.promptsPath = path.join(this.configDir, 'prompts.json');
+        
+        /**
+         * blockConfigPath: Stores the visual editor's block-based configuration.
+         * This includes block ordering, programmatic block enable/disable states,
+         * custom text block content, and collapse states.
+         * Separate from prompts.json to avoid breaking existing section-based API.
+         * Added 2026-02-06 for the visual prompt editor feature.
+         */
+        this.blockConfigPath = path.join(this.configDir, 'prompt-blocks.json');
+        
+        /**
+         * templatesPath: Stores user-saved custom prompt templates.
+         * Each template has a name, description, icon, and section content.
+         * Separate file so templates can be exported/shared independently.
+         * Added 2026-02-06 for the template library feature.
+         */
+        this.templatesPath = path.join(this.configDir, 'prompt-templates.json');
         
         // Ensure config directory exists
         if (!fs.existsSync(this.configDir)) {
@@ -59,11 +94,19 @@ class PromptManagementService {
         // Load default prompts (hardcoded source of truth)
         this.defaultPrompts = this.loadDefaultPrompts();
         
-        // Load custom prompts (user modifications)
+        // Load custom prompts (user modifications to section text)
         this.customPrompts = this.loadCustomPrompts();
+        
+        // Load block configuration (visual editor block ordering and toggles)
+        this.blockConfig = this.loadBlockConfig();
+        
+        // Load custom templates (user-saved prompt configurations)
+        this.customTemplates = this.loadCustomTemplates();
         
         console.log('[PromptManagementService] Initialized');
         console.log(`  Custom prompts: ${Object.keys(this.customPrompts).length > 0 ? 'YES' : 'NO'}`);
+        console.log(`  Block config: ${this.blockConfig ? 'YES' : 'NO'}`);
+        console.log(`  Custom templates: ${this.customTemplates.length}`);
     }
     
     /**
@@ -431,6 +474,293 @@ You MUST respond with ONLY valid JSON. No other text before or after. Your respo
             modifiedBy: this.customPrompts.modifiedBy || this.defaultPrompts.modifiedBy,
             hasCustomizations: Object.keys(this.customPrompts).length > 0
         };
+    }
+    
+    // =========================================================================
+    // BLOCK CONFIGURATION METHODS (Added 2026-02-06)
+    //
+    // These methods manage the visual prompt editor's block-based configuration.
+    // The block config stores the ordering of text + programmatic blocks,
+    // which programmatic blocks are enabled/disabled, and custom text content.
+    //
+    // This is separate from the section-based system (above) for backward
+    // compatibility. When a block config exists, getSystemPrompt() uses it
+    // to determine the text section content. When it doesn't exist, the old
+    // section-based system is used as-is.
+    // =========================================================================
+    
+    /**
+     * LOAD BLOCK CONFIG
+     * 
+     * Loads the visual editor's block configuration from disk.
+     * 
+     * **Technical**: Reads from user_data/config/prompt-blocks.json
+     * **Why**: Persists block ordering, toggles, and custom text across restarts
+     * **Product**: Users' visual editor layout is preserved
+     * **Returns**: Block config object or null if no config saved yet
+     */
+    loadBlockConfig() {
+        if (!fs.existsSync(this.blockConfigPath)) {
+            console.log('[PromptManagementService] No block config found (first-time user)');
+            return null;
+        }
+        
+        try {
+            const data = fs.readFileSync(this.blockConfigPath, 'utf-8');
+            const config = JSON.parse(data);
+            console.log('[PromptManagementService] Loaded block config');
+            return config;
+        } catch (error) {
+            console.error('[PromptManagementService] Error loading block config:', error);
+            return null;
+        }
+    }
+    
+    /**
+     * SAVE BLOCK CONFIG
+     * 
+     * Persists the visual editor's block configuration to disk.
+     * Also syncs text block content back to the section-based system
+     * for backward compatibility (so getSystemPrompt() still works).
+     * 
+     * **Technical**: Writes to prompt-blocks.json AND updates customPrompts
+     * sections to keep the two systems in sync. This dual-write ensures that
+     * even if the visual editor is not used, the prompt content is consistent.
+     * 
+     * @param {Object} config - Block configuration from the visual editor
+     * 
+     * **Why**: Dual-write to both block config and section prompts ensures
+     * backward compat. LLMService calls getSystemPrompt() which reads sections.
+     * Visual editor reads block config for layout/ordering.
+     * 
+     * **Product**: Changes in the visual editor take effect immediately for the AI.
+     */
+    saveBlockConfig(config) {
+        try {
+            // Save block config
+            this.blockConfig = config;
+            fs.writeFileSync(
+                this.blockConfigPath,
+                JSON.stringify(config, null, 2),
+                'utf-8'
+            );
+            
+            // Sync text block content to section-based system for backward compat
+            // This ensures getSystemPrompt() returns the right content
+            if (config && config.blocks) {
+                const sectionMapping = [
+                    'purpose', 'approach', 'lifeAreas', 'responseFormat',
+                    'areaActionsGuidelines', 'artifactGuidelines',
+                    'exampleResponse', 'importantNotes'
+                ];
+                
+                if (!this.customPrompts.system) {
+                    this.customPrompts.system = {};
+                }
+                
+                config.blocks.forEach(block => {
+                    if (block.type === 'text' && sectionMapping.includes(block.id) && block.content) {
+                        this.customPrompts.system[block.id] = block.content;
+                    }
+                });
+                
+                this.customPrompts.lastModified = new Date().toISOString();
+                this.customPrompts.modifiedBy = 'user';
+                this.saveCustomPrompts();
+            }
+            
+            console.log('[PromptManagementService] Saved block config (+ synced to sections)');
+        } catch (error) {
+            console.error('[PromptManagementService] Error saving block config:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * GET BLOCK CONFIG
+     * 
+     * Returns the current block configuration for the visual editor.
+     * 
+     * @returns {Object|null} Block config or null if none saved
+     */
+    getBlockConfig() {
+        return this.blockConfig;
+    }
+    
+    // =========================================================================
+    // VARIABLE RESOLUTION METHODS (Added 2026-02-06)
+    //
+    // These methods resolve {{variableName}} placeholders in prompt text
+    // at runtime. Variables provide dynamic context like the current date,
+    // user name, conversation count, etc.
+    //
+    // Variables are resolved when getSystemPrompt() is called, so the LLM
+    // always sees resolved values, not raw {{placeholders}}.
+    //
+    // WHY: Users want to write prompts like "Today is {{currentDate}}, help me
+    // plan my {{dayOfWeek}} evening" and have the AI see the actual date.
+    // BECAUSE: Without this, prompts are static and users would need to
+    // manually update date references, model names, etc.
+    // =========================================================================
+    
+    /**
+     * RESOLVE VARIABLES
+     * 
+     * Replaces all {{variableName}} placeholders in a text string with
+     * their resolved runtime values.
+     * 
+     * **Technical**: Uses regex to find {{variables}} and replaces each
+     * with a value from the runtime context. Unknown variables are left as-is.
+     * 
+     * **Why**: Lets users write dynamic prompts without manual updating.
+     * The AI always knows what day it is, what model is being used, etc.
+     * 
+     * @param {string} text - Text containing {{variable}} placeholders
+     * @param {Object} runtimeContext - Optional additional context (e.g., from settings)
+     * @returns {string} Text with variables resolved
+     */
+    resolveVariables(text, runtimeContext = {}) {
+        if (!text || typeof text !== 'string') return text;
+        
+        // Build the variable values map
+        const now = new Date();
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const hour = now.getHours();
+        
+        /**
+         * timeOfDay: Determines the period of day for conversational context.
+         * The AI can use this to say things like "How's your evening going?"
+         * Boundaries: morning (5-11), afternoon (12-16), evening (17-20), night (21-4)
+         */
+        let timeOfDay = 'morning';
+        if (hour >= 12 && hour < 17) timeOfDay = 'afternoon';
+        else if (hour >= 17 && hour < 21) timeOfDay = 'evening';
+        else if (hour >= 21 || hour < 5) timeOfDay = 'night';
+        
+        const variableValues = {
+            // Time variables — resolved from the system clock
+            currentDate: now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+            currentTime: now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+            dayOfWeek: dayNames[now.getDay()],
+            timeOfDay: timeOfDay,
+            
+            // System variables — from the runtime context passed by the caller
+            userName: runtimeContext.userName || 'User',
+            modelName: runtimeContext.modelName || 'AI',
+            appVersion: runtimeContext.appVersion || '1.0.0',
+            
+            // Database/stats variables — from the runtime context
+            conversationCount: String(runtimeContext.conversationCount || 0),
+            activeAreaCount: String(runtimeContext.activeAreaCount || 0),
+            areasList: runtimeContext.areasList || '',
+            
+            // Allow any additional context values to be used as variables
+            ...runtimeContext
+        };
+        
+        // Replace all {{variableName}} occurrences
+        return text.replace(/\{\{(\w+)\}\}/g, (match, varName) => {
+            if (variableValues[varName] !== undefined) {
+                return variableValues[varName];
+            }
+            // Unknown variable: leave as-is so the user can see it's unresolved
+            console.warn(`[PromptManagementService] Unknown variable: {{${varName}}}`);
+            return match;
+        });
+    }
+    
+    /**
+     * GET SYSTEM PROMPT WITH VARIABLES
+     * 
+     * Returns the system prompt with all variables resolved.
+     * This is the preferred method for LLMService to call.
+     * 
+     * **Technical**: Calls getSystemPrompt() then resolveVariables().
+     * **Why**: LLMService doesn't need to know about variable resolution.
+     * **Product**: The AI always sees fully resolved, contextual prompts.
+     * 
+     * @param {Object} runtimeContext - Context values for variable resolution
+     * @returns {string} Fully resolved system prompt
+     */
+    getSystemPromptWithVariables(runtimeContext = {}) {
+        const rawPrompt = this.getSystemPrompt();
+        return this.resolveVariables(rawPrompt, runtimeContext);
+    }
+    
+    // =========================================================================
+    // TEMPLATE MANAGEMENT METHODS (Added 2026-02-06)
+    //
+    // These methods manage user-saved custom prompt templates.
+    // Built-in templates are hardcoded in the frontend (prompt-template-library.js).
+    // Custom templates are saved to user_data/config/prompt-templates.json.
+    //
+    // WHY: Users may want to save their current prompt configuration as a
+    // reusable template, or share templates with others.
+    // BECAUSE: The template library lets users quickly switch between
+    // different AI personality modes, and custom templates extend this.
+    // =========================================================================
+    
+    /**
+     * LOAD CUSTOM TEMPLATES
+     * 
+     * Loads user-saved prompt templates from disk.
+     * 
+     * **Technical**: Reads from user_data/config/prompt-templates.json
+     * **Returns**: Array of template objects, or empty array if none exist
+     */
+    loadCustomTemplates() {
+        if (!fs.existsSync(this.templatesPath)) {
+            return [];
+        }
+        
+        try {
+            const data = fs.readFileSync(this.templatesPath, 'utf-8');
+            const templates = JSON.parse(data);
+            console.log(`[PromptManagementService] Loaded ${templates.length} custom templates`);
+            return Array.isArray(templates) ? templates : [];
+        } catch (error) {
+            console.error('[PromptManagementService] Error loading custom templates:', error);
+            return [];
+        }
+    }
+    
+    /**
+     * SAVE CUSTOM TEMPLATES
+     * 
+     * Persists custom templates to disk.
+     * 
+     * @param {Array} templates - Array of template objects to save
+     * 
+     * **Technical**: Overwrites the entire templates file with the new array.
+     * This is fine because templates are small and infrequently modified.
+     * 
+     * **Why**: Atomic write ensures consistency. No partial updates.
+     * **Product**: User-saved templates persist across app restarts.
+     */
+    saveCustomTemplates(templates) {
+        try {
+            this.customTemplates = Array.isArray(templates) ? templates : [];
+            fs.writeFileSync(
+                this.templatesPath,
+                JSON.stringify(this.customTemplates, null, 2),
+                'utf-8'
+            );
+            console.log(`[PromptManagementService] Saved ${this.customTemplates.length} custom templates`);
+        } catch (error) {
+            console.error('[PromptManagementService] Error saving custom templates:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * GET CUSTOM TEMPLATES
+     * 
+     * Returns all user-saved custom templates.
+     * 
+     * @returns {Array} Array of template objects
+     */
+    getCustomTemplates() {
+        return this.customTemplates;
     }
 }
 

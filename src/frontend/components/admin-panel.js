@@ -4,7 +4,9 @@
  * **Purpose**: Advanced configuration panel for power users and developers
  * 
  * **What It Provides**:
- * - System prompt editing (8 sections)
+ * - Visual prompt editor with draggable text + programmatic blocks (NEW 2026-02-06)
+ * - Template library for one-click AI personality switching (NEW 2026-02-06)
+ * - Variable system for dynamic prompt content (NEW 2026-02-06)
  * - Vector search configuration
  * - Context assembly parameters
  * - Performance monitoring
@@ -15,24 +17,40 @@
  * - Developers need to tune search parameters
  * - Power users want to optimize performance
  * - Transparency: show what's happening under the hood
+ * - (NEW) Users want to see and control WHERE programmatic sections (RAG context,
+ *   vector results, etc.) appear in the prompt flow
+ * - (NEW) Users want to quickly switch AI personality via templates
  * 
  * **Product Context**:
  * This is a "power user" feature. Most users won't touch it,
  * but those who do will appreciate the control and transparency.
+ * The visual editor makes the prompt system accessible to non-technical users too.
+ * 
+ * **Architecture Change (2026-02-06)**:
+ * The old textarea-based section editor has been replaced with:
+ * 1. VisualPromptEditor — block-based editor with drag-and-drop
+ * 2. PromptTemplateLibrary — template picker with built-in presets
+ * Both are imported as separate components and mounted inside the admin panel.
  * 
  * **Created**: 2026-01-24
- * **Part of**: Agentic AI Flows Enhancement
+ * **Last Modified**: 2026-02-06
+ * **Part of**: Agentic AI Flows Enhancement + Visual Prompt Editor Feature
  */
 
 class AdminPanel {
     /**
      * CONSTRUCTOR
      * 
-     * Initializes the admin panel with default state.
+     * Initializes the admin panel with the visual prompt editor and template library.
      * 
-     * **Technical**: Creates DOM structure and loads current config
-     * **Why**: Admin panel is hidden by default, shown on demand
-     * **Product**: Advanced users can access via settings gear icon
+     * **Technical**: Creates DOM structure, initializes sub-components (VisualPromptEditor,
+     * PromptTemplateLibrary), and loads current config from backend.
+     * 
+     * **Why**: Admin panel is hidden by default, shown on demand. Sub-components are
+     * created eagerly so they're ready when the panel opens.
+     * 
+     * **Product**: Advanced users can access via settings gear icon. The visual editor
+     * and template library are the first things they see in the System Prompts tab.
      */
     constructor() {
         this.isOpen = false;
@@ -41,13 +59,47 @@ class AdminPanel {
         this.config = null;
         this.metadata = null;
         
+        /**
+         * visualEditor: The block-based visual prompt editor component.
+         * Shows text sections and programmatic/RAG blocks as draggable visual elements.
+         * Users can reorder blocks, toggle programmatic sections, insert variables,
+         * and write custom text between blocks.
+         * Created 2026-02-06 to replace the old textarea-based section editor.
+         */
+        this.visualEditor = new VisualPromptEditor();
+        
+        /**
+         * templateLibrary: The prompt template picker component.
+         * Shows a grid of pre-built and custom templates with one-click apply.
+         * Created 2026-02-06 to give users quick AI personality switching.
+         */
+        this.templateLibrary = new PromptTemplateLibrary(this.visualEditor);
+        
+        /**
+         * autoSaveTimer: Debounce timer for auto-saving block config changes.
+         * The visual editor fires onChange frequently (on every keystroke),
+         * so we debounce saves to avoid excessive disk writes.
+         * 500ms delay balances responsiveness with I/O efficiency.
+         */
+        this.autoSaveTimer = null;
+        
         // Create panel element
         this.element = this.render();
         
         // Setup event listeners
         this.setupEventListeners();
         
-        console.log('[AdminPanel] Initialized');
+        // Wire up visual editor auto-save
+        this.visualEditor.onChange((data) => {
+            this.autoSaveBlockConfig(data);
+        });
+        
+        // Wire up template apply callback
+        this.templateLibrary.onApply((template) => {
+            this.showNotification(`Applied template: ${template.name}`, 'success');
+        });
+        
+        console.log('[AdminPanel] Initialized with visual editor + template library');
     }
     
     /**
@@ -86,55 +138,30 @@ class AdminPanel {
                 </div>
                 
                 <div class="admin-panel-body">
-                    <!-- Prompts Tab -->
+                    <!-- Prompts Tab (REBUILT 2026-02-06 with Visual Editor + Templates) -->
                     <div class="admin-tab-content active" data-tab-content="prompts">
                         <div class="admin-section">
-                            <h3>System Prompt Editor</h3>
+                            <h3>Visual Prompt Editor</h3>
                             <p class="admin-description">
-                                Customize how the AI behaves and responds. Changes take effect immediately.
+                                Build your AI's personality by arranging text blocks and runtime data injection points.
+                                Drag blocks to reorder, toggle programmatic sections on/off, and insert dynamic variables.
+                                Changes save automatically.
                             </p>
                             
-                            <div class="prompt-sections">
-                                <div class="section-selector">
-                                    <button class="section-btn active" data-section="purpose">Purpose</button>
-                                    <button class="section-btn" data-section="approach">Approach</button>
-                                    <button class="section-btn" data-section="lifeAreas">Life Areas</button>
-                                    <button class="section-btn" data-section="responseFormat">Format</button>
-                                    <button class="section-btn" data-section="areaActionsGuidelines">Actions</button>
-                                    <button class="section-btn" data-section="artifactGuidelines">Artifacts</button>
-                                    <button class="section-btn" data-section="exampleResponse">Example</button>
-                                    <button class="section-btn" data-section="importantNotes">Notes</button>
-                                </div>
-                                
-                                <div class="section-editor">
-                                    <div class="section-header">
-                                        <h4 id="section-title">Purpose Definition</h4>
-                                        <span class="section-status" id="section-status">Default</span>
-                                    </div>
-                                    
-                                    <textarea 
-                                        id="section-content" 
-                                        class="section-textarea"
-                                        placeholder="Loading..."
-                                    ></textarea>
-                                    
-                                    <div class="section-actions">
-                                        <button class="btn-secondary" id="reset-section">Reset to Default</button>
-                                        <button class="btn-primary" id="save-section">Save Changes</button>
-                                    </div>
-                                    
-                                    <div class="section-info">
-                                        <p><strong>What this section does:</strong></p>
-                                        <p id="section-explanation">Loading...</p>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- 
+                                VISUAL PROMPT EDITOR MOUNT POINT
+                                The VisualPromptEditor component renders here.
+                                It shows text blocks (editable) and programmatic blocks
+                                (RAG context, vector results, etc.) as draggable visual elements.
+                            -->
+                            <div id="visual-editor-mount"></div>
                             
-                            <div class="prompt-preview">
-                                <h4>Full System Prompt Preview</h4>
-                                <button class="btn-secondary" id="preview-prompt">Show Full Prompt</button>
-                                <button class="btn-danger" id="reset-all">Reset All to Defaults</button>
-                            </div>
+                            <!--
+                                TEMPLATE LIBRARY MOUNT POINT
+                                The PromptTemplateLibrary component renders below the editor.
+                                Shows a grid of built-in + custom templates with one-click apply.
+                            -->
+                            <div id="template-library-mount" style="margin-top: 32px;"></div>
                         </div>
                     </div>
                     
@@ -339,44 +366,24 @@ class AdminPanel {
             });
         });
         
-        // Section switching
-        this.element.querySelectorAll('.section-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.switchSection(e.target.dataset.section);
-            });
-        });
+        // NOTE (2026-02-06): The old section-switching, save-section, reset-section,
+        // preview-prompt, and reset-all listeners have been REMOVED because those
+        // elements no longer exist in the DOM. The visual prompt editor handles
+        // all prompt editing now, with its own internal event listeners.
+        // The old textarea-based section editor has been replaced by the
+        // VisualPromptEditor component which auto-saves on change.
         
-        // Save section button
-        this.element.querySelector('#save-section').addEventListener('click', () => {
-            this.saveCurrentSection();
-        });
-        
-        // Reset section button
-        this.element.querySelector('#reset-section').addEventListener('click', () => {
-            this.resetCurrentSection();
-        });
-        
-        // Preview prompt button
-        this.element.querySelector('#preview-prompt').addEventListener('click', () => {
-            this.previewFullPrompt();
-        });
-        
-        // Reset all button
-        this.element.querySelector('#reset-all').addEventListener('click', () => {
-            this.resetAllPrompts();
-        });
-        
-        // Save config button
+        // Save config button (Context Assembly tab — still exists)
         this.element.querySelector('#save-config').addEventListener('click', () => {
             this.saveConfiguration();
         });
         
-        // Reset config button
+        // Reset config button (Context Assembly tab — still exists)
         this.element.querySelector('#reset-config').addEventListener('click', () => {
             this.resetConfiguration();
         });
         
-        // Refresh performance button
+        // Refresh performance button (Performance tab — still exists)
         this.element.querySelector('#refresh-performance').addEventListener('click', () => {
             this.refreshPerformance();
         });
@@ -441,8 +448,18 @@ class AdminPanel {
      */
     async loadData() {
         try {
-            // Load prompt sections
+            // Load prompt sections (backward compat — still needed for visual editor)
             this.sections = await window.electronAPI.adminPanel.getPromptSections();
+            
+            // Load block configuration (visual editor layout)
+            // This may be null for first-time users, in which case the visual
+            // editor will create the default block layout from sections data
+            let blockConfig = null;
+            try {
+                blockConfig = await window.electronAPI.adminPanel.getBlockConfig();
+            } catch (err) {
+                console.log('[AdminPanel] No block config yet (first time), will create from sections');
+            }
             
             // Load context assembly config
             this.config = await window.electronAPI.adminPanel.getContextConfig();
@@ -450,15 +467,105 @@ class AdminPanel {
             // Load metadata
             this.metadata = await window.electronAPI.adminPanel.getPromptMetadata();
             
-            // Update UI
-            this.updatePromptUI();
+            // Mount and populate the visual prompt editor
+            this.mountVisualEditor(blockConfig);
+            
+            // Mount the template library
+            this.mountTemplateLibrary();
+            
+            // Update remaining UI (context, about tabs)
             this.updateConfigUI();
             this.updateAboutUI();
             
-            console.log('[AdminPanel] Data loaded');
+            console.log('[AdminPanel] Data loaded (with visual editor + templates)');
         } catch (error) {
             console.error('[AdminPanel] Failed to load data:', error);
         }
+    }
+    
+    /**
+     * MOUNT VISUAL EDITOR
+     * 
+     * Renders the VisualPromptEditor into the admin panel's prompts tab.
+     * Loads the editor with block config (if available) or creates default
+     * blocks from the existing section-based prompt data.
+     * 
+     * **Technical**: Mounts the editor element into #visual-editor-mount,
+     * then calls loadData() on the editor with sections and block config.
+     * 
+     * **Why**: The editor is a standalone component that needs to be mounted
+     * into the admin panel's DOM and hydrated with data from the backend.
+     * 
+     * @param {Object|null} blockConfig - Saved block config or null
+     */
+    mountVisualEditor(blockConfig) {
+        const mount = this.element.querySelector('#visual-editor-mount');
+        if (!mount) return;
+        
+        // Clear previous mount (in case of re-load)
+        mount.innerHTML = '';
+        mount.appendChild(this.visualEditor.element);
+        
+        // Render the editor UI
+        this.visualEditor.render();
+        
+        // Load data into the editor
+        this.visualEditor.loadData(this.sections, blockConfig);
+    }
+    
+    /**
+     * MOUNT TEMPLATE LIBRARY
+     * 
+     * Renders the PromptTemplateLibrary into the admin panel's prompts tab,
+     * below the visual editor.
+     * 
+     * **Technical**: Loads custom templates from backend, then renders
+     * the library into #template-library-mount.
+     */
+    async mountTemplateLibrary() {
+        const mount = this.element.querySelector('#template-library-mount');
+        if (!mount) return;
+        
+        // Load custom templates from backend
+        await this.templateLibrary.loadCustomTemplates();
+        
+        // Clear and mount
+        mount.innerHTML = '';
+        mount.appendChild(this.templateLibrary.element);
+        
+        // Render the library
+        this.templateLibrary.render();
+    }
+    
+    /**
+     * AUTO SAVE BLOCK CONFIG
+     * 
+     * Debounced save of the visual editor's block configuration.
+     * Called on every change from the visual editor (keypresses, reorders, toggles).
+     * 
+     * **Technical**: Uses a 500ms debounce timer. Each change resets the timer.
+     * Only the final state is saved, avoiding excessive disk I/O.
+     * 
+     * **Why**: The visual editor fires onChange very frequently (on every keystroke
+     * in a textarea). Without debouncing, we'd write to disk hundreds of times
+     * during a single editing session. 500ms is fast enough to feel instant
+     * but slow enough to batch rapid changes.
+     * 
+     * @param {Object} data - Block configuration from VisualPromptEditor.getSaveData()
+     */
+    autoSaveBlockConfig(data) {
+        if (this.autoSaveTimer) {
+            clearTimeout(this.autoSaveTimer);
+        }
+        
+        this.autoSaveTimer = setTimeout(async () => {
+            try {
+                await window.electronAPI.adminPanel.saveBlockConfig(data);
+                console.log('[AdminPanel] Auto-saved block config');
+            } catch (error) {
+                console.error('[AdminPanel] Failed to auto-save block config:', error);
+            }
+        }, 500);
     }
     
     /**
@@ -487,83 +594,10 @@ class AdminPanel {
         }
     }
     
-    /**
-     * SWITCH SECTION
-     * 
-     * Switches between prompt sections in the editor.
-     * 
-     * @param {string} sectionName - Section to switch to
-     */
-    switchSection(sectionName) {
-        if (!this.sections) return;
-        
-        // Update section buttons
-        this.element.querySelectorAll('.section-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.section === sectionName);
-        });
-        
-        // Update editor
-        const section = this.sections[sectionName];
-        if (section) {
-            this.element.querySelector('#section-title').textContent = this.getSectionTitle(sectionName);
-            this.element.querySelector('#section-content').value = section.content;
-            this.element.querySelector('#section-status').textContent = section.isCustom ? 'Custom' : 'Default';
-            this.element.querySelector('#section-status').className = section.isCustom ? 'section-status custom' : 'section-status';
-            this.element.querySelector('#section-explanation').textContent = this.getSectionExplanation(sectionName);
-        }
-        
-        this.currentSection = sectionName;
-    }
-    
-    /**
-     * GET SECTION TITLE
-     * 
-     * Returns human-readable title for a section.
-     */
-    getSectionTitle(sectionName) {
-        const titles = {
-            purpose: 'Purpose Definition',
-            approach: 'Approach Guidelines',
-            lifeAreas: 'Life Areas System',
-            responseFormat: 'Response Format',
-            areaActionsGuidelines: 'Area Actions Guidelines',
-            artifactGuidelines: 'Artifact Guidelines',
-            exampleResponse: 'Example Response',
-            importantNotes: 'Important Notes'
-        };
-        return titles[sectionName] || sectionName;
-    }
-    
-    /**
-     * GET SECTION EXPLANATION
-     * 
-     * Returns explanation of what a section does.
-     */
-    getSectionExplanation(sectionName) {
-        const explanations = {
-            purpose: 'Defines the AI\'s core identity and role. Sets the overall tone for all interactions.',
-            approach: 'Guidelines for how the AI should interact with users. Defines personality traits and communication style.',
-            lifeAreas: 'Instructions for the Life Areas memory system. Tells the AI when and how to create areas and entries.',
-            responseFormat: 'Defines the JSON structure the AI must use. Critical for structured outputs.',
-            areaActionsGuidelines: 'Specific rules for creating and updating life areas. Ensures consistent data structure.',
-            artifactGuidelines: 'Rules for generating visual artifacts. Defines when and how to create them.',
-            exampleResponse: 'A complete example showing the AI exactly what output looks like. Very important for consistency.',
-            importantNotes: 'Final reminders and critical rules. Reinforces key requirements.'
-        };
-        return explanations[sectionName] || 'No explanation available.';
-    }
-    
-    /**
-     * UPDATE PROMPT UI
-     * 
-     * Updates the prompts tab with loaded data.
-     */
-    updatePromptUI() {
-        if (!this.sections) return;
-        
-        // Load first section by default
-        this.switchSection('purpose');
-    }
+    // NOTE (2026-02-06): The old switchSection(), getSectionTitle(), getSectionExplanation(),
+    // and updatePromptUI() methods have been REMOVED. They were part of the old textarea-based
+    // section editor which has been replaced by the VisualPromptEditor component.
+    // The visual editor handles all section display, editing, and navigation internally.
     
     /**
      * UPDATE CONFIG UI
@@ -601,133 +635,13 @@ class AdminPanel {
         this.element.querySelector('#has-custom').textContent = this.metadata.hasCustomizations ? 'Yes' : 'No';
     }
     
-    /**
-     * SAVE CURRENT SECTION
-     * 
-     * Saves the currently edited section.
-     */
-    async saveCurrentSection() {
-        const content = this.element.querySelector('#section-content').value;
-        
-        try {
-            await window.electronAPI.adminPanel.updatePromptSection(this.currentSection, content);
-            
-            // Reload data
-            await this.loadData();
-            
-            // Show success
-            this.showNotification('Section saved successfully!', 'success');
-            
-            console.log(`[AdminPanel] Saved section: ${this.currentSection}`);
-        } catch (error) {
-            console.error('[AdminPanel] Failed to save section:', error);
-            this.showNotification('Failed to save section', 'error');
-        }
-    }
-    
-    /**
-     * RESET CURRENT SECTION
-     * 
-     * Resets the current section to default.
-     */
-    async resetCurrentSection() {
-        // P0 FIX: Use styled confirm instead of native confirm()
-        const confirmed = await window.app?.showConfirm(
-          'Reset Section',
-          'Reset this section to its default content?',
-          'Reset'
-        );
-        if (!confirmed) return;
-        
-        try {
-            await window.electronAPI.adminPanel.resetPromptSection(this.currentSection);
-            
-            // Reload data
-            await this.loadData();
-            
-            // Show success
-            this.showNotification('Section reset to default', 'success');
-            
-            console.log(`[AdminPanel] Reset section: ${this.currentSection}`);
-        } catch (error) {
-            console.error('[AdminPanel] Failed to reset section:', error);
-            this.showNotification('Failed to reset section', 'error');
-        }
-    }
-    
-    /**
-     * PREVIEW FULL PROMPT
-     * 
-     * Shows a modal with the complete assembled prompt.
-     */
-    async previewFullPrompt() {
-        try {
-            const fullPrompt = await window.electronAPI.adminPanel.getFullSystemPrompt();
-            
-            // Create modal
-            const modal = document.createElement('div');
-            modal.className = 'prompt-preview-modal';
-            modal.innerHTML = `
-                <div class="modal-overlay"></div>
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>Full System Prompt</h3>
-                        <button class="modal-close">×</button>
-                    </div>
-                    <div class="modal-body">
-                        <pre>${fullPrompt}</pre>
-                    </div>
-                    <div class="modal-footer">
-                        <p><strong>Length:</strong> ${fullPrompt.length} characters</p>
-                        <button class="btn-secondary modal-close">Close</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            // Close handlers
-            modal.querySelectorAll('.modal-close, .modal-overlay').forEach(el => {
-                el.addEventListener('click', () => {
-                    modal.remove();
-                });
-            });
-            
-        } catch (error) {
-            console.error('[AdminPanel] Failed to preview prompt:', error);
-            this.showNotification('Failed to load prompt', 'error');
-        }
-    }
-    
-    /**
-     * RESET ALL PROMPTS
-     * 
-     * Resets all prompts to defaults.
-     */
-    async resetAllPrompts() {
-        // P0 FIX: Use styled confirm instead of native confirm()
-        const confirmed = await window.app?.showConfirm(
-          'Reset All Prompts',
-          'Reset ALL prompts to defaults? This cannot be undone.',
-          'Reset All'
-        );
-        if (!confirmed) return;
-        
-        try {
-            await window.electronAPI.adminPanel.resetAllPrompts();
-            
-            // Reload data
-            await this.loadData();
-            
-            // Show success
-            this.showNotification('All prompts reset to defaults', 'success');
-            
-            console.log('[AdminPanel] Reset all prompts');
-        } catch (error) {
-            console.error('[AdminPanel] Failed to reset prompts:', error);
-            this.showNotification('Failed to reset prompts', 'error');
-        }
-    }
+    // NOTE (2026-02-06): The old saveCurrentSection(), resetCurrentSection(),
+    // previewFullPrompt(), and resetAllPrompts() methods have been REMOVED.
+    // These were part of the old textarea-based section editor.
+    // The VisualPromptEditor now handles saving (auto-save via onChange),
+    // resetting (via its own Reset All button), and previewing (via its
+    // Edit/Preview mode toggle). All section persistence is handled by
+    // the autoSaveBlockConfig() method above which calls through IPC.
     
     /**
      * SAVE CONFIGURATION

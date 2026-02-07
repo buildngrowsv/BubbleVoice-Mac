@@ -212,7 +212,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
     
     // Metadata and performance
     getPromptMetadata: () => ipcRenderer.invoke('admin:get-prompt-metadata'),
-    getPerformanceMetrics: () => ipcRenderer.invoke('admin:get-performance-metrics')
+    getPerformanceMetrics: () => ipcRenderer.invoke('admin:get-performance-metrics'),
+    
+    // Visual prompt editor: block configuration (Added 2026-02-06)
+    // These support the new block-based visual editor that shows programmatic/RAG
+    // sections as visual blocks alongside editable text sections.
+    getBlockConfig: () => ipcRenderer.invoke('admin:get-block-config'),
+    saveBlockConfig: (config) => ipcRenderer.invoke('admin:save-block-config', config),
+    
+    // Template library: custom templates (Added 2026-02-06)
+    // Users can save their current prompt config as a reusable template
+    // and browse/apply from a library of built-in and custom templates.
+    getCustomTemplates: () => ipcRenderer.invoke('admin:get-custom-templates'),
+    saveCustomTemplates: (templates) => ipcRenderer.invoke('admin:save-custom-templates', templates),
+    
+    // Variable resolution preview (Added 2026-02-06)
+    // Shows users what the prompt looks like with all {{variables}} resolved
+    // to their current runtime values.
+    previewResolvedPrompt: () => ipcRenderer.invoke('admin:preview-resolved-prompt')
   }
 });
 

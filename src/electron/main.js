@@ -1141,6 +1141,104 @@ ipcMain.handle('admin:get-performance-metrics', async () => {
 });
 
 /**
+ * VISUAL PROMPT EDITOR IPC HANDLERS (Added 2026-02-06)
+ * 
+ * These handlers support the new visual prompt editor features:
+ * 1. Block configuration (ordering, toggles, custom text)
+ * 2. Custom prompt templates (save/load/delete)
+ * 3. Variable resolution preview
+ * 
+ * WHY: The visual prompt editor needs to persist block ordering, programmatic
+ * block enable/disable states, and custom templates separately from the
+ * existing section-based prompt system. These handlers provide that.
+ * 
+ * ARCHITECTURE: All these handlers use the same getPromptManagementService()
+ * lazy loader as the existing admin panel handlers above.
+ */
+
+// Get block configuration for the visual prompt editor
+// Returns the saved block config (ordering, toggles) or null for first-time users
+ipcMain.handle('admin:get-block-config', async () => {
+  try {
+    const service = getPromptManagementService();
+    const config = service.getBlockConfig();
+    console.log('[Main] Retrieved block config:', config ? 'exists' : 'null (first time)');
+    return config;
+  } catch (error) {
+    console.error('[Main] Error getting block config:', error);
+    throw error;
+  }
+});
+
+// Save block configuration from the visual prompt editor
+// This also syncs text block content to the section-based system
+ipcMain.handle('admin:save-block-config', async (event, config) => {
+  try {
+    const service = getPromptManagementService();
+    service.saveBlockConfig(config);
+    console.log('[Main] Saved block config');
+    return { success: true };
+  } catch (error) {
+    console.error('[Main] Error saving block config:', error);
+    throw error;
+  }
+});
+
+// Get custom prompt templates (user-saved templates)
+ipcMain.handle('admin:get-custom-templates', async () => {
+  try {
+    const service = getPromptManagementService();
+    const templates = service.getCustomTemplates();
+    console.log(`[Main] Retrieved ${templates.length} custom templates`);
+    return templates;
+  } catch (error) {
+    console.error('[Main] Error getting custom templates:', error);
+    throw error;
+  }
+});
+
+// Save custom prompt templates
+// Overwrites the entire templates list (frontend manages additions/deletions)
+ipcMain.handle('admin:save-custom-templates', async (event, templates) => {
+  try {
+    const service = getPromptManagementService();
+    service.saveCustomTemplates(templates);
+    console.log(`[Main] Saved ${templates.length} custom templates`);
+    return { success: true };
+  } catch (error) {
+    console.error('[Main] Error saving custom templates:', error);
+    throw error;
+  }
+});
+
+// Preview variable resolution — shows what the prompt looks like with
+// all {{variables}} resolved to their current runtime values.
+// Used by the visual editor's preview mode.
+ipcMain.handle('admin:preview-resolved-prompt', async () => {
+  try {
+    const service = getPromptManagementService();
+    
+    // Build a runtime context with current values
+    // In production, this would pull from actual data sources
+    const runtimeContext = {
+      userName: 'User',
+      modelName: 'Gemini 2.5 Flash',
+      appVersion: '1.0.0',
+      conversationCount: 0,
+      activeAreaCount: 0,
+      areasList: ''
+    };
+    
+    const resolvedPrompt = service.getSystemPromptWithVariables(runtimeContext);
+    console.log('[Main] Generated resolved prompt preview');
+    return resolvedPrompt;
+  } catch (error) {
+    console.error('[Main] Error previewing resolved prompt:', error);
+    throw error;
+  }
+});
+
+/**
  * APP LIFECYCLE EVENTS
  */
 

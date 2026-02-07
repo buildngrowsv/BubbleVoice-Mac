@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="styles/life-areas-sidebar.css">
   <link rel="stylesheet" href="styles/chat-history-sidebar.css">
   <link rel="stylesheet" href="styles/admin-panel.css">
+  <link rel="stylesheet" href="styles/visual-prompt-editor.css">
 </head>
 <body>
   <!-- 
@@ -806,6 +807,11 @@
        The ChatHistorySidebar component was creating its own DOM element and prepending
        it to body, conflicting with the existing chat-sidebar HTML element.
        Now we only use ChatSidebar which works with the #chat-sidebar element above. -->
+  <!-- Visual Prompt Editor + Template Library must load BEFORE admin-panel.js
+       because AdminPanel's constructor creates VisualPromptEditor and PromptTemplateLibrary instances.
+       Added 2026-02-06 for the visual prompt editor feature. -->
+  <script src="components/visual-prompt-editor.js"></script>
+  <script src="components/prompt-template-library.js"></script>
   <script src="components/admin-panel.js"></script>
   <script src="components/web-speech-service.js"></script>
   <script src="components/conversation-manager.js"></script>
