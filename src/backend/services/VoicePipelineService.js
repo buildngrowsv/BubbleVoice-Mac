@@ -88,13 +88,172 @@ class VoicePipelineService extends EventEmitter {
     // This mirrors the Accountability app's isSpeaking flag
     // We need to know if the AI is currently speaking so we can detect interruptions
     this.isAISpeaking = false;
+    
+    // SINGLETON SWIFT HELPER (2026-02-06):
+    // Keep the Swift helper process alive between voice sessions to eliminate
+    // the ~3-5 second spawn + initialization delay on each mic click.
+    //
+    // WHY: Native Mac dictation (double-tap Command) starts instantly because
+    // the speech engine is always warm. Our previous approach spawned a new
+    // process each time the user clicked the mic button, adding:
+    //   1. Process spawn overhead (~1-2s)
+    //   2. Artificial 500ms wait for initialization
+    //   3. Audio engine setup time
+    //
+    // BECAUSE: The user reported "when I press the microphone it takes like
+    // 5 seconds for it to start actually transcribing with no visual feedback."
+    //
+    // FIX: Spawn the Swift helper ONCE (lazily on first use) and keep it alive.
+    // start_voice_input just sends a start_listening command (near-instant).
+    // stop_voice_input sends stop_listening but does NOT kill the process.
+    // Process is only killed on server shutdown or crash recovery.
+    this.sharedSwiftProcess = null;
+    this.swiftProcessReady = false;
+    this.swiftProcessReadyPromise = null;
+    this.swiftProcessReadyResolve = null;
+    
+    // Pre-warm the Swift helper on construction so it's ready before user clicks mic
+    this._ensureSwiftHelper().catch(err => {
+      console.error('[VoicePipelineService] Failed to pre-warm Swift helper:', err);
+    });
+  }
+
+  /**
+   * ENSURE SWIFT HELPER (SINGLETON)
+   * 
+   * Spawns the Swift helper process if not already running.
+   * Returns immediately if the process is alive and ready.
+   * 
+   * WHY: Eliminates the 3-5 second spawn delay on each mic click.
+   * The Swift helper stays alive between voice sessions, so subsequent
+   * start_listening commands execute near-instantly (~10ms).
+   * 
+   * CALLED BY: constructor (pre-warm), startVoiceInput (ensure alive)
+   * 
+   * @returns {Promise<void>} Resolves when Swift helper is ready
+   */
+  async _ensureSwiftHelper() {
+    // If already alive and ready, return immediately
+    if (this.sharedSwiftProcess && !this.sharedSwiftProcess.killed && this.swiftProcessReady) {
+      return;
+    }
+    
+    // If a spawn is already in progress, wait for it
+    if (this.swiftProcessReadyPromise) {
+      console.log('[VoicePipelineService] Swift helper spawn already in progress — waiting...');
+      return this.swiftProcessReadyPromise;
+    }
+    
+    const swiftHelperPath = path.join(__dirname, '../../../swift-helper/BubbleVoiceSpeech/.build/debug/BubbleVoiceSpeech');
+    console.log(`[VoicePipelineService] Spawning singleton Swift helper: ${swiftHelperPath}`);
+    
+    this.swiftProcessReady = false;
+    
+    // Create a promise that resolves when the Swift helper sends "ready"
+    this.swiftProcessReadyPromise = new Promise((resolve, reject) => {
+      this.swiftProcessReadyResolve = resolve;
+      
+      try {
+        this.sharedSwiftProcess = spawn(swiftHelperPath);
+        
+        // Handle stdout (responses from Swift)
+        // Route to the active session if one exists
+        this.sharedSwiftProcess.stdout.on('data', (data) => {
+          const lines = data.toString().split('\n');
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            try {
+              const response = JSON.parse(line);
+              
+              // Check for "ready" signal from Swift helper
+              if (response.type === 'ready') {
+                console.log('[VoicePipelineService] ✅ Swift helper ready (singleton)');
+                this.swiftProcessReady = true;
+                if (this.swiftProcessReadyResolve) {
+                  this.swiftProcessReadyResolve();
+                  this.swiftProcessReadyResolve = null;
+                }
+              }
+              
+              // Route to active session if one exists
+              const activeSession = this._getActiveSession();
+              if (activeSession) {
+                this.handleSwiftResponse(response, activeSession);
+              }
+            } catch (error) {
+              console.error('[VoicePipelineService] Error parsing Swift response:', error, line);
+            }
+          }
+        });
+        
+        // Handle stderr (logs from Swift)
+        this.sharedSwiftProcess.stderr.on('data', (data) => {
+          console.log(`[Swift Helper] ${data.toString().trim()}`);
+        });
+        
+        // Handle unexpected process exit — mark as needing respawn
+        this.sharedSwiftProcess.on('exit', (code, signal) => {
+          console.log(`[VoicePipelineService] Swift helper exited unexpectedly: code=${code}, signal=${signal}`);
+          this.sharedSwiftProcess = null;
+          this.swiftProcessReady = false;
+          this.swiftProcessReadyPromise = null;
+          
+          // Mark any active session as not listening since the process died
+          for (const [, session] of this.sessions) {
+            session.isListening = false;
+          }
+        });
+        
+        // Timeout: if ready signal doesn't come within 5s, resolve anyway
+        // (the old code waited 500ms blindly, this is more robust)
+        setTimeout(() => {
+          if (!this.swiftProcessReady) {
+            console.warn('[VoicePipelineService] Swift helper did not send ready within 5s — proceeding anyway');
+            this.swiftProcessReady = true;
+            if (this.swiftProcessReadyResolve) {
+              this.swiftProcessReadyResolve();
+              this.swiftProcessReadyResolve = null;
+            }
+          }
+        }, 5000);
+        
+      } catch (error) {
+        this.swiftProcessReadyPromise = null;
+        reject(error);
+      }
+    });
+    
+    return this.swiftProcessReadyPromise;
+  }
+  
+  /**
+   * GET ACTIVE SESSION
+   * 
+   * Returns the currently active voice session (there's only ever one in this Electron app).
+   * Used by the singleton Swift helper to route responses to the right session.
+   * 
+   * @returns {Object|null} Active session or null
+   */
+  _getActiveSession() {
+    for (const [, session] of this.sessions) {
+      if (session.isListening) return session;
+    }
+    // Return any session (even if not "listening") for TTS/pipeline events
+    for (const [, session] of this.sessions) {
+      return session;
+    }
+    return null;
   }
 
   /**
    * START VOICE INPUT
    * 
    * Starts voice input capture for a session.
-   * Spawns Swift helper process for speech recognition.
+   * Uses the singleton Swift helper (already warmed up) for near-instant startup.
+   * 
+   * PERFORMANCE (2026-02-06):
+   * Previously: spawn process (~1-2s) + 500ms wait + audio init = ~3-5s
+   * Now: send start_listening command to warm process = ~10ms
    * 
    * @param {string} sessionId - Session ID
    * @param {Object} settings - Voice settings
@@ -123,7 +282,7 @@ class VoicePipelineService extends EventEmitter {
         llm: null,
         tts: null
       },
-      swiftProcess: null,
+      swiftProcess: null,  // Legacy field — now uses this.sharedSwiftProcess
       // CRITICAL: Track if we're currently in the response pipeline
       // This includes: timers active, LLM processing, TTS generation, or audio playback
       // Used to detect if user speech should trigger an interruption
@@ -131,46 +290,28 @@ class VoicePipelineService extends EventEmitter {
       // Track if TTS is currently playing
       isTTSPlaying: false,
       // Track if we're processing a response (prevents duplicate LLM calls)
-      isProcessingResponse: false
+      isProcessingResponse: false,
+      // CANCELLATION FLAG (2026-02-06): Set to true when voice is stopped.
+      // Timer 3's polling loop checks this to abort early, preventing
+      // stale LLM calls and duplicate messages after the user stops voice.
+      isCancelled: false
     };
 
     try {
-      // Spawn Swift helper process
-      const swiftHelperPath = path.join(__dirname, '../../../swift-helper/BubbleVoiceSpeech/.build/debug/BubbleVoiceSpeech');
+      // Ensure singleton Swift helper is alive (pre-warmed in constructor, so usually instant)
+      const ensureStart = Date.now();
+      await this._ensureSwiftHelper();
+      const ensureElapsed = Date.now() - ensureStart;
       
-      console.log(`[VoicePipelineService] Spawning Swift helper: ${swiftHelperPath}`);
+      if (ensureElapsed > 100) {
+        console.log(`[VoicePipelineService] Swift helper ensure took ${ensureElapsed}ms (cold start)`);
+      }
       
-      session.swiftProcess = spawn(swiftHelperPath);
+      // Point session's swiftProcess at the shared singleton
+      // This keeps backward compatibility with sendSwiftCommand which checks session.swiftProcess
+      session.swiftProcess = this.sharedSwiftProcess;
 
-      // Handle stdout (responses from Swift)
-      session.swiftProcess.stdout.on('data', (data) => {
-        const lines = data.toString().split('\n');
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          try {
-            const response = JSON.parse(line);
-            this.handleSwiftResponse(response, session);
-          } catch (error) {
-            console.error('[VoicePipelineService] Error parsing Swift response:', error, line);
-          }
-        }
-      });
-
-      // Handle stderr (logs from Swift)
-      session.swiftProcess.stderr.on('data', (data) => {
-        console.log(`[Swift Helper] ${data.toString().trim()}`);
-      });
-
-      // Handle process exit
-      session.swiftProcess.on('exit', (code, signal) => {
-        console.log(`[VoicePipelineService] Swift helper exited: code=${code}, signal=${signal}`);
-        session.isListening = false;
-      });
-
-      // Wait a moment for Swift helper to initialize
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Send start_listening command
+      // Send start_listening command — NO spawn delay, NO 500ms wait!
       this.sendSwiftCommand(session, {
         type: 'start_listening',
         data: null
@@ -232,6 +373,24 @@ class VoicePipelineService extends EventEmitter {
     switch (response.type) {
       case 'ready':
         console.log('[VoicePipelineService] Swift helper is ready');
+        break;
+      
+      case 'listening_active':
+        // VISUAL FEEDBACK (2026-02-06): Swift helper confirmed audio engine is
+        // running and recognition is active. Forward to frontend so the mic
+        // button can show a "listening" animation immediately.
+        console.log('[VoicePipelineService] ✅ Swift helper confirmed listening is active');
+        if (this.server && this.server.connections) {
+          for (const [ws, connectionState] of this.server.connections) {
+            if (connectionState.id === session.id) {
+              this.server.sendMessage(ws, {
+                type: 'listening_active',
+                data: { status: 'listening' }
+              });
+              break;
+            }
+          }
+        }
         break;
 
       case 'transcription_update':
@@ -396,28 +555,49 @@ class VoicePipelineService extends EventEmitter {
     console.log(`[VoicePipelineService] Stopping voice input for ${session.id}`);
 
     session.isListening = false;
+    
+    // CANCELLATION FLAG (2026-02-06): Signal any in-flight timer callbacks
+    // (especially Timer 3's polling loop) to abort early.
+    // WHY: Timer 3's setTimeout callback may have already fired and entered
+    // its async polling loop. clearTimeout can't stop it. This flag does.
+    session.isCancelled = true;
+    
+    // Also reset pipeline state so nothing thinks we're still processing
+    session.isInResponsePipeline = false;
+    session.isTTSPlaying = false;
+    session.isProcessingResponse = false;
 
     // Clear all timers
     this.clearAllTimers(session);
 
-    // Send stop command to Swift helper
+    // Send stop command to Swift helper — but DON'T kill the process!
+    // SINGLETON PATTERN (2026-02-06): The Swift helper stays alive for instant
+    // re-use next time. Only send stop_listening to pause recognition.
     if (session.swiftProcess) {
       this.sendSwiftCommand(session, {
         type: 'stop_listening',
         data: null
       });
-
-      // Give it a moment to stop gracefully
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Kill the process
-      if (session.swiftProcess && !session.swiftProcess.killed) {
-        session.swiftProcess.kill();
-      }
     }
 
     // Remove session
     this.sessions.delete(session.id);
+  }
+  
+  /**
+   * SHUTDOWN (CLEANUP)
+   * 
+   * Kills the singleton Swift helper process. Called on server shutdown.
+   * This is the ONLY place the Swift process gets killed (except crash recovery).
+   */
+  shutdown() {
+    console.log('[VoicePipelineService] Shutting down — killing Swift helper');
+    if (this.sharedSwiftProcess && !this.sharedSwiftProcess.killed) {
+      this.sharedSwiftProcess.kill();
+      this.sharedSwiftProcess = null;
+    }
+    this.swiftProcessReady = false;
+    this.swiftProcessReadyPromise = null;
   }
 
   /**
@@ -473,6 +653,12 @@ class VoicePipelineService extends EventEmitter {
     // This happens in the background, user doesn't see anything yet
     session.silenceTimers.llm = setTimeout(async () => {
       console.log(`[VoicePipelineService] Timer 1 (LLM) fired for ${session.id} - 0.5s of actual silence detected!`);
+      
+      // CANCELLATION CHECK (2026-02-06)
+      if (session.isCancelled) {
+        console.log('[VoicePipelineService] ⛔ Timer 1 aborted — session was cancelled');
+        return;
+      }
       
       // CRITICAL: NOW we enter the response pipeline
       // This is when we've detected 0.5s of actual silence
@@ -632,6 +818,12 @@ class VoicePipelineService extends EventEmitter {
     session.silenceTimers.playback = setTimeout(async () => {
       console.log(`[VoicePipelineService] Timer 3 (Playback) fired for ${session.id}`);
       
+      // CANCELLATION CHECK (2026-02-06): Abort immediately if session was stopped.
+      if (session.isCancelled) {
+        console.log('[VoicePipelineService] ⛔ Timer 3 aborted at entry — session was cancelled');
+        return;
+      }
+      
       // Check if we were interrupted before timer fired
       if (!session.isInResponsePipeline) {
         console.log('[VoicePipelineService] Timer 3 cancelled by interruption');
@@ -645,6 +837,14 @@ class VoicePipelineService extends EventEmitter {
       const startTime = Date.now();
       
       while (!session.cachedResponses.llm && (Date.now() - startTime) < maxWaitTime) {
+        // CANCELLATION CHECK (2026-02-06): Abort if voice was stopped.
+        // WHY: stopVoiceInput sets isCancelled=true, but clearTimeout can't stop
+        // this already-executing async callback. This flag catches it.
+        if (session.isCancelled) {
+          console.log('[VoicePipelineService] ⛔ Timer 3 aborted — session was cancelled');
+          return;
+        }
+        
         // Check if interrupted while waiting
         if (!session.isInResponsePipeline) {
           console.log('[VoicePipelineService] Interrupted while waiting for LLM response');

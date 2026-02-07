@@ -177,6 +177,15 @@ class SpeechHelper {
     private var lastTranscriptionTime: Date?
     private var restartCount: Int = 0
     
+    // RESTART RATE LIMITER (2026-02-06):
+    // Tracks the timestamp of the last restart to prevent rapid-fire restarts.
+    // If restarts happen faster than every 0.5s, we're in a degenerate loop.
+    // After hitting the limit, we stop restarting and let the periodic timer recover.
+    private var lastRestartTime: Date = Date.distantPast
+    private var consecutiveRapidRestarts: Int = 0
+    private let maxConsecutiveRapidRestarts: Int = 3
+    private let minRestartInterval: TimeInterval = 0.5
+    
     // PERIODIC RESTART TIMER
     // This is a repeating timer that fires every few seconds to check
     // if the recognition session needs a proactive restart.
@@ -357,22 +366,33 @@ class SpeechHelper {
                         return
                     }
                     
-                    // Error 301 = "speech recognition request was canceled" (also normal during restart)
-                    // Error 203 = "Retry" from Apple's server-side recognition
-                    // Error 209 = "No speech detected" (normal during silence)
-                    // These are transient errors that should NOT stop listening entirely.
-                    // Instead of tearing down the whole pipeline, we restart recognition.
+                    // RECOVERABLE vs IGNORABLE ERRORS (2026-02-06 fix):
                     //
-                    // WHY: Previously, ANY recognition error called stopListening(), which
-                    // killed the audio engine and required a full re-initialization from
-                    // the backend. This caused the voice pipeline to "die" on transient
-                    // errors that could have been recovered by simply restarting the
-                    // recognition task.
+                    // ERROR 1110 "No speech detected" — IGNORABLE, NOT recoverable!
+                    // This fires when the recognition session times out during silence.
+                    // It is a NORMAL expected state. Previously, treating 1110 as recoverable
+                    // caused an infinite restart loop: restart → 1110 → restart → 1110...
+                    // reaching 68+ restarts in seconds, burning CPU and degrading audio.
+                    // The periodic watchdog timer (every 3s) handles stuck sessions.
                     //
-                    // BECAUSE: Apple's speech recognition sends various transient errors
-                    // (network glitches, temporary server issues, etc.) that resolve on
-                    // their own. We should only fully stop on unrecoverable errors.
-                    let recoverableCodes = [301, 203, 209, 1110]
+                    // ERROR 209 "No speech detected" (variant) — Same as 1110, ignorable.
+                    //
+                    // ERROR 301 "request was canceled" — Normal during restart, ignorable.
+                    //
+                    // ERROR 203 "Retry" — Transient server error, worth restarting ONCE.
+                    //
+                    // DESIGN: Separate truly recoverable errors (restart) from normal
+                    // states (ignore). The periodic timer handles long-term recovery.
+                    
+                    // IGNORABLE: Normal states that should NOT trigger a restart
+                    let ignorableCodes = [1110, 209, 301]
+                    if nsError.domain == "kAFAssistantErrorDomain" && ignorableCodes.contains(nsError.code) {
+                        self.logError("Ignorable recognition state (code \(nsError.code)): \(error.localizedDescription) — not restarting (periodic timer will handle)")
+                        return
+                    }
+                    
+                    // RECOVERABLE: Transient errors worth restarting for (with limit)
+                    let recoverableCodes = [203]
                     if nsError.domain == "kAFAssistantErrorDomain" && recoverableCodes.contains(nsError.code) {
                         self.logError("Recoverable recognition error (code \(nsError.code)): \(error.localizedDescription) — restarting recognition")
                         self.restartRecognition()
@@ -423,6 +443,14 @@ class SpeechHelper {
             
             isListening = true
             logError("Started listening")
+            
+            // VISUAL FEEDBACK (2026-02-06): Notify the backend that audio engine is
+            // running and recognition is active. The backend forwards this to the
+            // frontend so the mic button can show a "listening" animation.
+            // WHY: The user reported "no visual feedback on when transcription starts
+            // so I have to repeat myself." This event bridges the gap between the
+            // mic button click and actual audio capture.
+            sendResponse(type: "listening_active", data: ["status": AnyCodable("listening")])
             
             // START THE PERIODIC RESTART WATCHDOG TIMER
             // This timer runs every periodicCheckInterval seconds and checks:
@@ -649,6 +677,28 @@ class SpeechHelper {
         guard isListening else { return }
         guard let audioEngine = audioEngine else { return }
         
+        // RATE LIMITER (2026-02-06): Prevent rapid-fire restart loops.
+        // If restarts are happening faster than minRestartInterval, something is wrong.
+        // After maxConsecutiveRapidRestarts, stop restarting and let the periodic timer
+        // handle recovery at a sane cadence. This prevents the 68+ restart loops
+        // the user observed from error 1110 (and any future degenerate error patterns).
+        let now = Date()
+        let timeSinceLastRestart = now.timeIntervalSince(lastRestartTime)
+        if timeSinceLastRestart < minRestartInterval {
+            consecutiveRapidRestarts += 1
+            if consecutiveRapidRestarts >= maxConsecutiveRapidRestarts {
+                logError("⛔ Rate limit hit: \(consecutiveRapidRestarts) rapid restarts in a row — pausing restarts, periodic timer will recover")
+                consecutiveRapidRestarts = 0  // Reset for next cycle
+                isRestarting = false
+                pendingRestart = false
+                return
+            }
+        } else {
+            // Reset the counter if enough time has passed
+            consecutiveRapidRestarts = 0
+        }
+        lastRestartTime = now
+        
         // CONCURRENT RESTART GUARD (2026-02-06):
         // If a restart is already in progress, queue it instead of overlapping.
         //
@@ -656,11 +706,6 @@ class SpeechHelper {
         // (isFinal, reset_recognition command, periodic timer, error recovery).
         // When two restarts overlap, the second async block calls installTap(onBus: 0)
         // when the first already installed a tap — crashing with "tap already exists on bus 0".
-        //
-        // BECAUSE: User reported STT "hangs and stops working" after 2 words. The 0.5s
-        // silence timer fires between words, starts LLM processing, and when the next word
-        // arrives, triggers an interruption + reset_recognition. If Apple also sends isFinal
-        // around the same time, two restarts overlap and crash the Swift helper.
         //
         // FIX: Queue the restart. When the current restart completes, check pendingRestart
         // and restart again if needed. This serializes all restarts safely.
@@ -733,13 +778,17 @@ class SpeechHelper {
                         return
                     }
                     
-                    // RECOVERABLE ERRORS: Same list as in startListeningInternal
-                    // Instead of killing the pipeline, restart to get a fresh session.
-                    // WHY: Transient errors (server blips, "retry", "no speech detected")
-                    // resolve on their own. Killing the pipeline is overkill.
-                    let recoverableCodes = [301, 203, 209, 1110]
+                    // IGNORABLE: Normal states (same list as startListeningInternal)
+                    let ignorableCodes = [1110, 209, 301]
+                    if nsError.domain == "kAFAssistantErrorDomain" && ignorableCodes.contains(nsError.code) {
+                        self.logError("Ignorable recognition state in restarted task (code \(nsError.code)): \(error.localizedDescription) — not restarting")
+                        return
+                    }
+                    
+                    // RECOVERABLE: Transient errors worth one restart
+                    let recoverableCodes = [203]
                     if nsError.domain == "kAFAssistantErrorDomain" && recoverableCodes.contains(nsError.code) {
-                        self.logError("Recoverable recognition error in restarted task (code \(nsError.code)): \(error.localizedDescription) — restarting again")
+                        self.logError("Recoverable error in restarted task (code \(nsError.code)): \(error.localizedDescription) — restarting")
                         self.restartRecognition()
                         return
                     }

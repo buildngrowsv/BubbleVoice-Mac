@@ -538,9 +538,15 @@ class BubbleVoiceApp {
     console.log('[App] Starting voice input');
     
     this.state.isListening = true;
-    this.elements.voiceButton.classList.add('active');
-    this.elements.voiceVisualization.classList.add('active');
-    this.updateStatus('Listening...', 'processing');
+    
+    // VISUAL FEEDBACK PHASE 1 (2026-02-06): Show "connecting" state immediately.
+    // The button gets an intermediate "connecting" class with a subtle pulse animation.
+    // WHY: The user reported "no visual feedback on when transcription starts"
+    // and had to wait 5 seconds with no indication. Now they see:
+    //   Click → "Starting mic..." (connecting) → "Listening..." (active, confirmed)
+    this.elements.voiceButton.classList.add('connecting');
+    this.elements.voiceVisualization.classList.add('connecting');
+    this.updateStatus('Starting mic...', 'processing');
 
     // Hide welcome state if visible
     if (this.elements.welcomeState.style.display !== 'none') {
@@ -550,13 +556,15 @@ class BubbleVoiceApp {
     // Start voice controller with error handling for mic permission
     try {
       await this.voiceController.startListening();
+      // Note: the button transitions to full "active" state when we receive
+      // the 'listening_active' event from the Swift helper (see handleListeningActive)
     } catch (error) {
       console.error('[App] Voice input failed:', error);
       
       // Reset UI state since we failed to start
       this.state.isListening = false;
-      this.elements.voiceButton.classList.remove('active');
-      this.elements.voiceVisualization.classList.remove('active');
+      this.elements.voiceButton.classList.remove('active', 'connecting');
+      this.elements.voiceVisualization.classList.remove('active', 'connecting');
       this.updateStatus('Ready', 'connected');
 
       // Show helpful error with action to open settings (P0 FIX)
@@ -581,6 +589,32 @@ class BubbleVoiceApp {
   }
 
   /**
+   * HANDLE LISTENING ACTIVE
+   * 
+   * Called when the Swift helper confirms audio engine is running and
+   * speech recognition is actively capturing audio.
+   * 
+   * VISUAL FEEDBACK PHASE 2 (2026-02-06): Transitions the mic button
+   * from "connecting" (subtle pulse) to "active" (full listening animation).
+   * 
+   * WHY: The user needs to know the EXACT moment they can start speaking.
+   * Before this fix, there was a 3-5 second gap between clicking the mic
+   * and actual audio capture, with no indication of when to speak.
+   * 
+   * @param {Object} data - { status: 'listening' }
+   */
+  handleListeningActive(data) {
+    console.log('[App] ✅ Listening is active — audio engine confirmed running');
+    
+    // Transition from "connecting" to "active" state
+    this.elements.voiceButton.classList.remove('connecting');
+    this.elements.voiceButton.classList.add('active');
+    this.elements.voiceVisualization.classList.remove('connecting');
+    this.elements.voiceVisualization.classList.add('active');
+    this.updateStatus('Listening...', 'processing');
+  }
+
+  /**
    * STOP VOICE INPUT
    * 
    * Stops listening for voice input.
@@ -590,8 +624,8 @@ class BubbleVoiceApp {
     console.log('[App] Stopping voice input');
     
     this.state.isListening = false;
-    this.elements.voiceButton.classList.remove('active');
-    this.elements.voiceVisualization.classList.remove('active');
+    this.elements.voiceButton.classList.remove('active', 'connecting');
+    this.elements.voiceVisualization.classList.remove('active', 'connecting');
     this.updateStatus('Ready', 'connected');
 
     // Stop voice controller

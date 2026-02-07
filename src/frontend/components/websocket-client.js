@@ -383,6 +383,13 @@ class WebSocketClient {
           this.handleConversationTitleUpdated(message.data);
           break;
 
+        case 'listening_active':
+          // VISUAL FEEDBACK (2026-02-06): Swift helper confirmed audio engine
+          // is running and recognition is active. Show the user that we're
+          // now actively listening (mic pulse animation, status text, etc.)
+          this.handleListeningActive(message.data);
+          break;
+
         default:
           console.warn('[WebSocketClient] Unknown message type:', message.type);
       }
@@ -399,6 +406,28 @@ class WebSocketClient {
 
   handleTranscriptionUpdate(data) {
     this.app.voiceController.handleTranscription(data);
+  }
+
+  /**
+   * HANDLE LISTENING ACTIVE
+   * 
+   * Called when the Swift helper confirms that the audio engine is running
+   * and speech recognition is actively capturing audio.
+   * 
+   * WHY: There's a perceptible delay between clicking the mic button and
+   * actual audio capture starting. The user reported "no visual feedback
+   * on when transcription starts so I have to repeat myself." This event
+   * provides that feedback — the mic button animates and status changes
+   * only when we KNOW audio is being captured.
+   * 
+   * BECAUSE: Previously, the mic button just toggled immediately on click
+   * regardless of whether the backend/Swift helper was ready.
+   * 
+   * @param {Object} data - { status: 'listening' }
+   */
+  handleListeningActive(data) {
+    console.log('[WebSocketClient] ✅ Listening is active — audio engine confirmed running');
+    this.app.handleListeningActive(data);
   }
 
   /**

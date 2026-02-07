@@ -567,7 +567,8 @@ button, input, select, textarea, [contenteditable] {
   margin-bottom: var(--spacing-sm);
 }
 
-.voice-visualization.active {
+.voice-visualization.active,
+.voice-visualization.connecting {
   display: flex;
 }
 
@@ -808,16 +809,44 @@ button, input, select, textarea, [contenteditable] {
   box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
 }
 
+/**
+ * VOICE BUTTON STATES (2026-02-06):
+ * 
+ * 1. DEFAULT: Normal mic button (purple gradient)
+ * 2. CONNECTING: User clicked mic, waiting for audio engine to start.
+ *    Shows a fast pulse animation with amber color so the user knows
+ *    something is happening. Transitions to ACTIVE when Swift helper
+ *    confirms listening_active.
+ * 3. ACTIVE: Audio engine confirmed running, user can speak.
+ *    Shows steady red pulse animation and stop icon.
+ *
+ * WHY: User reported "5 seconds with no visual feedback" between
+ * clicking mic and actual transcription starting. Now there's
+ * immediate visual feedback (connecting) and a clear transition
+ * to the listening state (active).
+ */
+.voice-button.connecting {
+  background: linear-gradient(135deg, #f5a623 0%, #e08e15 100%);
+  animation: connectingPulse 0.6s ease-in-out infinite;
+}
+
+@keyframes connectingPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(245, 166, 35, 0.3); }
+  50% { transform: scale(1.08); box-shadow: 0 0 25px rgba(245, 166, 35, 0.6); }
+}
+
 .voice-button.active {
   background: var(--color-error);
   animation: pulse 1.5s ease-in-out infinite;
 }
 
-.voice-button.active .voice-icon {
+.voice-button.active .voice-icon,
+.voice-button.connecting .voice-icon {
   display: none;
 }
 
-.voice-button.active .stop-icon {
+.voice-button.active .stop-icon,
+.voice-button.connecting .stop-icon {
   display: block !important;
 }
 
