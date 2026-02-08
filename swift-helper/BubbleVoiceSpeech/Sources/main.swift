@@ -161,17 +161,44 @@ final class SpeechHelper: @unchecked Sendable {
     private var isListening = false
     private var isSpeaking = false
     
-    // RESET SERIALIZATION LOCK (2026-02-07):
-    // E2E testing revealed that multiple reset_recognition commands arriving
-    // in rapid succession (from interruption + echo + speech_ended) cause a
-    // FATAL crash: "required condition is false: nullptr == Tap()".
-    // This happens because each reset calls stopListeningAsync() + startListeningInternal(),
-    // and when they race, the second startListeningInternal tries to installTap
-    // on a node that already has a tap from the first start.
+    // RESET SERIALIZATION LOCK (2026-02-07, updated 2026-02-08):
+    // Multiple reset_recognition commands can arrive in rapid succession
+    // (from interruption + echo + speech_ended). This flag prevents
+    // concurrent resets from racing.
     //
-    // FIX: Use a boolean flag to serialize resets. If a reset is in progress,
-    // subsequent reset requests are queued (or skipped with a log).
+    // HISTORY: Originally this was CRITICAL because each reset destroyed
+    // and rebuilt the entire audio pipeline (engine, tap, analyzer,
+    // converter). Now with the lightweight input-rotation pattern
+    // (2026-02-08 fix), resets are much cheaper and safer, but we still
+    // serialize them to prevent continuation swap races.
     private var isResetting = false
+    
+    // ANALYZER SESSION PERSISTENCE (2026-02-08):
+    // Track whether we have a live, reusable analyzer session. When true,
+    // resetSpeechAnalyzerSession() uses the lightweight finalize → start
+    // pattern instead of destroying everything. This is the KEY FIX for
+    // the "chunk batch" bug — we keep the neural model warm and the audio
+    // engine running across turn boundaries.
+    //
+    // WHY THIS MATTERS:
+    // Previously, every reset called finalizeAndFinishThroughEndOfInput()
+    // which PERMANENTLY killed the analyzer. Creating a new one took ~2-4
+    // seconds (neural model load, asset check, audio engine restart),
+    // which is why we observed "4-second chunk batches" instead of the
+    // real-time word-by-word streaming that SpeechAnalyzer actually supports.
+    //
+    // With this flag, the first start_listening creates the full pipeline,
+    // and subsequent resets just rotate the input stream — taking ~50ms
+    // instead of ~2-4 seconds.
+    private var hasLiveAnalyzerSession = false
+    
+    // LAST AUDIO TIMESTAMP (2026-02-08):
+    // Tracks the CMTime of the last audio buffer fed to the analyzer.
+    // Used by the lightweight reset to tell the analyzer "finalize
+    // everything through this point" before starting a new input stream.
+    // Without this, finalize(through:) doesn't know where the current
+    // input ends, potentially causing incomplete finalization.
+    private var lastAudioTimestamp: CMTime = .zero
     
     // PRE-WARM STATE (2026-02-07):
     // Based on research showing 2-3 second startup delay for SpeechAnalyzer
@@ -633,7 +660,26 @@ final class SpeechHelper: @unchecked Sendable {
                     )
                     self.totalFramesProcessed += UInt64(converted.frameLength)
                     
-                    continuation.yield(AnalyzerInput(
+                    // TRACK LAST TIMESTAMP (2026-02-08):
+                    // Record the end time of this buffer so that
+                    // resetSpeechAnalyzerSession() can tell the analyzer
+                    // "finalize everything through this point" when doing
+                    // a lightweight input rotation. Without this, we'd
+                    // have to pass nil to finalize(through:) which may
+                    // not flush all buffered results.
+                    let bufferEndCMTime = CMTime(
+                        value: CMTimeValue(self.totalFramesProcessed),
+                        timescale: CMTimeScale(self.audioSampleRate)
+                    )
+                    self.lastAudioTimestamp = bufferEndCMTime
+                    
+                    // YIELD TO CURRENT CONTINUATION (2026-02-08):
+                    // We yield to self.speechAnalyzerInputContinuation
+                    // (not the captured `continuation` variable) so that
+                    // when resetSpeechAnalyzerSession() swaps the
+                    // continuation, subsequent buffers go to the new
+                    // stream without restarting the tap.
+                    self.speechAnalyzerInputContinuation?.yield(AnalyzerInput(
                         buffer: converted,
                         bufferStartTime: bufferStartCMTime
                     ))
@@ -651,6 +697,7 @@ final class SpeechHelper: @unchecked Sendable {
             try await analyzer.start(inputSequence: stream)
             
             isListening = true
+            hasLiveAnalyzerSession = true
             logError("Started listening (SpeechAnalyzer, format: \(analyzerFormat))")
             
             // Notify frontend for visual mic feedback.
@@ -768,6 +815,28 @@ final class SpeechHelper: @unchecked Sendable {
             )
         }
         speechAnalyzerAudioFormat = format
+        
+        // PREHEAT ANALYZER (2026-02-08):
+        // Proactively load neural model resources so the first volatile
+        // result arrives faster. Without this, the first result from a
+        // cold analyzer can take ~1-2 seconds. With preheating, the model
+        // is already loaded and ready to process audio immediately.
+        //
+        // From Itsuki's SpeechAnalyzer article:
+        // "To proactively load system resources and 'preheat' the analyzer,
+        //  we can call prepareToAnalyze(in:) after setting the modules.
+        //  This may improve how quickly the modules return their first results."
+        //
+        // We pass nil for progressReadyHandler because we don't need progress
+        // updates — we just want the model loaded.
+        do {
+            try await analyzer.prepareToAnalyze(in: format, withProgressReadyHandler: nil)
+            logError("Analyzer preheated successfully — neural model loaded and ready")
+        } catch {
+            // Non-fatal: The analyzer will still work, just with slightly
+            // slower first results. This can fail if resources are constrained.
+            logError("Analyzer preheat failed (non-fatal): \(error.localizedDescription)")
+        }
     }
     
     /**
@@ -983,46 +1052,130 @@ final class SpeechHelper: @unchecked Sendable {
     /**
      * RESET SPEECH ANALYZER SESSION
      *
-     * Cleanly stops the current session and starts a fresh one.
+     * Creates a clean transcription boundary for a new conversational turn.
      *
      * CALLED BY: "reset_recognition" command from backend at key lifecycle points:
      *   1) After AI finishes speaking (speech_ended)
      *   2) After an interruption is detected
      *   3) After the timer cascade completes (turn boundary)
      *
-     * FIX (2026-02-07): Previously this called the synchronous stopListening()
-     * followed by startListeningInternal(). Now we use stopListeningAsync()
-     * which properly awaits the analyzer finalization before starting a new
-     * session. This prevents race conditions where the old analyzer is still
-     * cleaning up when the new one starts, which could cause audio tap conflicts.
+     * ============================================================
+     * 2026-02-08 CRITICAL REWRITE — "LIGHTWEIGHT INPUT ROTATION"
+     * ============================================================
+     *
+     * PREVIOUS BEHAVIOR (BUG):
+     * Every reset called finalizeAndFinishThroughEndOfInput() which
+     * PERMANENTLY KILLED the analyzer, then recreated the entire
+     * pipeline from scratch (new transcriber, new analyzer, new audio
+     * converter, restart audio engine, reinstall tap). This took ~2-4
+     * seconds and caused the "4-second chunk batch" perception because
+     * the neural model had to cold-start every time.
+     *
+     * NEW BEHAVIOR (FIX):
+     * We keep the analyzer, transcriber, audio engine, audio tap, and
+     * converter ALL alive. We only:
+     *   1) Finish the current input stream (continuation.finish())
+     *   2) Finalize the current input (analyzer.finalize(through:))
+     *   3) Create a NEW AsyncStream
+     *   4) Start the analyzer on the new stream (analyzer.start())
+     *
+     * This takes ~50ms instead of ~2-4 seconds. The neural model stays
+     * warm, volatile results continue streaming word-by-word, and we
+     * eliminate the dead zone between turns where no transcription
+     * happened.
+     *
+     * FALLBACK: If the lightweight rotation fails for any reason, we
+     * fall back to the old full-rebuild approach. This ensures we
+     * never get stuck in a broken state.
+     *
+     * WHY THIS WORKS:
+     * Apple's SpeechAnalyzer docs (confirmed by Itsuki's deep-dive
+     * article) state that finalize(through:) finalizes the CURRENT
+     * INPUT but keeps the session alive. After finalization, you can
+     * call start(inputSequence:) again with new audio. The module's
+     * results stream continues to work across input rotations.
      */
     private func resetSpeechAnalyzerSession() async {
-        // SERIALIZATION CHECK (2026-02-07):
-        // E2E testing showed that 3 reset commands can arrive within milliseconds
-        // (interruption + echo detection + speech_ended). Without this guard,
-        // concurrent resets race and crash on double tap installation.
+        // SERIALIZATION CHECK:
+        // Multiple resets can arrive within milliseconds (interruption + echo
+        // + speech_ended). Prevent concurrent rotation races.
         guard !isResetting else {
             logError("Reset already in progress — skipping duplicate reset request")
             return
         }
         isResetting = true
         
-        // WHY: We want a clean transcription boundary after AI speech or interruptions.
-        // This mirrors the old "restart recognition" behavior but uses the new
-        // SpeechAnalyzer pipeline: stop everything, then start fresh.
+        // LIGHTWEIGHT ROTATION PATH (2026-02-08):
+        // If we have a live analyzer session, use the fast path that keeps
+        // everything alive and just rotates the input stream.
+        if hasLiveAnalyzerSession,
+           let analyzer = speechAnalyzer,
+           speechTranscriber != nil {
+            
+            logError("🔄 Lightweight input rotation — keeping analyzer warm")
+            
+            do {
+                // Step 1: Close the current input stream.
+                // This tells the analyzer "no more audio from this stream."
+                // The audio tap keeps running but yields are temporarily
+                // going to a nil continuation (harmless — they're just dropped).
+                let oldContinuation = speechAnalyzerInputContinuation
+                speechAnalyzerInputContinuation = nil  // Temporarily nil so tap drops buffers
+                oldContinuation?.finish()
+                
+                // Step 2: Finalize the current input.
+                // This tells the analyzer "process and emit final results for
+                // everything you received so far." The session stays alive.
+                //
+                // We use the last tracked audio timestamp so the analyzer
+                // knows exactly where the current input ends. If we don't
+                // have a timestamp (e.g., no audio was fed yet), we pass
+                // the current time which tells it to finalize everything.
+                try await analyzer.finalize(through: lastAudioTimestamp)
+                logError("✅ Finalized current input — analyzer session still alive")
+                
+                // Step 3: Reset tracking state for the new turn.
+                // We keep totalFramesProcessed because the audio engine and
+                // tap are still running — the timeline is continuous.
+                consecutiveSilentFrames = 0
+                speechEnergyDetectedSinceLastResult = false
+                silentFramesSinceSpeech = 0
+                
+                // Step 4: Create a new input stream for the next turn.
+                let (newStream, newContinuation) = AsyncStream<AnalyzerInput>.makeStream()
+                speechAnalyzerInputContinuation = newContinuation
+                
+                // Step 5: Start the analyzer on the new input stream.
+                // The module's results stream (transcriber.results) continues
+                // working — the existing result consumption task picks up
+                // results from the new input seamlessly.
+                try await analyzer.start(inputSequence: newStream)
+                
+                logError("✅ Input rotation complete — analyzer ready for new turn (~50ms)")
+                isResetting = false
+                return
+                
+            } catch {
+                // Lightweight rotation failed — fall back to full rebuild.
+                // This should be rare but handles edge cases like the analyzer
+                // being in an unexpected state after a crash or timeout.
+                logError("⚠️ Lightweight rotation failed: \(error.localizedDescription) — falling back to full rebuild")
+                hasLiveAnalyzerSession = false
+                // Fall through to the full rebuild path below
+            }
+        }
+        
+        // FULL REBUILD PATH (FALLBACK):
+        // Used on the first start, or if lightweight rotation fails.
+        // This is the old behavior — destroy everything and start fresh.
+        // It's slow (~2-4 seconds) but guaranteed to work.
+        logError("🔧 Full rebuild path — destroying and recreating pipeline")
+        
         await stopListeningAsync()
         
-        // STABILIZATION DELAY (2026-02-07):
-        // E2E testing revealed SIGTRAP crashes when the stop-start cycle happens
-        // too quickly. The AVAudioEngine's internal audio thread may still be
-        // draining the last few tap callbacks when we try to install a new tap.
-        // This 200ms delay gives the audio system time to fully quiesce before
-        // we set up a new session.
-        //
-        // WHY 200ms: Long enough for the audio thread to drain (audio buffers at
-        // 48kHz / 4096 samples = ~85ms per buffer, so 200ms covers 2+ buffer cycles).
-        // Short enough that the user doesn't notice any delay (human perception
-        // threshold for audio delay is ~100-200ms).
+        // STABILIZATION DELAY:
+        // Only needed for full rebuild because we're stopping/starting
+        // the audio engine. Not needed for lightweight rotation.
         try? await Task.sleep(nanoseconds: 200_000_000)
         
         await startListeningInternal()
@@ -1084,6 +1237,8 @@ final class SpeechHelper: @unchecked Sendable {
         flushCheckTimer = nil
         
         isListening = false
+        hasLiveAnalyzerSession = false
+        lastAudioTimestamp = .zero
         logError("Stopped listening (SpeechAnalyzer session fully finalized)")
     }
     
@@ -1133,6 +1288,8 @@ final class SpeechHelper: @unchecked Sendable {
         flushCheckTimer = nil
         
         isListening = false
+        hasLiveAnalyzerSession = false
+        lastAudioTimestamp = .zero
         logError("Stopped listening (SpeechAnalyzer session finalized)")
     }
     

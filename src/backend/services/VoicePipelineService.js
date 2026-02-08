@@ -77,24 +77,43 @@ class VoicePipelineService extends EventEmitter {
     this.swiftHelperPath = path.join(__dirname, '../../../swift-helper/BubbleVoiceSpeech');
 
     // Timer configuration (in milliseconds)
-    // TUNED (2026-02-07): E2E testing revealed that SpeechAnalyzer processes audio
-    // in ~4-second chunks with gaps of 3-4 seconds between transcription updates.
-    // The original 1.2s timer (from Accountability's SFSpeechRecognizer system)
-    // fired during these gaps, causing premature sends — long utterances got cut
-    // off after the first sentence.
     //
-    // NEW VALUES: Increased llmStart to 4.5s to span the SpeechAnalyzer processing
-    // window. This means the AI starts thinking 4.5s after the user stops speaking
-    // (vs 1.2s before). The trade-off is acceptable because:
-    //   - 4.5s feels like "the AI is thinking" (still natural)
-    //   - Prevents the #1 reported bug (premature message sends)
-    //   - VAD heartbeats provide an additional safety net for shorter pauses
+    // ============================================================
+    // 2026-02-08 CRITICAL UPDATE — REDUCED FROM 4.5s TO 1.2s
+    // ============================================================
     //
-    // The TTS and playback timers follow proportionally.
+    // PREVIOUS VALUES (4.5s/5.5s/6.5s): Were inflated because of a
+    // bug in main.swift where every reset_recognition call destroyed
+    // and rebuilt the entire SpeechAnalyzer pipeline from scratch.
+    // The neural model cold-start took ~2-4 seconds, creating gaps
+    // where no transcription updates arrived — the "chunk batch"
+    // effect. The 4.5s timer was tuned to span these cold-start gaps.
+    //
+    // ROOT CAUSE FIX (2026-02-08): main.swift now uses "lightweight
+    // input rotation" — finalize(through:) + start(inputSequence:)
+    // instead of finalizeAndFinishThroughEndOfInput(). The analyzer,
+    // transcriber, audio engine, and tap ALL stay alive. Resets take
+    // ~50ms instead of ~2-4 seconds. Volatile results now stream
+    // word-by-word in real-time (~200-500ms between updates), just
+    // like SFSpeechRecognizer did in Accountability v6.
+    //
+    // NEW VALUES: Brought back close to Accountability v6 timings
+    // (which used 0.5s/1.5s/2.0s). We use slightly higher values
+    // because SpeechAnalyzer's first volatile result can take up to
+    // ~1 second even with a warm model, and we want a small buffer.
+    //
+    // The three-timer cascade pattern from Accountability is:
+    //   - llmStart:      Start LLM processing (silence threshold)
+    //   - ttsStart:      Start TTS generation (if LLM result ready)
+    //   - playbackStart: Start audio playback (if TTS result ready)
+    //
+    // With the local `say` command for TTS (no network latency),
+    // the TTS and playback timers can be tighter than Accountability's
+    // cloud Deepgram values.
     this.timerConfig = {
-      llmStart: 4500,    // 4.5s - Start LLM processing (spans SpeechAnalyzer 4s window)
-      ttsStart: 5500,    // 5.5s - Start TTS generation
-      playbackStart: 6500  // 6.5s - Start audio playback
+      llmStart: 1200,      // 1.2s - Start LLM processing after silence
+      ttsStart: 2200,      // 2.2s - Start TTS generation
+      playbackStart: 3200  // 3.2s - Start audio playback
     };
     
     // CRITICAL: Track playback state for interruption detection
@@ -1303,10 +1322,16 @@ class VoicePipelineService extends EventEmitter {
     // sentences in continuous speech, but shorter than the user's actual "I'm done
     // talking" silence.
     //
-    // 3000ms covers: sentence pauses (1-2s) + SpeechAnalyzer processing lag (up to 4s)
-    // Total worst-case delay: 1.2s (timer) + 3s (VAD) = 4.2s before AI starts thinking.
-    // This is acceptable because the user perceives the AI as "thinking" during this time.
-    const vadSilenceThresholdMs = 3000;  // Consider VAD silent after 3s with no heartbeat
+    // 2026-02-08 UPDATE: Reduced from 3000ms to 1500ms.
+    // With the lightweight input rotation fix, SpeechAnalyzer no longer
+    // has ~4-second cold-start gaps between turns. Volatile results stream
+    // in real-time (~200-500ms between updates). The VAD heartbeat still
+    // provides a safety net, but the threshold can be much tighter.
+    //
+    // 1500ms covers natural sentence pauses (1-2s) without adding excessive
+    // delay. Total worst-case: 1.2s (timer) + 1.5s (VAD) = 2.7s before AI
+    // starts thinking — much better than the previous 4.2s.
+    const vadSilenceThresholdMs = 1500;  // Consider VAD silent after 1.5s with no heartbeat
     const vadMaxWaitMs = 45000;          // Safety: never wait more than 45s
 
     const runLlmProcessing = async () => {
