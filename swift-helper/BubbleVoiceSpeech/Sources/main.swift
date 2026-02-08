@@ -215,9 +215,32 @@ final class SpeechHelper: @unchecked Sendable {
     
     // Track consecutive silent frames to avoid cutting off speech at word boundaries.
     // We only stop feeding audio after sustained silence (not brief pauses between words).
-    // 15 consecutive silent frames at 4096 samples/48kHz ≈ 1.3 seconds of silence.
+    // TUNED (2026-02-07): Increased from 15 to 30 frames.
+    // 30 consecutive silent frames at 4096 samples/48kHz ≈ 2.6 seconds of silence.
+    // This covers natural sentence-boundary pauses in continuous speech (typically
+    // 1-2 seconds). At 15 frames (1.3s), the grace period expired during pauses
+    // like "coffee. [pause] Then I went..." causing premature timer firing.
+    // At 30 frames (2.6s), we bridge all natural pauses while still cutting off
+    // after genuine silence (user finished speaking).
     private var consecutiveSilentFrames: Int = 0
-    private let maxConsecutiveSilentFrames: Int = 15
+    private let maxConsecutiveSilentFrames: Int = 30
+    
+    // VAD HEARTBEAT (2026-02-07):
+    // E2E testing revealed that the backend's 1.2s silence timer fires during
+    // SpeechAnalyzer's 4-second processing gaps, causing premature sends.
+    // FIX: While VAD detects speech energy, send periodic "vad_speech_active"
+    // heartbeats to the backend. The backend delays its timer while heartbeats
+    // are arriving, and only fires the timer after both:
+    //   1. No transcription updates for 1.2s, AND
+    //   2. No VAD heartbeats for 1.2s (i.e., user actually stopped speaking)
+    //
+    // Heartbeat interval: 300ms — frequent enough that the backend's 1.2s timer
+    // never fires during processing gaps, infrequent enough to not spam.
+    private var lastVadHeartbeatTime: UInt64 = 0
+    // TUNED (2026-02-07): 300ms interval was too infrequent — word-gap pauses
+    // could cause the backend's 1.5s VAD silence check to expire between heartbeats.
+    // 150ms ensures at least 10 heartbeats per 1.5s window.
+    private let vadHeartbeatIntervalFrames: UInt64 = 7200  // ~150ms at 48kHz
     
     // SINGLE-WORD FLUSH MECHANISM (2026-02-07):
     // Testing revealed that single-word utterances ("yes", "no", "ok") RELIABLY
@@ -411,6 +434,48 @@ final class SpeechHelper: @unchecked Sendable {
             // By defensively removing first, we prevent this crash entirely.
             inputNode.removeTap(onBus: 0)
             
+            // HARDWARE ECHO CANCELLATION (2026-02-08):
+            // Enable Apple's Voice Processing IO on the input node. This
+            // activates hardware-level Acoustic Echo Cancellation (AEC)
+            // which subtracts the Mac's speaker output from the mic input.
+            //
+            // WHY THIS MATTERS:
+            // Without AEC, when the AI speaks through the speakers, the mic
+            // picks up that audio and SpeechAnalyzer transcribes it — the AI
+            // "hears itself." The backend currently handles this via string-
+            // matching in shouldIgnoreEchoTranscription(), which is fragile.
+            //
+            // With Voice Processing IO, the echo is cancelled at the hardware
+            // level BEFORE it reaches SpeechAnalyzer. Our benchmark tests
+            // (whisperkit-echo-benchmark-results.md) confirmed this works:
+            //   - Raw mic: TTS echo fully transcribed (BAD)
+            //   - Voice Processing IO: TTS echo filtered, external speech
+            //     preserved (IDEAL result in all tests)
+            //
+            // Voice Processing IO also provides:
+            //   - Noise suppression (reduces background hum/fan noise)
+            //   - Automatic Gain Control (normalizes volume levels)
+            //
+            // IMPORTANT: Must be enabled BEFORE reading inputNode.outputFormat
+            // because it changes the node's format (e.g., from 1ch to 9ch).
+            // The audio converter is created from the post-VoiceProcessing
+            // format, so the pipeline stays consistent.
+            //
+            // DECIDED BY AI (2026-02-08): Based on benchmark results showing
+            // Voice Processing IO scored "IDEAL" on echo tests while energy
+            // VAD gate scored "NO ECHO CANCEL — both captured." The backend's
+            // text-matching echo suppression remains as a secondary safety net.
+            do {
+                try inputNode.setVoiceProcessingEnabled(true)
+                logError("Voice Processing IO enabled (hardware AEC active)")
+            } catch {
+                // Non-fatal: If Voice Processing IO fails (e.g., on older
+                // hardware or in certain audio configurations), we fall back
+                // to the existing backend text-matching echo suppression.
+                // The app still works, just without hardware AEC.
+                logError("WARNING: Voice Processing IO failed: \(error.localizedDescription). Falling back to software echo suppression.")
+            }
+            
             let inputFormat = inputNode.outputFormat(forBus: 0)
             
             audioConverter = AVAudioConverter(from: inputFormat, to: analyzerFormat)
@@ -451,6 +516,32 @@ final class SpeechHelper: @unchecked Sendable {
                 
                 if rms < self.vadEnergyThreshold {
                     self.consecutiveSilentFrames += 1
+                    
+                    // VAD HEARTBEAT DURING GRACE PERIOD (2026-02-07):
+                    // Even during short silence gaps (word boundaries, sentence pauses),
+                    // continue sending heartbeats if we're within the grace period.
+                    // This prevents the backend's silence timer from firing during
+                    // natural 1-2 second pauses between sentences in continuous speech.
+                    //
+                    // WITHOUT THIS: Say "First I woke up early. Then I went for a walk."
+                    // → The 1.5s pause after "early." causes VAD silence → timer fires
+                    // → only "First I woke up early" gets sent to LLM (Bug 5)
+                    //
+                    // WITH THIS: Heartbeats continue during the grace period (up to
+                    // maxConsecutiveSilentFrames frames ≈ 1.3s), keeping the backend
+                    // timer gate open through natural pauses.
+                    if self.consecutiveSilentFrames <= self.maxConsecutiveSilentFrames
+                       && self.speechEnergyDetectedSinceLastResult {
+                        let framesSinceLastHeartbeat = self.totalFramesProcessed - self.lastVadHeartbeatTime
+                        if framesSinceLastHeartbeat >= self.vadHeartbeatIntervalFrames {
+                            self.lastVadHeartbeatTime = self.totalFramesProcessed
+                            self.sendResponse(type: "vad_speech_active", data: [
+                                "rms": AnyCodable(rms),
+                                "inGracePeriod": AnyCodable(true),
+                                "timestamp": AnyCodable(Date().timeIntervalSince1970)
+                            ])
+                        }
+                    }
                     
                     // SINGLE-WORD FLUSH (2026-02-07):
                     // If we previously detected speech energy but haven't received
@@ -502,6 +593,23 @@ final class SpeechHelper: @unchecked Sendable {
                     // knows to activate when silence returns.
                     self.speechEnergyDetectedSinceLastResult = true
                     self.silentFramesSinceSpeech = 0
+                    
+                    // VAD HEARTBEAT (2026-02-07):
+                    // Send periodic heartbeat to backend while user is speaking.
+                    // This prevents the backend's silence timer from firing during
+                    // SpeechAnalyzer's 4-second processing gaps (which cause >1.2s
+                    // gaps in transcription updates even though user is still speaking).
+                    //
+                    // Without this, a 7-sentence utterance gets cut off after the
+                    // first sentence because the timer fires during the processing gap.
+                    let framesSinceLastHeartbeat = self.totalFramesProcessed - self.lastVadHeartbeatTime
+                    if framesSinceLastHeartbeat >= self.vadHeartbeatIntervalFrames {
+                        self.lastVadHeartbeatTime = self.totalFramesProcessed
+                        self.sendResponse(type: "vad_speech_active", data: [
+                            "rms": AnyCodable(rms),
+                            "timestamp": AnyCodable(Date().timeIntervalSince1970)
+                        ])
+                    }
                 }
                 
                 do {
@@ -903,6 +1011,20 @@ final class SpeechHelper: @unchecked Sendable {
         // This mirrors the old "restart recognition" behavior but uses the new
         // SpeechAnalyzer pipeline: stop everything, then start fresh.
         await stopListeningAsync()
+        
+        // STABILIZATION DELAY (2026-02-07):
+        // E2E testing revealed SIGTRAP crashes when the stop-start cycle happens
+        // too quickly. The AVAudioEngine's internal audio thread may still be
+        // draining the last few tap callbacks when we try to install a new tap.
+        // This 200ms delay gives the audio system time to fully quiesce before
+        // we set up a new session.
+        //
+        // WHY 200ms: Long enough for the audio thread to drain (audio buffers at
+        // 48kHz / 4096 samples = ~85ms per buffer, so 200ms covers 2+ buffer cycles).
+        // Short enough that the user doesn't notice any delay (human perception
+        // threshold for audio delay is ~100-200ms).
+        try? await Task.sleep(nanoseconds: 200_000_000)
+        
         await startListeningInternal()
         
         isResetting = false
