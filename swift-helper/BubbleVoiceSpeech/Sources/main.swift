@@ -762,13 +762,28 @@ final class SpeechHelper: @unchecked Sendable {
      * This is handled via AssetInventory, which downloads on-device
      * models from Apple's servers. Once installed, they persist.
      *
-     * TRANSCRIBER OPTIONS (Updated 2026-02-07 based on deep research):
+     * TRANSCRIBER OPTIONS (Updated 2026-02-08 based on demo repository analysis):
      * - transcriptionOptions: [] (default, no special modes)
-     * - reportingOptions: [.volatileResults] — gives us real-time partial
-     *   results that update progressively as the user speaks. Research confirmed
-     *   volatile results are "rough, real-time guesses; iteratively refined" that
-     *   get replaced by final results. This is what powers the live transcription
-     *   display in the frontend (shown at 0.7 opacity until finalized).
+     * - reportingOptions: [.volatileResults, .fastResults] — CRITICAL FIX
+     *   (2026-02-08): Added .fastResults based on SwiftUI_SpeechAnalyzerDemo analysis.
+     *   
+     *   .volatileResults alone: Provides partial results but batches them (1-4s gaps)
+     *   .volatileResults + .fastResults: Streams results word-by-word (200-500ms updates)
+     *   
+     *   This combination is what enables true real-time streaming. Without .fastResults,
+     *   the analyzer waits for "enough confidence" before sending results, causing the
+     *   "4-second chunk batch" behavior we've been fighting.
+     *   
+     *   The demo repository uses .timeIndexedProgressiveTranscription preset which
+     *   includes both flags. This is the missing piece that explains why their
+     *   implementation streams smoothly while ours was chunky.
+     *   
+     *   With this fix, we should be able to:
+     *   - Reduce silence timers from 4.5s to 0.5-1.0s
+     *   - Remove or simplify VAD heartbeat system
+     *   - Remove single-word flush mechanism
+     *   - Get true word-by-word streaming like SFSpeechRecognizer
+     *
      * - attributeOptions: [.audioTimeRange] — ADDED based on research.
      *   This gives us per-result audio timestamp ranges that tell us EXACTLY
      *   when speech occurred in the audio timeline. This is critical for:
@@ -785,12 +800,14 @@ final class SpeechHelper: @unchecked Sendable {
      * preset may not compile in the release. We use explicit options which
      * is equivalent and more reliable. The research confirmed this approach
      * matches what community implementations use.
+     *
+     * REFERENCE: speechanalyzer-research/BUBBLEVOICE_VS_DEMO_COMPARISON.md
      */
     private func configureSpeechAnalyzerIfNeeded() async throws {
         let transcriber = SpeechTranscriber(
             locale: speechAnalyzerLocale,
             transcriptionOptions: [],
-            reportingOptions: [.volatileResults],
+            reportingOptions: [.volatileResults, .fastResults],
             attributeOptions: [.audioTimeRange]
         )
         speechTranscriber = transcriber
@@ -1232,11 +1249,17 @@ final class SpeechHelper: @unchecked Sendable {
                 // This tells the analyzer "process and emit final results for
                 // everything you received so far." The session stays alive.
                 //
-                // We use the last tracked audio timestamp so the analyzer
-                // knows exactly where the current input ends. If we don't
-                // have a timestamp (e.g., no audio was fed yet), we pass
-                // the current time which tells it to finalize everything.
-                try await analyzer.finalize(through: lastAudioTimestamp)
+                // UPDATED (2026-02-08): Use nil instead of lastAudioTimestamp.
+                // The demo repository uses finalize(through: nil) which means
+                // "finalize everything received so far." Using a timestamp can
+                // cause incomplete finalization if:
+                // - The timestamp is slightly behind the actual last buffer
+                // - There's a race condition in timestamp tracking
+                // - The analyzer has buffered audio beyond that timestamp
+                //
+                // With nil, the analyzer finalizes all buffered input, which is
+                // what we want when rotating to a new turn.
+                try await analyzer.finalize(through: nil)
                 logError("✅ Finalized current input — analyzer session still alive")
                 
                 // Step 3: Reset tracking state for the new turn.
