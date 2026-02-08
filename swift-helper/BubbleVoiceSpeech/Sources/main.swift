@@ -997,7 +997,12 @@ final class SpeechHelper: @unchecked Sendable {
             guard let self = self else { return }
             do {
                 for try await result in transcriber.results {
+                    // DEBUG (2026-02-08): Log raw result to diagnose period-only issue
+                    self.logError("🔍 RAW RESULT: isFinal=\(result.isFinal), text.characters.count=\(result.text.characters.count)")
+                    self.logError("🔍 RAW TEXT: '\(result.text)'")
+                    
                     let text = String(result.text.characters)
+                    self.logError("🔍 EXTRACTED TEXT: '\(text)'")
                     
                     // RESET FLUSH TRACKING (2026-02-07):
                     // We got a transcription result, so the analyzer DID process
