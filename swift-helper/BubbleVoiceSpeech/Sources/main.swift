@@ -1741,6 +1741,70 @@ final class SpeechHelper: @unchecked Sendable {
 
 let helper = SpeechHelper()
 
+// ============================================================
+// DEV MODE: Diagnostic Test
+// ============================================================
+// Set DEV_MODE_TEST environment variable to run diagnostic tests at startup
+// Usage: DEV_MODE_TEST=1 ./BubbleVoiceSpeech
+if ProcessInfo.processInfo.environment["DEV_MODE_TEST"] == "1" {
+    helper.logError("🧪 DEV MODE: Running diagnostic tests...")
+    helper.logError("🧪 This will test if SpeechAnalyzer produces transcription results")
+    helper.logError("")
+    
+    Task {
+        // Use the public command interface
+        helper.logError("🧪 Sending start_listening command...")
+        helper.handleCommand(Command(type: "start_listening", data: nil))
+        
+        // Wait for initialization
+        try? await Task.sleep(nanoseconds: 3_000_000_000)
+        
+        helper.logError("")
+        helper.logError("🎤 MICROPHONE IS NOW LISTENING FOR 15 SECONDS")
+        helper.logError("🎤 SPEAK INTO YOUR MICROPHONE NOW!")
+        helper.logError("🎤 Say: 'Hello world this is a test'")
+        helper.logError("")
+        
+        // Monitor for 15 seconds
+        for i in 1...15 {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            if i % 3 == 0 {
+                helper.logError("⏱️  \(i) seconds elapsed...")
+            }
+        }
+        
+        helper.logError("")
+        helper.logError("🧪 Test complete. Stopping...")
+        helper.handleCommand(Command(type: "stop_listening", data: nil))
+        
+        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        
+        helper.logError("")
+        helper.logError("============================================================")
+        helper.logError("🧪 DIAGNOSTIC RESULTS:")
+        helper.logError("============================================================")
+        helper.logError("")
+        helper.logError("Look at the output above for 'transcription_update' messages.")
+        helper.logError("")
+        helper.logError("✅ WORKING: You should see multiple transcription_update messages")
+        helper.logError("   with the text you spoke.")
+        helper.logError("")
+        helper.logError("❌ BROKEN: If you see ZERO transcription_update messages,")
+        helper.logError("   the SpeechAnalyzer is not producing results.")
+        helper.logError("")
+        helper.logError("You should also see 'vad_speech_active' heartbeats every 500ms")
+        helper.logError("while you were speaking (this proves audio is flowing).")
+        helper.logError("")
+        helper.logError("============================================================")
+        helper.logError("")
+        
+        // Exit dev mode
+        helper.logError("🧪 DEV MODE: Exiting in 2 seconds...")
+        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        exit(0)
+    }
+}
+
 // Read commands from stdin in background
 DispatchQueue.global(qos: .userInitiated).async {
     DispatchQueue.main.async {
