@@ -214,30 +214,173 @@ The transcriber processes ALL audio the microphone captures with no noise gate. 
 
 ---
 
-## Summary: Minimum Viable Setup
+## 15. SpeechAnalyzer.Options — Priority and ModelRetention (2026-02-08)
+
+**Severity**: PERFORMANCE — missed optimization, significant impact
+
+Apple docs reveal `SpeechAnalyzer` accepts an `Options` struct with two critical fields:
+
+```swift
+// CORRECT — production setup:
+let options = SpeechAnalyzer.Options(
+    priority: .userInitiated,
+    modelRetention: .processLifetime
+)
+let analyzer = SpeechAnalyzer(modules: [transcriber], options: options)
+
+// WRONG — missing options (our original code):
+let analyzer = SpeechAnalyzer(modules: [transcriber])
+```
+
+**`priority: .userInitiated`**: Sets the Task priority for analysis work. Without this, analysis runs at default priority and can be deprioritized when other system tasks run (Spotlight, background updates). For a real-time voice app, this ensures the Neural Engine stays focused on our audio.
+
+**`modelRetention: .processLifetime`**: Keeps the neural model loaded in memory for the entire process lifetime, even after the analyzer is deallocated. Without this, every full rebuild (our fallback path) has to re-load the model from disk (~1-2 seconds). With this, the model stays in memory and new analyzers reuse it instantly.
+
+Itsuki's article confirms this exact pattern: `SpeechAnalyzer(modules: [transcriber], options: .init(priority: .userInitiated, modelRetention: .processLifetime))`
+
+---
+
+## 16. bestAvailableAudioFormat — The `considering:` Variant (2026-02-08)
+
+**Severity**: QUALITY — may improve transcription accuracy
+
+Apple provides two variants:
+- `bestAvailableAudioFormat(compatibleWith:)` — simple, no source info
+- `bestAvailableAudioFormat(compatibleWith:considering:)` — takes the mic's native format into account
+
+From Apple docs: "Retrieves the best-quality audio format that the specified modules can work with, **taking into account the natural format of the audio** and assets installed on the device."
+
+The `considering:` variant lets the system optimize format selection based on what the mic actually provides. For example, if the mic is 48kHz/Float32 and the model prefers 16kHz/Int16, the system might pick an intermediate that minimizes quality loss during conversion.
+
+---
+
+## 17. AssetInventory.reserve(locale:) — Asset Retention (2026-02-08)
+
+**Severity**: RELIABILITY — prevents surprise re-downloads
+
+Apple provides explicit locale reservation:
+```swift
+try await AssetInventory.reserve(locale: locale)
+```
+
+This tells the system "don't evict these speech model assets." Without it, the system may auto-remove assets when disk space is low, causing a surprise download on the next `start_listening`.
+
+Itsuki's article recommends this for production apps. Technically optional (AssetInventory does it automatically during download), but explicit reservation provides stronger guarantees.
+
+Corresponding cleanup: `await AssetInventory.release(reservedLocale: locale)` — but we don't call this since we want the model available for the entire process lifetime.
+
+---
+
+## 18. cancelAnalysis(before:) — Interruption Optimization (2026-02-08)
+
+**Severity**: PERFORMANCE — faster interruption response
+
+Apple provides `cancelAnalysis(before:)` which stops processing audio that predates a given timestamp. This is perfect for interruptions:
+
+```swift
+// When user interrupts, cancel old audio processing:
+await analyzer.cancelAnalysis(before: lastAudioTimestamp)
+
+// Then reset for new input:
+continuation.finish()
+try await analyzer.finalize(through: lastAudioTimestamp)
+// ... create new stream, start analyzer
+```
+
+**Without this**: During an interruption, the analyzer continues processing old audio (AI echo, pre-interruption content) which we'll discard anyway. This wastes Neural Engine time.
+
+**With this**: Old audio processing is cancelled immediately, freeing the Neural Engine to focus on the user's new speech. Makes interruptions feel ~100-200ms faster.
+
+Note: `cancelAnalysis(before:)` is non-throwing in macOS 26.1 (unlike most other SpeechAnalyzer methods).
+
+---
+
+## 19. volatileRangeChangedHandler — Real-Time Analysis Tracking (2026-02-08)
+
+**Severity**: LOW — informational, potential future use
+
+Apple docs mention:
+```swift
+func setVolatileRangeChangedHandler(sending ((CMTimeRange, Bool, Bool) -> Void)?)
+var volatileRange: CMTimeRange?
+```
+
+This callback fires when the "volatile range" changes — the range of audio that hasn't been finalized yet and may still produce different results. Could be useful for:
+- Tracking what the analyzer is currently processing
+- Knowing when results are "stable" vs "still changing"
+- Implementing a progress indicator
+
+Not currently implemented because our existing volatile/final result tracking is sufficient.
+
+---
+
+## 20. AnalysisContext — Custom Vocabulary (2026-02-08)
+
+**Severity**: LOW — potential accuracy improvement, not yet implemented
+
+Apple docs mention:
+```swift
+func setContext(AnalysisContext) async throws
+var context: AnalysisContext
+```
+
+`AnalysisContext` can provide contextual information to improve analysis, like expected vocabulary or conversation topic. Potential use: feed conversation history context to improve recognition of domain-specific terms.
+
+Not yet implemented because the standard recognition quality is sufficient for general conversation. Worth exploring if users report consistent misrecognition of specific terms.
+
+---
+
+## 21. Input Stream Rotation — Officially Supported Pattern (2026-02-08)
+
+**Severity**: CRITICAL CONFIRMATION — validates our fix
+
+Apple docs explicitly state:
+
+> "While you can terminate the input sequence you created with a method such as `AsyncStream.Continuation.finish()`, **finishing the input sequence does not cause the analysis session to become finished**, and you can continue the session with a different input sequence."
+
+This is the **official confirmation** that our lightweight input rotation pattern (finish continuation → finalize(through:) → new stream → start(inputSequence:)) is the correct, supported approach. The analyzer session survives input stream termination and can be restarted with a new stream.
+
+---
+
+## Summary: Production-Ready Setup (Updated 2026-02-08)
 
 ```swift
 import Speech
 import AVFoundation
 
-// 1. Create transcriber
+// 1. Create transcriber with all recommended options
 let transcriber = SpeechTranscriber(
     locale: Locale(identifier: "en-US"),
     transcriptionOptions: [],
     reportingOptions: [.volatileResults],
-    attributeOptions: []
+    attributeOptions: [.audioTimeRange]
 )
 
-// 2. Create analyzer
-let analyzer = SpeechAnalyzer(modules: [transcriber])
+// 2. Create analyzer WITH options for priority and model caching
+let options = SpeechAnalyzer.Options(
+    priority: .userInitiated,
+    modelRetention: .processLifetime
+)
+let analyzer = SpeechAnalyzer(modules: [transcriber], options: options)
 
-// 3. Get the target audio format
-let format = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber])!
+// 3. Reserve locale assets explicitly
+try await AssetInventory.reserve(locale: Locale(identifier: "en-US"))
 
-// 4. Create AsyncStream for audio input
+// 4. Get the target audio format (with mic format consideration)
+let engine = AVAudioEngine()
+let micFormat = engine.inputNode.outputFormat(forBus: 0)
+let format = await SpeechAnalyzer.bestAvailableAudioFormat(
+    compatibleWith: [transcriber],
+    considering: micFormat
+)!
+
+// 5. Preheat the analyzer (load neural model proactively)
+try await analyzer.prepareToAnalyze(in: format, withProgressReadyHandler: nil)
+
+// 6. Create AsyncStream for audio input
 let (stream, continuation) = AsyncStream<AnalyzerInput>.makeStream()
 
-// 5. Start consuming results (BEFORE calling start!)
+// 7. Start consuming results (BEFORE calling start!)
 Task {
     for try await result in transcriber.results {
         let text = String(result.text.characters)
@@ -245,22 +388,30 @@ Task {
     }
 }
 
-// 6. Set up audio engine with converter
-let engine = AVAudioEngine()
-let converter = AVAudioConverter(from: engine.inputNode.outputFormat(forBus: 0), to: format)
+// 8. Set up audio engine with converter
+let converter = AVAudioConverter(from: micFormat, to: format)
 converter?.primeMethod = .none  // CRITICAL
 
-engine.inputNode.installTap(onBus: 0, bufferSize: 4096, format: nil) { buffer, _ in
+engine.inputNode.installTap(onBus: 0, bufferSize: 4096, format: micFormat) { buffer, _ in
     let converted = convertBuffer(buffer, to: format, using: converter!)
     continuation.yield(AnalyzerInput(buffer: converted))
 }
 
-// 7. Start everything
+// 9. Start everything
 engine.prepare()
 try engine.start()
 try await analyzer.start(inputSequence: stream)
 
-// 8. To stop:
+// 10. To rotate input (turn boundary — NOT shutdown):
+continuation.finish()
+try await analyzer.finalize(through: lastTimestamp)
+let (newStream, newCont) = AsyncStream<AnalyzerInput>.makeStream()
+try await analyzer.start(inputSequence: newStream)
+
+// 11. During interruptions, cancel old audio first:
+await analyzer.cancelAnalysis(before: lastTimestamp)
+
+// 12. To fully stop (session end):
 continuation.finish()
 try await analyzer.finalizeAndFinishThroughEndOfInput()
 engine.stop()

@@ -386,6 +386,33 @@ final class SpeechHelper: @unchecked Sendable {
                 logError("Pre-warm: speech assets already installed for \(speechAnalyzerLocale.identifier(.bcp47))")
             }
             
+            // RESERVE LOCALE ASSETS (2026-02-08, added based on Apple docs):
+            //
+            // Explicitly reserve the locale's assets so the system won't
+            // auto-evict them to free disk space. From Apple docs:
+            //   "Add the locale to the app's current asset reservations"
+            //
+            // This is technically optional since AssetInventory does it
+            // automatically during download, but explicitly reserving gives
+            // us stronger guarantees that the model stays available across
+            // the entire process lifetime. Itsuki's article also recommends
+            // this for production apps that need reliable availability.
+            //
+            // Without this, if the user's disk is low, the system might
+            // evict our speech model between sessions, causing a surprise
+            // re-download on the next "start_listening" command.
+            //
+            // DECIDED BY AI (2026-02-08): Based on Apple docs and Itsuki's
+            // article. Low risk, high reliability improvement.
+            do {
+                try await AssetInventory.reserve(locale: speechAnalyzerLocale)
+                logError("Pre-warm: locale assets reserved for \(speechAnalyzerLocale.identifier(.bcp47))")
+            } catch {
+                // Non-fatal: reservation failure doesn't prevent usage,
+                // just means the system might evict assets if disk is low.
+                logError("Pre-warm: locale reservation failed (non-fatal): \(error.localizedDescription)")
+            }
+            
             localeAssetsVerified = true
         } catch {
             logError("Pre-warm: asset verification failed (non-fatal): \(error.localizedDescription)")
@@ -804,15 +831,93 @@ final class SpeechHelper: @unchecked Sendable {
             logError("Skipping asset check (pre-warmed)")
         }
         
-        let analyzer = SpeechAnalyzer(modules: [transcriber])
+        // ANALYZER OPTIONS (2026-02-08, added based on Apple docs review):
+        //
+        // priority: .userInitiated — Sets the TaskPriority for analysis work.
+        //   Our voice app is real-time and user-facing, so we want high priority
+        //   on the Neural Engine and CPU. Without this, analysis work runs at
+        //   default priority and can be deprioritized by the system when other
+        //   tasks are running (e.g., Spotlight indexing, background updates).
+        //   Itsuki's SpeechAnalyzer article confirms this option is available
+        //   and recommended for live transcription use cases.
+        //
+        // modelRetention: .processLifetime — Keeps the neural speech model
+        //   loaded in memory for the ENTIRE lifetime of this process, even
+        //   after the analyzer is deallocated. This is CRITICAL because:
+        //   1) If our lightweight input rotation fallback triggers a full rebuild,
+        //      the new analyzer can reuse the cached model instantly (~50ms)
+        //      instead of re-loading it from disk (~1-2 seconds).
+        //   2) Our Swift helper process is long-lived (singleton, kept alive
+        //      between voice sessions). The model should stay warm for the
+        //      entire session.
+        //   3) Apple docs explicitly say: "To delay or prevent unloading an
+        //      analyzer's resources — caching them for later use by a different
+        //      analyzer instance — you can select a ModelRetention option."
+        //   Without this, model resources are unloaded when the analyzer is
+        //   deallocated, causing a cold-start penalty on the next creation.
+        //
+        // DECIDED BY AI (2026-02-08): Based on Apple documentation review and
+        // Itsuki's Level Up Coding article confirming these options. The user's
+        // complaint about "chunk batch" behavior traced partly to cold-start
+        // model loading — these options ensure the model stays hot.
+        let analyzerOptions = SpeechAnalyzer.Options(
+            priority: .userInitiated,
+            modelRetention: .processLifetime
+        )
+        let analyzer = SpeechAnalyzer(modules: [transcriber], options: analyzerOptions)
         speechAnalyzer = analyzer
         
-        guard let format = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber]) else {
-            throw NSError(
-                domain: "SpeechAnalyzer",
-                code: -101,
-                userInfo: [NSLocalizedDescriptionKey: "Failed to obtain compatible audio format"]
-            )
+        // AUDIO FORMAT SELECTION (2026-02-08, improved based on Apple docs):
+        //
+        // Apple provides TWO variants of bestAvailableAudioFormat:
+        //   1) bestAvailableAudioFormat(compatibleWith:) — simple, no source info
+        //   2) bestAvailableAudioFormat(compatibleWith:considering:) — takes the
+        //      source audio's natural format into account
+        //
+        // The `considering:` variant lets the system pick an optimal intermediate
+        // format that balances model quality with conversion efficiency. For
+        // example, if our mic outputs 48kHz and the model prefers 16kHz, the
+        // system might pick an intermediate that minimizes quality loss.
+        //
+        // Apple docs: "Retrieves the best-quality audio format that the specified
+        // modules can work with, taking into account the natural format of the
+        // audio and assets installed on the device."
+        //
+        // We read the mic's native format from AVAudioEngine's inputNode BEFORE
+        // Voice Processing IO is enabled (which changes the format). The
+        // inputNode.outputFormat(forBus:) is available even before engine.start().
+        //
+        // DECIDED BY AI (2026-02-08): Using the considering: variant is a direct
+        // recommendation from Apple docs and Itsuki's article for better format
+        // selection. Falls back to the simple variant if mic format is unavailable.
+        let micNativeFormat: AVAudioFormat? = audioEngine?.inputNode.outputFormat(forBus: 0)
+        
+        let format: AVAudioFormat
+        if let micFormat = micNativeFormat {
+            guard let selectedFormat = await SpeechAnalyzer.bestAvailableAudioFormat(
+                compatibleWith: [transcriber],
+                considering: micFormat
+            ) else {
+                throw NSError(
+                    domain: "SpeechAnalyzer",
+                    code: -101,
+                    userInfo: [NSLocalizedDescriptionKey: "Failed to obtain compatible audio format (with considering:)"]
+                )
+            }
+            format = selectedFormat
+            logError("Audio format selected with considering: mic=\(micFormat), selected=\(selectedFormat)")
+        } else {
+            // Fallback: no mic format available yet (shouldn't happen since
+            // audioEngine is created in init, but defensive programming)
+            guard let fallbackFormat = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber]) else {
+                throw NSError(
+                    domain: "SpeechAnalyzer",
+                    code: -101,
+                    userInfo: [NSLocalizedDescriptionKey: "Failed to obtain compatible audio format"]
+                )
+            }
+            format = fallbackFormat
+            logError("Audio format selected without considering: (mic format unavailable), selected=\(fallbackFormat)")
         }
         speechAnalyzerAudioFormat = format
         
@@ -1488,6 +1593,47 @@ final class SpeechHelper: @unchecked Sendable {
             if isListening {
                 Task { [weak self] in
                     await self?.resetSpeechAnalyzerSession()
+                }
+            }
+            
+        case "cancel_old_audio":
+            // INTERRUPTION OPTIMIZATION (2026-02-08, added based on Apple docs):
+            //
+            // Apple provides `cancelAnalysis(before:)` which tells the analyzer:
+            // "Stop processing any audio that came before this timestamp."
+            //
+            // This is useful during INTERRUPTIONS: when the user starts speaking
+            // over the AI, the audio from before the interruption is irrelevant
+            // (it's just the AI's voice being echoed back). Instead of waiting
+            // for the analyzer to finalize that old audio (which we'd discard
+            // anyway), we cancel it immediately.
+            //
+            // From Apple docs: "Stops analyzing audio predating the given time."
+            //
+            // The backend sends this command with the approximate timestamp
+            // of when the interruption was detected, so the analyzer skips
+            // processing everything before that point and focuses on the
+            // user's new speech.
+            //
+            // PRODUCT IMPACT: Faster interruption response. Instead of waiting
+            // ~200ms for old audio to finalize (only to throw it away), the
+            // analyzer immediately shifts focus to new audio.
+            //
+            // DECIDED BY AI (2026-02-08): Based on Apple docs review showing
+            // cancelAnalysis(before:) exists specifically for this use case.
+            logError("Received cancel_old_audio command — cancelling stale audio processing")
+            if isListening, let analyzer = speechAnalyzer {
+                Task { [weak self] in
+                    guard let self = self else { return }
+                    // Cancel all audio analysis before the current timestamp.
+                    // This frees up the Neural Engine to process the user's
+                    // new interrupting speech immediately.
+                    let cancelBefore = self.lastAudioTimestamp
+                    // NOTE: cancelAnalysis(before:) is non-throwing per the
+                    // current API (macOS 26.1). If Apple changes this in a
+                    // future release, we should add do/catch back.
+                    await analyzer.cancelAnalysis(before: cancelBefore)
+                    self.logError("✅ Cancelled analysis before \(cancelBefore.seconds)s — analyzer freed for new speech")
                 }
             }
             

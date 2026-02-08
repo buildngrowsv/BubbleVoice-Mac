@@ -1680,24 +1680,47 @@ class VoicePipelineService extends EventEmitter {
       session.isTTSPlaying = false;
     }
     
-    // CRITICAL (2026-02-06, updated 2026-02-07): Reset recognition on interruption
+    // INTERRUPTION OPTIMIZATION (2026-02-08, added based on Apple docs review):
+    //
+    // STEP 1: Cancel old audio processing BEFORE resetting.
+    // Apple's cancelAnalysis(before:) tells the SpeechAnalyzer to stop processing
+    // audio that predates the current timestamp. During an interruption, any audio
+    // from before the user started speaking is just AI echo or stale context —
+    // we don't need to wait for it to finalize.
+    //
+    // This frees up the Neural Engine immediately to focus on the user's new speech,
+    // making interruptions feel faster and more responsive.
+    //
+    // From Apple docs: "Stops analyzing audio predating the given time."
+    //
+    // DECIDED BY AI (2026-02-08): Direct application of Apple docs API that we
+    // were not previously using. Low risk (non-fatal if it fails), high impact
+    // on interruption responsiveness.
+    this.sendSwiftCommand(session, {
+      type: 'cancel_old_audio',
+      data: null
+    });
+    console.log('[VoicePipelineService] Sent cancel_old_audio to Swift — freeing analyzer for new speech');
+    
+    // STEP 2 (2026-02-06, updated 2026-02-07): Reset recognition on interruption
     //
     // WHY: SpeechAnalyzer accumulates all transcription text within a session
     // (Finding #1 from turn detection testing). When the user interrupts, we
     // need a clean session so the interrupting speech doesn't get merged with
     // the pre-interruption text.
     //
-    // WHAT THIS DOES: Tells the Swift helper to tear down the current
-    // SpeechAnalyzer instance and create a fresh one. This calls
-    // stopListeningAsync() → startListeningInternal() which properly
-    // awaits analyzer finalization before starting clean.
+    // WHAT THIS DOES: Triggers the lightweight input rotation in main.swift —
+    // finalize(through:) + start(inputSequence:) — which keeps the analyzer
+    // warm and just swaps the input stream. Takes ~50ms instead of ~2-4 seconds.
     //
-    // TIMING: We do this AFTER stopping TTS so the restart doesn't race
-    // with the audio pipeline changes from stopping playback.
+    // TIMING: We send cancel_old_audio first (above) to immediately free the
+    // Neural Engine, then reset to get a clean transcription slate. The cancel
+    // and reset happen in rapid succession via IPC.
     //
     // PRODUCT CONTEXT: If a user interrupts mid-AI-response with "wait, actually..."
-    // we want "wait, actually" to be captured with maximum accuracy. A fresh
-    // SpeechAnalyzer session gives us a clean transcription slate.
+    // we want "wait, actually" to be captured with maximum accuracy. The cancel
+    // ensures old audio isn't clogging the pipeline, and the reset gives us a
+    // clean transcription slate.
     this.sendSwiftCommand(session, {
       type: 'reset_recognition',
       data: null
