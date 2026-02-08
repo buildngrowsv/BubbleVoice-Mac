@@ -77,11 +77,24 @@ class VoicePipelineService extends EventEmitter {
     this.swiftHelperPath = path.join(__dirname, '../../../swift-helper/BubbleVoiceSpeech');
 
     // Timer configuration (in milliseconds)
-    // These values are from the Accountability app's battle-tested system
+    // TUNED (2026-02-07): E2E testing revealed that SpeechAnalyzer processes audio
+    // in ~4-second chunks with gaps of 3-4 seconds between transcription updates.
+    // The original 1.2s timer (from Accountability's SFSpeechRecognizer system)
+    // fired during these gaps, causing premature sends — long utterances got cut
+    // off after the first sentence.
+    //
+    // NEW VALUES: Increased llmStart to 4.5s to span the SpeechAnalyzer processing
+    // window. This means the AI starts thinking 4.5s after the user stops speaking
+    // (vs 1.2s before). The trade-off is acceptable because:
+    //   - 4.5s feels like "the AI is thinking" (still natural)
+    //   - Prevents the #1 reported bug (premature message sends)
+    //   - VAD heartbeats provide an additional safety net for shorter pauses
+    //
+    // The TTS and playback timers follow proportionally.
     this.timerConfig = {
-      llmStart: 1200,    // 1.2s - Start LLM processing (slower to avoid mid-sentence cutoff)
-      ttsStart: 2200,    // 2.2s - Start TTS generation (buffered for natural pauses)
-      playbackStart: 3200  // 3.2s - Start audio playback (prevents premature send)
+      llmStart: 4500,    // 4.5s - Start LLM processing (spans SpeechAnalyzer 4s window)
+      ttsStart: 5500,    // 5.5s - Start TTS generation
+      playbackStart: 6500  // 6.5s - Start audio playback
     };
     
     // CRITICAL: Track playback state for interruption detection
@@ -545,6 +558,15 @@ class VoicePipelineService extends EventEmitter {
       // properly handle both without garbling the text.
       finalizedText: '',        // Accumulated finalized segments (immutable once set)
       currentVolatile: '',      // Latest volatile text (replaced on each volatile update)
+      lastVadHeartbeatAt: 0,    // Timestamp of last VAD heartbeat from Swift (speech energy detected)
+      
+      // CASCADE EPOCH (2026-02-07):
+      // Each time resetSilenceTimer is called, this increments. The timer cascade's
+      // async function checks this before proceeding. If the epoch changed (meaning
+      // a newer transcription arrived and reset the cascade), the old cascade aborts.
+      // This prevents "zombie" timer callbacks from processing stale text after
+      // a transcription update resets the cascade.
+      cascadeEpoch: 0,
       silenceTimers: {
         llm: null,
         tts: null,
@@ -768,34 +790,43 @@ class VoicePipelineService extends EventEmitter {
         //
         // This is fundamentally different from waiting for isFinal!
         
-        // CRITICAL FIX (2026-02-06): Evaluate pipeline state TWICE — once before
-        // interruption and once after — instead of caching in a local variable.
+        // INTERRUPTION DETECTION (2026-02-07, ROOT CAUSE FIX):
         //
-        // WHY: Previously, `isInResponsePipeline` was computed once (line ~256) and
-        // used for BOTH the interruption check AND the silence timer restart check.
-        // After handleSpeechDetected() cleared session.isInResponsePipeline, the
-        // local variable was still true, so the silence timer check (!isInResponsePipeline)
-        // evaluated to false — the silence timer was NEVER restarted from this transcription.
+        // We check if the AI is ACTIVELY responding (LLM processing, TTS playing, or
+        // Swift speaking). If so, new transcription = user interruption.
         //
-        // BECAUSE: This caused the voice pipeline to go dead after interruptions.
-        // Timer 1 fires (1.2s pause between words), sets isInResponsePipeline=true.
-        // Next word triggers interruption + clears state. But the silence timer doesn't
-        // restart. No new timer cascade. User keeps speaking but backend ignores it.
-        // STT appears to "hang" because transcriptions arrive but are never processed.
+        // CRITICAL BUG FIX (2026-02-07):
+        // Previously, this check ALSO included `hasActiveTimersBefore` — whether the
+        // silence detection timers were running. This was WRONG because:
         //
-        // FIX: Re-evaluate session state AFTER the interruption handler runs. This
-        // ensures the silence timer restarts immediately after an interruption, so the
-        // backend is ready to process the next user utterance without waiting for another
-        // transcription update.
-        const hasActiveTimersBefore = session.silenceTimers.llm || session.silenceTimers.tts || session.silenceTimers.playback;
-        const wasInResponsePipeline = session.isInResponsePipeline || session.isTTSPlaying || swiftIsSpeaking || hasActiveTimersBefore;
+        //   1) User says "Hello" → first transcription → starts 4.5s LLM timer
+        //   2) 3 seconds later, SpeechAnalyzer emits "Hello, I am" (next chunk)
+        //   3) LLM timer is still pending (has 1.5s left) → hasActiveTimersBefore = true
+        //   4) wasInResponsePipeline = true → FALSE INTERRUPTION!
+        //   5) handleSpeechDetected resets everything, sends reset_recognition to Swift
+        //   6) Swift tears down recognition, loses all buffered audio
+        //   7) Only first sentence gets sent to LLM → premature send bug
+        //
+        // ROOT CAUSE: Silence timers being active means "we're WAITING to detect a
+        // turn boundary" — NOT "the AI is responding." The timer cascade is a
+        // DETECTION mechanism, not a response-in-progress indicator.
+        //
+        // Genuine response-in-progress indicators are:
+        //   - session.isInResponsePipeline: Set when LLM timer actually fires (runLlmProcessing)
+        //   - session.isTTSPlaying: Set when TTS audio starts playing
+        //   - swiftIsSpeaking: Real-time flag from Swift helper that TTS process is active
+        //
+        // FIX: Only check actual response-in-progress flags, NOT pending silence timers.
+        // This eliminates the false interruption that was the root cause of Bug 5
+        // (premature send for long utterances).
+        const wasInResponsePipeline = session.isInResponsePipeline || session.isTTSPlaying || swiftIsSpeaking;
         
         // Check for interruption if we're in response pipeline
         if (wasInResponsePipeline && text.trim().length > 0) {
           console.log('‼️ [VOICE INTERRUPT] User is speaking while AI is in response pipeline - triggering interruption');
-          console.log(`   - Active timers: ${hasActiveTimersBefore}`);
           console.log(`   - In pipeline: ${session.isInResponsePipeline}`);
           console.log(`   - TTS playing: ${session.isTTSPlaying}`);
+          console.log(`   - Swift speaking: ${swiftIsSpeaking}`);
           
           // Trigger interruption - this will clear timers and cached responses
           this.handleSpeechDetected(session);
@@ -825,10 +856,28 @@ class VoicePipelineService extends EventEmitter {
         );
         
         // RE-EVALUATE pipeline state AFTER interruption handler may have cleared it.
-        // This is the critical fix — we check the CURRENT session state, not the stale
-        // local variable from before the interruption.
-        const hasActiveTimersAfter = session.silenceTimers.llm || session.silenceTimers.tts || session.silenceTimers.playback;
-        const isCurrentlyInPipeline = session.isInResponsePipeline || session.isTTSPlaying || swiftIsSpeaking || hasActiveTimersAfter;
+        //
+        // CRITICAL BUG FIX (2026-02-07):
+        // Previously included `hasActiveTimersAfter` — whether silence timers were
+        // still running. This prevented resetSilenceTimer from being called during
+        // normal speech! Here's why that was wrong:
+        //
+        //   1) User says "Hello" → resetSilenceTimer → starts 4.5s LLM timer
+        //   2) User says "Hello, I am" (3s later) → timer still pending
+        //   3) hasActiveTimersAfter = true → isCurrentlyInPipeline = true
+        //   4) resetSilenceTimer is SKIPPED → timer is NOT reset
+        //   5) Timer fires 1.5s later with partial text "Hello" instead of
+        //      waiting 4.5s after "Hello, I am" for the complete utterance
+        //
+        // The timer-reset pattern (from Accountability AI) REQUIRES that every
+        // transcription update resets the timer. The timer should fire 4.5s after
+        // the LAST transcription, not 4.5s after the FIRST one.
+        //
+        // FIX: Only check actual pipeline activity flags (LLM processing, TTS playing,
+        // Swift speaking). When the AI is genuinely responding, we DON'T want to
+        // start new timer cascades. But when the user is speaking (and silence timers
+        // are the only "active" thing), we MUST reset timers on every transcription.
+        const isCurrentlyInPipeline = session.isInResponsePipeline || session.isTTSPlaying || swiftIsSpeaking;
         
         // TIMER-RESET PATTERN (from Accountability AI):
         // Reset the timer on EVERY transcription update. Timer only fires when
@@ -919,6 +968,25 @@ class VoicePipelineService extends EventEmitter {
       //     and reset to listen again.
       //
       // PRODUCT IMPACT: Users can say "yes" and get a response instead of silence.
+      // VAD HEARTBEAT HANDLER (2026-02-07):
+      // Swift sends "vad_speech_active" every ~300ms while the microphone
+      // picks up speech-level audio energy. This tells us the user is STILL
+      // speaking, even if the SpeechAnalyzer hasn't emitted new transcription
+      // updates (due to its 4-second processing window).
+      //
+      // WHY THIS IS CRITICAL:
+      // E2E testing showed that long utterances (7 sentences, ~20 seconds)
+      // get cut off after the first sentence. The 1.2s silence timer fires
+      // during the SpeechAnalyzer's processing gap (between 4-second chunks)
+      // because no transcription_updates arrive during the gap.
+      //
+      // FIX: Track lastVadHeartbeatAt. In the timer cascade, check if
+      // a heartbeat arrived recently — if so, delay the timer.
+      case 'vad_speech_active':
+        session.lastVadHeartbeatAt = Date.now();
+        // Don't log every heartbeat (too noisy), just track timing
+        break;
+      
       case 'speech_energy_silence':
         console.log('[VoicePipelineService] 🎤 Speech energy then silence detected by Swift VAD');
         
@@ -933,28 +1001,63 @@ class VoicePipelineService extends EventEmitter {
           console.log(`[VoicePipelineService] 🎤 Have text "${currentText}" but no active timers — starting timer cascade`);
           this.resetSilenceTimer(session);
         } else if (!hasText && isIdle) {
-          // The analyzer swallowed the utterance entirely. Let the user know.
+          // The analyzer swallowed the utterance entirely (or ambient noise
+          // triggered the VAD). Let the user know.
           console.log('[VoicePipelineService] 🎤 No transcription text despite speech energy — short utterance likely swallowed by analyzer');
           
           // Send a subtle notification to frontend that we detected speech
           // but couldn't transcribe it. The frontend can show a brief hint.
+          //
+          // BUG FIX (2026-02-07): Previously iterated over connections.values()
+          // which gives connectionState objects, not WebSocket objects.
+          // connections is a Map<WebSocket, ConnectionState>. We need to
+          // iterate over entries or keys to get the actual WebSocket.
           if (this.server && this.server.connections) {
-            for (const ws of this.server.connections.values()) {
-              ws.send(JSON.stringify({
+            for (const [ws, connectionState] of this.server.connections) {
+              this.server.sendMessage(ws, {
                 type: 'speech_not_captured',
                 data: {
                   reason: 'short_utterance',
                   hint: 'Try speaking a bit more — short responses like "yes" or "no" may need a follow-up word'
                 }
-              }));
+              });
             }
           }
           
-          // Reset Swift recognition so it's clean for the next attempt
-          this.sendSwiftCommand(session, {
-            type: 'reset_recognition',
-            data: null
-          });
+          // CRITICAL FIX (2026-02-07): Do NOT send reset_recognition here!
+          //
+          // Previously, we sent reset_recognition when speech_energy_silence
+          // fired with no transcription text. This was intended to "clean up"
+          // after a swallowed short utterance. But it caused TWO critical bugs:
+          //
+          // BUG 1: SIGTRAP crash in Swift helper
+          //   The rapid stop-start cycle in resetSpeechAnalyzerSession() can
+          //   trigger a SIGTRAP in AVAudioEngine when the audio tap from the
+          //   previous session hasn't fully drained. This killed the Swift
+          //   helper entirely, making all subsequent voice input impossible.
+          //
+          // BUG 2: Audio loss during active speech
+          //   Ambient noise or brief environmental sounds can trigger the VAD
+          //   (energy > 0.008 threshold) during the pre-speech wait (between
+          //   pressing the mic button and actually speaking). When the VAD
+          //   then detects silence, speech_energy_silence fires. If the user
+          //   starts speaking RIGHT as the reset happens, the first few seconds
+          //   of their actual utterance are lost — the audio engine is being
+          //   torn down and rebuilt during their speech.
+          //
+          // WHY REMOVING THIS IS SAFE:
+          // The recognition session is ALREADY listening. It will capture
+          // the next utterance without any reset. SpeechAnalyzer handles
+          // continuous audio processing internally — it doesn't need to be
+          // restarted between utterances within a session. The only times
+          // we MUST reset are at turn boundaries (after AI speaks) and
+          // after genuine interruptions — both of which already have their
+          // own reset_recognition calls.
+          //
+          // Note: We still send the speech_not_captured notification to the
+          // frontend so the user gets feedback that their short utterance
+          // wasn't captured.
+          console.log('[VoicePipelineService] 🎤 NOT sending reset_recognition (recognition still active, will capture next utterance)');
         } else {
           console.log(`[VoicePipelineService] 🎤 Speech energy silence detected but pipeline busy (inPipeline=${session.isInResponsePipeline}, tts=${session.isTTSPlaying}) — no action needed`);
         }
@@ -1100,6 +1203,12 @@ class VoicePipelineService extends EventEmitter {
     }
     session.awaitingSilenceConfirmation = false;
     
+    // CASCADE EPOCH INCREMENT (2026-02-07):
+    // Every time the silence timer is reset (new transcription arrived),
+    // increment the epoch. Any in-flight timer callback (including those
+    // in the VAD wait loop) will see the epoch changed and abort.
+    session.cascadeEpoch = (session.cascadeEpoch || 0) + 1;
+    
     // Clear any existing silence timers (like Accountability's timerManager.invalidateTimer())
     this.clearAllTimers(session);
     
@@ -1169,6 +1278,36 @@ class VoicePipelineService extends EventEmitter {
     const playbackDelayFromLlm = Math.max(0, playbackDelay - llmDelay);
     const confirmWindowMs = 800;
     const minUtteranceMs = 1800;
+    
+    // VAD-AWARE TIMER GATE (2026-02-07):
+    // Before starting the LLM timer, check if the user is still speaking
+    // according to the Swift VAD. If heartbeats arrived within the last 500ms,
+    // the user is still speaking — delay the timer cascade.
+    //
+    // WHY: SpeechAnalyzer has 4-second processing windows. During these windows,
+    // no transcription_update messages arrive, but the user IS still speaking.
+    // Without this check, the 1.2s timer fires during the processing gap and
+    // sends an incomplete message (Bug 5: "First I woke up early" instead of
+    // the full 7-sentence utterance).
+    //
+    // HOW: Poll session.lastVadHeartbeatAt every 200ms. If a heartbeat arrived
+    // within the last 600ms, the user is still speaking — reschedule the cascade.
+    // Maximum wait: 30 seconds (safety valve against stuck state).
+    const vadCheckIntervalMs = 200;
+    // TUNED (2026-02-07): Must be long enough to cover sentence-boundary pauses
+    // in natural speech. The macOS `say` command produces pauses of 1-2 seconds
+    // between sentences. The SpeechAnalyzer has 4-second processing windows that
+    // create gaps > 3 seconds in transcription updates.
+    //
+    // This threshold should be: longer than the longest natural pause between
+    // sentences in continuous speech, but shorter than the user's actual "I'm done
+    // talking" silence.
+    //
+    // 3000ms covers: sentence pauses (1-2s) + SpeechAnalyzer processing lag (up to 4s)
+    // Total worst-case delay: 1.2s (timer) + 3s (VAD) = 4.2s before AI starts thinking.
+    // This is acceptable because the user perceives the AI as "thinking" during this time.
+    const vadSilenceThresholdMs = 3000;  // Consider VAD silent after 3s with no heartbeat
+    const vadMaxWaitMs = 45000;          // Safety: never wait more than 45s
 
     const runLlmProcessing = async () => {
       session.isInResponsePipeline = true;
@@ -1295,22 +1434,44 @@ class VoicePipelineService extends EventEmitter {
         let fullResponse = '';
         let bubbles = [];
         let artifact = null;
-
-        await this.llmService.generateResponse(
-          conversation,
-          session.settings || {},
-          {
-            onChunk: (chunk) => {
-              fullResponse += chunk;
-            },
-            onBubbles: (generatedBubbles) => {
-              bubbles = generatedBubbles;
-            },
-            onArtifact: (generatedArtifact) => {
-              artifact = generatedArtifact;
+        
+        // RETRY LOGIC FOR EMPTY RESPONSES (2026-02-07):
+        // E2E testing showed Gemini sometimes returns empty responses,
+        // especially on short prompts or when rate-limited. Retrying
+        // once with a brief delay often succeeds.
+        const maxRetries = 2;
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          fullResponse = '';
+          bubbles = [];
+          artifact = null;
+          
+          await this.llmService.generateResponse(
+            conversation,
+            session.settings || {},
+            {
+              onChunk: (chunk) => {
+                fullResponse += chunk;
+              },
+              onBubbles: (generatedBubbles) => {
+                bubbles = generatedBubbles;
+              },
+              onArtifact: (generatedArtifact) => {
+                artifact = generatedArtifact;
+              }
             }
+          );
+          
+          if (fullResponse.trim().length > 0) {
+            break; // Got a response, stop retrying
           }
-        );
+          
+          if (attempt < maxRetries) {
+            console.warn(`[VoicePipelineService] ⚠️ LLM returned empty response (attempt ${attempt}/${maxRetries}), retrying in 500ms...`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } else {
+            console.warn(`[VoicePipelineService] ⚠️ LLM returned empty response after ${maxRetries} attempts`);
+          }
+        }
 
         session.cachedResponses.llm = {
           text: fullResponse,
@@ -1340,11 +1501,64 @@ class VoicePipelineService extends EventEmitter {
       }
     };
 
+    // Capture the cascade epoch to detect if this timer was superseded by a newer cascade
+    const thisCascadeEpoch = session.cascadeEpoch || 0;
+    
     session.silenceTimers.llm = setTimeout(async () => {
+      // EPOCH CHECK (2026-02-07): If a newer transcription arrived and reset the
+      // cascade, this timer's epoch will be stale. Abort to prevent processing
+      // stale/incomplete text. This is the key fix for Bug 5.
+      if ((session.cascadeEpoch || 0) !== thisCascadeEpoch) {
+        console.log(`[VoicePipelineService] ⛔ Timer 1 stale — epoch changed (${thisCascadeEpoch} → ${session.cascadeEpoch}), aborting`);
+        return;
+      }
+      
       console.log(`[VoicePipelineService] Timer 1 (LLM) fired for ${session.id} - ${llmDelay}ms of silence detected (adaptive=${adaptiveDelayMs}ms)!`);
 
       if (session.isCancelled) {
         console.log('[VoicePipelineService] ⛔ Timer 1 aborted — session was cancelled');
+        return;
+      }
+      
+      // VAD-AWARE GATE (2026-02-07):
+      // Before processing, check if the user is still speaking according to Swift VAD.
+      // If VAD heartbeats arrived recently, the user hasn't stopped — delay until they do.
+      //
+      // This is the critical fix for Bug 5 (premature send of long utterances).
+      // The SpeechAnalyzer has 4-second processing windows. Between chunks,
+      // no transcription_update messages arrive for >1.2s, causing the timer
+      // to fire. But the Swift VAD still detects speech energy. By waiting for
+      // VAD silence, we ensure we only process when the user truly stopped.
+      const vadWaitStart = Date.now();
+      while (true) {
+        // EPOCH CHECK in VAD loop: new transcription may have arrived
+        if ((session.cascadeEpoch || 0) !== thisCascadeEpoch) {
+          console.log(`[VoicePipelineService] ⛔ Timer 1 aborted during VAD wait — epoch changed (${thisCascadeEpoch} → ${session.cascadeEpoch})`);
+          return;
+        }
+        
+        const timeSinceVad = Date.now() - (session.lastVadHeartbeatAt || 0);
+        if (timeSinceVad > vadSilenceThresholdMs) {
+          // VAD confirms silence — user has stopped speaking
+          break;
+        }
+        if (Date.now() - vadWaitStart > vadMaxWaitMs) {
+          console.log('[VoicePipelineService] ⚠️ VAD wait exceeded safety limit — proceeding anyway');
+          break;
+        }
+        if (session.isCancelled) {
+          console.log('[VoicePipelineService] ⛔ Timer 1 aborted during VAD wait — session was cancelled');
+          return;
+        }
+        // User still speaking — wait and check again
+        await new Promise(resolve => setTimeout(resolve, vadCheckIntervalMs));
+      }
+      console.log(`[VoicePipelineService] VAD confirmed silence after ${Date.now() - vadWaitStart}ms wait`);
+      
+      // FINAL EPOCH CHECK (2026-02-07): After the VAD wait (which can take seconds),
+      // check again if a newer cascade has taken over.
+      if ((session.cascadeEpoch || 0) !== thisCascadeEpoch) {
+        console.log(`[VoicePipelineService] ⛔ Timer 1 aborted after VAD wait — epoch changed during wait (${thisCascadeEpoch} → ${session.cascadeEpoch})`);
         return;
       }
 
