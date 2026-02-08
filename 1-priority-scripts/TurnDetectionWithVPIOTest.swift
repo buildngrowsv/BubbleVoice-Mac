@@ -1,693 +1,750 @@
 /// TurnDetectionWithVPIOTest.swift
 ///
-/// PURPOSE: Full turn detection state machine test with VPIO echo cancellation.
-/// Implements the complete pipeline from instructions.mdc:
-///   - 2-second silence timer (resets on each new word)
-///   - Turn end detection → generate TTS echo-back "Turn N - [transcription]"
-///   - Response caching (5-second window if user speaks before TTS plays)
-///   - Interruption handling (2+ words while TTS is playing/generating → stop)
-///   - VPIO AEC so the TTS echo-back doesn't contaminate the mic
+/// COMPLETE turn detection, caching, and interruption test with VPIO AEC.
+/// Implements EVERY path from instructions.mdc:
 ///
-/// Instead of calling an LLM, we echo back the transcription via `say` command
-/// played through AVAudioPlayerNode (routed through VPIO for AEC).
+///   PATH A (Normal):       silence 2s → generate TTS → play → finish → next turn
+///   PATH B (Cache Hit):    silence 2s → generating → user 2+ words → cancel & cache
+///                          → user stops 2s → cache < 5s → speak cached → finish
+///   PATH C (Cache Expiry): silence 2s → generating → user 2+ words → cancel & cache
+///                          → user keeps talking > 5s → cache expired → discard
+///                          → next silence 2s → fresh response
+///   PATH D (Playback Int): playing TTS → user 2+ words → stop playback → next turn
 ///
-/// Runs for 5 turns then exits with a summary.
+/// Instead of LLM, we echo back "Turn N: [transcription]" via `say`.
+/// Runs for 5 completed turns (turns where TTS finishes or is interrupted during playback).
+/// Maintains a conversation thread across all turns.
 ///
-/// HOW TO RUN:
-///   ./run-turn-detection-test.sh
-///
+/// HOW TO RUN: ./run-turn-detection-test.sh
 /// REQUIRES: macOS 26+, microphone permission, background audio from another device.
-///
-/// DESIGN: Built on the confirmed-working VPIO echo cancellation test foundation.
-/// Uses a class with instance variables to prevent SpeechAnalyzer deallocation issues.
-/// State transitions are logged with timestamps so you can trace the full pipeline.
 
 import AVFoundation
 import Foundation
 import Speech
 
-// MARK: - Utility
+func setStdoutUnbuffered() { setbuf(stdout, nil) }
 
-/// Ensure stdout flushes immediately so all prints appear in real-time.
-/// Critical for command-line Swift tools where stdout is buffered by default.
-func setStdoutUnbuffered() {
-    setbuf(stdout, nil)
-}
+// MARK: - State Machine
 
-/// Returns seconds elapsed since a reference date, formatted to 1 decimal place.
-/// Used for all log timestamps so you can trace the timeline of events.
-func elapsed(since start: Date) -> String {
-    String(format: "%.1f", Date().timeIntervalSince(start))
-}
-
-// MARK: - Turn Detection State Machine
-
-/// The possible states of the turn detection pipeline.
-/// Each state has specific rules about what happens when the user speaks
-/// or stops speaking, per instructions.mdc sections 1-4.
-///
-/// State transitions:
-///   listening → preparingToSpeak (silence timer fires, start generating TTS)
-///   preparingToSpeak → speaking (TTS file ready, start playback)
-///   preparingToSpeak → listening (user interrupts with 2+ words, cancel & cache)
-///   speaking → listening (TTS finishes normally OR user interrupts with 2+ words)
-///   listening → speaking (cache is valid when silence timer fires, skip generation)
-enum TurnState: CustomStringConvertible {
+/// Every possible state the agent can be in.
+/// The state determines how we react to new transcription words.
+enum AgentState: CustomStringConvertible {
+    /// Listening for user speech. Silence timer runs when words are detected.
     case listening
-    case preparingToSpeak
-    case speaking
+    /// The `say` process is generating the TTS audio file (~1s).
+    /// User 2+ words here → kill process, cache response, back to listening.
+    case generatingTTS
+    /// AVAudioPlayerNode is playing TTS audio through speakers.
+    /// User 2+ words here → stop playback, back to listening.
+    case playingTTS
     
     var description: String {
         switch self {
         case .listening: return "LISTENING"
-        case .preparingToSpeak: return "PREPARING_TO_SPEAK"
-        case .speaking: return "SPEAKING"
+        case .generatingTTS: return "GENERATING"
+        case .playingTTS: return "PLAYING"
         }
     }
 }
 
-// MARK: - Main Test Class
+// MARK: - Conversation Turn Record
 
-/// TurnDetectionTest - Implements the full turn detection pipeline with VPIO AEC.
-///
-/// Architecture:
-///   - AVAudioEngine with VPIO enabled (echo cancellation)
-///   - AVAudioPlayerNode for TTS playback through the engine
-///   - SpeechAnalyzer (macOS 26+) for transcription on the AEC-cleaned mic signal
-///   - Custom state machine managing silence timers, caching, and interruption
-///
-/// The test listens to background audio (e.g., YouTube on a phone), detects 2-second
-/// silences as turn ends, generates a TTS echo-back via `say`, plays it through
-/// the engine (with VPIO AEC), and handles interruptions during playback.
+/// Record of a single conversation turn for the thread log.
+/// We keep ALL turns, including interrupted ones, per instructions.mdc section 3:
+/// "Never drop user speech from the thread, even if it happened mid-pipeline."
+/// "Keep the full agent response in the conversation thread (do not trim it)."
+struct ConversationTurn {
+    let turnNumber: Int
+    let userText: String
+    let agentResponse: String
+    let wasInterruptedDuringGeneration: Bool
+    let wasInterruptedDuringPlayback: Bool
+    let usedCache: Bool
+}
+
+// MARK: - Main Test
+
 @available(macOS 26.0, *)
 class TurnDetectionTest {
     
-    // MARK: - Audio Engine (copied from confirmed-working VPIO test)
-    
+    // ── Audio engine (from confirmed-working VPIO test) ──
     var audioEngine = AVAudioEngine()
     let playerNode = AVAudioPlayerNode()
     
-    // MARK: - SpeechAnalyzer (copied from confirmed-working VPIO test)
-    
+    // ── SpeechAnalyzer ──
     var analyzer: SpeechAnalyzer?
     var transcriber: SpeechTranscriber?
     var continuation: AsyncStream<AnalyzerInput>.Continuation?
     var resultTask: Task<Void, Error>?
     var frameCount: Int64 = 0
     
-    // MARK: - Turn Detection State
+    // ── State machine ──
+    var state: AgentState = .listening
+    let testStart = Date()
     
-    /// Current state of the turn detection pipeline.
-    var state: TurnState = .listening
-    
-    /// Which turn number we're on (1-5). Incremented when a turn ends.
-    var currentTurnNumber = 0
-    
-    /// Maximum number of turns before the test exits.
+    // ── Turn tracking ──
+    /// Completed turn count. We run until this reaches maxTurns.
+    /// A "completed turn" = TTS finished playing OR was interrupted during playback.
+    /// Interrupted-during-generation does NOT count as a completed turn (response was cached, not spoken).
+    var completedTurns = 0
     let maxTurns = 5
     
-    /// The accumulated transcription for the current turn.
-    /// Reset when a new turn begins (after the previous turn's TTS finishes or is interrupted).
-    /// SpeechAnalyzer gives progressive/volatile results, so we track the latest full text.
-    var currentTurnTranscription = ""
+    /// The full text of what the user said in the current turn so far.
+    /// This is the NEW text since the last turn boundary, extracted by comparing
+    /// the total transcription against `textLengthAtTurnStart`.
+    var currentTurnText = ""
     
-    /// The word count from the last transcription result we processed.
-    /// Used to detect when NEW words appear (word count increases → reset silence timer).
-    /// We compare total words in the latest result, not incremental diffs.
-    var lastKnownWordCount = 0
+    /// The entire raw transcription from SpeechAnalyzer for the full session.
+    /// SpeechAnalyzer gives progressive/volatile results. We always store the
+    /// latest (longest) version. When it revises, we take the revision.
+    var fullSessionTranscription = ""
     
-    /// Timestamp when the last new word was detected.
-    /// The silence timer checks: (now - lastNewWordTime) >= 2.0 seconds → turn end.
+    /// Character count of `fullSessionTranscription` at the start of the current turn.
+    /// Everything after this point belongs to the current turn.
+    var textLengthAtTurnStart = 0
+    
+    /// Word count of the latest transcription result. Used to detect new words.
+    /// We compare successive results: if word count goes up, new words appeared.
+    var lastResultWordCount = 0
+    
+    /// Timestamp of the most recent new-word detection. The silence timer measures from here.
     var lastNewWordTime = Date()
     
-    /// The silence timer task. Gets cancelled and restarted every time a new word arrives.
-    /// When it fires (survives 2 seconds without cancellation), it triggers turn end processing.
+    // ── Silence timer ──
     var silenceTimerTask: Task<Void, Never>?
+    let silenceThreshold: Double = 2.0
     
-    /// How long to wait after the last word before declaring a turn end.
-    /// Per instructions.mdc section 1: "When the timer hits 2 seconds with no new words"
-    let silenceThresholdSeconds: Double = 2.0
+    // ── Response cache ──
+    /// The cached response text. Set when user interrupts during TTS generation.
+    /// Cleared when: (a) cache is used, (b) cache expires, (c) TTS plays successfully.
+    var cachedResponse: String? = nil
     
-    // MARK: - Response Caching
+    /// When the cache timer started. Per instructions.mdc section 2:
+    /// "start a 5-second cache timer from the moment the user resumes speaking"
+    var cacheTimerStart: Date? = nil
     
-    /// The cached TTS response text, saved when the user interrupts before playback starts.
-    /// Per instructions.mdc section 2: if user speaks after we decide to respond but before
-    /// audio plays, we cache the response instead of discarding it.
-    var cachedResponse: String?
+    let cacheExpiry: Double = 5.0
     
-    /// When the cache timer started. Cache expires after 5 seconds.
-    /// Per instructions.mdc: "If the cache timer exceeds 5 seconds → discard the cached response"
-    var cacheTimerStart: Date?
+    // ── TTS control ──
+    /// Handle to the running `say` process so we can kill it on interruption.
+    var sayProcess: Process? = nil
     
-    /// How long a cached response remains valid.
-    let cacheExpirySeconds: Double = 5.0
+    /// Flag: set true when we request cancellation of TTS generation.
+    /// The generateAndPlay function checks this after waitUntilExit to know
+    /// whether it was interrupted vs finished normally.
+    var generationWasCancelled = false
     
-    // MARK: - TTS State
+    // ── Interruption detection ──
+    /// Word count snapshot taken when agent enters generatingTTS or playingTTS.
+    /// Interruption = (currentWordCount - this) >= 2.
+    var wordCountAtAgentStart = 0
     
-    /// The Process handle for the currently-running `say` command.
-    /// We keep a reference so we can kill it if the user interrupts during file generation.
-    var activeSayProcess: Process?
+    // ── SpeechAnalyzer diagnostics ──
+    // These track the health and behavior of SpeechAnalyzer to understand WHY
+    // it has long gaps (3-57 seconds) between result batches even with continuous audio.
+    //
+    // HYPOTHESIS: VPIO zeros the mic input during TTS playback (echo cancellation).
+    // This feeds near-zero audio to SpeechAnalyzer, which may confuse its internal
+    // voice activity detector (VAD). After TTS stops, the VAD needs time to recalibrate,
+    // causing the long gap before results resume.
+    //
+    // ALTERNATE HYPOTHESIS: SpeechAnalyzer accumulates internally and only delivers
+    // when it has a confident sentence-level transcription, regardless of input quality.
     
-    /// Whether the playerNode is currently playing audio.
-    /// Used by the interruption check to know if we're in active playback.
-    var isPlayingTTS = false
+    /// Total buffers yielded to SpeechAnalyzer's AsyncStream since the test started.
+    var totalBuffersYielded: Int = 0
     
-    /// Word count at the moment we entered PREPARING_TO_SPEAK or SPEAKING state.
-    /// Used to calculate total new words since the agent started its turn,
-    /// rather than checking incremental deltas which can be +1 at a time
-    /// due to SpeechAnalyzer's progressive/volatile result delivery.
-    /// Without this, rapid single-word updates ("+1 word, +1 word, +1 word...")
-    /// would never trigger the 2-word interruption threshold even though
-    /// multiple words were clearly spoken.
-    var wordCountAtAgentTurnStart = 0
+    /// Buffers yielded since the last SpeechAnalyzer result. Resets on each new result.
+    /// If this is high (>200) when a result arrives, it means SpeechAnalyzer was processing
+    /// for a long time before emitting anything.
+    var buffersSinceLastResult: Int = 0
     
-    /// Timestamp when the test started. Used for all log timestamps.
-    var testStartTime = Date()
+    /// Current RMS energy of the mic input, updated every tap callback.
+    /// Used ONLY for diagnostics (not for silence detection — the user correctly noted
+    /// that RMS picks up non-speech noise like music, ambient sound, etc.).
+    var currentRMSEnergy: Float = 0.0
     
-    /// Completion continuation for signaling when all 5 turns are done.
-    /// The main run() method awaits this so it doesn't exit prematurely.
-    var completionContinuation: CheckedContinuation<Void, Never>?
+    /// Timestamp of last diagnostic log for periodic reporting.
+    var lastDiagLogTime = Date.distantPast
+    
+    /// Timestamp of last SpeechAnalyzer result delivery, for measuring gaps.
+    var lastResultDeliveryTime = Date.distantPast
+    
+    // ── Conversation thread ──
+    var conversationThread: [ConversationTurn] = []
+    
+    // ── Completion signal ──
+    var done: CheckedContinuation<Void, Never>?
     
     // MARK: - Logging
     
-    /// Prints a timestamped, state-tagged log message.
-    /// Format: [T+12.3s] [LISTENING] MESSAGE
-    /// This makes it easy to trace the timeline of state transitions.
-    func log(_ message: String) {
-        let t = elapsed(since: testStartTime)
-        print("[T+\(t)s] [\(state)] \(message)")
+    func log(_ msg: String) {
+        let t = String(format: "%6.1f", Date().timeIntervalSince(testStart))
+        print("[T+\(t)s] [\(state)] \(msg)")
         fflush(stdout)
     }
     
-    // MARK: - Main Entry Point
+    func logState(_ from: AgentState, _ to: AgentState) {
+        let t = String(format: "%6.1f", Date().timeIntervalSince(testStart))
+        print("[T+\(t)s] STATE: \(from) → \(to)")
+        fflush(stdout)
+    }
+    
+    // MARK: - Run
     
     func run() async throws {
-        testStartTime = Date()
-        
-        print("============================================================")
-        print("  Turn Detection Test with VPIO Echo Cancellation")
-        print("  Runs for \(maxTurns) turns. Play audio from another device.")
-        print("  2s silence = turn end → echoes back via TTS")
-        print("  2+ words during TTS = interruption → stops playback")
-        print("============================================================")
+        print("================================================================")
+        print("  FULL Turn Detection + Caching + Interruption Test")
+        print("  VPIO Echo Cancellation | \(maxTurns) completed turns")
+        print("  Play audio from your phone as the 'user'")
+        print("================================================================")
+        print("")
+        print("  Paths tested:")
+        print("    A) Normal:    silence → generate → play → finish")
+        print("    B) Cache hit: silence → generate → interrupt → cache → silence → speak cache")
+        print("    C) Cache exp: silence → generate → interrupt → cache → >5s → discard → fresh")
+        print("    D) Play int:  playing → user speaks → stop playback")
         print("")
         
-        // --- AUDIO ENGINE SETUP (from confirmed-working VPIO test) ---
-        
-        log("Enabling VPIO...")
+        // ── Setup audio engine with VPIO (from confirmed-working test) ──
         try audioEngine.outputNode.setVoiceProcessingEnabled(true)
-        log("VPIO enabled: \(audioEngine.outputNode.isVoiceProcessingEnabled)")
-        
-        // Connect mixer → output with the VPIO format (required to avoid error -10875)
-        let outputFormat = audioEngine.outputNode.outputFormat(forBus: 0)
-        audioEngine.connect(audioEngine.mainMixerNode, to: audioEngine.outputNode, format: outputFormat)
-        
-        // Attach player node for TTS playback
+        let outFmt = audioEngine.outputNode.outputFormat(forBus: 0)
+        audioEngine.connect(audioEngine.mainMixerNode, to: audioEngine.outputNode, format: outFmt)
         audioEngine.attach(playerNode)
         audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
         
-        // --- SPEECH ANALYZER SETUP (from confirmed-working VPIO test) ---
-        
-        guard let locale = await SpeechTranscriber.supportedLocale(equivalentTo: Locale(identifier: "en-US")) else {
-            log("FATAL: en-US locale not supported")
-            return
+        // ── Setup SpeechAnalyzer (from confirmed-working test) ──
+        guard let locale = await SpeechTranscriber.supportedLocale(
+            equivalentTo: Locale(identifier: "en-US")) else {
+            log("FATAL: en-US not supported"); return
         }
-        
-        let transcriber = SpeechTranscriber(
-            locale: locale,
-            transcriptionOptions: [],
-            reportingOptions: [.volatileResults],
-            attributeOptions: []
-        )
-        self.transcriber = transcriber
-        
-        guard let analyzerFormat = await SpeechAnalyzer.bestAvailableAudioFormat(compatibleWith: [transcriber]) else {
-            log("FATAL: No compatible audio format")
-            return
+        // CRITICAL: Must use BOTH .volatileResults AND .fastResults together.
+        // .volatileResults alone: SpeechAnalyzer batches results in ~3.8 second chunks.
+        // .volatileResults + .fastResults: Streams word-by-word at 200-500ms intervals.
+        // This was discovered by analyzing the SwiftUI_SpeechAnalyzerDemo repo which uses
+        // the .timeIndexedProgressiveTranscription preset (maps to these exact flags).
+        // Without .fastResults, the 2-second silence timer ALWAYS false-triggers because
+        // the 3.8s batch gap is longer than the 2.0s threshold.
+        // Also adding .audioTimeRange for precise speech timing per result.
+        let xscriber = SpeechTranscriber(
+            locale: locale, transcriptionOptions: [],
+            reportingOptions: [.volatileResults, .fastResults],
+            attributeOptions: [.audioTimeRange])
+        self.transcriber = xscriber
+        guard let aFmt = await SpeechAnalyzer.bestAvailableAudioFormat(
+            compatibleWith: [xscriber]) else {
+            log("FATAL: no audio format"); return
         }
+        let xanalyzer = SpeechAnalyzer(modules: [xscriber])
+        self.analyzer = xanalyzer
+        let (stream, cont) = AsyncStream<AnalyzerInput>.makeStream()
+        self.continuation = cont
         
-        let analyzer = SpeechAnalyzer(modules: [transcriber])
-        self.analyzer = analyzer
-        
-        let (stream, continuation) = AsyncStream<AnalyzerInput>.makeStream()
-        self.continuation = continuation
-        
-        // --- RESULT CONSUMER: processes every transcription result ---
-        // This is the core of the turn detection system. Every time SpeechAnalyzer
-        // produces a new transcription result, we check:
-        //   1. Did new words appear? → Reset silence timer
-        //   2. Are we in SPEAKING/PREPARING state with 2+ new words? → Interrupt
+        // ── Result consumer task ──
         resultTask = Task { [weak self] in
-            guard let self = self else { return }
-            for try await result in transcriber.results {
-                let text = String(result.text.characters).trimmingCharacters(in: .whitespaces)
+            guard let self else { return }
+            for try await result in xscriber.results {
+                let raw = String(result.text.characters)
+                let text = raw.trimmingCharacters(in: .whitespaces)
                 guard !text.isEmpty else { continue }
-                
-                await self.handleTranscriptionResult(text)
+                self.onTranscriptionResult(text)
             }
         }
         
-        // --- AUDIO TAP: feeds mic (with VPIO AEC) to SpeechAnalyzer ---
-        let inputNode = audioEngine.inputNode
-        let inputFormat = inputNode.outputFormat(forBus: 0)
-        
-        let tapFormat = AVAudioFormat(
-            commonFormat: .pcmFormatFloat32,
-            sampleRate: inputFormat.sampleRate,
-            channels: 1,
-            interleaved: false
-        )!
-        
-        guard let converter = AVAudioConverter(from: tapFormat, to: analyzerFormat) else {
-            log("FATAL: Could not create audio converter")
-            return
+        // ── Audio tap → SpeechAnalyzer (from confirmed-working test) ──
+        let inNode = audioEngine.inputNode
+        let inFmt = inNode.outputFormat(forBus: 0)
+        let tapFmt = AVAudioFormat(commonFormat: .pcmFormatFloat32,
+                                    sampleRate: inFmt.sampleRate, channels: 1, interleaved: false)!
+        guard let conv = AVAudioConverter(from: tapFmt, to: aFmt) else {
+            log("FATAL: no converter"); return
         }
-        
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: tapFormat) { [weak self] buffer, time in
-            guard let self = self else { return }
+        inNode.installTap(onBus: 0, bufferSize: 1024, format: tapFmt) { [weak self] buf, _ in
+            guard let self else { return }
             
-            let ratio = analyzerFormat.sampleRate / tapFormat.sampleRate
-            let outputFrameCapacity = AVAudioFrameCount(Double(buffer.frameLength) * ratio)
-            guard outputFrameCapacity > 0,
-                  let convertedBuffer = AVAudioPCMBuffer(
-                    pcmFormat: analyzerFormat,
-                    frameCapacity: outputFrameCapacity
-                  ) else { return }
-            
-            var error: NSError?
-            converter.convert(to: convertedBuffer, error: &error) { _, outStatus in
-                outStatus.pointee = .haveData
-                return buffer
+            // ── Calculate RMS energy for diagnostics only ──
+            if let data = buf.floatChannelData?[0] {
+                var sumSquares: Float = 0
+                let count = Int(buf.frameLength)
+                for i in 0..<count { sumSquares += data[i] * data[i] }
+                self.currentRMSEnergy = sqrt(sumSquares / Float(max(count, 1)))
             }
             
-            if error == nil && convertedBuffer.frameLength > 0 {
-                let cmTime = CMTime(value: CMTimeValue(self.frameCount), timescale: CMTimeScale(analyzerFormat.sampleRate))
-                self.frameCount += Int64(convertedBuffer.frameLength)
-                self.continuation?.yield(AnalyzerInput(buffer: convertedBuffer, bufferStartTime: cmTime))
+            // ── Periodic diagnostic log (every 2s to reduce noise) ──
+            // Shows: RMS energy of mic input, buffers fed since last SpeechAnalyzer result,
+            // and time since last result delivery. This tells us whether SpeechAnalyzer is
+            // getting audio and how long it's been "thinking" without delivering.
+            let now = Date()
+            if now.timeIntervalSince(self.lastDiagLogTime) >= 2.0 {
+                self.lastDiagLogTime = now
+                let rms = String(format: "%.4f", self.currentRMSEnergy)
+                let t = String(format: "%6.1f", now.timeIntervalSince(self.testStart))
+                let sinceResult = self.lastResultDeliveryTime == Date.distantPast
+                    ? "never"
+                    : String(format: "%.1fs ago", now.timeIntervalSince(self.lastResultDeliveryTime))
+                let sinceWord = String(format: "%.1fs", now.timeIntervalSince(self.lastNewWordTime))
+                print("[T+\(t)s] [\(self.state)] DIAG rms=\(rms) bufs_since_result=\(self.buffersSinceLastResult) total_bufs=\(self.totalBuffersYielded) last_result=\(sinceResult) last_word=\(sinceWord)")
+                fflush(stdout)
+            }
+            
+            // ── Feed to SpeechAnalyzer ──
+            let ratio = aFmt.sampleRate / tapFmt.sampleRate
+            let cap = AVAudioFrameCount(Double(buf.frameLength) * ratio)
+            guard cap > 0, let out = AVAudioPCMBuffer(pcmFormat: aFmt, frameCapacity: cap) else { return }
+            var err: NSError?
+            conv.convert(to: out, error: &err) { _, s in s.pointee = .haveData; return buf }
+            if err == nil && out.frameLength > 0 {
+                let t = CMTime(value: CMTimeValue(self.frameCount), timescale: CMTimeScale(aFmt.sampleRate))
+                self.frameCount += Int64(out.frameLength)
+                self.continuation?.yield(AnalyzerInput(buffer: out, bufferStartTime: t))
+                self.totalBuffersYielded += 1
+                self.buffersSinceLastResult += 1
             }
         }
         
-        // --- START ---
+        // ── Start ──
         audioEngine.prepare()
         try audioEngine.start()
-        try await analyzer.start(inputSequence: stream)
-        
-        log("Audio engine and SpeechAnalyzer started")
-        log("Listening for background audio... speak or play something!")
+        try await xanalyzer.start(inputSequence: stream)
+        log("Engine + SpeechAnalyzer started. Listening...")
         print("")
         
-        // Wait for all 5 turns to complete, or timeout after 3 minutes
-        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
-            self.completionContinuation = cont
-            
-            // Safety timeout: 3 minutes max
-            Task {
-                try? await Task.sleep(for: .seconds(180))
-                self.log("TIMEOUT: 3 minutes elapsed, ending test")
-                self.completionContinuation?.resume()
-                self.completionContinuation = nil
-            }
+        // ── Wait for completion or 3-minute timeout ──
+        await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in
+            self.done = c
+            Task { try? await Task.sleep(for: .seconds(180)); self.finish("TIMEOUT 3min") }
         }
         
-        // --- CLEANUP ---
-        print("")
-        log("Test complete! Cleaning up...")
+        // ── Cleanup ──
         playerNode.stop()
         audioEngine.stop()
-        inputNode.removeTap(onBus: 0)
-        self.continuation?.finish()
+        inNode.removeTap(onBus: 0)
+        continuation?.finish()
         resultTask?.cancel()
         
+        // ── Print conversation thread ──
         print("")
-        print("============================================================")
-        print("  TEST FINISHED - \(currentTurnNumber) turns completed")
-        print("============================================================")
+        print("================================================================")
+        print("  CONVERSATION THREAD (\(conversationThread.count) turns)")
+        print("================================================================")
+        for turn in conversationThread {
+            let flags = [
+                turn.wasInterruptedDuringGeneration ? "INT-GEN/CACHED" : nil,
+                turn.wasInterruptedDuringPlayback ? "INT-PLAY" : nil,
+                turn.usedCache ? "FROM-CACHE" : nil
+            ].compactMap { $0 }.joined(separator: ", ")
+            let flagStr = flags.isEmpty ? "" : " [\(flags)]"
+            print("  USER \(turn.turnNumber): \"\(turn.userText)\"")
+            print("  AI   \(turn.turnNumber): \"\(turn.agentResponse)\"\(flagStr)")
+            print("")
+        }
+        print("================================================================")
+        print("  TEST FINISHED — \(completedTurns) completed turns")
+        print("================================================================")
+    }
+    
+    func finish(_ reason: String) {
+        log("FINISH: \(reason)")
+        done?.resume()
+        done = nil
     }
     
     // MARK: - Transcription Result Handler
     
-    /// Called every time SpeechAnalyzer produces a new transcription result.
-    /// This is the "brain" of the turn detection system. It decides what to do
-    /// based on the current state and whether new words have appeared.
-    ///
-    /// Key behaviors per state:
-    ///   LISTENING: Track words, manage silence timer, check cache validity
-    ///   PREPARING_TO_SPEAK: Check for 2+ word interruption → cancel & cache
-    ///   SPEAKING: Check for 2+ word interruption → stop playback
-    func handleTranscriptionResult(_ text: String) async {
-        let words = text.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
-        let wordCount = words.count
+    /// Tracks the last time we logged a WORDS line, to debounce burst logging.
+    /// SpeechAnalyzer delivers 5-15 progressive results at the exact same timestamp.
+    /// Logging each one creates noise. Instead we log the first and set a debounce
+    /// timer to log the final state of the burst 100ms later.
+    var wordLogDebounceTask: Task<Void, Never>?
+    
+    /// Called for every progressive transcription result from SpeechAnalyzer.
+    /// This is the central dispatch: it detects new words, manages the silence timer,
+    /// and triggers interruptions based on the current agent state.
+    func onTranscriptionResult(_ text: String) {
+        // ── Detect new words ──
+        let words = text.split(separator: " ", omittingEmptySubsequences: true)
+        let wc = words.count
+        let isNew = wc > lastResultWordCount
+        let delta = wc - lastResultWordCount
         
-        // Detect if new words appeared by comparing to last known count.
-        // SpeechAnalyzer gives progressive results like "Hello" → "Hello world" → "Hello world how".
-        // When word count increases, new speech has been detected.
-        let newWordsDetected = wordCount > lastKnownWordCount
-        let newWordsDelta = wordCount - lastKnownWordCount
-        
-        if newWordsDetected {
-            lastNewWordTime = Date()
-            
-            // Update the current turn's transcription with the latest full text.
-            // We always keep the most recent complete text, not a diff.
-            currentTurnTranscription = text
+        // Update the full session transcription and extract current turn text.
+        // SpeechAnalyzer gives progressive results that may revise earlier text,
+        // so we always take the latest version and slice from turnStart.
+        fullSessionTranscription = text
+        if text.count > textLengthAtTurnStart {
+            let startIdx = text.index(text.startIndex,
+                offsetBy: min(textLengthAtTurnStart, text.count))
+            currentTurnText = String(text[startIdx...]).trimmingCharacters(in: .whitespaces)
         }
         
+        guard isNew else { return } // No new words — nothing to do.
+        
+        // ── Diagnostic: how long did SpeechAnalyzer take between result batches? ──
+        let now = Date()
+        let gapSinceResult = lastResultDeliveryTime == Date.distantPast
+            ? -1.0
+            : now.timeIntervalSince(lastResultDeliveryTime)
+        if gapSinceResult > 3.0 {
+            // Log when SpeechAnalyzer had a long gap (>3s) — these are the problematic pauses.
+            log("⚠️ ANALYZER GAP: \(String(format: "%.1f", gapSinceResult))s since last result, \(buffersSinceLastResult) buffers fed during gap, rms_now=\(String(format: "%.4f", currentRMSEnergy))")
+        }
+        lastResultDeliveryTime = now
+        buffersSinceLastResult = 0
+        
+        lastResultWordCount = wc
+        lastNewWordTime = now
+        
+        // ── Route based on state ──
         switch state {
+            
         case .listening:
-            if newWordsDetected {
-                log("NEW WORDS (+\(newWordsDelta)): \"\(text)\"")
-                lastKnownWordCount = wordCount
+            // Debounced logging: SpeechAnalyzer delivers 5-15 progressive results in
+            // the same millisecond. We only log the FINAL state of each burst to keep
+            // output readable. Cancel previous debounce and start a new 150ms timer.
+            wordLogDebounceTask?.cancel()
+            wordLogDebounceTask = Task { [weak self, currentText = currentTurnText, d = delta] in
+                try? await Task.sleep(for: .milliseconds(150))
+                guard !Task.isCancelled, let self else { return }
+                self.log("WORDS (+\(d) in burst): \"\(currentText)\"")
+            }
+            restartSilenceTimer()
+            
+        case .generatingTTS:
+            let sinceTurn = wc - wordCountAtAgentStart
+            if sinceTurn >= 2 {
+                // ── INTERRUPTION DURING GENERATION ──
+                // Per instructions.mdc §4: kill say, cache response, back to listening.
+                // Per §2: cache timer starts NOW (when user resumed speaking).
+                log(">>> INTERRUPT DURING GENERATION (\(sinceTurn) words since agent start)")
+                log("    User said: \"\(currentTurnText)\"")
                 
-                // Reset the silence timer - user is still speaking.
-                // The timer only fires if 2 full seconds pass without new words.
-                startSilenceTimer()
+                generationWasCancelled = true
+                if let p = sayProcess, p.isRunning {
+                    p.terminate()
+                    log("    Killed say process (PID \(p.processIdentifier))")
+                }
+                // Cache is already set by generateAndPlayTTS before it started.
+                // Set the cache timer to NOW.
+                cacheTimerStart = Date()
+                log("    Response cached. Cache timer started (\(cacheExpiry)s window).")
+                
+                let oldState = state
+                state = .listening
+                logState(oldState, state)
+                
+                // Start tracking this as a new turn segment.
+                startNewTurnSegment()
+                restartSilenceTimer()
+            } else {
+                log("SPEECH (\(sinceTurn) word) during generation: \"\(currentTurnText)\"")
             }
             
-        case .preparingToSpeak:
-            // Track total new words since agent turn started, not just the incremental delta.
-            // SpeechAnalyzer delivers progressive results (+1 word at a time), so checking
-            // individual deltas would never hit the 2-word threshold. Instead we compare
-            // current total to the snapshot taken when we entered this state.
-            let totalNewWordsSinceAgentTurn = wordCount - wordCountAtAgentTurnStart
-            
-            if newWordsDetected && totalNewWordsSinceAgentTurn >= 2 {
-                log("INTERRUPT (during generation): \(totalNewWordsSinceAgentTurn) words since agent turn started")
-                log("  User said: \"\(text)\"")
-                await cancelTTSGeneration()
-                // The response is already cached by generateAndPlayTTS when it sets state
-                transitionTo(.listening)
-                lastKnownWordCount = wordCount
-                currentTurnTranscription = text
-                startSilenceTimer()
-            } else if newWordsDetected {
-                log("SPEECH DETECTED (\(totalNewWordsSinceAgentTurn) word) during generation: \"\(text)\"")
-                lastKnownWordCount = wordCount
-                currentTurnTranscription = text
-            }
-            
-        case .speaking:
-            // Same approach: total new words since agent started speaking, not incremental.
-            let totalNewWordsSinceAgentTurn = wordCount - wordCountAtAgentTurnStart
-            
-            if newWordsDetected && totalNewWordsSinceAgentTurn >= 2 {
-                log("INTERRUPT (during playback): \(totalNewWordsSinceAgentTurn) words since agent turn started")
-                log("  User said: \"\(text)\"")
-                await stopTTSPlayback()
-                transitionTo(.listening)
-                lastKnownWordCount = wordCount
-                currentTurnTranscription = text
-                startSilenceTimer()
-            } else if newWordsDetected {
-                log("SPEECH DETECTED (\(totalNewWordsSinceAgentTurn) word) during playback: \"\(text)\" (not interrupting yet)")
-                lastKnownWordCount = wordCount
+        case .playingTTS:
+            let sinceTurn = wc - wordCountAtAgentStart
+            if sinceTurn >= 2 {
+                // ── INTERRUPTION DURING PLAYBACK ──
+                // Per instructions.mdc §4: immediately stop playback, end agent turn.
+                log(">>> INTERRUPT DURING PLAYBACK (\(sinceTurn) words since agent start)")
+                log("    User said: \"\(currentTurnText)\"")
+                
+                playerNode.stop()
+                log("    Stopped AVAudioPlayerNode")
+                
+                let oldState = state
+                state = .listening
+                logState(oldState, state)
+                
+                startNewTurnSegment()
+                restartSilenceTimer()
+            } else {
+                log("SPEECH (\(sinceTurn) word) during playback: \"\(currentTurnText)\"")
             }
         }
-    }
-    
-    // MARK: - State Transitions
-    
-    /// Transitions to a new state with logging.
-    func transitionTo(_ newState: TurnState) {
-        let oldState = state
-        state = newState
-        let t = elapsed(since: testStartTime)
-        print("[T+\(t)s] STATE: \(oldState) → \(newState)")
-        fflush(stdout)
     }
     
     // MARK: - Silence Timer
     
-    /// Starts (or restarts) the 2-second silence timer.
-    /// Every new word resets this timer. If it survives 2 seconds without being
-    /// cancelled, it fires and triggers turn end processing.
+    /// Restarts the 2-second silence timer. Every new word calls this.
+    /// When 2 seconds pass without cancellation, `onSilenceTimerFired` is called.
     ///
-    /// Per instructions.mdc section 1:
-    /// "Every new word from speech transcription resets a 2-second silence timer.
-    ///  When the timer hits 2 seconds with no new words, we treat that as a turn end."
-    func startSilenceTimer() {
-        // Cancel any existing timer
+    /// NOTE: We previously tried an audio energy gate here to wait for RMS to drop,
+    /// but the user correctly identified that RMS picks up non-speech sounds (music,
+    /// ambient noise) and would prevent the timer from ever firing in noisy environments.
+    ///
+    /// The REAL issue is SpeechAnalyzer's bursty delivery pattern — it accumulates
+    /// internally and delivers results in batches with 3-57 second gaps. This is a
+    /// SpeechAnalyzer behavior issue, not something we can fix by monitoring RMS.
+    /// See diagnostics (⚠️ ANALYZER GAP logs) to understand the gap pattern.
+    func restartSilenceTimer() {
         silenceTimerTask?.cancel()
-        
         silenceTimerTask = Task { [weak self] in
-            guard let self = self else { return }
-            
-            // Wait 2 seconds
-            try? await Task.sleep(for: .seconds(self.silenceThresholdSeconds))
-            
-            // If we weren't cancelled, the user has been silent for 2 seconds
-            guard !Task.isCancelled else { return }
-            guard self.state == .listening else { return }
-            
-            await self.handleTurnEnd()
+            try? await Task.sleep(for: .seconds(self?.silenceThreshold ?? 2.0))
+            guard !Task.isCancelled, let self, self.state == .listening else { return }
+            self.onSilenceTimerFired()
         }
     }
     
-    // MARK: - Turn End Processing
+    // MARK: - Turn End
     
-    /// Called when the silence timer fires (2 seconds of silence detected).
-    /// This is where we decide what to "say back" and start the TTS pipeline.
-    ///
-    /// Handles two scenarios:
-    ///   1. No cache: Generate new response ("Turn N - transcription")
-    ///   2. Valid cache: Reuse the cached response (skip generation if cache < 5 seconds)
-    func handleTurnEnd() async {
-        let transcription = currentTurnTranscription.trimmingCharacters(in: .whitespaces)
+    /// Called when 2 seconds of silence are detected.
+    /// Decides whether to use a cached response or generate a fresh one.
+    func onSilenceTimerFired() {
+        let turnText = currentTurnText.trimmingCharacters(in: .whitespaces)
         
-        // Ignore empty turns (silence timer fired but no actual words were captured)
-        guard !transcription.isEmpty else {
-            log("SILENCE TIMER FIRED but no transcription captured, ignoring")
+        guard !turnText.isEmpty else {
+            log("SILENCE 2s but empty transcription — ignoring")
             return
         }
         
-        // Check if we have a valid cached response
-        if let cached = cachedResponse, let cacheStart = cacheTimerStart {
-            let cacheAge = Date().timeIntervalSince(cacheStart)
-            if cacheAge < cacheExpirySeconds {
-                // Cache is still valid! Use it.
-                log("TURN END (silence 2.0s) — CACHE HIT")
-                log("  Cache age: \(String(format: "%.1f", cacheAge))s (< \(cacheExpirySeconds)s, still valid)")
-                log("  Using cached response: \"\(cached)\"")
-                log("  New speech since cache: \"\(transcription)\"")
+        log("──── SILENCE 2.0s DETECTED ────")
+        log("  Turn text: \"\(turnText)\"")
+        
+        // ── Check cache ──
+        if let cached = cachedResponse, let cStart = cacheTimerStart {
+            let age = Date().timeIntervalSince(cStart)
+            if age < cacheExpiry {
+                // ── PATH B: Cache hit ──
+                log("  CACHE HIT — age \(String(format: "%.1f", age))s < \(cacheExpiry)s")
+                log("  Speaking cached response: \"\(cached)\"")
                 
-                // Clear cache before speaking
-                let responseText = cached
+                // Record this turn (the speech during cache window)
+                conversationThread.append(ConversationTurn(
+                    turnNumber: conversationThread.count + 1,
+                    userText: turnText,
+                    agentResponse: cached,
+                    wasInterruptedDuringGeneration: false,
+                    wasInterruptedDuringPlayback: false,
+                    usedCache: true
+                ))
+                
+                let response = cached
                 cachedResponse = nil
                 cacheTimerStart = nil
                 
-                await generateAndPlayTTS(responseText: responseText)
+                Task { await self.generateAndPlayTTS(response: response, isCached: true) }
                 return
             } else {
-                // Cache expired
-                log("TURN END (silence 2.0s) — CACHE EXPIRED")
-                log("  Cache age: \(String(format: "%.1f", cacheAge))s (> \(cacheExpirySeconds)s, discarded)")
+                // ── PATH C: Cache expired ──
+                log("  CACHE EXPIRED — age \(String(format: "%.1f", age))s > \(cacheExpiry)s")
+                log("  Discarding cached response. Will generate fresh.")
                 cachedResponse = nil
                 cacheTimerStart = nil
-                // Fall through to generate new response
+                // Fall through to generate fresh response
             }
         }
         
-        // No cache (or expired cache) — generate new response
-        currentTurnNumber += 1
+        // ── PATH A / fresh after PATH C: Generate new response ──
+        completedTurns += 1
+        let turnNum = completedTurns
         
-        if currentTurnNumber > maxTurns {
-            log("ALL \(maxTurns) TURNS COMPLETE")
-            completionContinuation?.resume()
-            completionContinuation = nil
+        if turnNum > maxTurns {
+            finish("ALL \(maxTurns) TURNS COMPLETE")
             return
         }
         
-        let responseText = "Turn \(currentTurnNumber). \(transcription)"
+        let response = "Turn \(turnNum). \(turnText)"
+        log("  NEW RESPONSE for turn \(turnNum)/\(maxTurns): \"\(response)\"")
         
-        log("TURN END (silence 2.0s) — Turn \(currentTurnNumber)/\(maxTurns)")
-        log("  Transcription: \"\(transcription)\"")
-        log("  Response: \"\(responseText)\"")
+        // Record in conversation thread
+        conversationThread.append(ConversationTurn(
+            turnNumber: turnNum,
+            userText: turnText,
+            agentResponse: response,
+            wasInterruptedDuringGeneration: false,
+            wasInterruptedDuringPlayback: false,
+            usedCache: false
+        ))
         
-        await generateAndPlayTTS(responseText: responseText)
+        Task { await self.generateAndPlayTTS(response: response, isCached: false) }
     }
     
-    // MARK: - TTS Generation & Playback
+    // MARK: - TTS Pipeline
     
-    /// Generates a TTS audio file with `say` and plays it through the AVAudioEngine.
-    /// This is the full pipeline: state transition → file generation → playback → cleanup.
+    /// Full TTS pipeline: generate audio file with `say`, then play through AVAudioEngine.
     ///
-    /// If the user interrupts during generation (2+ words detected in handleTranscriptionResult),
-    /// the say process is killed and the response is cached for potential reuse.
+    /// At any point, onTranscriptionResult may interrupt us by:
+    ///   - During generation: setting generationWasCancelled=true and killing the process
+    ///   - During playback: calling playerNode.stop() and setting state to .listening
     ///
-    /// If the user interrupts during playback, the playerNode is stopped immediately.
+    /// If interrupted during generation, the response was already set as cachedResponse
+    /// before we started. The cache timer is set by onTranscriptionResult.
     ///
-    /// When playback finishes normally, we transition back to LISTENING and prepare
-    /// for the next turn.
-    func generateAndPlayTTS(responseText: String) async {
-        // --- PHASE 1: Generate the audio file ---
+    /// If interrupted during playback, we mark the turn as interrupted in the thread.
+    func generateAndPlayTTS(response: String, isCached: Bool) async {
+        // ── PHASE 1: Generate TTS file ──
+        generationWasCancelled = false
+        wordCountAtAgentStart = lastResultWordCount
         
-        // Snapshot the current word count so we can detect 2+ new words
-        // during generation/playback relative to this starting point.
-        wordCountAtAgentTurnStart = lastKnownWordCount
-        transitionTo(.preparingToSpeak)
+        // Pre-set cache so if interrupted, the response is already saved.
+        // Only set cache for fresh responses. If this IS a cached response being spoken,
+        // we don't re-cache it (it's already been cached once).
+        if !isCached {
+            cachedResponse = response
+        } else {
+            cachedResponse = nil
+        }
+        cacheTimerStart = nil // only set when user actually speaks
         
-        // Cache the response immediately so if we get interrupted during generation,
-        // the response is already saved for potential reuse.
-        cachedResponse = responseText
-        cacheTimerStart = nil // Timer starts when user speaks, not now
+        let oldState = state
+        state = .generatingTTS
+        logState(oldState, .generatingTTS)
         
-        let ttsPath = "/tmp/turn_detection_tts_\(currentTurnNumber).aiff"
-        let ttsURL = URL(fileURLWithPath: ttsPath)
-        try? FileManager.default.removeItem(at: ttsURL)
+        let path = "/tmp/turn_tts_\(completedTurns)_\(Int(Date().timeIntervalSince1970)).aiff"
+        let url = URL(fileURLWithPath: path)
+        try? FileManager.default.removeItem(at: url)
         
-        log("GENERATING TTS: \"\(responseText)\"")
         let genStart = Date()
+        log("GENERATING: \"\(response)\"")
         
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/say")
-        process.arguments = ["-o", ttsPath, responseText]
-        activeSayProcess = process
+        let proc = Process()
+        proc.executableURL = URL(fileURLWithPath: "/usr/bin/say")
+        proc.arguments = ["-o", path, response]
+        sayProcess = proc
         
-        do {
-            try process.run()
-        } catch {
-            log("ERROR: Failed to run say command: \(error)")
-            transitionTo(.listening)
+        do { try proc.run() } catch {
+            log("ERROR: say failed: \(error)")
+            state = .listening
             return
         }
         
-        // Wait for say process to finish (or be killed by interruption)
-        process.waitUntilExit()
-        activeSayProcess = nil
+        // This blocks until say finishes or is killed by the interrupt handler.
+        proc.waitUntilExit()
+        sayProcess = nil
         
-        let genTime = Date().timeIntervalSince(genStart) * 1000
+        let genMs = Int(Date().timeIntervalSince(genStart) * 1000)
         
-        // Check if we were interrupted during generation
-        if state != .preparingToSpeak {
-            log("TTS generation was interrupted after \(Int(genTime))ms")
-            // Cache timer starts from when the user started speaking (already set in handleTranscriptionResult)
-            cacheTimerStart = lastNewWordTime
-            log("  Response cached. Cache timer started.")
-            // Reset for next turn's transcription
-            resetForNextListening()
+        // ── Check if we were interrupted during generation ──
+        if generationWasCancelled || state != .generatingTTS {
+            log("GENERATION INTERRUPTED after \(genMs)ms")
+            // The interrupt handler already:
+            //   - transitioned state to .listening
+            //   - set cacheTimerStart
+            //   - started silence timer
+            //   - started new turn segment
+            // We just need to record this interrupted turn.
+            if !isCached, let lastTurn = conversationThread.last {
+                // Update the last turn record to mark it as interrupted during gen
+                conversationThread[conversationThread.count - 1] = ConversationTurn(
+                    turnNumber: lastTurn.turnNumber,
+                    userText: lastTurn.userText,
+                    agentResponse: lastTurn.agentResponse,
+                    wasInterruptedDuringGeneration: true,
+                    wasInterruptedDuringPlayback: false,
+                    usedCache: lastTurn.usedCache
+                )
+            }
+            // completedTurns is NOT incremented — generation-interrupted turns don't count.
+            // The response is cached and might be spoken on the next silence.
+            if !isCached {
+                // We already incremented completedTurns in onSilenceTimerFired, undo it
+                completedTurns -= 1
+            }
+            try? FileManager.default.removeItem(at: url)
             return
         }
         
-        // Check if the file was generated successfully
-        guard FileManager.default.fileExists(atPath: ttsPath) else {
-            log("ERROR: TTS file was not generated (say process may have been killed)")
-            transitionTo(.listening)
-            resetForNextListening()
+        // ── Generation succeeded, check file ──
+        guard FileManager.default.fileExists(atPath: path),
+              let file = try? AVAudioFile(forReading: url) else {
+            log("ERROR: TTS file missing or unreadable")
+            state = .listening
             return
         }
         
-        log("TTS generated in \(Int(genTime))ms")
+        let dur = Double(file.length) / file.fileFormat.sampleRate
+        log("GENERATED in \(genMs)ms, duration \(String(format: "%.1f", dur))s")
         
-        // --- PHASE 2: Play the audio file ---
-        guard let audioFile = try? AVAudioFile(forReading: ttsURL) else {
-            log("ERROR: Could not read TTS audio file")
-            transitionTo(.listening)
-            resetForNextListening()
-            return
-        }
-        
-        let duration = Double(audioFile.length) / audioFile.fileFormat.sampleRate
-        log("PLAYING TTS (\(String(format: "%.1f", duration))s)...")
-        
-        transitionTo(.speaking)
-        isPlayingTTS = true
-        
-        // Clear the cache since we're actually speaking now (no longer "pre-playback")
+        // ── PHASE 2: Play the TTS audio ──
+        // Clear cache since we're actually playing now.
         cachedResponse = nil
         cacheTimerStart = nil
         
-        // Play and wait for completion
-        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
-            playerNode.scheduleFile(audioFile, at: nil) {
-                cont.resume()
+        // Reset the interruption word counter for the playback phase.
+        wordCountAtAgentStart = lastResultWordCount
+        
+        let playOld = state
+        state = .playingTTS
+        logState(playOld, .playingTTS)
+        log("PLAYING TTS (\(String(format: "%.1f", dur))s)...")
+        
+        // Play and wait for completion (or interruption).
+        let playbackFinished = await withCheckedContinuation { (c: CheckedContinuation<Bool, Never>) in
+            var resumed = false
+            playerNode.scheduleFile(file, at: nil) {
+                // This fires when the file finishes playing OR when .stop() is called.
+                if !resumed {
+                    resumed = true
+                    c.resume(returning: true)
+                }
             }
             playerNode.play()
         }
         
-        isPlayingTTS = false
+        try? FileManager.default.removeItem(at: url)
         
-        // Clean up the temp file
-        try? FileManager.default.removeItem(at: ttsURL)
-        
-        // Check if we were interrupted during playback
-        if state != .speaking {
-            log("TTS playback was interrupted")
-            // State was already changed to .listening by handleTranscriptionResult
+        // ── Check if interrupted during playback ──
+        if state != .playingTTS {
+            // Interrupted by onTranscriptionResult which already set state to .listening
+            log("PLAYBACK INTERRUPTED")
+            
+            // Mark in conversation thread
+            if let lastTurn = conversationThread.last {
+                conversationThread[conversationThread.count - 1] = ConversationTurn(
+                    turnNumber: lastTurn.turnNumber,
+                    userText: lastTurn.userText,
+                    agentResponse: lastTurn.agentResponse,
+                    wasInterruptedDuringGeneration: lastTurn.wasInterruptedDuringGeneration,
+                    wasInterruptedDuringPlayback: true,
+                    usedCache: lastTurn.usedCache
+                )
+            }
+            // Playback interruption DOES count as a completed turn
+            // (the agent spoke, even if cut short).
+            
+            if completedTurns >= maxTurns {
+                finish("ALL \(maxTurns) TURNS COMPLETE")
+            }
             return
         }
         
-        // Playback finished normally
-        log("TTS playback finished normally")
-        transitionTo(.listening)
-        resetForNextListening()
+        // ── Playback finished normally ──
+        log("PLAYBACK FINISHED normally")
+        let finOld = state
+        state = .listening
+        logState(finOld, .listening)
         
-        // Check if we've completed all turns
-        if currentTurnNumber >= maxTurns {
-            log("ALL \(maxTurns) TURNS COMPLETE")
-            completionContinuation?.resume()
-            completionContinuation = nil
+        startNewTurnSegment()
+        
+        if completedTurns >= maxTurns {
+            finish("ALL \(maxTurns) TURNS COMPLETE")
         }
     }
     
-    // MARK: - Interruption Helpers
+    // MARK: - Turn Segmentation
     
-    /// Kills the in-progress `say` process when the user interrupts during TTS generation.
-    func cancelTTSGeneration() async {
-        if let process = activeSayProcess, process.isRunning {
-            log("KILLING say process (PID \(process.processIdentifier))")
-            process.terminate()
-            activeSayProcess = nil
-        }
-    }
-    
-    /// Stops the AVAudioPlayerNode when the user interrupts during TTS playback.
-    func stopTTSPlayback() async {
-        if isPlayingTTS {
-            log("STOPPING playerNode playback")
-            playerNode.stop()
-            isPlayingTTS = false
-        }
-    }
-    
-    // MARK: - State Reset
-    
-    /// Resets the word tracking state for the next listening period.
-    /// Called after a turn completes (normally or via interruption) so the next
-    /// turn starts fresh without carrying over stale word counts.
-    ///
-    /// IMPORTANT: We do NOT reset lastKnownWordCount to 0 here because SpeechAnalyzer
-    /// gives cumulative transcriptions within a session. The word count only ever
-    /// increases. If we reset to 0, the next result (which still has the old high
-    /// word count) would trigger a massive "+N words" delta and immediately restart
-    /// the silence timer with stale text. Instead, we keep the current word count
-    /// as the baseline and only react to genuinely NEW words going forward.
-    func resetForNextListening() {
-        currentTurnTranscription = ""
-        // lastKnownWordCount is intentionally NOT reset — see comment above
+    /// Marks the current position in the transcription stream as the start of a new turn.
+    /// Everything transcribed after this point belongs to the next turn.
+    func startNewTurnSegment() {
+        textLengthAtTurnStart = fullSessionTranscription.count
+        currentTurnText = ""
+        // Do NOT reset lastResultWordCount — it's cumulative for the session.
+        // Do NOT reset wordCountAtAgentStart — it's set fresh when agent starts.
     }
 }
-
 
 // MARK: - Entry Point
 
 @main
-struct TurnDetectionTestEntryPoint {
+struct TurnDetectionEntry {
     static func main() {
         setStdoutUnbuffered()
-        
-        if #available(macOS 26.0, *) {
-            Task {
-                let test = TurnDetectionTest()
-                do {
-                    try await test.run()
-                } catch {
-                    print("Test failed with error: \(error)")
-                }
-                exit(0)
-            }
-            RunLoop.main.run()
-        } else {
-            print("Requires macOS 26+")
-            exit(1)
+        guard #available(macOS 26.0, *) else { print("Requires macOS 26+"); exit(1) }
+        Task {
+            let test = TurnDetectionTest()
+            do { try await test.run() }
+            catch { print("FATAL: \(error)") }
+            exit(0)
         }
+        RunLoop.main.run()
     }
 }
