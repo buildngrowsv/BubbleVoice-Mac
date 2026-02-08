@@ -269,28 +269,10 @@ final class SpeechHelper: @unchecked Sendable {
     // 150ms ensures at least 10 heartbeats per 1.5s window.
     private let vadHeartbeatIntervalFrames: UInt64 = 7200  // ~150ms at 48kHz
     
-    // SINGLE-WORD FLUSH MECHANISM (2026-02-07):
-    // Testing revealed that single-word utterances ("yes", "no", "ok") RELIABLY
-    // produce ZERO transcription results because SpeechAnalyzer processes audio
-    // in ~4-second chunks. A 0.3-second word leaves too little signal in the
-    // 4-second window for the analyzer to commit to a transcription.
-    //
-    // FIX: Track whether we detected speech energy (via VAD) and then silence.
-    // If we saw speech followed by sustained silence (>2 seconds), we "flush"
-    // the analyzer by finishing the input stream and immediately restarting.
-    // This forces the analyzer to emit any buffered results.
-    //
-    // Without this fix, users saying "yes" or "no" get:
-    //   - No visual feedback in the input field
-    //   - The silence timer never starts (no transcription to trigger it)
-    //   - The turn hangs until they speak more or the session times out
-    private var speechEnergyDetectedSinceLastResult = false
-    private var flushCheckTimer: Task<Void, Never>?
-    // How many silent frames after speech before we flush.
-    // 25 frames at 4096 samples/48kHz ≈ 2.1 seconds — long enough
-    // to confirm the user actually stopped, short enough to not feel laggy.
-    private let flushAfterSilentFrames: Int = 25
-    private var silentFramesSinceSpeech: Int = 0
+    // REMOVED (2026-02-08): Single-word flush mechanism no longer needed.
+    // With .fastResults flag enabled, SpeechAnalyzer streams results
+    // word-by-word every 200-500ms. Short utterances now produce volatile
+    // results immediately, so we don't need to flush the analyzer.
     
     // NOTE: All legacy restart / hang detection logic has been removed
     // because SpeechAnalyzer manages its own session lifecycle. This is
@@ -584,8 +566,7 @@ final class SpeechHelper: @unchecked Sendable {
                     // WITH THIS: Heartbeats continue during the grace period (up to
                     // maxConsecutiveSilentFrames frames ≈ 1.3s), keeping the backend
                     // timer gate open through natural pauses.
-                    if self.consecutiveSilentFrames <= self.maxConsecutiveSilentFrames
-                       && self.speechEnergyDetectedSinceLastResult {
+                    if self.consecutiveSilentFrames <= self.maxConsecutiveSilentFrames {
                         let framesSinceLastHeartbeat = self.totalFramesProcessed - self.lastVadHeartbeatTime
                         if framesSinceLastHeartbeat >= self.vadHeartbeatIntervalFrames {
                             self.lastVadHeartbeatTime = self.totalFramesProcessed
@@ -597,29 +578,8 @@ final class SpeechHelper: @unchecked Sendable {
                         }
                     }
                     
-                    // SINGLE-WORD FLUSH (2026-02-07):
-                    // If we previously detected speech energy but haven't received
-                    // any transcription results, and we've now been silent long enough,
-                    // force the analyzer to flush by resetting the session.
-                    // This handles "yes", "no", "ok" and other quick responses
-                    // that the 4-second processing window would otherwise swallow.
-                    if self.speechEnergyDetectedSinceLastResult {
-                        self.silentFramesSinceSpeech += 1
-                        
-                        if self.silentFramesSinceSpeech >= self.flushAfterSilentFrames {
-                            self.logError("VAD: Speech then silence detected (\(self.silentFramesSinceSpeech) silent frames) — flushing analyzer for possible short utterance")
-                            self.speechEnergyDetectedSinceLastResult = false
-                            self.silentFramesSinceSpeech = 0
-                            
-                            // Notify backend that we detected "speech then silence"
-                            // so it can handle short-utterance fallback behavior
-                            // (e.g., start a shorter timer to wait for the delayed result)
-                            self.sendResponse(type: "speech_energy_silence", data: [
-                                "silentFrames": AnyCodable(self.flushAfterSilentFrames),
-                                "estimatedSilenceDurationMs": AnyCodable(Int(Double(self.flushAfterSilentFrames) * 4096.0 / 48000.0 * 1000.0))
-                            ])
-                        }
-                    }
+                    // REMOVED (2026-02-08): Single-word flush logic no longer needed
+                    // with .fastResults enabled.
                     
                     // Still feed audio during brief pauses (word boundaries)
                     // but stop after sustained silence to save processing.
@@ -641,12 +601,6 @@ final class SpeechHelper: @unchecked Sendable {
                 } else {
                     // Speech detected — reset the silence counter
                     self.consecutiveSilentFrames = 0
-                    
-                    // SINGLE-WORD FLUSH TRACKING (2026-02-07):
-                    // Mark that we've seen speech energy so the flush mechanism
-                    // knows to activate when silence returns.
-                    self.speechEnergyDetectedSinceLastResult = true
-                    self.silentFramesSinceSpeech = 0
                     
                     // VAD HEARTBEAT (2026-02-07):
                     // Send periodic heartbeat to backend while user is speaking.
@@ -1004,13 +958,7 @@ final class SpeechHelper: @unchecked Sendable {
                     let text = String(result.text.characters)
                     self.logError("🔍 EXTRACTED TEXT: '\(text)'")
                     
-                    // RESET FLUSH TRACKING (2026-02-07):
-                    // We got a transcription result, so the analyzer DID process
-                    // the speech. No need to flush — clear the "speech detected" flag.
-                    // This prevents redundant flushes when the analyzer already
-                    // emitted results for the speech it heard.
-                    self.speechEnergyDetectedSinceLastResult = false
-                    self.silentFramesSinceSpeech = 0
+                    // REMOVED (2026-02-08): Flush tracking no longer needed
                     
                     // EXTRACT AUDIO TIMESTAMPS (2026-02-07):
                     // The audioTimeRange attribute gives us the precise audio
@@ -1271,8 +1219,6 @@ final class SpeechHelper: @unchecked Sendable {
                 // We keep totalFramesProcessed because the audio engine and
                 // tap are still running — the timeline is continuous.
                 consecutiveSilentFrames = 0
-                speechEnergyDetectedSinceLastResult = false
-                silentFramesSinceSpeech = 0
                 
                 // Step 4: Create a new input stream for the next turn.
                 let (newStream, newContinuation) = AsyncStream<AnalyzerInput>.makeStream()
@@ -1363,12 +1309,6 @@ final class SpeechHelper: @unchecked Sendable {
         totalFramesProcessed = 0
         consecutiveSilentFrames = 0
         
-        // Reset single-word flush tracking
-        speechEnergyDetectedSinceLastResult = false
-        silentFramesSinceSpeech = 0
-        flushCheckTimer?.cancel()
-        flushCheckTimer = nil
-        
         isListening = false
         hasLiveAnalyzerSession = false
         lastAudioTimestamp = .zero
@@ -1413,12 +1353,6 @@ final class SpeechHelper: @unchecked Sendable {
         // Reset audio timeline tracking
         totalFramesProcessed = 0
         consecutiveSilentFrames = 0
-        
-        // Reset single-word flush tracking
-        speechEnergyDetectedSinceLastResult = false
-        silentFramesSinceSpeech = 0
-        flushCheckTimer?.cancel()
-        flushCheckTimer = nil
         
         isListening = false
         hasLiveAnalyzerSession = false

@@ -1007,79 +1007,11 @@ class VoicePipelineService extends EventEmitter {
         break;
       
       case 'speech_energy_silence':
-        console.log('[VoicePipelineService] 🎤 Speech energy then silence detected by Swift VAD');
-        
-        const currentText = (session.latestTranscription || '').trim();
-        const hasText = currentText.length > 0;
-        const isIdle = !session.isInResponsePipeline && !session.isTTSPlaying && !session.isProcessingResponse;
-        
-        if (hasText && isIdle) {
-          // We have text and no timers are running — this means the transcription
-          // arrived but the timer cascade hasn't started yet (possible if updates
-          // came without triggering resetSilenceTimer). Start the cascade now.
-          console.log(`[VoicePipelineService] 🎤 Have text "${currentText}" but no active timers — starting timer cascade`);
-          this.resetSilenceTimer(session);
-        } else if (!hasText && isIdle) {
-          // The analyzer swallowed the utterance entirely (or ambient noise
-          // triggered the VAD). Let the user know.
-          console.log('[VoicePipelineService] 🎤 No transcription text despite speech energy — short utterance likely swallowed by analyzer');
-          
-          // Send a subtle notification to frontend that we detected speech
-          // but couldn't transcribe it. The frontend can show a brief hint.
-          //
-          // BUG FIX (2026-02-07): Previously iterated over connections.values()
-          // which gives connectionState objects, not WebSocket objects.
-          // connections is a Map<WebSocket, ConnectionState>. We need to
-          // iterate over entries or keys to get the actual WebSocket.
-          if (this.server && this.server.connections) {
-            for (const [ws, connectionState] of this.server.connections) {
-              this.server.sendMessage(ws, {
-                type: 'speech_not_captured',
-                data: {
-                  reason: 'short_utterance',
-                  hint: 'Try speaking a bit more — short responses like "yes" or "no" may need a follow-up word'
-                }
-              });
-            }
-          }
-          
-          // CRITICAL FIX (2026-02-07): Do NOT send reset_recognition here!
-          //
-          // Previously, we sent reset_recognition when speech_energy_silence
-          // fired with no transcription text. This was intended to "clean up"
-          // after a swallowed short utterance. But it caused TWO critical bugs:
-          //
-          // BUG 1: SIGTRAP crash in Swift helper
-          //   The rapid stop-start cycle in resetSpeechAnalyzerSession() can
-          //   trigger a SIGTRAP in AVAudioEngine when the audio tap from the
-          //   previous session hasn't fully drained. This killed the Swift
-          //   helper entirely, making all subsequent voice input impossible.
-          //
-          // BUG 2: Audio loss during active speech
-          //   Ambient noise or brief environmental sounds can trigger the VAD
-          //   (energy > 0.008 threshold) during the pre-speech wait (between
-          //   pressing the mic button and actually speaking). When the VAD
-          //   then detects silence, speech_energy_silence fires. If the user
-          //   starts speaking RIGHT as the reset happens, the first few seconds
-          //   of their actual utterance are lost — the audio engine is being
-          //   torn down and rebuilt during their speech.
-          //
-          // WHY REMOVING THIS IS SAFE:
-          // The recognition session is ALREADY listening. It will capture
-          // the next utterance without any reset. SpeechAnalyzer handles
-          // continuous audio processing internally — it doesn't need to be
-          // restarted between utterances within a session. The only times
-          // we MUST reset are at turn boundaries (after AI speaks) and
-          // after genuine interruptions — both of which already have their
-          // own reset_recognition calls.
-          //
-          // Note: We still send the speech_not_captured notification to the
-          // frontend so the user gets feedback that their short utterance
-          // wasn't captured.
-          console.log('[VoicePipelineService] 🎤 NOT sending reset_recognition (recognition still active, will capture next utterance)');
-        } else {
-          console.log(`[VoicePipelineService] 🎤 Speech energy silence detected but pipeline busy (inPipeline=${session.isInResponsePipeline}, tts=${session.isTTSPlaying}) — no action needed`);
-        }
+        // REMOVED (2026-02-08): This event is no longer sent by Swift helper.
+        // With .fastResults enabled, short utterances produce volatile results
+        // immediately (200-500ms), so we don't need special "speech then silence"
+        // detection or the single-word flush mechanism.
+        console.log('[VoicePipelineService] ⚠️ Received deprecated speech_energy_silence event (should not happen)');
         break;
 
       case 'recognition_restarted':
