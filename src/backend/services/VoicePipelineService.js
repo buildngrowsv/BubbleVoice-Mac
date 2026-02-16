@@ -1374,12 +1374,17 @@ class VoicePipelineService extends EventEmitter {
         // TIMING: Sent right before the LLM API call, so the user sees the
         // thinking indicator as soon as their speech is finalized.
         // ============================================================
-        if (session.sendToFrontend) {
-          session.sendToFrontend({
-            type: 'ai_response_stream_start',
-            data: {}
-          });
-          console.log('[VoicePipelineService] Sent ai_response_stream_start to show thinking indicator');
+        if (this.server && this.server.connections) {
+          for (const [ws, connectionState] of this.server.connections) {
+            if (connectionState.id === session.id) {
+              this.server.sendMessage(ws, {
+                type: 'ai_response_stream_start',
+                data: {}
+              });
+              console.log('[VoicePipelineService] Sent ai_response_stream_start to show thinking indicator');
+              break;
+            }
+          }
         }
 
         if (!this.llmService) {
