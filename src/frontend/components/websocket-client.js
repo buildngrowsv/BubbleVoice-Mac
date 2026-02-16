@@ -330,6 +330,27 @@ class WebSocketClient {
           this.handleAIResponseStreamStart(message.data);
           break;
 
+        // VOICE PIPELINE THINKING INDICATOR (2026-02-16 FIX):
+        // ====================================================
+        //
+        // This message type is sent by VoicePipelineService when it starts
+        // the LLM API call after the user stops speaking. It shows the
+        // animated bouncing dots (thinking indicator) WITHOUT creating an
+        // empty streaming message bubble.
+        //
+        // WHY THIS IS DIFFERENT FROM ai_response_stream_start:
+        // The voice pipeline collects the FULL LLM response, then delivers
+        // it as one ai_response message. It does NOT stream chunks like the
+        // text input path does. Previously, the voice pipeline incorrectly
+        // sent ai_response_stream_start which created an empty streaming
+        // bubble that expected chunk updates — causing the blank bubble bug.
+        //
+        // FLOW: voice_processing_start → thinking dots shown → LLM processes
+        //       → ai_response arrives → handleAIResponse() removes dots + adds message
+        case 'voice_processing_start':
+          this.handleVoiceProcessingStart(message.data);
+          break;
+
         case 'ai_response_stream_chunk':
           this.handleAIResponseStreamChunk(message.data);
           break;
@@ -561,6 +582,34 @@ class WebSocketClient {
     this.app.conversationManager.removeThinkingIndicator();
     this.app.showCancelButton(false);
     this.app.conversationManager.startStreamingMessage('assistant');
+  }
+
+  /**
+   * HANDLE VOICE PROCESSING START (2026-02-16 FIX)
+   * 
+   * Shows the thinking indicator (animated bouncing dots) when the voice
+   * pipeline starts processing the user's speech through the LLM.
+   * 
+   * WHY THIS IS SEPARATE FROM handleAIResponseStreamStart:
+   * The text-input path uses streaming (start → chunks → end) and needs
+   * to create a streaming message bubble. The voice pipeline does NOT
+   * stream — it collects the full response and delivers it at once via
+   * ai_response. So the voice pipeline only needs thinking dots, not a
+   * streaming bubble.
+   * 
+   * PREVIOUS BUG: Voice pipeline sent ai_response_stream_start which
+   * called startStreamingMessage('assistant'), creating an empty gray
+   * bubble. Since no chunks ever arrived (voice doesn't stream), this
+   * bubble stayed blank forever — the "blank bubble" bug.
+   * 
+   * @param {Object} data - Empty data object (no payload needed)
+   */
+  handleVoiceProcessingStart(data) {
+    console.log('[WebSocketClient] Voice processing started — showing thinking indicator');
+    this.app.conversationManager.showThinkingIndicator();
+    this.app.showCancelButton(true);
+    this.app.state.isProcessing = true;
+    this.app.updateStatus('Thinking...', 'processing');
   }
 
   handleAIResponseStreamChunk(data) {

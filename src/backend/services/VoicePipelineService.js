@@ -1288,7 +1288,23 @@ class VoicePipelineService extends EventEmitter {
           return;
         }
 
-        const maxWaitTime = 10000;
+        // CRITICAL FIX (2026-02-16): Increased maxWaitTime from 10s to 46s.
+        // ================================================================
+        //
+        // PROBLEM: The old 10-second wait meant any LLM call taking >13.2s
+        // (3.2s playback delay + 10s poll) would "time out" here even though
+        // the LLM was still working (UnifiedLLMService has a 45s timeout).
+        // With Gemini tool-calling (bubbles + area_action), responses routinely
+        // take 15-36 seconds. Timer 3 would give up, send an error, and the
+        // LLM response would later arrive, get saved to DB, but NEVER displayed
+        // to the user — creating a blank bubble and lost response.
+        //
+        // FIX: Match the LLM timeout (45s) plus 1s buffer. Now Timer 3 will
+        // keep polling until either the LLM responds or the LLM itself times out
+        // and sets cachedResponses.llm with an error fallback message.
+        //
+        // The user sees thinking dots during this wait (via voice_processing_start).
+        const maxWaitTime = 46000;
         const pollInterval = 200;
         const startTime = Date.now();
 
@@ -1309,17 +1325,11 @@ class VoicePipelineService extends EventEmitter {
             this.sendResponseToFrontend(session, session.cachedResponses.llm);
           } else {
             console.warn('[VoicePipelineService] ⚠️ LLM returned empty text — not sending blank AI response');
-            if (this.server && this.server.connections) {
-              for (const [ws, connectionState] of this.server.connections) {
-                if (connectionState.id === session.id) {
-                  this.server.sendMessage(ws, {
-                    type: 'error',
-                    data: { message: 'AI response was empty. Please try again.' }
-                  });
-                  break;
-                }
-              }
-            }
+            // CRITICAL FIX (2026-02-16): Use this.server.sendMessage() directly
+            // instead of session.sendToFrontend which was NEVER assigned on the
+            // session object. The old code silently swallowed the error because
+            // session.sendToFrontend was always undefined/falsy.
+            this.sendErrorToFrontend(session, 'AI response was empty. Please try again.');
           }
 
           this.sendSwiftCommand(session, {
@@ -1333,43 +1343,55 @@ class VoicePipelineService extends EventEmitter {
             this.generateTTS(responseText, session.settings, session);
           } else {
             console.log('[VoicePipelineService] Skipping TTS for empty response — resetting pipeline immediately');
-            session.isTTSPlaying = false;
-            session.isInResponsePipeline = false;
-            session.latestTranscription = '';
-            session.currentTranscription = '';
-            session.textAtLastTimerReset = '';
-            session.finalizedText = '';
-            session.currentVolatile = '';
-            session.isProcessingResponse = false;
-            session.firstTranscriptionAt = 0;
-            session.lastTranscriptionAt = 0;
-            session.awaitingSilenceConfirmation = false;
+            this.resetPipelineState(session);
           }
         } else {
+          // CRITICAL FIX (2026-02-16): Properly handle timeout with error delivery
+          // and pipeline state reset.
+          //
+          // PREVIOUS BUG: Used session.sendToFrontend() which was never assigned,
+          // so error was silently dropped. Also never reset isProcessingResponse
+          // or isInResponsePipeline, leaving the pipeline stuck.
+          //
+          // FIX: Use sendErrorToFrontend() helper and resetPipelineState() to
+          // properly clean up. Also set session.timer3TimedOut flag so that if
+          // the LLM eventually responds (after this timeout), the try/catch block
+          // knows to deliver the late response directly.
           console.error('[VoicePipelineService] Timer 3 timed out waiting for LLM response');
+          session.timer3TimedOut = true;
           this.sendUserMessageToFrontend(session, session.latestTranscription);
-          if (session.sendToFrontend) {
-            session.sendToFrontend({
-              type: 'error',
-              data: { message: 'AI response timed out. Please try again.' }
-            });
-          }
+          this.sendErrorToFrontend(session, 'AI is taking longer than expected. Response will appear when ready.');
+          // NOTE: We do NOT reset the pipeline here because the LLM call is still
+          // running. The try/catch block below will deliver the late response and
+          // reset the pipeline when the LLM eventually finishes.
         }
       }, playbackDelayFromLlm);
 
       try {
         console.log(`[VoicePipelineService] Processing transcription: "${session.latestTranscription}"`);
 
-        // SEND LLM PROCESSING STATE TO FRONTEND (2026-02-16 UX FIX):
+        // SEND THINKING INDICATOR TO FRONTEND (2026-02-16 UX FIX):
         // ============================================================
         //
         // PROBLEM: During voice input, after the user stops speaking, there's
         // a 2-10 second gap where the LLM is processing but the UI shows nothing.
         // The user doesn't know if the app is working or frozen.
         //
-        // FIX: Send ai_response_stream_start message to trigger the thinking
-        // indicator (animated dots) that already exists in the text chat UI.
-        // This gives immediate visual feedback that the AI is processing.
+        // FIX: Send voice_processing_start message to trigger the thinking
+        // indicator (animated bouncing dots) that already exists in the chat UI.
+        //
+        // CRITICAL BUG FIX (2026-02-16): Previously this sent ai_response_stream_start
+        // which is the TEXT-INPUT streaming pattern. That message type causes the
+        // frontend to call startStreamingMessage('assistant') which creates an EMPTY
+        // assistant bubble expecting ai_response_stream_chunk messages to fill it.
+        // But the voice pipeline NEVER sends chunks — it delivers the full response
+        // via the non-streaming ai_response message type. This mismatch left an
+        // empty/blank gray bubble in the UI that was never filled or cleaned up.
+        //
+        // The new voice_processing_start message type triggers showThinkingIndicator()
+        // (animated bouncing dots) WITHOUT creating a streaming bubble. When the
+        // ai_response arrives, handleAIResponse() removes the dots and adds the
+        // complete message — matching the voice pipeline's actual delivery pattern.
         //
         // TIMING: Sent right before the LLM API call, so the user sees the
         // thinking indicator as soon as their speech is finalized.
@@ -1378,10 +1400,10 @@ class VoicePipelineService extends EventEmitter {
           for (const [ws, connectionState] of this.server.connections) {
             if (connectionState.id === session.id) {
               this.server.sendMessage(ws, {
-                type: 'ai_response_stream_start',
+                type: 'voice_processing_start',
                 data: {}
               });
-              console.log('[VoicePipelineService] Sent ai_response_stream_start to show thinking indicator');
+              console.log('[VoicePipelineService] Sent voice_processing_start to show thinking indicator');
               break;
             }
           }
@@ -1468,6 +1490,39 @@ class VoicePipelineService extends EventEmitter {
         });
 
         console.log(`[VoicePipelineService] AI response saved to conversation history`);
+
+        // LATE RESPONSE DELIVERY (2026-02-16 CRITICAL FIX):
+        // ===========================================================
+        //
+        // PROBLEM: If Timer 3 already timed out (set session.timer3TimedOut = true),
+        // it means the polling loop gave up before the LLM finished. The response
+        // is now cached and saved to DB, but Timer 3 is done — nobody is going to
+        // pick up this cached response and send it to the frontend. The user sees
+        // a blank bubble or thinking dots that never resolve.
+        //
+        // FIX: Check if Timer 3 timed out. If so, deliver the response directly
+        // from here, bypass the normal Timer 3 delivery path. Also reset the
+        // pipeline state since we're handling delivery ourselves.
+        //
+        // BECAUSE: This happened in production when Gemini tool-calling took 36s
+        // but Timer 3 only waited 10s (now 46s, but we keep this safety net).
+        // The user spoke, saw thinking dots, then a blank bubble — response was
+        // saved to DB but never shown. The conversation appeared broken.
+        // ===========================================================
+        if (session.timer3TimedOut) {
+          console.log('[VoicePipelineService] 🔄 Late LLM response arrived after Timer 3 timeout — delivering directly');
+          const lateResponseText = (fullResponse || '').trim();
+          if (lateResponseText.length > 0) {
+            this.sendResponseToFrontend(session, session.cachedResponses.llm);
+            // Also generate TTS for the late response so user hears it
+            session.isTTSPlaying = true;
+            this.generateTTS(lateResponseText, session.settings, session);
+          } else {
+            console.warn('[VoicePipelineService] Late LLM response was empty — resetting pipeline');
+            this.resetPipelineState(session);
+          }
+          session.timer3TimedOut = false;
+        }
       } catch (error) {
         console.error('[VoicePipelineService] Error in LLM processing:', error);
 
@@ -1476,6 +1531,16 @@ class VoicePipelineService extends EventEmitter {
           bubbles: ['try again?', 'tell me more'],
           artifact: null
         };
+
+        // PIPELINE STATE FIX (2026-02-16): If Timer 3 timed out and the LLM
+        // also errored, we need to deliver the error fallback and reset state.
+        // Without this, the pipeline stays stuck forever.
+        if (session.timer3TimedOut) {
+          console.log('[VoicePipelineService] 🔄 LLM errored after Timer 3 timeout — delivering error fallback');
+          this.sendResponseToFrontend(session, session.cachedResponses.llm);
+          this.resetPipelineState(session);
+          session.timer3TimedOut = false;
+        }
 
         session.isProcessingResponse = false;
       }
@@ -1892,6 +1957,79 @@ class VoicePipelineService extends EventEmitter {
     }
     
     console.warn(`[VoicePipelineService] Could not find WebSocket connection for session ${session.id}`);
+  }
+
+  /**
+   * SEND ERROR TO FRONTEND (2026-02-16 FIX)
+   * 
+   * Sends an error message to the frontend for a specific voice session.
+   * 
+   * WHY THIS EXISTS: The old code used session.sendToFrontend() which was
+   * NEVER assigned on the session object — errors were silently dropped.
+   * This helper uses the same pattern as sendUserMessageToFrontend() and
+   * sendResponseToFrontend() to reliably find and message the correct
+   * WebSocket connection.
+   * 
+   * BECAUSE: When Timer 3 timed out waiting for the LLM, the error
+   * "AI response timed out. Please try again." was supposed to display
+   * but session.sendToFrontend was always undefined/falsy, so the user
+   * saw nothing — just a blank bubble and no feedback.
+   * 
+   * @param {Object} session - Voice session
+   * @param {string} errorMessage - Human-readable error message
+   */
+  sendErrorToFrontend(session, errorMessage) {
+    console.log(`[VoicePipelineService] Sending error to frontend for ${session.id}: ${errorMessage}`);
+    
+    if (this.server && this.server.connections) {
+      for (const [ws, connectionState] of this.server.connections) {
+        if (connectionState.id === session.id) {
+          this.server.sendMessage(ws, {
+            type: 'error',
+            data: { message: errorMessage }
+          });
+          return;
+        }
+      }
+    }
+    
+    console.warn(`[VoicePipelineService] Could not find WebSocket connection for session ${session.id} to send error`);
+  }
+
+  /**
+   * RESET PIPELINE STATE (2026-02-16 FIX)
+   * 
+   * Cleanly resets all pipeline tracking variables on a session back to
+   * their idle/ready state. Called after a response is fully delivered,
+   * or after a timeout/error that ends the current turn.
+   * 
+   * WHY THIS EXISTS: Previously, the pipeline reset logic was duplicated
+   * in multiple places (Timer 3 success path, Timer 3 empty response path)
+   * and was MISSING from the Timer 3 timeout path entirely. This caused
+   * isProcessingResponse and isInResponsePipeline to stay stuck after
+   * a timeout, potentially blocking all future voice interactions until
+   * the app was restarted.
+   * 
+   * BECAUSE: When Timer 3 timed out (LLM took too long), the pipeline
+   * variables were never reset. The next time the user spoke, the cascade
+   * would see isProcessingResponse=true and skip LLM processing entirely.
+   * 
+   * @param {Object} session - Voice session to reset
+   */
+  resetPipelineState(session) {
+    console.log(`[VoicePipelineService] Resetting pipeline state for ${session.id}`);
+    session.isTTSPlaying = false;
+    session.isInResponsePipeline = false;
+    session.latestTranscription = '';
+    session.currentTranscription = '';
+    session.textAtLastTimerReset = '';
+    session.finalizedText = '';
+    session.currentVolatile = '';
+    session.isProcessingResponse = false;
+    session.firstTranscriptionAt = 0;
+    session.lastTranscriptionAt = 0;
+    session.awaitingSilenceConfirmation = false;
+    session.timer3TimedOut = false;
   }
 
   /**
