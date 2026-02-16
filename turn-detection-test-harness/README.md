@@ -1,5 +1,11 @@
 # Turn Detection Test Harness
 
+> **NOTE (2026-02-09):** This harness predates the VPIO AEC discovery and the `.fastResults` fix.
+> The timer values (1.2s cascade), VAD gating, and echo suppression logic described here are
+> outdated. The current approach uses VPIO for hardware echo cancellation and a 2.0s silence
+> timer with `.fastResults` streaming. See `1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md`.
+> The priority test scripts in `1-priority-scripts/` are the current working tests.
+
 A terminal-based test tool that exercises the **exact same voice pipeline logic** as BubbleVoice-Mac's `VoicePipelineService.js`, but replaces the LLM API call with a simple echo.
 
 ## What This Does

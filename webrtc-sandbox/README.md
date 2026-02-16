@@ -1,5 +1,11 @@
 # WebRTC Echo Cancellation Sandbox
 
+> ## ⚠️ SUPERSEDED (2026-02-09)
+>
+> **WebRTC is NOT needed for echo cancellation on macOS.** VPIO provides hardware AEC at
+> full output volume. See `1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md`.
+> This sandbox is kept for historical reference only.
+
 ## Purpose
 
 Test the core WebRTC architecture for echo cancellation:

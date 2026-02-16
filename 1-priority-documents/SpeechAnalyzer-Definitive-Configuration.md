@@ -65,11 +65,14 @@ try audioEngine.outputNode.setVoiceProcessingEnabled(true)
 ```
 
 This one line enables:
-- Hardware-level acoustic echo cancellation
+- Hardware-level acoustic echo cancellation at **full output volume** (no need to lower TTS volume)
 - The `inputNode` output = clean mic signal with speaker audio subtracted
 - SpeechAnalyzer receives echo-free audio via the tap
 - Continuous transcription THROUGH TTS playback (no gaps, no pausing)
 - 0.5s recovery after TTS ends (confirmed by PostTTSRecoveryStrategiesTest)
+- **No WebRTC needed** — VPIO is a single API call, no dual-peer connection required
+- **No `isSpeaking` flag filtering needed** — the audio is already clean before SpeechAnalyzer sees it
+- **No backend echo suppression needed** — VPIO handles it at the hardware level
 
 ### What This Replaced
 
@@ -157,15 +160,29 @@ All in `1-priority-scripts/`:
 
 ## Documents That Conflict With This (and corrections)
 
+All documents below have been updated with correction headers pointing back to this doc.
+
+### Configuration / API Issues
+
 | Document | What It Says (WRONG) | What's Actually True |
 |----------|---------------------|---------------------|
 | `CRITICAL-STT-BUG-CONFIRMED.md` | "SpeechAnalyzer API is fundamentally broken" | Works perfectly with `.fastResults` |
 | `SpeechAnalyzer-API-Quirks-And-Gotchas.md` §5 | Uses `[.volatileResults]` only | Must use `[.volatileResults, .fastResults]` |
-| `SpeechAnalyzer-API-Quirks-And-Gotchas.md` §13 | "No built-in echo cancellation" | VPIO provides hardware AEC |
 | `Turn-Detection-Learnings.md` #2, #10 | "4-second chunk batching" | Only without `.fastResults`; with it, 200-500ms streaming |
 | `Turn-Detection-Learnings.md` #11 | "Single words reliably fail" | Much less severe with `.fastResults` |
-| `STT-Whisper-vs-SpeechAnalyzer-Research.md` | "No echo cancellation" | VPIO provides it |
 | `PostTTSRecoveryStrategiesTest.swift` header | "25-second stall from VPIO" | Stall was from missing `.fastResults` |
+
+### Echo Cancellation / Volume Issues
+
+| Document | What It Says (WRONG) | What's Actually True |
+|----------|---------------------|---------------------|
+| `SpeechAnalyzer-API-Quirks-And-Gotchas.md` §13 | "No built-in echo cancellation" | VPIO provides hardware AEC at full volume |
+| `STT-Whisper-vs-SpeechAnalyzer-Research.md` | "No echo cancellation", lists WebRTC as workaround | VPIO provides it, no WebRTC needed |
+| `STT-Comprehensive-Test-Results.md` | "Filter transcriptions where isSpeaking=true", "echo suppression is critical" | VPIO handles AEC at hardware level, no filtering needed |
+| `Turn-Detection-Learnings.md` #7 | "7-second echo suppression window is correct" | Not needed with VPIO AEC |
+| `webrtc-sandbox/TESTING_GUIDE.md` | "Confirms we need WebRTC's AEC" | VPIO provides AEC, WebRTC not needed on macOS |
+| `webrtc-sandbox/README.md` | "WebRTC AEC is needed" | Superseded by VPIO |
+| `turn-detection-test-harness/README.md` | "mic may pick up TTS audio", echo suppression logic | VPIO prevents echo at hardware level |
 
 ---
 

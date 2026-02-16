@@ -1,8 +1,18 @@
 # WebRTC Sandbox Testing Guide
 
+> ## ⚠️ SUPERSEDED (2026-02-09)
+>
+> **WebRTC is NOT needed for echo cancellation on macOS.** Apple's VPIO
+> (`audioEngine.outputNode.setVoiceProcessingEnabled(true)`) provides hardware AEC at full
+> output volume with a single API call. This entire WebRTC sandbox was an exploration that
+> has been superseded by the simpler VPIO approach.
+>
+> **See:** `1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md` and
+> `1-priority-documents/WebRTC-Echo-Cancellation-Architecture.md`
+
 ## Overview
 
-This sandbox tests the core hypothesis: **Can we play TTS through WebRTC while transcribing environment speech without echo?**
+This sandbox tests the core hypothesis: ~~**Can we play TTS through WebRTC while transcribing environment speech without echo?**~~ **ANSWERED: Yes, but via VPIO, not WebRTC.**
 
 ## Test Progression
 

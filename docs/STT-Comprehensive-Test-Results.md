@@ -1,8 +1,22 @@
 # SpeechAnalyzer Comprehensive Test Results
 
-**Generated**: 2026-02-07
-**Platform**: macOS 26.1 (SpeechAnalyzer + SpeechTranscriber, en-US)
+**Generated**: 2026-02-07  
+**Platform**: macOS 26.1 (SpeechAnalyzer + SpeechTranscriber, en-US)  
 **Helper Binary**: `swift-helper/BubbleVoiceSpeech/.build/debug/BubbleVoiceSpeech`
+
+> ## ⚠️ CORRECTIONS (2026-02-09)
+>
+> **Echo suppression via `isSpeaking` flag is OBSOLETE.** Multiple sections below recommend
+> filtering transcriptions when `isSpeaking=true` and using a 7-second echo suppression window.
+> This approach is no longer needed because **VPIO provides hardware echo cancellation at full
+> output volume**. With VPIO enabled, the mic input is echo-cancelled before reaching
+> SpeechAnalyzer — the AI cannot hear itself, and no software-level echo filtering is required.
+>
+> **Also:** These tests were run WITHOUT `.fastResults`, so the "4-second processing window"
+> timings and batch behaviors described here are outdated.
+>
+> **See:** `1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md` for current
+> source of truth.
 
 ---
 
@@ -132,9 +146,7 @@ Tests what happens when the backend fires multiple `reset_recognition` commands 
 
 The `resetSpeechAnalyzerSession()` method (which calls `stopListening()` + `startListeningInternal()`) is resilient to rapid invocation. However, each reset involves creating a new SpeechAnalyzer instance, so there's a ~2-3 second gap where no transcription occurs. The backend should debounce resets if possible.
 
----
-
-## Scenario 7: Echo / Self-Hearing (TTS + STT Simultaneously)
+---## Scenario 7: Echo / Self-Hearing (TTS + STT Simultaneously)
 
 Tests the critical production scenario where the AI speaks through speakers while the mic is listening.
 
@@ -157,9 +169,7 @@ Plus ambient room audio was captured in the `isSpeaking=true` updates (because t
 
 **The `isSpeaking` flag works correctly.** When the helper's `speak` command is active, all transcription updates are tagged with `isSpeaking: true`. The Node.js backend uses this flag to suppress echo — any transcription received while `isSpeaking=true` is ignored or treated as echo, not as user speech.
 
-**Critical for production**: Without echo suppression using this flag, the AI would hear itself and create an infinite conversation loop.
-
----
+**Critical for production**: Without echo suppression using this flag, the AI would hear itself and create an infinite conversation loop.---
 
 ## Scenario 8: Quiet Speech (Volume Sensitivity)
 
