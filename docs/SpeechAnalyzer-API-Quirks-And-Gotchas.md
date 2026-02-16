@@ -77,7 +77,7 @@ This is a confirmed Apple bug. You cannot use `SpeechDetector` with `SpeechAnaly
 
 ---
 
-## 5. `SpeechTranscriber.Preset` API Changes
+## 5. `SpeechTranscriber.Preset` API Changes (UPDATED 2026-02-09)
 
 The preset `.progressiveLiveTranscription` that appeared in early beta documentation may not exist in the release. Use explicit options instead:
 
@@ -85,16 +85,25 @@ The preset `.progressiveLiveTranscription` that appeared in early beta documenta
 // This may not compile:
 let transcriber = SpeechTranscriber(locale: locale, preset: .progressiveLiveTranscription)
 
-// Use this instead:
+// ✅ CORRECT — use this (UPDATED 2026-02-09):
 let transcriber = SpeechTranscriber(
     locale: locale,
     transcriptionOptions: [],
-    reportingOptions: [.volatileResults],
-    attributeOptions: []
+    reportingOptions: [.volatileResults, .fastResults],  // BOTH required!
+    attributeOptions: [.audioTimeRange]
 )
 ```
 
-The `.volatileResults` reporting option gives you progressive partial updates (essential for real-time transcription).
+**CRITICAL (2026-02-09):** You MUST include `.fastResults` alongside `.volatileResults`.
+- `.volatileResults` alone: Results arrive in ~3.8-second batches (the "chunk batch" behavior)
+- `.volatileResults` + `.fastResults`: Results stream word-by-word at 200-500ms intervals
+
+This was discovered by analyzing Apple's `SwiftUI_SpeechAnalyzerDemo` repo, which uses
+the `.timeIndexedProgressiveTranscription` preset (maps to these exact flags). Without
+`.fastResults`, the analyzer waits for "enough confidence" before sending results. With it,
+you get true real-time streaming identical to `SFSpeechRecognizer`'s partial results.
+
+**See:** `1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md` for full details.
 
 ---
 
@@ -191,11 +200,27 @@ On first use with a new locale, there's a one-time download delay. After that, s
 
 ---
 
-## 13. No Built-In Echo Cancellation
+## 13. Echo Cancellation via VPIO (CORRECTED 2026-02-09)
 
-SpeechAnalyzer does not have any echo cancellation. If the device's speakers are playing audio (TTS, music, etc.), the microphone will capture it and the transcriber will transcribe it.
+> **CORRECTION (2026-02-09):** The original text here said "No Built-In Echo Cancellation"
+> and recommended tracking `isSpeaking` to filter transcriptions. That approach is OBSOLETE.
+> VPIO provides hardware AEC that completely solves echo cancellation.
 
-**Solution**: Track TTS state (`isSpeaking`) and filter out transcriptions received during TTS playback. This is what our helper does — every `transcription_update` includes `isSpeaking: true/false`.
+SpeechAnalyzer itself has no echo cancellation, BUT when you enable VPIO on the AVAudioEngine:
+
+```swift
+try audioEngine.outputNode.setVoiceProcessingEnabled(true)
+```
+
+...the `inputNode` output is automatically echo-cancelled at the hardware level. TTS audio
+played through `AVAudioPlayerNode` on the same engine is subtracted from the mic input.
+SpeechAnalyzer receives clean, echo-free audio and transcribes continuously through TTS
+playback with zero TTS word leakage.
+
+**No need to:** Track `isSpeaking`, filter transcriptions during TTS, or pause STT during TTS.
+
+**See:** `1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md` and
+`1-priority-documents/WebRTC-Echo-Cancellation-Architecture.md` for full details and test results.
 
 ---
 
@@ -342,17 +367,18 @@ This is the **official confirmation** that our lightweight input rotation patter
 
 ---
 
-## Summary: Production-Ready Setup (Updated 2026-02-08)
+## Summary: Production-Ready Setup (Updated 2026-02-09)
 
 ```swift
 import Speech
 import AVFoundation
 
 // 1. Create transcriber with all recommended options
+//    CRITICAL: .fastResults is REQUIRED for real-time streaming (see Quirk #5)
 let transcriber = SpeechTranscriber(
     locale: Locale(identifier: "en-US"),
     transcriptionOptions: [],
-    reportingOptions: [.volatileResults],
+    reportingOptions: [.volatileResults, .fastResults],  // BOTH required!
     attributeOptions: [.audioTimeRange]
 )
 

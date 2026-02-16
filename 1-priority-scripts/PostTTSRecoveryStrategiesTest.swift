@@ -1,11 +1,18 @@
 /// PostTTSRecoveryStrategiesTest.swift
 ///
-/// Tests THREE strategies to solve the ~25-second SpeechAnalyzer stall after VPIO TTS playback.
+/// Tests FOUR strategies to solve a ~25-second SpeechAnalyzer stall after VPIO TTS playback.
 ///
-/// THE PROBLEM:
+/// RESOLUTION (2026-02-09):
+/// The 25-second stall was caused by missing `.fastResults` in SpeechTranscriber's
+/// reportingOptions, NOT by VPIO interaction. With `.fastResults` enabled, ALL strategies
+/// (including baseline / do-nothing) recover in under 0.5 seconds. No special post-TTS
+/// strategy is needed. See 1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md.
+///
+/// ORIGINAL PROBLEM (now resolved):
 /// After TTS audio plays through AVAudioPlayerNode with VPIO echo cancellation,
-/// SpeechAnalyzer stops producing results for ~25 seconds despite receiving audio
-/// buffers with speech present. This makes the app unresponsive after every AI response.
+/// SpeechAnalyzer stopped producing results for ~25 seconds. This was because without
+/// `.fastResults`, the analyzer batched results in ~3.8s chunks and the post-TTS
+/// "recalibration" took much longer.
 ///
 /// STRATEGIES TESTED:
 ///   A) SILENT KEEPALIVE: After TTS finishes, immediately play a short silent audio buffer

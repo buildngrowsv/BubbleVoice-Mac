@@ -1,12 +1,31 @@
-# CRITICAL: SpeechAnalyzer Not Producing Transcriptions
+# ~~CRITICAL: SpeechAnalyzer Not Producing Transcriptions~~ RESOLVED
 
 **Date**: February 7, 2026  
-**Status**: 🔴 CRITICAL BUG CONFIRMED  
-**Priority**: P0 - Blocks all voice functionality  
+**Status**: ✅ RESOLVED (2026-02-09) — Root cause was missing `.fastResults` flag  
+**Priority**: ~~P0 - Blocks all voice functionality~~ CLOSED  
 
-## Summary
+> ## RESOLUTION (2026-02-09)
+>
+> **This bug was NOT an API issue.** The SpeechAnalyzer API works correctly when configured with
+> `reportingOptions: [.volatileResults, .fastResults]`. The original configuration only used
+> `[.volatileResults]`, which causes the analyzer to batch results in ~3.8-second chunks.
+> With very short test utterances, these batches often fell outside the test's observation window,
+> making it appear that zero results were produced.
+>
+> Adding `.fastResults` enables word-by-word streaming at 200-500ms intervals. All test scenarios
+> that previously "failed" now work correctly.
+>
+> **See:** `1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md` for the complete
+> source of truth on SpeechAnalyzer configuration.
+>
+> The conclusions and recommendations below are OBSOLETE. Keeping the original text for historical
+> reference only.
 
-The SpeechAnalyzer API in macOS 26.0 is **NOT producing any transcription results** in the BubbleVoice-Mac app. Multiple diagnostic tests confirm that audio is flowing correctly through the pipeline, but the `transcriber.results` AsyncSequence remains completely silent.
+---
+
+## ~~Summary~~ (OBSOLETE — see resolution above)
+
+The SpeechAnalyzer API in macOS 26.0 is ~~**NOT producing any transcription results**~~ in the BubbleVoice-Mac app. Multiple diagnostic tests confirm that audio is flowing correctly through the pipeline, but the `transcriber.results` AsyncSequence remains completely silent.
 
 ## Test Results
 
@@ -300,21 +319,15 @@ All test results and logs are available in:
 - `/tests/run-comprehensive-stt-tests.sh` - Automated test suite
 - `/tests/test-stt-manual-interactive.sh` - Manual interactive test
 
-## Conclusion
+## ~~Conclusion~~ (OBSOLETE — see resolution at top)
 
-The SpeechAnalyzer API is fundamentally broken in the current implementation. Despite correct initialization, configuration, and audio pipeline setup, the `transcriber.results` AsyncSequence produces zero results. This is a critical blocker for all voice functionality in BubbleVoice-Mac.
+~~The SpeechAnalyzer API is fundamentally broken in the current implementation.~~
 
-**The issue is NOT**:
-- Code structure or async handling
-- Permissions or audio access
-- Audio format or conversion
-- VAD or audio pipeline
+**ACTUAL ROOT CAUSE (discovered 2026-02-09):** Missing `.fastResults` in `reportingOptions`.
+The configuration `reportingOptions: [.volatileResults]` alone causes ~3.8s batching. Adding
+`.fastResults` enables word-by-word streaming. The API is NOT broken — it was misconfigured.
 
-**The issue IS**:
-- SpeechAnalyzer's results stream is silent
-- Either API bug, configuration issue, or undocumented requirement
-
-**Immediate Action Required**: Implement fallback to SFSpeechRecognizer to unblock voice features while investigating SpeechAnalyzer issue.
+**No SFSpeechRecognizer fallback needed.** SpeechAnalyzer works perfectly with the correct flags.
 
 ---
 

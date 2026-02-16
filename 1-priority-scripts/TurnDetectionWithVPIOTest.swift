@@ -471,10 +471,10 @@ class TurnDetectionTest {
     /// but the user correctly identified that RMS picks up non-speech sounds (music,
     /// ambient noise) and would prevent the timer from ever firing in noisy environments.
     ///
-    /// The REAL issue is SpeechAnalyzer's bursty delivery pattern — it accumulates
-    /// internally and delivers results in batches with 3-57 second gaps. This is a
-    /// SpeechAnalyzer behavior issue, not something we can fix by monitoring RMS.
-    /// See diagnostics (⚠️ ANALYZER GAP logs) to understand the gap pattern.
+    /// RESOLVED (2026-02-09): The "bursty delivery" with 3-57 second gaps was caused by
+    /// missing `.fastResults` in SpeechTranscriber's reportingOptions. With `.fastResults`
+    /// enabled, results stream at 200-500ms intervals and the 2-second silence timer
+    /// works reliably. See 1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md.
     func restartSilenceTimer() {
         silenceTimerTask?.cancel()
         silenceTimerTask = Task { [weak self] in

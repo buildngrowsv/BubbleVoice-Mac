@@ -286,18 +286,19 @@ This is a **critical finding** that firmly disqualifies Whisper for conversation
 
 **For comparison**: SpeechAnalyzer delivers first partial results in **~1-2 seconds** from speech onset, with progressive word-by-word updates.
 
-### SpeechAnalyzer Does NOT Handle Echo Cancellation
+### Echo Cancellation: VPIO Solves It (CORRECTED 2026-02-09)
 
-Important for BubbleVoice's duplex audio (speaking while TTS plays):
+> **CORRECTION (2026-02-09):** The original text said "No built-in echo cancellation" and listed
+> workarounds. This is OUTDATED. VPIO provides complete hardware AEC on macOS.
 
-- **No built-in echo cancellation or TTS bleed mitigation** in SpeechAnalyzer
-- It expects clean audio buffers from `AVAudioEngine`
-- Our backend's echo suppression logic (checking `isSpeaking` flag) remains essential
-- **Workaround options**:
-  1. AVAudioEngine's built-in AEC on input node (feed cleaned buffers to SpeechAnalyzer)
-  2. Pause TTS during STT (prevents true simultaneity)
-  3. Custom WebRTC-based AEC preprocessing (adds latency)
-  4. Our current approach: backend filters transcriptions that match recent TTS output
+SpeechAnalyzer itself has no echo cancellation, but enabling VPIO on the AVAudioEngine
+(`audioEngine.outputNode.setVoiceProcessingEnabled(true)`) provides hardware-level AEC.
+The mic input is echo-cancelled before reaching SpeechAnalyzer, enabling true full-duplex
+voice (continuous STT through TTS playback, zero echo leakage).
+
+- **No need for** `isSpeaking` flag filtering, pausing STT, WebRTC AEC, or backend echo suppression
+- **Option 1 from the original list** (AVAudioEngine's built-in AEC) is the correct approach
+- See `1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md` for details
 
 ### Volatile Results vs Final Results
 

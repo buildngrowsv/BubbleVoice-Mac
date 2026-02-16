@@ -1,7 +1,20 @@
 # Turn Detection & Conversation Pipeline Learnings
 
-**Date**: 2026-02-07
+**Date**: 2026-02-07  
 **Source**: Automated test suite (`tests/test-turn-detection-scenarios.py`)
+
+> ## ⚠️ CORRECTION (2026-02-09)
+>
+> **Findings #2, #10, and #11 below are OUTDATED.** They describe "4-second chunk batching"
+> and "single words reliably fail" behaviors that were caused by missing `.fastResults` in the
+> `SpeechTranscriber` configuration. With `reportingOptions: [.volatileResults, .fastResults]`,
+> results stream word-by-word at 200-500ms intervals and these issues largely disappear.
+>
+> The timer recommendations (1.2s LLM timer, etc.) were calibrated for the 4-second batching.
+> With `.fastResults`, a **2.0-second silence timer** works reliably for turn detection.
+>
+> **See:** `1-priority-documents/SpeechAnalyzer-Definitive-Configuration.md` for the current
+> source of truth.
 
 ---
 
