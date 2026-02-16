@@ -567,6 +567,41 @@ final class SpeechHelper: @unchecked Sendable {
             do {
                 try audioEngine.outputNode.setVoiceProcessingEnabled(true)
                 logError("VPIO enabled on outputNode (hardware AEC active)")
+                
+                // DISABLE VPIO AUDIO DUCKING (2026-02-16 BUGFIX):
+                // ============================================================
+                //
+                // PROBLEM: When VPIO is enabled, macOS automatically "ducks"
+                // (reduces volume of) ALL other system audio to ~1% volume.
+                // This affected the user's YouTube playback — volume dropped
+                // to nearly zero and STAYED that way even after stopping voice
+                // input, because VPIO's ducking persists while the engine exists.
+                //
+                // ROOT CAUSE: VPIO assumes a phone-call-like use case where
+                // you want to suppress background audio. Our voice AI app is
+                // NOT a phone call — the user may be watching YouTube while
+                // intermittently talking to the AI.
+                //
+                // FIX: Use AVAudioVoiceProcessingOtherAudioDuckingConfiguration
+                // (available macOS 14+) to disable VPIO's automatic ducking.
+                // Setting enableAdvancedDucking:true with duckingLevel:.min
+                // overrides the default aggressive ducking with minimum ducking.
+                //
+                // enableAdvancedDucking:false would revert to the DEFAULT system
+                // ducking (which is the aggressive behavior we want to avoid).
+                // enableAdvancedDucking:true with .min gives us control.
+                //
+                // DISCOVERED: User reported YouTube video at ~1% volume during
+                // and AFTER voice input session. Forum posts on Apple Developer
+                // Forums (thread/664346, thread/733733) confirm this is a known
+                // VPIO behavior with no workaround prior to this API.
+                // ============================================================
+                let noDuckingConfig = AVAudioVoiceProcessingOtherAudioDuckingConfiguration(
+                    enableAdvancedDucking: true,
+                    duckingLevel: .min
+                )
+                audioEngine.inputNode.voiceProcessingOtherAudioDuckingConfiguration = noDuckingConfig
+                logError("VPIO ducking configured to minimum (other audio volume preserved)")
             } catch {
                 // Non-fatal: If VPIO fails (e.g., on older hardware or
                 // certain audio configurations), TTS echo will leak into
@@ -605,11 +640,56 @@ final class SpeechHelper: @unchecked Sendable {
             audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
             logError("Connected playerNode → mainMixer (TTS audio will route through VPIO)")
             
-            let inputFormat = inputNode.outputFormat(forBus: 0)
+            // TAP FORMAT FIX (2026-02-16 BUGFIX):
+            // ============================================================
+            //
+            // PROBLEM: With VPIO enabled on the outputNode, the inputNode's
+            // outputFormat(forBus: 0) returns a MULTICHANNEL VPIO aggregate
+            // device format (e.g., 9 channels). Installing the tap with this
+            // format, then trying to convert to mono 16kHz Int16 for the
+            // SpeechAnalyzer, caused the audio converter to fail silently or
+            // produce garbage — resulting in ZERO transcription results.
+            //
+            // ROOT CAUSE: The confirmed working VPIO echo cancellation test
+            // (1-priority-scripts/CONFIRMED-WORKING-VPIOEchoCancellationTest.swift)
+            // explicitly creates a MONO Float32 tap format:
+            //   let tapFormat = AVAudioFormat(commonFormat: .pcmFormatFloat32,
+            //       sampleRate: inputFormat.sampleRate, channels: 1, interleaved: false)
+            //
+            // But main.swift was using inputFormat directly:
+            //   inputNode.installTap(onBus: 0, bufferSize: 4096, format: inputFormat)
+            //
+            // When VPIO changes the input format to multichannel, this broke
+            // the entire STT pipeline.
+            //
+            // FIX: Create an explicit mono Float32 tap format at the input's
+            // sample rate. AVAudioEngine handles the downmix from multichannel
+            // to mono internally when the tap format differs from the node's
+            // output format. The converter then goes from mono Float32 → mono
+            // Int16 16kHz, which is a simple rate conversion that works reliably.
+            //
+            // DISCOVERED: User reported "Didn't capture what I said" — no
+            // transcription results at all. Console logs showed no transcription_update
+            // events being emitted, confirming the tap/converter chain was broken.
+            // ============================================================
+            let rawInputFormat = inputNode.outputFormat(forBus: 0)
+            logError("Raw inputNode format (may be multichannel with VPIO): \(rawInputFormat)")
             
-            audioConverter = AVAudioConverter(from: inputFormat, to: analyzerFormat)
+            // Create explicit mono Float32 tap format matching the confirmed test
+            guard let tapFormat = AVAudioFormat(
+                commonFormat: .pcmFormatFloat32,
+                sampleRate: rawInputFormat.sampleRate,
+                channels: 1,
+                interleaved: false
+            ) else {
+                sendError("Failed to create mono Float32 tap format")
+                return
+            }
+            logError("Tap format (explicit mono Float32): \(tapFormat)")
+            
+            audioConverter = AVAudioConverter(from: tapFormat, to: analyzerFormat)
             if audioConverter == nil {
-                sendError("Failed to create audio converter for SpeechAnalyzer format")
+                sendError("Failed to create audio converter for SpeechAnalyzer format (tapFormat → analyzerFormat)")
                 return
             }
             // CRITICAL: Set primeMethod to .none to avoid timestamp drift.
@@ -628,7 +708,7 @@ final class SpeechHelper: @unchecked Sendable {
             totalFramesProcessed = 0
             consecutiveSilentFrames = 0
             
-            inputNode.installTap(onBus: 0, bufferSize: 4096, format: inputFormat) { [weak self] buffer, _ in
+            inputNode.installTap(onBus: 0, bufferSize: 4096, format: tapFormat) { [weak self] buffer, _ in
                 guard let self = self else { return }
                 
                 // ENERGY-BASED VAD GATE (2026-02-07):
@@ -1375,6 +1455,32 @@ final class SpeechHelper: @unchecked Sendable {
         audioEngine?.stop()
         audioEngine?.inputNode.removeTap(onBus: 0)
         
+        // DISABLE VPIO TO RESTORE SYSTEM AUDIO (2026-02-16 BUGFIX):
+        // ============================================================
+        //
+        // CRITICAL: When VPIO is enabled, macOS ducks all other system audio.
+        // Even after audioEngine.stop(), the VPIO state persists on the engine's
+        // audio unit, keeping the ducking active. The user reported that YouTube
+        // stayed at ~1% volume even after stopping voice input, only recovering
+        // after quitting the entire app.
+        //
+        // FIX: Explicitly disable VPIO when stopping listening. This releases
+        // the VPIO aggregate device and restores normal audio routing, allowing
+        // other apps' audio to return to full volume immediately.
+        //
+        // We re-enable VPIO in startListeningInternal() when the user starts
+        // a new voice session, so this is safe. The cost is that VPIO setup
+        // happens each time listening starts (~10ms), which is negligible.
+        // ============================================================
+        if let engine = audioEngine {
+            do {
+                try engine.outputNode.setVoiceProcessingEnabled(false)
+                logError("VPIO disabled on outputNode (system audio volume restored)")
+            } catch {
+                logError("WARNING: Failed to disable VPIO: \(error.localizedDescription)")
+            }
+        }
+        
         // Finish the input stream and cancel result consumption.
         speechAnalyzerInputContinuation?.finish()
         speechAnalyzerInputContinuation = nil
@@ -1420,6 +1526,19 @@ final class SpeechHelper: @unchecked Sendable {
         // Stop feeding audio to the analyzer.
         audioEngine?.stop()
         audioEngine?.inputNode.removeTap(onBus: 0)
+        
+        // DISABLE VPIO TO RESTORE SYSTEM AUDIO (2026-02-16 BUGFIX):
+        // Same fix as stopListeningAsync() — disable VPIO so other apps'
+        // audio is no longer ducked. See the async version for full explanation
+        // of the bug (YouTube at ~1% volume after stopping voice input).
+        if let engine = audioEngine {
+            do {
+                try engine.outputNode.setVoiceProcessingEnabled(false)
+                logError("VPIO disabled on outputNode (system audio volume restored)")
+            } catch {
+                logError("WARNING: Failed to disable VPIO: \(error.localizedDescription)")
+            }
+        }
         
         // Finish the input stream and cancel result consumption.
         speechAnalyzerInputContinuation?.finish()
