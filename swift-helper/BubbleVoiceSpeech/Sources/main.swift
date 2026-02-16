@@ -154,8 +154,58 @@ final class SpeechHelper: @unchecked Sendable {
     // later if the frontend exposes locale selection.
     private var speechAnalyzerLocale: Locale = Locale(identifier: "en-US")
     
-    // TTS process
-    private var ttsProcess: Process?
+    // ============================================================
+    // TTS THROUGH AVAUDIOENGINE (2026-02-16)
+    // ============================================================
+    //
+    // CRITICAL ARCHITECTURE CHANGE:
+    // Previously, TTS used `say "text"` which plays directly to system
+    // speakers, BYPASSING the AVAudioEngine. This meant VPIO's echo
+    // cancellation had no reference signal — it didn't know what audio
+    // was being played, so it couldn't subtract it from the mic input.
+    // The result: the AI "heard itself" and we needed fragile software
+    // echo suppression in the backend (shouldIgnoreEchoTranscription).
+    //
+    // NEW APPROACH:
+    // TTS now uses `say -o file.aiff "text"` to generate audio files,
+    // then plays them through an AVAudioPlayerNode connected to the
+    // same AVAudioEngine where VPIO is enabled. This routes TTS audio
+    // through outputNode → speakers, giving VPIO a reference signal
+    // to subtract from the mic input. Echo cancellation now works at
+    // the hardware level with zero software filtering needed.
+    //
+    // This was confirmed working in the VPIO echo cancellation test
+    // (1-priority-scripts/CONFIRMED-WORKING-VPIOEchoCancellationTest.swift)
+    // which showed ZERO TTS words leaking into transcription while
+    // background speech was captured cleanly.
+    //
+    // AUDIO GRAPH WITH PLAYERNODE:
+    //   say -o → .aiff file → AVAudioPlayerNode → mainMixerNode → outputNode → Speakers
+    //                                                                   │
+    //                                              VPIO reference signal (known output)
+    //                                                                   │
+    //   Microphone → inputNode → [AEC subtraction] → tap → SpeechAnalyzer (clean audio)
+    //
+    // CHUNKED PIPELINE:
+    // Text is split into sentence-level chunks (min 7 words per chunk).
+    // Each chunk is generated as a separate .aiff file. While chunk N
+    // plays, chunk N+1 is being generated. This gives ~1s latency to
+    // first speech, then continuous playback with no gaps.
+    // ============================================================
+    private let playerNode = AVAudioPlayerNode()
+    
+    /// Task that manages the generate→schedule→play pipeline for TTS chunks.
+    /// Cancelled by stopSpeaking() when user interrupts or TTS completes.
+    private var ttsGenerationTask: Task<Void, Never>?
+    
+    /// Reference to the currently running `say -o` process so stopSpeaking()
+    /// can kill it immediately during interruption (no waiting for generation).
+    private var currentSayProcess: Process?
+    
+    /// Flag checked by the TTS pipeline task to abort between chunks.
+    /// Set to true by stopSpeaking(), checked before each chunk generation
+    /// and before each schedule operation.
+    private var isTTSCancelled = false
     
     // State
     private var isListening = false
@@ -282,6 +332,16 @@ final class SpeechHelper: @unchecked Sendable {
     init() {
         // Initialize audio engine only; SpeechAnalyzer is configured on demand.
         self.audioEngine = AVAudioEngine()
+        
+        // ATTACH PLAYER NODE EARLY (2026-02-16):
+        // The playerNode must be attached to the engine before the engine starts.
+        // We attach here in init and connect later in startListeningInternal()
+        // after VPIO is enabled and output formats are known.
+        // attach() just registers the node — it doesn't need format info.
+        // connect() establishes audio connections with format negotiation.
+        // Attaching here means the playerNode is always ready for TTS,
+        // even across stop/start cycles of the engine.
+        audioEngine?.attach(playerNode)
         
         // Send ready signal (no permission prompt here).
         requestAuthorization()
@@ -470,47 +530,80 @@ final class SpeechHelper: @unchecked Sendable {
             // By defensively removing first, we prevent this crash entirely.
             inputNode.removeTap(onBus: 0)
             
-            // HARDWARE ECHO CANCELLATION (2026-02-08):
-            // Enable Apple's Voice Processing IO on the input node. This
-            // activates hardware-level Acoustic Echo Cancellation (AEC)
-            // which subtracts the Mac's speaker output from the mic input.
+            // ============================================================
+            // HARDWARE ECHO CANCELLATION VIA VPIO (2026-02-16 REWRITE)
+            // ============================================================
             //
-            // WHY THIS MATTERS:
-            // Without AEC, when the AI speaks through the speakers, the mic
-            // picks up that audio and SpeechAnalyzer transcribes it — the AI
-            // "hears itself." The backend currently handles this via string-
-            // matching in shouldIgnoreEchoTranscription(), which is fragile.
+            // Enable Apple's Voice Processing IO (VPIO) on the OUTPUT node.
+            // Per Apple docs, enabling on either input or output node enables
+            // it on both — they share the same VPIO audio unit. We use
+            // outputNode to match the confirmed working test script
+            // (CONFIRMED-WORKING-VPIOEchoCancellationTest.swift).
             //
-            // With Voice Processing IO, the echo is cancelled at the hardware
-            // level BEFORE it reaches SpeechAnalyzer. Our benchmark tests
-            // (whisperkit-echo-benchmark-results.md) confirmed this works:
-            //   - Raw mic: TTS echo fully transcribed (BAD)
-            //   - Voice Processing IO: TTS echo filtered, external speech
-            //     preserved (IDEAL result in all tests)
+            // WHAT VPIO PROVIDES:
+            //   - Hardware-level Acoustic Echo Cancellation (AEC) at FULL volume
+            //   - The outputNode knows what audio is going to speakers
+            //   - The inputNode subtracts that speaker audio from mic input
+            //   - Result: SpeechAnalyzer gets clean mic audio with no TTS echo
+            //   - Also: noise suppression, automatic gain control
             //
-            // Voice Processing IO also provides:
-            //   - Noise suppression (reduces background hum/fan noise)
-            //   - Automatic Gain Control (normalizes volume levels)
+            // WHY OUTPUTNODE INSTEAD OF INPUTNODE:
+            // Previously (2026-02-08) we enabled on inputNode, which DOES
+            // enable VPIO. But the confirmed working echo test uses outputNode
+            // and explicitly connects mainMixer→output with the VPIO format.
+            // This explicit connection is CRITICAL when a playerNode is
+            // attached — without it, the engine fails with error -10875
+            // because the auto-connection uses a format incompatible with VPIO.
             //
-            // IMPORTANT: Must be enabled BEFORE reading inputNode.outputFormat
-            // because it changes the node's format (e.g., from 1ch to 9ch).
-            // The audio converter is created from the post-VoiceProcessing
-            // format, so the pipeline stays consistent.
+            // AUDIO GRAPH AFTER VPIO:
+            //   playerNode → mainMixerNode → outputNode(VPIO) → Speakers
+            //   Microphone → inputNode(VPIO, AEC applied) → tap → SpeechAnalyzer
             //
-            // DECIDED BY AI (2026-02-08): Based on benchmark results showing
-            // Voice Processing IO scored "IDEAL" on echo tests while energy
-            // VAD gate scored "NO ECHO CANCEL — both captured." The backend's
-            // text-matching echo suppression remains as a secondary safety net.
+            // CONFIRMED: Zero TTS words leaked into transcription in the
+            // VPIO echo test while background speech was captured cleanly.
+            // This eliminates the need for the backend's fragile software
+            // echo suppression (shouldIgnoreEchoTranscription).
+            // ============================================================
             do {
-                try inputNode.setVoiceProcessingEnabled(true)
-                logError("Voice Processing IO enabled (hardware AEC active)")
+                try audioEngine.outputNode.setVoiceProcessingEnabled(true)
+                logError("VPIO enabled on outputNode (hardware AEC active)")
             } catch {
-                // Non-fatal: If Voice Processing IO fails (e.g., on older
-                // hardware or in certain audio configurations), we fall back
-                // to the existing backend text-matching echo suppression.
-                // The app still works, just without hardware AEC.
-                logError("WARNING: Voice Processing IO failed: \(error.localizedDescription). Falling back to software echo suppression.")
+                // Non-fatal: If VPIO fails (e.g., on older hardware or
+                // certain audio configurations), TTS echo will leak into
+                // transcription. The backend's software echo suppression
+                // can serve as a degraded fallback.
+                logError("WARNING: VPIO failed: \(error.localizedDescription). Echo cancellation will not work for TTS.")
             }
+            
+            // EXPLICIT MIXER→OUTPUT CONNECTION (2026-02-16):
+            // CRITICAL: When VPIO is enabled, the output node's format changes
+            // to a VPIO aggregate device format. The auto-connection between
+            // mainMixerNode and outputNode may use an incompatible format,
+            // causing engine start failure (error -10875). We must explicitly
+            // connect with the post-VPIO output format.
+            //
+            // This matches the confirmed working VPIO test which does:
+            //   audioEngine.connect(audioEngine.mainMixerNode,
+            //                       to: audioEngine.outputNode,
+            //                       format: outputFormat)
+            //
+            // Without this explicit connection, scheduling audio on the
+            // playerNode would fail because the format chain is broken.
+            let outputFormat = audioEngine.outputNode.outputFormat(forBus: 0)
+            audioEngine.connect(audioEngine.mainMixerNode, to: audioEngine.outputNode, format: outputFormat)
+            logError("Connected mainMixer → output with VPIO format: \(outputFormat)")
+            
+            // CONNECT PLAYERNODE → MIXER (2026-02-16):
+            // Route TTS audio through the engine so VPIO can echo-cancel it.
+            // format:nil lets AVAudioEngine auto-convert from the .aiff file's
+            // format to the engine's native format. This is important because
+            // say -o generates files at 22.05kHz/32-bit while the engine may
+            // run at 48kHz after VPIO is enabled.
+            //
+            // The playerNode was already attached in init(). Calling connect()
+            // here is safe even if a connection already exists — it just updates.
+            audioEngine.connect(playerNode, to: audioEngine.mainMixerNode, format: nil)
+            logError("Connected playerNode → mainMixer (TTS audio will route through VPIO)")
             
             let inputFormat = inputNode.outputFormat(forBus: 0)
             
@@ -1360,70 +1453,457 @@ final class SpeechHelper: @unchecked Sendable {
         logError("Stopped listening (SpeechAnalyzer session finalized)")
     }
     
+    // ============================================================
+    // TTS PIPELINE: CHUNKED SAY -O → AVAUDIOPLAYERNODE
+    // ============================================================
+    //
+    // This section implements the TTS pipeline that routes audio through
+    // AVAudioEngine for VPIO echo cancellation. The pipeline:
+    //
+    // 1. Splits text into sentence-level chunks (min 7 words per chunk)
+    // 2. For each chunk, generates an .aiff file via `say -o`
+    // 3. Schedules the file on AVAudioPlayerNode for playback
+    // 4. Pipelines: generates chunk N+1 while chunk N is playing
+    //
+    // This replaces the old `say "text"` direct approach which bypassed
+    // the engine and broke echo cancellation.
+    //
+    // DESIGN REFERENCE:
+    // - Architecture: 1-priority-documents/WebRTC-Echo-Cancellation-Architecture.md
+    // - Confirmed test: 1-priority-scripts/CONFIRMED-WORKING-VPIOEchoCancellationTest.swift
+    // - Chunking rules: min 7 words per chunk to avoid generation-time > play-time gaps
+    // - Latency: ~1s for first chunk, then continuous (175% pipeline efficiency)
+    // ============================================================
+    
     /**
-     * SPEAK
-     * 
-     * Speaks text using the macOS `say` command.
-     * This provides high-quality TTS with many voice options.
-     * 
-     * @param text: Text to speak
-     * @param voice: Voice name (optional, uses default if not specified)
+     * SPEAK — CHUNKED TTS THROUGH AVAUDIOENGINE
+     *
+     * Generates TTS audio as .aiff files and plays them through AVAudioPlayerNode
+     * on the same AVAudioEngine where VPIO is enabled. This ensures hardware echo
+     * cancellation works — the AI's voice is subtracted from the mic input.
+     *
+     * PIPELINE FLOW:
+     *   1. Split text into sentence chunks (min 7 words each)
+     *   2. Generate chunk 0 as .aiff file (~1s, user waits here)
+     *   3. Schedule chunk 0 on playerNode → starts playing immediately
+     *   4. While chunk 0 plays, generate chunk 1 as .aiff file
+     *   5. Schedule chunk 1 → auto-queued after chunk 0 finishes
+     *   6. Continue until all chunks are generated and played
+     *
+     * INTERRUPTION:
+     *   If user speaks 2+ words during playback, the backend calls stop_speaking.
+     *   stopSpeaking() kills the say process, stops playerNode, cancels the task.
+     *   The audio engine stays running (mic tap continues).
+     *
+     * CALLED BY: handleCommand() when "speak" command arrives from backend.
+     * DEPENDS ON: audioEngine must be running (startListeningInternal was called).
+     *   If engine is not running, falls back to direct say (degraded, no AEC).
+     *
+     * @param text: Full text to speak (will be chunked into sentences)
+     * @param voice: macOS voice name (e.g., "Samantha"), nil for system default
      * @param rate: Speech rate in words per minute (default: 200)
      */
     func speak(text: String, voice: String? = nil, rate: Int = 200) {
-        // Stop any current speech
+        // Stop any current speech first (handles rapid speak commands)
         stopSpeaking()
         
-        // Create process for `say` command
-        ttsProcess = Process()
-        ttsProcess?.executableURL = URL(fileURLWithPath: "/usr/bin/say")
+        isSpeaking = true
+        isTTSCancelled = false
+        sendResponse(type: "speech_started", data: nil)
+        logError("TTS pipeline starting for text: \"\(text.prefix(80))...\"")
         
-        // Build arguments
+        // Split text into sentence-level chunks with minimum word count.
+        // Short sentences are batched together because the say command has
+        // ~900ms fixed overhead per file, which exceeds audio duration for
+        // short phrases and causes audible gaps between chunks.
+        let chunks = splitTextIntoSpeechChunks(text: text)
+        logError("TTS split into \(chunks.count) chunk(s)")
+        
+        if chunks.isEmpty {
+            isSpeaking = false
+            sendResponse(type: "speech_ended", data: nil)
+            return
+        }
+        
+        // Check if audio engine is running (required for playerNode playback).
+        // The engine should be running because speak is always called during
+        // an active voice session (after startListening). But if somehow it's
+        // not running, we fall back to direct say (no echo cancellation).
+        guard let engine = audioEngine, engine.isRunning else {
+            logError("WARNING: Audio engine not running — falling back to direct say (no AEC)")
+            speakDirectFallback(text: text, voice: voice, rate: rate)
+            return
+        }
+        
+        // Launch the async TTS pipeline.
+        // This Task generates .aiff files and schedules them on playerNode.
+        // The generate→schedule loop is the pipeline: chunk N+1 generates
+        // while chunk N plays through the engine.
+        ttsGenerationTask = Task { [weak self] in
+            guard let self = self else { return }
+            
+            var isFirstChunk = true
+            var tempFiles: [URL] = []
+            
+            for (index, chunkText) in chunks.enumerated() {
+                // Check cancellation before each chunk (user may have interrupted)
+                guard !self.isTTSCancelled else {
+                    self.logError("TTS cancelled before chunk \(index)")
+                    break
+                }
+                
+                // GENERATE: Run `say -o /tmp/bv_tts_chunk_N.aiff "text"` (~1s)
+                // This is the only blocking step. For the first chunk, the user
+                // waits ~1s. For subsequent chunks, this runs in parallel with
+                // the previous chunk's playback (pipeline overlap).
+                guard let fileURL = await self.generateChunkAudioFile(
+                    text: chunkText,
+                    chunkIndex: index,
+                    voice: voice,
+                    rate: rate
+                ) else {
+                    self.logError("Chunk \(index) generation failed, skipping")
+                    continue
+                }
+                
+                tempFiles.append(fileURL)
+                
+                // Check cancellation after generation (user may have spoken during say -o)
+                guard !self.isTTSCancelled else {
+                    self.logError("TTS cancelled after chunk \(index) generation")
+                    break
+                }
+                
+                // SCHEDULE: Add the audio file to playerNode's playback queue.
+                // This is instant — the file is buffered into memory and queued.
+                // If the node is already playing, the new file plays after the
+                // current one finishes. If this is the first chunk, we call play().
+                do {
+                    let audioFile = try AVAudioFile(forReading: fileURL)
+                    // IMPORTANT: We use the completion-handler overload with nil
+                    // instead of the async version. The async version (`await
+                    // scheduleFile`) blocks until the audio buffer is consumed
+                    // from the schedule queue (effectively waiting for playback).
+                    // This would KILL pipelining because we couldn't generate
+                    // chunk N+1 while chunk N is playing.
+                    //
+                    // The non-async version with nil handler is INSTANT — it
+                    // just buffers the audio data into memory and adds it to
+                    // the playerNode's playback queue. This is what enables
+                    // the pipeline: generate N+1 while N plays from queue.
+                    self.playerNode.scheduleFile(audioFile, at: nil, completionHandler: nil)
+                    
+                    if isFirstChunk {
+                        self.playerNode.play()
+                        isFirstChunk = false
+                        self.logError("TTS playback started (chunk 0)")
+                    }
+                    
+                    self.logError("Scheduled chunk \(index)/\(chunks.count - 1) " +
+                                  "(\(chunkText.split(separator: " ").count) words): " +
+                                  "\"\(chunkText.prefix(60))\"")
+                } catch {
+                    self.logError("Failed to schedule chunk \(index): \(error.localizedDescription)")
+                }
+            }
+            
+            // WAIT FOR PLAYBACK TO FINISH:
+            // All chunks are generated and scheduled. Now poll playerNode.isPlaying
+            // until all audio has played through the engine. We poll every 100ms
+            // which is fine — this is a background task and doesn't block anything.
+            //
+            // WHY POLLING: AVAudioPlayerNode doesn't have an async "wait for done"
+            // API. The scheduleFile completion handler fires when the file is
+            // consumed (not necessarily when audio finishes playing due to buffering).
+            // Polling isPlaying is the reliable way to detect when all audio is done.
+            while self.playerNode.isPlaying && !self.isTTSCancelled {
+                try? await Task.sleep(nanoseconds: 100_000_000) // 100ms
+            }
+            
+            // CLEANUP: Remove temporary .aiff files from /tmp
+            for url in tempFiles {
+                try? FileManager.default.removeItem(at: url)
+            }
+            
+            // SIGNAL TTS COMPLETE:
+            // Dispatch to main to match the threading model of other state changes.
+            // Only send speech_ended if we're still marked as speaking (stopSpeaking
+            // may have already sent it during an interruption).
+            DispatchQueue.main.async {
+                if self.isSpeaking {
+                    self.isSpeaking = false
+                    self.logError("TTS pipeline complete — all chunks played")
+                    self.sendResponse(type: "speech_ended", data: nil)
+                }
+            }
+        }
+    }
+    
+    /**
+     * GENERATE CHUNK AUDIO FILE
+     *
+     * Runs `say -o /tmp/bv_tts_chunk_N.aiff "text"` to generate an audio file
+     * for one chunk of TTS text. This is an async wrapper that doesn't block
+     * the Swift cooperative thread pool.
+     *
+     * LATENCY (tested on M4 Max):
+     *   - 1 word: ~900ms generation, ~450ms audio
+     *   - 5 words: ~1000ms generation, ~1400ms audio
+     *   - 25 words: ~1400ms generation, ~5200ms audio
+     *   - 70 words: ~2800ms generation, ~19000ms audio
+     *
+     * For sentences ≥7 words, generation time < audio duration, so the pipeline
+     * can generate the next chunk while the current one plays (no gaps).
+     *
+     * @param text: The text for this chunk
+     * @param chunkIndex: Index used for temp file naming
+     * @param voice: macOS voice name (nil for system default)
+     * @param rate: Speech rate in WPM
+     * @returns: URL of the generated .aiff file, or nil if generation failed
+     */
+    private func generateChunkAudioFile(text: String, chunkIndex: Int, voice: String?, rate: Int) async -> URL? {
+        let fileURL = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("bv_tts_chunk_\(chunkIndex).aiff")
+        
+        // Clean up any leftover file from a previous session
+        try? FileManager.default.removeItem(at: fileURL)
+        
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/say")
+        
+        var args = ["-o", fileURL.path]
+        if let voice = voice { args += ["-v", voice] }
+        args += ["-r", "\(rate)", text]
+        process.arguments = args
+        
+        // Store reference so stopSpeaking() can kill it mid-generation
+        self.currentSayProcess = process
+        
+        // Run asynchronously using terminationHandler + continuation.
+        // This avoids blocking the cooperative thread pool (which
+        // process.waitUntilExit() would do in an async context).
+        let success: Bool = await withCheckedContinuation { continuation in
+            process.terminationHandler = { proc in
+                continuation.resume(returning: proc.terminationStatus == 0)
+            }
+            do {
+                try process.run()
+            } catch {
+                continuation.resume(returning: false)
+            }
+        }
+        
+        self.currentSayProcess = nil
+        
+        guard success, FileManager.default.fileExists(atPath: fileURL.path) else {
+            logError("say -o failed for chunk \(chunkIndex)")
+            return nil
+        }
+        
+        return fileURL
+    }
+    
+    /**
+     * SPLIT TEXT INTO SPEECH CHUNKS
+     *
+     * Splits LLM response text into sentence-level chunks suitable for the
+     * TTS pipeline. The chunking algorithm batches short sentences together
+     * to meet a minimum word count per chunk.
+     *
+     * WHY 7 WORDS MINIMUM:
+     * The `say -o` command has ~900ms fixed overhead per file generation.
+     * For sentences <7 words, generation time exceeds audio duration:
+     *   - "Yes." (1 word): 900ms gen > 450ms audio = audible gap
+     *   - "I understand." (2 words): 950ms gen > 700ms audio = gap
+     *   - "Let me explain the key concepts." (6 words): 1000ms gen < 1400ms audio = OK
+     *
+     * By batching short sentences (< 7 words) with their neighbors, we ensure
+     * every chunk has enough audio duration to overlap with the next chunk's
+     * generation time, giving gap-free continuous speech.
+     *
+     * ALGORITHM:
+     *   1. Split by sentence boundaries: /[.!?]+\s+/
+     *   2. If sentence < 7 words: add to buffer
+     *   3. If sentence ≥ 7 words: flush buffer (if any), then this is its own chunk
+     *   4. When buffer ≥ 7 words total: flush as one chunk
+     *   5. If entire text < 7 words: single chunk (don't split)
+     *   6. Remainder in buffer at end: flush as final chunk
+     *
+     * REFERENCE: 1-priority-documents/WebRTC-Echo-Cancellation-Architecture.md
+     *
+     * @param text: Full LLM response text
+     * @returns: Array of text chunks, each ≥7 words (except possibly the last)
+     */
+    private func splitTextIntoSpeechChunks(text: String) -> [String] {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+        
+        // If entire text is short, don't split at all
+        let totalWords = trimmed.split(separator: " ").count
+        if totalWords < 7 {
+            return [trimmed]
+        }
+        
+        // Split by sentence boundaries (period, exclamation, question mark followed by space)
+        // We use a regex-like approach: split on punctuation + whitespace boundaries
+        let sentencePattern = try! NSRegularExpression(pattern: "(?<=[.!?])\\s+", options: [])
+        let range = NSRange(trimmed.startIndex..., in: trimmed)
+        var sentences: [String] = []
+        var lastEnd = trimmed.startIndex
+        
+        sentencePattern.enumerateMatches(in: trimmed, options: [], range: range) { match, _, _ in
+            guard let match = match else { return }
+            let matchRange = Range(match.range, in: trimmed)!
+            let sentence = String(trimmed[lastEnd..<matchRange.lowerBound])
+            if !sentence.trimmingCharacters(in: .whitespaces).isEmpty {
+                sentences.append(sentence.trimmingCharacters(in: .whitespaces))
+            }
+            lastEnd = matchRange.upperBound
+        }
+        
+        // Don't forget the remainder after the last sentence boundary
+        let remainder = String(trimmed[lastEnd...]).trimmingCharacters(in: .whitespaces)
+        if !remainder.isEmpty {
+            sentences.append(remainder)
+        }
+        
+        // If splitting produced nothing or just one sentence, return as single chunk
+        if sentences.count <= 1 {
+            return [trimmed]
+        }
+        
+        // Batch short sentences together to meet the 7-word minimum
+        let minWordsPerChunk = 7
+        var chunks: [String] = []
+        var buffer: [String] = []
+        var bufferWordCount = 0
+        
+        for sentence in sentences {
+            let sentenceWordCount = sentence.split(separator: " ").count
+            
+            if sentenceWordCount >= minWordsPerChunk {
+                // This sentence is long enough on its own.
+                // First, flush any buffered short sentences as a chunk.
+                if !buffer.isEmpty {
+                    chunks.append(buffer.joined(separator: " "))
+                    buffer.removeAll()
+                    bufferWordCount = 0
+                }
+                // Then add this sentence as its own chunk.
+                chunks.append(sentence)
+            } else {
+                // Short sentence — add to buffer
+                buffer.append(sentence)
+                bufferWordCount += sentenceWordCount
+                
+                // Flush buffer if it's reached the minimum
+                if bufferWordCount >= minWordsPerChunk {
+                    chunks.append(buffer.joined(separator: " "))
+                    buffer.removeAll()
+                    bufferWordCount = 0
+                }
+            }
+        }
+        
+        // Flush any remaining buffered sentences
+        if !buffer.isEmpty {
+            chunks.append(buffer.joined(separator: " "))
+        }
+        
+        return chunks
+    }
+    
+    /**
+     * SPEAK DIRECT FALLBACK
+     *
+     * Fallback TTS that runs `say` directly (no AVAudioEngine routing).
+     * Used ONLY when the audio engine is not running, which shouldn't happen
+     * in normal operation but handles edge cases gracefully.
+     *
+     * WARNING: This bypasses VPIO echo cancellation. The AI's voice WILL
+     * leak into the microphone and SpeechAnalyzer will transcribe it.
+     * The backend's software echo suppression would need to handle this.
+     *
+     * @param text: Text to speak
+     * @param voice: macOS voice name (nil for default)
+     * @param rate: Speech rate in WPM
+     */
+    private func speakDirectFallback(text: String, voice: String? = nil, rate: Int = 200) {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/say")
+        
         var arguments = [String]()
-        
-        // Add voice if specified
         if let voice = voice {
             arguments.append(contentsOf: ["-v", voice])
         }
-        
-        // Add rate
         arguments.append(contentsOf: ["-r", "\(rate)"])
-        
-        // Add text
         arguments.append(text)
+        process.arguments = arguments
         
-        ttsProcess?.arguments = arguments
-        
-        // Handle completion on main thread
-        ttsProcess?.terminationHandler = { [weak self] process in
+        process.terminationHandler = { [weak self] _ in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                self.isSpeaking = false
-                self.logError("Speech ended")
-                self.sendResponse(type: "speech_ended", data: nil)
+                if self.isSpeaking {
+                    self.isSpeaking = false
+                    self.logError("Speech ended (direct fallback)")
+                    self.sendResponse(type: "speech_ended", data: nil)
+                }
             }
         }
         
         do {
-            try ttsProcess?.run()
-            isSpeaking = true
-            sendResponse(type: "speech_started", data: nil)
-            logError("Started speaking")
+            currentSayProcess = process
+            try process.run()
+            logError("Started speaking (direct fallback, NO echo cancellation)")
         } catch {
+            isSpeaking = false
+            currentSayProcess = nil
             sendError("Failed to start speech: \(error.localizedDescription)")
         }
     }
     
     /**
      * STOP SPEAKING
-     * 
-     * Stops current TTS playback.
+     *
+     * Immediately stops all TTS playback and generation. Called when:
+     *   1. User interrupts (backend detects 2+ words during TTS)
+     *   2. Backend explicitly stops speech
+     *   3. New speak command arrives (speak() calls this first)
+     *
+     * STOPS THREE THINGS:
+     *   1. playerNode playback (immediate audio silence)
+     *   2. Running say -o process (kills file generation mid-flight)
+     *   3. TTS pipeline task (prevents scheduling of remaining chunks)
+     *
+     * DOES NOT stop the audio engine — the mic tap continues running
+     * so SpeechAnalyzer can transcribe the user's interrupting speech.
      */
     func stopSpeaking() {
-        if let process = ttsProcess, process.isRunning {
+        // Set cancellation flag FIRST — the pipeline task checks this
+        // between every chunk generation and schedule operation
+        isTTSCancelled = true
+        
+        // Stop playerNode playback immediately (audio goes silent)
+        // reset() stops playback AND clears the schedule queue
+        playerNode.stop()
+        playerNode.reset()
+        
+        // Kill any running say -o process (file generation may be in progress)
+        if let process = currentSayProcess, process.isRunning {
             process.terminate()
+            logError("Killed say -o process during interruption")
+        }
+        currentSayProcess = nil
+        
+        // Cancel the pipeline task (it may be between chunks or awaiting)
+        ttsGenerationTask?.cancel()
+        ttsGenerationTask = nil
+        
+        // Update state and notify backend
+        if isSpeaking {
             isSpeaking = false
-            logError("Stopped speaking")
+            logError("Stopped speaking (all TTS cancelled)")
+            sendResponse(type: "speech_ended", data: nil)
         }
     }
     

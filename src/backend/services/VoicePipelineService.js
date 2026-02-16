@@ -215,13 +215,31 @@ class VoicePipelineService extends EventEmitter {
     }
   }
 
+  // ============================================================
+  // ECHO SUPPRESSION — LARGELY OBSOLETE WITH VPIO (2026-02-16)
+  // ============================================================
+  //
+  // HISTORY:
+  // These echo suppression functions were critical when TTS ran via
+  // `say "text"` directly to speakers, bypassing AVAudioEngine. In
+  // that setup, VPIO had no reference signal and couldn't cancel echo.
+  //
+  // CURRENT STATE (2026-02-16):
+  // TTS now routes through AVAudioPlayerNode on the same AVAudioEngine
+  // where VPIO is enabled. VPIO provides hardware-level AEC that
+  // subtracts TTS audio from mic input BEFORE SpeechAnalyzer sees it.
+  // Confirmed: ZERO TTS words leaked in the VPIO echo test.
+  //
+  // KEPT AS DEGRADED FALLBACK for edge cases where VPIO fails or
+  // the speakDirectFallback path is used (engine not running).
+  // ============================================================
+
   /**
-   * NORMALIZE TEXT FOR ECHO COMPARISON
+   * NORMALIZE TEXT FOR ECHO COMPARISON (FALLBACK ONLY)
    *
-   * We compare short transcription fragments against the AI's spoken text
-   * to detect microphone echo. This normalization strips punctuation and
-   * collapses whitespace so small fragments ("it", "it looks") match even
-   * if the recognizer inserts or removes punctuation.
+   * With VPIO active (2026-02-16), this is rarely needed because mic
+   * audio is already echo-free at the hardware level. Kept for the
+   * degraded fallback path when VPIO initialization fails.
    *
    * @param {string} text - Raw text to normalize
    * @returns {string} Normalized text (lowercase, whitespace-collapsed)
@@ -236,23 +254,12 @@ class VoicePipelineService extends EventEmitter {
   }
 
   /**
-   * DETECT LIKELY ECHO FRAGMENT
+   * DETECT LIKELY ECHO FRAGMENT (OBSOLETE — KEPT FOR BACKWARD COMPAT)
    *
-   * This is a heuristic that tries to answer: "Is this transcription
-   * probably the AI's TTS being picked up by the mic?"
-   *
-   * We only classify as echo if:
-   * - The AI is actively speaking, AND
-   * - The fragment is SHORT or looks like a PREFIX of the spoken text, AND
-   * - The fragment is contained in (or aligned with) the AI's spoken text.
-   *
-   * IMPORTANT REFINEMENT (2026-02-07):
-   * We saw echo fragments like "It looks like" — longer than 1-2 words —
-   * still causing interruptions. We now treat short PREFIX matches as echo,
-   * because TTS bleed often captures the first few words of the AI reply.
-   *
-   * If the fragment is longer or clearly not part of the AI's speech,
-   * we treat it as a real user interruption.
+   * OBSOLETE (2026-02-16): With VPIO routing TTS through AVAudioEngine,
+   * hardware echo cancellation handles this at the OS level. This function
+   * is only called from the shouldIgnoreEchoTranscription fallback path
+   * which itself only triggers when VPIO is not active.
    *
    * @param {string} incomingText - Current transcription fragment
    * @param {string} lastSpokenText - Last TTS text sent to Swift
@@ -281,19 +288,12 @@ class VoicePipelineService extends EventEmitter {
   }
 
   /**
-   * SHOULD IGNORE ECHO TRANSCRIPTION
+   * SHOULD IGNORE ECHO TRANSCRIPTION (FALLBACK ONLY)
    *
-   * Decides whether to ignore a transcription update because it is likely
-   * the AI's voice being picked up by the microphone.
-   *
-   * WHY THIS MATTERS:
-   * Echo transcriptions were triggering the interruption logic and restarting
-   * the timer cascade mid-response. That creates a "choppy" feel and causes
-   * tiny user messages like "It" to appear while the AI is speaking.
-   *
-   * BECAUSE:
-   * The macOS `say` TTS can leak into the mic if the user has open speakers
-   * or a sensitive microphone. We need a defensive, heuristic filter.
+   * With VPIO routing TTS through AVAudioEngine (2026-02-16), this function
+   * should almost never filter anything because the mic audio is already
+   * echo-cancelled at the hardware level. It's kept as a safety net for
+   * edge cases where VPIO fails or the direct-say fallback path is used.
    *
    * @param {Object} session - Voice session state
    * @param {string} incomingText - Transcription update text
@@ -631,13 +631,10 @@ class VoicePipelineService extends EventEmitter {
       firstTranscriptionAt: 0,
       lastTranscriptionAt: 0,
       awaitingSilenceConfirmation: false,
-      // ECHO SUPPRESSION (2026-02-07):
-      // When the AI speaks, the microphone can pick up TTS audio.
-      // That echo can be misclassified as user speech and triggers
-      // interruption + new timer cascades, which creates "choppy" turns.
-      //
-      // We store the last TTS text + timestamp so we can ignore tiny
-      // echo fragments that match the AI's spoken words.
+      // ECHO SUPPRESSION STATE (2026-02-07, updated 2026-02-16):
+      // With VPIO routing TTS through AVAudioEngine, hardware echo
+      // cancellation handles most of this. These fields are kept as a
+      // fallback for when VPIO fails or the direct-say path is used.
       lastSpokenText: '',
       lastSpokenAt: 0
     };
@@ -790,10 +787,9 @@ class VoicePipelineService extends EventEmitter {
         const audioInfo = audioEndTime > 0 ? `, audio: ${audioStartTime.toFixed(2)}-${audioEndTime.toFixed(2)}s` : '';
         console.log(`[VoicePipelineService] Transcription: "${text}" (final: ${isFinal}, swiftSpeaking: ${swiftIsSpeaking}${audioInfo})`);
 
-        // ECHO SUPPRESSION CHECK (2026-02-07):
-        // If the AI is speaking and this looks like a short echo fragment,
-        // ignore it entirely so we don't trigger interruptions or timer resets.
-        // This keeps the conversation flow smooth and prevents "choppy" turns.
+        // ECHO SUPPRESSION CHECK (2026-02-07, updated 2026-02-16):
+        // With VPIO active, hardware AEC handles echo cancellation. This
+        // check is a fallback safety net for when VPIO is not active.
         if (this.shouldIgnoreEchoTranscription(session, text, swiftIsSpeaking)) {
           console.log('[VoicePipelineService] 🔇 Ignoring likely echo transcription while AI is speaking');
           return;
@@ -1890,11 +1886,10 @@ class VoicePipelineService extends EventEmitter {
       return null;
     }
 
-    // ECHO SUPPRESSION CONTEXT (2026-02-07):
-    // Store the exact text we're about to speak so we can detect
-    // short echo fragments that show up in transcription while
-    // the AI is talking. This lets us ignore mic bleed without
-    // breaking real user interruptions.
+    // ECHO SUPPRESSION CONTEXT (2026-02-07, updated 2026-02-16):
+    // With VPIO now routing TTS through AVAudioEngine, hardware echo
+    // cancellation handles echo at the OS level. These fields are still
+    // set as a fallback for when VPIO fails or speakDirectFallback is used.
     session.lastSpokenText = text || '';
     session.lastSpokenAt = Date.now();
 
