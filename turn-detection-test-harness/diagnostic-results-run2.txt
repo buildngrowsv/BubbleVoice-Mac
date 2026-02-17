@@ -1,0 +1,423 @@
+
+╔══════════════════════════════════════════════════════════════╗
+║  COMPREHENSIVE SPEECH DIAGNOSTIC — 10 TESTS                ║
+╚══════════════════════════════════════════════════════════════╝
+
+  Each test: 20s. Total: ~230s
+  Ensure background speech (video/podcast) is playing on another device.
+
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 1: Raw Energy Baseline (10s no VPIO + 10s VPIO)      ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:24:42.119] STATUS: Phase A: No VPIO — monitoring 10s...
+  Phase A (no VPIO):
+  Energy — min: 0.00170, avg: 0.00996, max: 0.03362
+  Frames above VAD (0.008): 42/102 (41%)
+  [00:24:57.677] STATUS: Phase B: VPIO — monitoring 10s...
+  Phase B (VPIO):
+  Energy — min: 0.00019, avg: 0.02426, max: 0.22509
+  Frames above VAD (0.008): 41/106 (38%)
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 2: SpeechTranscriber (bare, no filters)              ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:25:14.797] ERR: Error Domain=com.apple.coreaudio.avfaudio Code=560227702 "(null)" UserInfo={false condition=canPerformIO}
+
+  ── TEST 2 SUMMARY ──
+  Transcriptions: 0
+  No energy samples
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 3: SpeechTranscriber + VPIO                          ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:25:17.562] STATUS: VPIO enabled
+  [00:25:19.791] STATUS: Listening...
+
+  ── TEST 3 SUMMARY ──
+  Transcriptions: 0
+  Energy — min: 0.00026, avg: 0.03120, max: 0.18567
+  Frames above VAD (0.008): 154/216 (71%)
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 4: SpeechTranscriber + 10x software gain             ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:25:47.982] STATUS: Listening...
+  [00:25:51.995] TX: [V] "See"
+  [00:25:51.995] TX: [V] "See."
+  [00:25:52.003] TX: [F] "Yeah."
+  [00:25:52.004] TX: [V] " Yeah"
+  [00:25:55.797] TX: [V] " Yeah as"
+  [00:25:55.797] TX: [V] " Yeah as soon"
+  [00:25:55.797] TX: [V] " Yeah as soon as"
+  [00:25:55.797] TX: [V] " Yeah as soon as I"
+  [00:25:55.797] TX: [V] " Yeah as soon as I started"
+  [00:25:55.797] TX: [V] " Yeah as soon as I started making"
+  [00:25:55.797] TX: [V] " Yeah as soon as I started making me"
+  [00:25:55.798] TX: [V] " Yeah as soon as I started making me some"
+  [00:25:55.798] TX: [V] " Yeah as soon as I started making me some dec"
+  [00:25:55.798] TX: [V] " Yeah as soon as I started making me some decent"
+  [00:25:55.798] TX: [V] " Yeah as soon as I started making me some decent money"
+  [00:25:55.798] TX: [V] " Yeah as soon as I started making me some decent money,"
+  [00:25:55.798] TX: [V] " Yeah as soon as I started making me some decent money, I"
+  [00:25:55.798] TX: [V] " Yeah as soon as I started making me some decent money, I was"
+  [00:25:55.799] TX: [V] " Yeah as soon as I started making me some decent money, I was like"
+  [00:25:55.799] TX: [V] " Yeah as soon as I started making me some decent money, I was like,"
+  [00:25:55.799] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man"
+  [00:25:59.599] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man,"
+  [00:25:59.601] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man, I"
+  [00:25:59.601] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'"
+  [00:25:59.601] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm"
+  [00:25:59.601] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting"
+  [00:25:59.601] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out"
+  [00:25:59.601] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out the"
+  [00:25:59.602] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out the h"
+  [00:25:59.602] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out the hood"
+  [00:25:59.602] TX: [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out the hood."
+  [00:25:59.689] TX: [F] " Yeah, and as soon as I started making me some decent money, I was like, man, I'm getting out the hood."
+  [00:25:59.690] TX: [V] " The"
+  [00:26:03.498] TX: [V] " The more"
+  [00:26:03.498] TX: [V] " The more white"
+  [00:26:03.499] TX: [V] " The more white people"
+  [00:26:03.499] TX: [V] " The more white people,"
+  [00:26:03.499] TX: [V] " The more white people, the"
+  [00:26:03.499] TX: [V] " The more white people, the better"
+  [00:26:03.499] TX: [V] " The more white people, the better."
+  [00:26:03.524] TX: [F] " The more white people, the better."
+  [00:26:07.297] TX: [V] " You"
+  [00:26:07.298] TX: [V] " You know"
+  [00:26:07.298] TX: [V] " You know what"
+  [00:26:07.298] TX: [V] " You know what mot"
+  [00:26:07.298] TX: [V] " You know what motiv"
+  [00:26:07.298] TX: [V] " You know what motivated"
+  [00:26:07.298] TX: [V] " You know what motivated you"
+  [00:26:07.298] TX: [V] " You know what motivated you?"
+  [00:26:07.324] TX: [F] " You know what motivated you?"
+
+  ── TEST 4 SUMMARY ──
+  Transcriptions: 50
+  Energy — min: 0.00000, avg: 0.13268, max: 0.51969
+  Frames above VAD (0.008): 211/212 (99%)
+    00:25:51.994 [V] "See"
+    00:25:51.995 [V] "See."
+    00:25:52.003 [F] "Yeah."
+    00:25:52.004 [V] " Yeah"
+    00:25:55.797 [V] " Yeah as"
+    00:25:55.797 [V] " Yeah as soon"
+    00:25:55.797 [V] " Yeah as soon as"
+    00:25:55.797 [V] " Yeah as soon as I"
+    00:25:55.797 [V] " Yeah as soon as I started"
+    00:25:55.797 [V] " Yeah as soon as I started making"
+    00:25:55.797 [V] " Yeah as soon as I started making me"
+    00:25:55.798 [V] " Yeah as soon as I started making me some"
+    00:25:55.798 [V] " Yeah as soon as I started making me some dec"
+    00:25:55.798 [V] " Yeah as soon as I started making me some decent"
+    00:25:55.798 [V] " Yeah as soon as I started making me some decent money"
+    00:25:55.798 [V] " Yeah as soon as I started making me some decent money,"
+    00:25:55.798 [V] " Yeah as soon as I started making me some decent money, I"
+    00:25:55.798 [V] " Yeah as soon as I started making me some decent money, I was"
+    00:25:55.799 [V] " Yeah as soon as I started making me some decent money, I was like"
+    00:25:55.799 [V] " Yeah as soon as I started making me some decent money, I was like,"
+    00:25:55.799 [V] " Yeah as soon as I started making me some decent money, I was like, Man"
+    00:25:59.599 [V] " Yeah as soon as I started making me some decent money, I was like, Man,"
+    00:25:59.601 [V] " Yeah as soon as I started making me some decent money, I was like, Man, I"
+    00:25:59.601 [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'"
+    00:25:59.601 [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm"
+    00:25:59.601 [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting"
+    00:25:59.601 [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out"
+    00:25:59.601 [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out the"
+    00:25:59.602 [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out the h"
+    00:25:59.602 [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out the hood"
+    00:25:59.602 [V] " Yeah as soon as I started making me some decent money, I was like, Man, I'm getting out the hood."
+    00:25:59.689 [F] " Yeah, and as soon as I started making me some decent money, I was like, man, I'm getting out the hood."
+    00:25:59.689 [V] " The"
+    00:26:03.498 [V] " The more"
+    00:26:03.498 [V] " The more white"
+    00:26:03.498 [V] " The more white people"
+    00:26:03.499 [V] " The more white people,"
+    00:26:03.499 [V] " The more white people, the"
+    00:26:03.499 [V] " The more white people, the better"
+    00:26:03.499 [V] " The more white people, the better."
+    00:26:03.524 [F] " The more white people, the better."
+    00:26:07.297 [V] " You"
+    00:26:07.298 [V] " You know"
+    00:26:07.298 [V] " You know what"
+    00:26:07.298 [V] " You know what mot"
+    00:26:07.298 [V] " You know what motiv"
+    00:26:07.298 [V] " You know what motivated"
+    00:26:07.298 [V] " You know what motivated you"
+    00:26:07.298 [V] " You know what motivated you?"
+    00:26:07.323 [F] " You know what motivated you?"
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 5: SpeechTranscriber + VPIO + 10x gain               ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:26:12.242] STATUS: VPIO enabled
+  [00:26:13.991] STATUS: Listening...
+
+  ── TEST 5 SUMMARY ──
+  Transcriptions: 0
+  Energy — min: 0.00117, avg: 0.23819, max: 0.80990
+  Frames above VAD (0.008): 199/216 (92%)
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 6: DictationTranscriber (bare)                       ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:26:41.869] STATUS: Listening...
+  [00:26:48.689] TX: [V] "Over and over"
+  [00:26:50.695] TX: [V] "Over and over I"
+  [00:26:50.893] TX: [V] "Over and over I I broke"
+  [00:26:50.909] TX: [V] "Over and over cycle I broke"
+  [00:26:51.082] TX: [V] "Over and over it I broke"
+  [00:26:51.083] TX: [V] "And I broke it I broke"
+  [00:26:51.379] TX: [V] "And I broke it"
+  [00:26:52.596] TX: [V] "And I broke it on"
+  [00:26:52.613] TX: [V] "And I broke it on my"
+  [00:26:52.786] TX: [V] "And I broke it on my wife"
+  [00:26:54.003] TX: [V] "And I broke it on my wife I've"
+  [00:26:54.289] TX: [V] "And I broke it on my wife I've never"
+  [00:26:55.217] TX: [V] "And I broke it on my wife I've never laid a hand on my"
+  [00:26:57.099] TX: [V] "And I broke it on my wife I've never on my kids"
+  [00:27:01.013] TX: [V] "And I broke it on my wife I've never on my kids it wasn't like"
+  [00:27:01.206] TX: [V] "And I broke it on my wife I've never on my kids like that like"
+  [00:27:01.488] TX: [V] "And I broke it on my wife I've never on my kids like that"
+  [00:27:02.712] TX: [V] "And I broke it on my wife I've never on my kids like that that great"
+  [00:27:02.882] TX: [V] "And I broke it on my wife I've never on my kids it wasn't that great"
+
+  ── TEST 6 SUMMARY ──
+  Transcriptions: 19
+  Energy — min: 0.00000, avg: 0.03384, max: 0.11507
+  Frames above VAD (0.008): 162/210 (77%)
+    00:26:48.689 [V] "Over and over"
+    00:26:50.695 [V] "Over and over I"
+    00:26:50.893 [V] "Over and over I I broke"
+    00:26:50.909 [V] "Over and over cycle I broke"
+    00:26:51.082 [V] "Over and over it I broke"
+    00:26:51.083 [V] "And I broke it I broke"
+    00:26:51.379 [V] "And I broke it"
+    00:26:52.596 [V] "And I broke it on"
+    00:26:52.613 [V] "And I broke it on my"
+    00:26:52.786 [V] "And I broke it on my wife"
+    00:26:54.003 [V] "And I broke it on my wife I've"
+    00:26:54.289 [V] "And I broke it on my wife I've never"
+    00:26:55.217 [V] "And I broke it on my wife I've never laid a hand on my"
+    00:26:57.099 [V] "And I broke it on my wife I've never on my kids"
+    00:27:01.013 [V] "And I broke it on my wife I've never on my kids it wasn't like"
+    00:27:01.206 [V] "And I broke it on my wife I've never on my kids like that like"
+    00:27:01.488 [V] "And I broke it on my wife I've never on my kids like that"
+    00:27:02.712 [V] "And I broke it on my wife I've never on my kids like that that great"
+    00:27:02.882 [V] "And I broke it on my wife I've never on my kids it wasn't that great"
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 7: DictationTranscriber + VPIO                       ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:27:05.873] STATUS: VPIO enabled
+  [00:27:07.696] STATUS: Listening...
+
+  ── TEST 7 SUMMARY ──
+  Transcriptions: 0
+  Energy — min: 0.00077, avg: 0.01359, max: 0.18976
+  Frames above VAD (0.008): 59/211 (27%)
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 8: SFSpeechRecognizer + software gain (10x)          ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:27:35.140] STATUS: On-device
+  [00:27:35.340] STATUS: Listening (SFSpeech + 10x gain)...
+  [00:27:36.957] TX: [V] "Zero proof"
+  [00:27:37.457] TX: [V] "Zero proof quant"
+  [00:27:37.462] TX: [V] "Zero proof quantum"
+  [00:27:37.751] TX: [V] "Zero proof quantum escape"
+  [00:27:37.755] TX: [V] "Zero proof quantum scape"
+  [00:27:37.953] TX: [V] "Zero proof quantum scape is"
+  [00:27:38.157] TX: [V] "Zero proof quantum scape is different"
+  [00:27:38.357] TX: [V] "Zero proof quantum scape is different they"
+  [00:27:38.663] TX: [V] "Zero proof quantum scape is different they've actually"
+  [00:27:38.968] TX: [V] "Zero proof quantum scape is different they've actually worked"
+  [00:27:39.185] TX: [V] "Zero proof quantum scape is different they've actually worked with the"
+  [00:27:39.368] TX: [V] "Zero proof quantum scape is different they've actually worked with the partner"
+  [00:27:39.850] TX: [V] "Zero proof quantum scape is different they've actually worked with the like"
+  [00:27:39.852] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like"
+  [00:27:39.853] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like vole"
+  [00:27:39.858] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volk"
+  [00:27:40.150] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volks"
+  [00:27:40.358] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen"
+  [00:27:40.760] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and"
+  [00:27:41.058] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they"
+  [00:27:41.352] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they publish"
+  [00:27:41.562] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published"
+  [00:27:41.562] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published paper"
+  [00:27:41.958] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published paper showing"
+  [00:27:41.958] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing"
+  [00:27:42.250] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how"
+  [00:27:42.561] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their"
+  [00:27:42.757] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff"
+  [00:27:43.160] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works"
+  [00:27:43.758] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and"
+  [00:27:43.956] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when"
+  [00:27:44.147] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it"
+  [00:27:44.150] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes"
+  [00:27:44.355] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to"
+  [00:27:44.357] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the"
+  [00:27:44.652] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim"
+  [00:27:44.947] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of"
+  [00:27:45.157] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid"
+  [00:27:45.372] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state"
+  [00:27:45.565] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery"
+  [00:27:46.159] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there"
+  [00:27:46.367] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is"
+  [00:27:46.565] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a"
+  [00:27:46.781] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar"
+  [00:27:47.363] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar this"
+  [00:27:47.572] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar this this video"
+  [00:27:47.752] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video"
+  [00:27:47.993] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we"
+  [00:27:48.276] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're"
+  [00:27:48.585] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going"
+  [00:27:48.602] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under"
+  [00:27:49.192] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under this"
+  [00:27:49.983] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under this I'm"
+  [00:27:50.171] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under and I'm"
+  [00:27:51.171] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under and I'm Ricky da"
+  [00:27:51.373] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under and I'm da Vinci da"
+  [00:27:51.554] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under and I'm da Vinci"
+  [00:27:53.100] TX: [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar and this video we're going under this all I'm da Vinci"
+  [00:27:53.950] TX: [V] "This"
+  [00:27:54.759] TX: [V] "This was brought to"
+
+  ── TEST 8 SUMMARY ──
+  Transcriptions: 60
+  Energy — min: 0.00000, avg: 0.14111, max: 0.37817
+  Frames above VAD (0.008): 209/210 (99%)
+    00:27:36.957 [V] "Zero proof"
+    00:27:37.457 [V] "Zero proof quant"
+    00:27:37.462 [V] "Zero proof quantum"
+    00:27:37.751 [V] "Zero proof quantum escape"
+    00:27:37.754 [V] "Zero proof quantum scape"
+    00:27:37.953 [V] "Zero proof quantum scape is"
+    00:27:38.157 [V] "Zero proof quantum scape is different"
+    00:27:38.357 [V] "Zero proof quantum scape is different they"
+    00:27:38.663 [V] "Zero proof quantum scape is different they've actually"
+    00:27:38.968 [V] "Zero proof quantum scape is different they've actually worked"
+    00:27:39.185 [V] "Zero proof quantum scape is different they've actually worked with the"
+    00:27:39.368 [V] "Zero proof quantum scape is different they've actually worked with the partner"
+    00:27:39.850 [V] "Zero proof quantum scape is different they've actually worked with the like"
+    00:27:39.852 [V] "Zero proof quantum scape is different they've actually worked with partners like"
+    00:27:39.853 [V] "Zero proof quantum scape is different they've actually worked with partners like vole"
+    00:27:39.858 [V] "Zero proof quantum scape is different they've actually worked with partners like Volk"
+    00:27:40.150 [V] "Zero proof quantum scape is different they've actually worked with partners like Volks"
+    00:27:40.358 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen"
+    00:27:40.760 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and"
+    00:27:41.058 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they"
+    00:27:41.352 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they publish"
+    00:27:41.562 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published"
+    00:27:41.562 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published paper"
+    00:27:41.958 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published paper showing"
+    00:27:41.958 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing"
+    00:27:42.250 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how"
+    00:27:42.561 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their"
+    00:27:42.757 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff"
+    00:27:43.160 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works"
+    00:27:43.758 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and"
+    00:27:43.956 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when"
+    00:27:44.147 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it"
+    00:27:44.150 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes"
+    00:27:44.355 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to"
+    00:27:44.357 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the"
+    00:27:44.652 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim"
+    00:27:44.947 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of"
+    00:27:45.157 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid"
+    00:27:45.372 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state"
+    00:27:45.565 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery"
+    00:27:46.159 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there"
+    00:27:46.367 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is"
+    00:27:46.564 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a"
+    00:27:46.781 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar"
+    00:27:47.363 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar this"
+    00:27:47.572 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar this this video"
+    00:27:47.752 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video"
+    00:27:47.993 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we"
+    00:27:48.276 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're"
+    00:27:48.585 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going"
+    00:27:48.602 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under"
+    00:27:49.192 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under this"
+    00:27:49.983 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under this I'm"
+    00:27:50.171 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under and I'm"
+    00:27:51.171 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under and I'm Ricky da"
+    00:27:51.373 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under and I'm da Vinci da"
+    00:27:51.554 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar in this video we're going under and I'm da Vinci"
+    00:27:53.100 [V] "Zero proof quantum scape is different they've actually worked with partners like Volkswagen and they published papers showing how their stuff works and when it comes to the claim of solid state battery there is a caviar and this video we're going under this all I'm da Vinci"
+    00:27:53.950 [V] "This"
+    00:27:54.759 [V] "This was brought to"
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 9: SFSpeechRecognizer + VPIO (AGC)                   ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:27:59.371] STATUS: VPIO enabled
+  [00:27:59.371] STATUS: On-device
+  [00:27:59.450] STATUS: Listening (SFSpeech + VPIO)...
+
+  ── TEST 9 SUMMARY ──
+  Transcriptions: 0
+  Energy — min: 0.00000, avg: 0.03649, max: 0.23955
+  Frames above VAD (0.008): 173/210 (82%)
+
+╔══════════════════════════════════════════════════════════════╗
+║  TEST 10: SpeechTranscriber + VPIO + 20x gain              ║
+╚══════════════════════════════════════════════════════════════╝
+
+  [00:28:29.896] STATUS: VPIO enabled
+  [00:28:32.268] STATUS: Listening...
+
+  ── TEST 10 SUMMARY ──
+  Transcriptions: 0
+  Energy — min: 0.00433, avg: 0.44844, max: 0.93476
+  Frames above VAD (0.008): 207/212 (97%)
+
+╔══════════════════════════════════════════════════════════════╗
+║  FINAL COMPARISON TABLE                                    ║
+╚══════════════════════════════════════════════════════════════╝
+
+  #   Name                                           | TX     | avgE     | maxE     | above VAD
+  ─── ────────────────────────────────────────────── │ ────── │ ──────── │ ──────── │ ─────────
+   1. Energy baseline (no VPIO)                  | TX:   0 | avgE: 0.0100 | maxE: 0.0336 | above VAD: 41%
+   1. Energy baseline (VPIO)                     | TX:   0 | avgE: 0.0243 | maxE: 0.2251 | above VAD: 38%
+   2. SpeechTranscriber (bare, no filters)       | TX:   0 | avgE: 0.0000 | maxE: 0.0000 | above VAD: 0%
+   3. SpeechTranscriber + VPIO                   | TX:   0 | avgE: 0.0312 | maxE: 0.1857 | above VAD: 71%
+   4. SpeechTranscriber + 10x software gain      | TX:  50 | avgE: 0.1327 | maxE: 0.5197 | above VAD: 99%
+   5. SpeechTranscriber + VPIO + 10x gain        | TX:   0 | avgE: 0.2382 | maxE: 0.8099 | above VAD: 92%
+   6. DictationTranscriber (bare)                | TX:  19 | avgE: 0.0338 | maxE: 0.1151 | above VAD: 77%
+   7. DictationTranscriber + VPIO                | TX:   0 | avgE: 0.0136 | maxE: 0.1898 | above VAD: 27%
+   8. SFSpeechRecognizer + 10x gain              | TX:  60 | avgE: 0.1411 | maxE: 0.3782 | above VAD: 99%
+   9. SFSpeechRecognizer + VPIO                  | TX:   0 | avgE: 0.0365 | maxE: 0.2395 | above VAD: 82%
+  10. SpeechTranscriber + VPIO + 20x gain        | TX:   0 | avgE: 0.4484 | maxE: 0.9348 | above VAD: 97%
+
+  ✅ Tests with transcriptions:
+    Test 4 (SpeechTranscriber + 10x software gain): 50 transcriptions
+      00:25:51.994 [V] "See"
+      00:25:51.995 [V] "See."
+      00:25:52.003 [F] "Yeah."
+      00:25:52.004 [V] " Yeah"
+      00:25:55.797 [V] " Yeah as"
+    Test 6 (DictationTranscriber (bare)): 19 transcriptions
+      00:26:48.689 [V] "Over and over"
+      00:26:50.695 [V] "Over and over I"
+      00:26:50.893 [V] "Over and over I I broke"
+      00:26:50.909 [V] "Over and over cycle I broke"
+      00:26:51.082 [V] "Over and over it I broke"
+    Test 8 (SFSpeechRecognizer + 10x gain): 60 transcriptions
+      00:27:36.957 [V] "Zero proof"
+      00:27:37.457 [V] "Zero proof quant"
+      00:27:37.462 [V] "Zero proof quantum"
+      00:27:37.751 [V] "Zero proof quantum escape"
+      00:27:37.754 [V] "Zero proof quantum scape"
+

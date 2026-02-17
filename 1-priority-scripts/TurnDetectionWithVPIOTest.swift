@@ -24,6 +24,55 @@ import Speech
 
 func setStdoutUnbuffered() { setbuf(stdout, nil) }
 
+// MARK: - File Logging
+
+/// Global file handle for logging detailed test output
+var logFileHandle: FileHandle?
+var logFilePath: String?
+
+func initializeLogFile() {
+    let timestamp = DateFormatter().then {
+        $0.dateFormat = "yyyyMMdd_HHmmss"
+    }.string(from: Date())
+    logFilePath = "/tmp/turn-detection-test-\(timestamp).log"
+    
+    FileManager.default.createFile(atPath: logFilePath!, contents: nil)
+    logFileHandle = FileHandle(forWritingAtPath: logFilePath!)
+    
+    let header = """
+    ================================================================
+    TURN DETECTION WITH VPIO TEST - DETAILED LOG
+    ================================================================
+    Started: \(Date())
+    Test: TurnDetectionWithVPIOTest.swift
+    Purpose: Compare SpeechAnalyzer word-by-word output with timing
+    ================================================================
+    
+    """
+    writeToLog(header)
+    print("📝 Logging to: \(logFilePath!)")
+}
+
+func writeToLog(_ message: String) {
+    guard let handle = logFileHandle,
+          let data = (message + "\n").data(using: .utf8) else { return }
+    handle.write(data)
+}
+
+func closeLogFile() {
+    logFileHandle?.closeFile()
+    if let path = logFilePath {
+        print("\n📝 Log saved to: \(path)")
+    }
+}
+
+extension DateFormatter {
+    func then(_ block: (DateFormatter) -> Void) -> DateFormatter {
+        block(self)
+        return self
+    }
+}
+
 // MARK: - State Machine
 
 /// Every possible state the agent can be in.
@@ -206,6 +255,9 @@ class TurnDetectionTest {
         print("    D) Play int:  playing → user speaks → stop playback")
         print("")
         
+        // Initialize log file
+        initializeLogFile()
+        
         // ── Setup audio engine with VPIO (from confirmed-working test) ──
         try audioEngine.outputNode.setVoiceProcessingEnabled(true)
         let outFmt = audioEngine.outputNode.outputFormat(forBus: 0)
@@ -386,7 +438,9 @@ class TurnDetectionTest {
             : now.timeIntervalSince(lastResultDeliveryTime)
         if gapSinceResult > 3.0 {
             // Log when SpeechAnalyzer had a long gap (>3s) — these are the problematic pauses.
-            log("⚠️ ANALYZER GAP: \(String(format: "%.1f", gapSinceResult))s since last result, \(buffersSinceLastResult) buffers fed during gap, rms_now=\(String(format: "%.4f", currentRMSEnergy))")
+            let msg = "⚠️ ANALYZER GAP: \(String(format: "%.1f", gapSinceResult))s since last result, \(buffersSinceLastResult) buffers fed during gap, rms_now=\(String(format: "%.4f", currentRMSEnergy))"
+            log(msg)
+            writeToLog(msg)
         }
         lastResultDeliveryTime = now
         buffersSinceLastResult = 0
@@ -402,10 +456,13 @@ class TurnDetectionTest {
             // the same millisecond. We only log the FINAL state of each burst to keep
             // output readable. Cancel previous debounce and start a new 150ms timer.
             wordLogDebounceTask?.cancel()
-            wordLogDebounceTask = Task { [weak self, currentText = currentTurnText, d = delta] in
+            wordLogDebounceTask = Task { [weak self, currentText = currentTurnText, d = delta, fullText = text] in
                 try? await Task.sleep(for: .milliseconds(150))
                 guard !Task.isCancelled, let self else { return }
+                let t = String(format: "%6.1f", Date().timeIntervalSince(self.testStart))
                 self.log("WORDS (+\(d) in burst): \"\(currentText)\"")
+                // Log to file with full details
+                writeToLog("[T+\(t)s] [LISTENING] RESULT: wordCount=\(self.lastResultWordCount), delta=+\(d), text=\"\(fullText)\"")
             }
             restartSilenceTimer()
             
@@ -743,6 +800,7 @@ struct TurnDetectionEntry {
             let test = TurnDetectionTest()
             do { try await test.run() }
             catch { print("FATAL: \(error)") }
+            closeLogFile()
             exit(0)
         }
         RunLoop.main.run()
