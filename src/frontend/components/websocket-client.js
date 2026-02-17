@@ -578,6 +578,33 @@ class WebSocketClient {
    */
   handleUserMessage(data) {
     console.log('[WebSocketClient] Handling user message:', data.text);
+
+    // GHOST TRANSCRIPTION FILTER (2026-02-16):
+    // Don't display punctuation-only messages as chat bubbles. This is the final
+    // defense-in-depth layer — the backend already filters punctuation before
+    // sending to the LLM, but if a "." somehow reaches this handler, we must
+    // not create a chat bubble that says just ".". That looks broken to the user.
+    //
+    // WHY: VPIO echo cancellation residual during TTS playback can produce
+    // phantom "." transcriptions. Even with backend guards, this frontend guard
+    // ensures the user never sees a lone period as a "message" in their chat.
+    const messageText = (data.text || '').trim();
+    const strippedMessage = messageText.replace(/[\s.,!?;:'"…\-–—_\\/()[\]{}@#$%^&*+=<>~`|]+/g, '');
+    if (strippedMessage.length === 0) {
+      console.log('[WebSocketClient] 👻 Ignoring punctuation-only user message:', messageText);
+      // Still clear the input field in case punctuation was written there
+      const inputField = this.app.elements.inputField;
+      if (inputField) {
+        if (inputField.value !== undefined && typeof inputField.value === 'string') {
+          inputField.value = '';
+        } else {
+          inputField.textContent = '';
+        }
+        inputField.style.opacity = '1.0';
+        inputField.style.fontStyle = 'normal';
+      }
+      return;
+    }
     
     // Add user message to conversation display
     this.app.conversationManager.addMessage({

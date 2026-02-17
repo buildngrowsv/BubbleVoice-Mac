@@ -977,12 +977,22 @@ class VoicePipelineService extends EventEmitter {
           session.latestTranscription = mergedTranscription;
         }
 
-        // Send transcription to frontend (debounced for smoother UI)
-        this.scheduleFrontendTranscriptionUpdate(
-          session,
-          mergedTranscription,
-          isFinal
-        );
+        // Send transcription to frontend (debounced for smoother UI).
+        //
+        // GHOST TRANSCRIPTION FIX (2026-02-16):
+        // Don't send punctuation-only transcriptions to the frontend at all.
+        // This prevents the input field from briefly showing "." and prevents
+        // the user from seeing phantom punctuation flash in the text field
+        // during TTS playback. The frontend should only see real words.
+        if (!this.isPunctuationOnly(mergedTranscription)) {
+          this.scheduleFrontendTranscriptionUpdate(
+            session,
+            mergedTranscription,
+            isFinal
+          );
+        } else {
+          console.log(`[VoicePipelineService] 👻 Not sending punctuation-only transcription to frontend: "${mergedTranscription.trim()}"`);
+        }
         
         // RE-EVALUATE pipeline state AFTER interruption handler may have cleared it.
         //

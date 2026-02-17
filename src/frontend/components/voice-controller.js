@@ -191,6 +191,23 @@ class VoiceController {
   handleTranscription(data) {
     console.log('[VoiceController] Transcription:', data.text, 'Final:', data.isFinal);
 
+    // GHOST TRANSCRIPTION FILTER (2026-02-16):
+    // Don't write punctuation-only text to the input field. During TTS playback,
+    // VPIO echo cancellation residual artifacts cause SpeechAnalyzer to emit
+    // phantom punctuation (typically "."). The backend already filters these out
+    // (see VoicePipelineService.isPunctuationOnly), but this is a defense-in-depth
+    // guard on the frontend to prevent "." from ever appearing in the text field.
+    //
+    // WHY: Users reported seeing a period flash briefly in the input field during
+    // AI speech, which then triggered a false interruption and sent "." to the LLM.
+    // This guard ensures the input field only shows real words.
+    const textContent = (data.text || '').trim();
+    const strippedText = textContent.replace(/[\s.,!?;:'"…\-–—_\\/()[\]{}@#$%^&*+=<>~`|]+/g, '');
+    if (strippedText.length === 0 && textContent.length > 0) {
+      console.log('[VoiceController] 👻 Ignoring punctuation-only transcription:', textContent);
+      return;
+    }
+
     const inputField = this.app.elements.inputField;
     
     // Get current text content (without HTML)
