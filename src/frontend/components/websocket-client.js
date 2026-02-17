@@ -545,6 +545,37 @@ class WebSocketClient {
    * @param {string} data.text - User's transcribed speech
    * @param {number} data.timestamp - When the message was sent
    */
+  /**
+   * HANDLE USER MESSAGE (UPDATED 2026-02-17)
+   *
+   * Called when the backend sends a user message to display as a chat bubble.
+   * This now fires IMMEDIATELY when silence is confirmed (moved from Timer 3
+   * to runLlmProcessing in VoicePipelineService), so the user sees their
+   * message appear as a bubble within ~1.2s of stopping speech — before the
+   * LLM even starts processing.
+   *
+   * PREVIOUS BUG: The user message was sent only after the LLM responded
+   * (8-10+ seconds later), so the transcribed text sat in the input field
+   * the whole time. The message then appeared as BOTH a bubble AND in the
+   * input field simultaneously because the text comparison sometimes failed
+   * (SpeechAnalyzer finalization can change text slightly from the volatile
+   * version that was last written to the input field).
+   *
+   * FIX: Always clear the input field when a user message arrives, regardless
+   * of whether the text matches exactly. The only reason the input field has
+   * text at this point is from voice transcription — there's no user-typed
+   * text to preserve because the voice pipeline is active.
+   *
+   * UX FLOW (after fix):
+   *   1. User speaks → volatile text appears in input field
+   *   2. User stops → 1.2s → user_message arrives → bubble created, input cleared
+   *   3. Thinking dots show while LLM processes
+   *   4. AI response arrives
+   *
+   * @param {Object} data - User message data
+   * @param {string} data.text - User's transcribed speech
+   * @param {number} data.timestamp - When the message was sent
+   */
   handleUserMessage(data) {
     console.log('[WebSocketClient] Handling user message:', data.text);
     
@@ -555,20 +586,28 @@ class WebSocketClient {
       timestamp: data.timestamp
     });
 
-    // Clear the input field if it contains the transcription
-    // This prevents the user from seeing duplicate text
-    // Handle both input elements and contenteditable divs
-    // FIX (2026-01-28): Use innerText instead of textContent to properly handle line breaks
+    // ALWAYS clear the input field when a user message arrives (2026-02-17).
+    //
+    // PREVIOUS APPROACH: Only cleared if input text matched data.text exactly.
+    // This failed when SpeechAnalyzer's finalized text diverged from the last
+    // volatile text written to the input (e.g., volatile: "it seems like I can"
+    // vs finalized: "Uh, it seems like I can"). The mismatch left text in the
+    // input field, creating a jarring duplicate display.
+    //
+    // NEW APPROACH: Always clear. When voice is active, the input field only
+    // contains transcription text (not user-typed text), so clearing is safe.
+    // If the user was typing (not using voice), handleUserMessage wouldn't be
+    // called — typed messages go through a different path.
     const inputField = this.app.elements.inputField;
     if (inputField) {
-      const currentText = inputField.value || inputField.innerText || '';
-      if (currentText.trim() === data.text.trim()) {
-        if (inputField.value !== undefined) {
-          inputField.value = '';
-        } else {
-          inputField.textContent = '';  // OK to use textContent for clearing
-        }
+      if (inputField.value !== undefined && typeof inputField.value === 'string') {
+        inputField.value = '';
+      } else {
+        inputField.textContent = '';
       }
+      // Reset opacity to full (in case last transcription was volatile/partial)
+      inputField.style.opacity = '1.0';
+      inputField.style.fontStyle = 'normal';
     }
   }
 

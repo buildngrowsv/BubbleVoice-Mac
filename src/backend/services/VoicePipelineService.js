@@ -151,6 +151,45 @@ class VoicePipelineService extends EventEmitter {
   }
 
   /**
+   * IS PUNCTUATION ONLY — GHOST TRANSCRIPTION FILTER (2026-02-16)
+   *
+   * Returns true if the given text contains ONLY punctuation/whitespace
+   * and no actual spoken words. This filters out phantom transcriptions
+   * that SpeechAnalyzer produces during TTS playback.
+   *
+   * WHY THIS EXISTS:
+   * When VPIO (Voice Processing IO) echo-cancels TTS audio, small
+   * residual artifacts sometimes leak through to the mic input. Apple's
+   * SpeechAnalyzer interprets these artifacts as punctuation — typically
+   * a lone period ".". This phantom "." then:
+   *   1) Falsely triggers the interruption system (stops AI mid-speech)
+   *   2) Gets sent to the LLM as a user message (LLM responds to ".")
+   *   3) Wastes tokens and breaks conversation flow
+   *
+   * BECAUSE: The interruption spec requires 2+ WORDS from the user to
+   * trigger an interrupt. A period is zero words. This helper enforces
+   * that requirement by stripping all punctuation and checking if any
+   * actual word characters remain.
+   *
+   * PATTERN: Used in three critical places:
+   *   - Interruption detection (handleSwiftResponse transcription_update)
+   *   - Timer reset logic (same handler)
+   *   - latestTranscription assignment (prevents "." from becoming the
+   *     text that gets sent to the LLM when the timer fires)
+   *
+   * @param {string} text - The transcription text to check
+   * @returns {boolean} True if text is ONLY punctuation/whitespace (no real words)
+   */
+  isPunctuationOnly(text) {
+    if (!text) return true;
+    // Strip all punctuation, whitespace, and common noise characters.
+    // What remains should be actual word characters (letters, numbers).
+    // If nothing remains, the text was purely punctuation/noise.
+    const stripped = text.replace(/[\s.,!?;:'"…\-–—_\\/()[\]{}@#$%^&*+=<>~`|]+/g, '');
+    return stripped.length === 0;
+  }
+
+  /**
    * MERGE TRANSCRIPTION TEXT — VOLATILE-AWARE (2026-02-07)
    *
    * Normalizes speech recognition updates into a single growing utterance,
@@ -609,6 +648,10 @@ class VoicePipelineService extends EventEmitter {
       // Timer 3's polling loop checks this to abort early, preventing
       // stale LLM calls and duplicate messages after the user stops voice.
       isCancelled: false,
+      // DUPLICATE SEND PREVENTION (2026-02-17): Set to true when we send
+      // the user message to frontend in runLlmProcessing. This prevents
+      // Timer 3 from sending a duplicate user message bubble.
+      userMessageAlreadySentToFrontend: false,
       // FRONTEND TRANSCRIPTION SMOOTHING (2026-02-07):
       // We don't want to spam the frontend with every single partial result.
       // The STT can update every ~100ms (sometimes faster), which makes the
@@ -636,7 +679,14 @@ class VoicePipelineService extends EventEmitter {
       // cancellation handles most of this. These fields are kept as a
       // fallback for when VPIO fails or the direct-say path is used.
       lastSpokenText: '',
-      lastSpokenAt: 0
+      lastSpokenAt: 0,
+      // INTERRUPTION DEBOUNCE STATE (2026-02-17):
+      // Prevents the reset storm when user interrupts AI speech.
+      // swiftIsSpeaking lags behind actual state by 200-500ms due to IPC,
+      // so without debouncing, every volatile update during that window
+      // triggers a separate handleSpeechDetected → reset_recognition.
+      lastInterruptionAt: 0,
+      _interruptSuppressCount: 0
     };
 
     try {
@@ -836,15 +886,73 @@ class VoicePipelineService extends EventEmitter {
         // (premature send for long utterances).
         const wasInResponsePipeline = session.isInResponsePipeline || session.isTTSPlaying || swiftIsSpeaking;
         
-        // Check for interruption if we're in response pipeline
-        if (wasInResponsePipeline && text.trim().length > 0) {
+        // Check for interruption if we're in response pipeline.
+        //
+        // GHOST TRANSCRIPTION FIX (2026-02-16):
+        // Previously checked `text.trim().length > 0` which allowed a lone
+        // period "." to trigger interruption. VPIO echo cancellation leaves
+        // tiny residual artifacts that SpeechAnalyzer interprets as punctuation
+        // (typically "."). Per the spec, interruption requires 2+ actual WORDS
+        // from the user — punctuation-only text is not a real interruption.
+        //
+        // FIX: Added `!this.isPunctuationOnly(text)` guard. Now a phantom "."
+        // during TTS playback is silently ignored instead of stopping the AI,
+        // sending "." to the LLM, and wasting tokens on a nonsense response.
+        if (wasInResponsePipeline && text.trim().length > 0 && !this.isPunctuationOnly(text)) {
+          // INTERRUPTION DEBOUNCE (2026-02-17):
+          // ====================================
+          //
+          // PREVIOUS BUG: When the user interrupted the AI, EVERY volatile
+          // transcription update (arriving every ~100ms) triggered a SEPARATE
+          // handleSpeechDetected() call because swiftIsSpeaking stayed true
+          // until the Swift helper processed the stop_speaking command (~200-500ms
+          // IPC latency). This caused:
+          //   - 5+ reset_recognition commands sent in rapid succession
+          //   - 5+ cancel_old_audio commands
+          //   - SpeechAnalyzer became confused, producing garbled finalized text
+          //   - ". " artifacts, phantom ", you" prefixes, dropped words
+          //
+          // ROOT CAUSE: The swiftIsSpeaking flag lags behind actual state by
+          // 200-500ms due to IPC round-trip. After we send stop_speaking, Swift
+          // needs time to read stdin, stop AVAudioPlayerNode, send speech_ended
+          // back, and for Node.js to parse and update session flags.
+          //
+          // FIX: Debounce interruption handling. After the FIRST interruption
+          // fires, ignore subsequent ones for 800ms. This covers the IPC
+          // round-trip while still catching genuine re-interruptions.
+          // ====================================
+          const now = Date.now();
+          const timeSinceLastInterrupt = now - (session.lastInterruptionAt || 0);
+          const interruptDebounceMs = 800;
+          
+          if (timeSinceLastInterrupt < interruptDebounceMs) {
+            // Suppress duplicate interruption — still within debounce window.
+            // Don't log every suppression (too noisy), just count.
+            if (!session._interruptSuppressCount) session._interruptSuppressCount = 0;
+            session._interruptSuppressCount++;
+            break; // Skip ALL processing for this stale transcription update
+          }
+          
+          // Log how many duplicates we suppressed during the debounce window
+          if (session._interruptSuppressCount > 0) {
+            console.log(`[VoicePipelineService] 🔇 Suppressed ${session._interruptSuppressCount} duplicate interruptions during debounce window`);
+            session._interruptSuppressCount = 0;
+          }
+          
           console.log('‼️ [VOICE INTERRUPT] User is speaking while AI is in response pipeline - triggering interruption');
           console.log(`   - In pipeline: ${session.isInResponsePipeline}`);
           console.log(`   - TTS playing: ${session.isTTSPlaying}`);
           console.log(`   - Swift speaking: ${swiftIsSpeaking}`);
           
+          session.lastInterruptionAt = now;
+          
           // Trigger interruption - this will clear timers and cached responses
           this.handleSpeechDetected(session);
+        } else if (wasInResponsePipeline && this.isPunctuationOnly(text)) {
+          // LOG BUT IGNORE: This is almost certainly VPIO residual noise
+          // interpreted as punctuation by SpeechAnalyzer during TTS playback.
+          // We do NOT interrupt, do NOT start timers, do NOT update latestTranscription.
+          console.log(`[VoicePipelineService] 👻 Ignoring ghost punctuation "${text.trim()}" during TTS (VPIO artifact)`);
         }
         
         // VOLATILE-AWARE MERGE (2026-02-07):
@@ -859,7 +967,13 @@ class VoicePipelineService extends EventEmitter {
         session.currentTranscription = mergedTranscription;
 
         // Keep latestTranscription aligned with the merged full utterance.
-        if (mergedTranscription.trim().length > 0) {
+        //
+        // GHOST TRANSCRIPTION FIX (2026-02-16):
+        // Also guard against punctuation-only text here. If we let "." into
+        // latestTranscription, the silence timer will fire and send "." to the
+        // LLM as the user's message. This is the second line of defense after
+        // the interruption guard above.
+        if (mergedTranscription.trim().length > 0 && !this.isPunctuationOnly(mergedTranscription)) {
           session.latestTranscription = mergedTranscription;
         }
 
@@ -906,8 +1020,15 @@ class VoicePipelineService extends EventEmitter {
         // Timer coalescing (50ms debounce) collapses burst resets into one cascade.
         // When user stops, updates stop. Timer fires 1.2s after last burst.
         if (!isCurrentlyInPipeline) {
-          const hasMeaningfulText = mergedTranscription.trim().length > 0;
-          const hasExistingTranscription = (session.latestTranscription || '').trim().length > 0;
+          // GHOST TRANSCRIPTION FIX (2026-02-16):
+          // "Meaningful text" must contain actual words, not just punctuation.
+          // Without this, a phantom "." from VPIO artifacts would start the
+          // silence timer, which fires 1.2s later and sends "." to the LLM.
+          // This is the third and final line of defense: even if "." somehow
+          // got past the interruption guard and latestTranscription guard,
+          // the timer won't start for punctuation-only transcriptions.
+          const hasMeaningfulText = mergedTranscription.trim().length > 0 && !this.isPunctuationOnly(mergedTranscription);
+          const hasExistingTranscription = (session.latestTranscription || '').trim().length > 0 && !this.isPunctuationOnly(session.latestTranscription || '');
           if (hasMeaningfulText || hasExistingTranscription) {
             // Reset the timer on EVERY update (Accountability AI pattern)
             // The timer will only fire if updates stop for 1.2s (+ adaptive delay)
@@ -1272,6 +1393,63 @@ class VoicePipelineService extends EventEmitter {
 
       session.isProcessingResponse = true;
 
+      // ================================================================
+      // SAFETY NET (2026-02-16): Final guard against punctuation-only text
+      // reaching the LLM. The three upstream guards (interruption check,
+      // latestTranscription assignment, timer reset) should prevent this,
+      // but defense-in-depth is critical here because sending "." to the
+      // LLM wastes tokens and produces a confusing response.
+      //
+      // If latestTranscription is empty or punctuation-only, abort the
+      // entire LLM processing pipeline and reset to a clean state.
+      // ================================================================
+      const transcriptionForLlm = (session.latestTranscription || '').trim();
+      if (transcriptionForLlm.length === 0 || this.isPunctuationOnly(transcriptionForLlm)) {
+        console.log(`[VoicePipelineService] ⛔ Aborting LLM — transcription is empty or punctuation-only: "${transcriptionForLlm}"`);
+        session.isInResponsePipeline = false;
+        session.isProcessingResponse = false;
+        return;
+      }
+
+      // ================================================================
+      // CRITICAL UX FIX (2026-02-17): Send user message to frontend IMMEDIATELY
+      // when silence is confirmed, NOT after the LLM responds in Timer 3.
+      // ================================================================
+      //
+      // PREVIOUS BUG: sendUserMessageToFrontend() was inside Timer 3's
+      // polling loop, which meant the user's transcription sat in the input
+      // field for 8-10+ seconds while the LLM processed. When Timer 3
+      // finally fired, BOTH the user message bubble AND the AI response
+      // appeared simultaneously — a jarring UX where the message seemed to
+      // "jump" from the input field to a bubble at the same time as the AI
+      // answered.
+      //
+      // WHAT USERS SAW: Three confusing states:
+      //   1. Text in input field + thinking dots (8-10 seconds)
+      //   2. Text in BOTH input field AND bubble (brief flash)
+      //   3. Clean state with bubble + response
+      //
+      // FIX: Send user message immediately here, before the LLM call.
+      // Now the flow is:
+      //   1. User stops speaking (T+0s)
+      //   2. Silence confirmed (T+1.2s) → user bubble appears, input clears
+      //   3. Thinking dots show while LLM processes (8-10s)
+      //   4. AI response appears
+      //
+      // This matches how text-input works (message appears immediately on
+      // send, then thinking dots, then response). Voice should feel the same.
+      //
+      // We snapshot latestTranscription NOW because Timer 3 runs later and
+      // the session state could change (e.g., if user interrupts).
+      // ================================================================
+      const userMessageText = (session.latestTranscription || '').trim();
+      if (userMessageText.length > 0) {
+        console.log('[VoicePipelineService] Sending user message to frontend (immediate, before LLM)');
+        this.sendUserMessageToFrontend(session, session.latestTranscription);
+        // Track that we already sent the user message so Timer 3 doesn't duplicate it
+        session.userMessageAlreadySentToFrontend = true;
+      }
+
       session.silenceTimers.tts = setTimeout(async () => {
         console.log(`[VoicePipelineService] Timer 2 (TTS) fired for ${session.id}`);
         if (!session.isInResponsePipeline) {
@@ -1319,7 +1497,12 @@ class VoicePipelineService extends EventEmitter {
         if (session.cachedResponses.llm) {
           const responseText = (session.cachedResponses.llm.text || '').trim();
           console.log('[VoicePipelineService] Sending messages to frontend');
-          this.sendUserMessageToFrontend(session, session.latestTranscription);
+          
+          // SKIP user message here — already sent in runLlmProcessing above (2026-02-17).
+          // Only send if it wasn't sent earlier (safety net for edge cases).
+          if (!session.userMessageAlreadySentToFrontend) {
+            this.sendUserMessageToFrontend(session, session.latestTranscription);
+          }
 
           if (responseText.length > 0) {
             this.sendResponseToFrontend(session, session.cachedResponses.llm);
@@ -1359,7 +1542,10 @@ class VoicePipelineService extends EventEmitter {
           // knows to deliver the late response directly.
           console.error('[VoicePipelineService] Timer 3 timed out waiting for LLM response');
           session.timer3TimedOut = true;
-          this.sendUserMessageToFrontend(session, session.latestTranscription);
+          // User message already sent in runLlmProcessing (2026-02-17), skip duplicate.
+          if (!session.userMessageAlreadySentToFrontend) {
+            this.sendUserMessageToFrontend(session, session.latestTranscription);
+          }
           this.sendErrorToFrontend(session, 'AI is taking longer than expected. Response will appear when ready.');
           // NOTE: We do NOT reset the pipeline here because the LLM call is still
           // running. The try/catch block below will deliver the late response and
@@ -2030,6 +2216,7 @@ class VoicePipelineService extends EventEmitter {
     session.lastTranscriptionAt = 0;
     session.awaitingSilenceConfirmation = false;
     session.timer3TimedOut = false;
+    session.userMessageAlreadySentToFrontend = false;
   }
 
   /**
