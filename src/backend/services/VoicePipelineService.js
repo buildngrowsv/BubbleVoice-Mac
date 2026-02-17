@@ -236,12 +236,129 @@ class VoicePipelineService extends EventEmitter {
     const incoming = (incomingText || '').trim();
     if (!incoming) return ((session.finalizedText || '') + ' ' + (session.currentVolatile || '')).trim();
 
+    // Helper: count actual words (letters/numbers) ignoring punctuation-only tokens.
+    // Used below for volatile-protection heuristic.
+    const countWords = (t) => (t || '').replace(/[^\w\s']/g, '').split(/\s+/).filter(w => w.length > 0).length;
     
     if (isFinal) {
-      // FINALIZED: Append to the permanent finalized text.
-      // Clear the volatile buffer since this segment is now committed.
       const prevFinalized = (session.finalizedText || '').trim();
-      session.finalizedText = prevFinalized ? `${prevFinalized} ${incoming}` : incoming;
+      const prevVolatile = (session.currentVolatile || '').trim();
+      
+      // ============================================================
+      // VOLATILE PROTECTION — GARBLED-FINAL DETECTION (2026-02-17)
+      // ============================================================
+      //
+      // BUG: SpeechAnalyzer sometimes finalizes with garbled text that
+      // covers only a small fraction of the audio the volatile covered.
+      //
+      // Confirmed in production logs:
+      //   volatile "what can we talk about?" (6 words, 12s audio)
+      //   final    ", of."                   (1 word,  2s audio)
+      //
+      //   volatile "It'll fly you." (3 words, 12s audio)
+      //   final    ", you."         (1 word,  2s audio)
+      //
+      //   volatile "Little boy." (2 words)
+      //   final    ".."          (0 words — punctuation-only)
+      //
+      // ROOT CAUSE: After lightweight input rotation (reset_recognition),
+      // the SpeechAnalyzer loses segment context and finalizes with only
+      // the tail of the audio, producing fragments like ", of." or ", you."
+      // that don't match what the user actually said.
+      //
+      // FIX: When a final has drastically fewer words than the current
+      // volatile, the volatile was more accurate. Promote the volatile
+      // to finalized text and discard the garbled final.
+      //
+      // Threshold: final must have < 50% of volatile's word count, and
+      // volatile must have at least 2 real words (so single-word volatiles
+      // don't trigger this — they're too short to be confident about).
+      //
+      // SAFETY: In normal SpeechAnalyzer operation, the final should have
+      // SIMILAR or MORE words than the volatile (it adds punctuation and
+      // sometimes corrects word boundaries). A final with drastically
+      // FEWER words is the red flag for this garbled-final bug.
+      // ============================================================
+      const incomingWords = countWords(incoming);
+      const volatileWords = countWords(prevVolatile);
+      
+      if (prevVolatile && volatileWords >= 2 && incomingWords < volatileWords * 0.5) {
+        // Final is suspiciously shorter than volatile — keep volatile.
+        // Promote the volatile to finalized text since it's more accurate.
+        session.finalizedText = prevFinalized ? `${prevFinalized} ${prevVolatile}` : prevVolatile;
+        session.currentVolatile = '';
+        console.log(`[mergeTranscription] ⚠️ GARBLED FINAL DETECTED: final "${incoming}" (${incomingWords} words) was a drastic downgrade from volatile "${prevVolatile}" (${volatileWords} words) — kept volatile as finalized`);
+        return session.finalizedText.trim();
+      }
+      
+      // Also protect against punctuation-only finals corrupting the state.
+      //
+      // CASE A: volatile has content → promote volatile, discard punctuation final.
+      //   Example: volatile "Little boy." → final ".." → keep "Little boy."
+      //   The isPunctuationOnly check upstream filters these from the UI,
+      //   but we need to protect the merge state too.
+      //
+      // CASE B: volatile is empty → just skip the punctuation final entirely.
+      //   Example: previous final "I'm trying to think." → next final "."
+      //   Without this guard, finalizedText becomes "I'm trying to think. ."
+      //   and then SpeechAnalyzer's cumulative final adds it AGAIN, causing
+      //   ". . what happened?" duplication. This was confirmed in logs:
+      //   SpeechAnalyzer finalized ". what happened?" (cumulative, includes
+      //   the "." from a prior segment), and our merge appended it to
+      //   already-tracked "." → ". . what happened?"
+      if (this.isPunctuationOnly(incoming)) {
+        if (prevVolatile && volatileWords >= 1) {
+          // CASE A: Promote volatile, discard punctuation final
+          session.finalizedText = prevFinalized ? `${prevFinalized} ${prevVolatile}` : prevVolatile;
+          session.currentVolatile = '';
+          console.log(`[mergeTranscription] ⚠️ PUNCTUATION-ONLY FINAL: "${incoming}" would erase volatile "${prevVolatile}" — promoted volatile to finalized`);
+          return session.finalizedText.trim();
+        } else {
+          // CASE B: No volatile to protect — just skip the punctuation final.
+          // Don't append "." or ".." to finalizedText.
+          session.currentVolatile = '';
+          console.log(`[mergeTranscription] ⚠️ PUNCTUATION-ONLY FINAL: "${incoming}" skipped — not appending noise to finalized text`);
+          return (prevFinalized || '').trim();
+        }
+      }
+      
+      // CUMULATIVE-FINAL DEDUPLICATION (2026-02-17):
+      // SpeechAnalyzer sometimes sends finalized text that is CUMULATIVE —
+      // it includes text from previous finalized segments as a prefix.
+      // Example: prevFinalized = "I'm trying to think."
+      //          incoming final = ". what happened?" (includes "." from prior)
+      //
+      // If the incoming text starts with the tail of prevFinalized, we need
+      // to strip the overlap to avoid duplication like ". . what happened?"
+      //
+      // Heuristic: if prevFinalized ends with content that the incoming starts
+      // with, strip the overlapping prefix from incoming.
+      let deduplicatedIncoming = incoming;
+      if (prevFinalized && incoming.length > 2) {
+        // Check if incoming starts with punctuation that matches the end of prevFinalized.
+        // This catches cases like prevFinalized="...think." and incoming=". what happened?"
+        // where the leading ". " is a cumulative artifact.
+        const incomingLeadingPunct = incoming.match(/^[\s.,!?;:…\-–—]+/);
+        if (incomingLeadingPunct) {
+          const leadingNoise = incomingLeadingPunct[0];
+          const prevEnd = prevFinalized.slice(-leadingNoise.length);
+          // If the leading punctuation of the incoming matches the trailing
+          // punctuation of the previous finalized text, it's likely cumulative.
+          // Strip it to prevent duplication.
+          if (prevEnd.trim() === leadingNoise.trim() || 
+              this.isPunctuationOnly(leadingNoise)) {
+            deduplicatedIncoming = incoming.slice(leadingNoise.length).trim();
+            if (deduplicatedIncoming !== incoming.trim()) {
+              console.log(`[mergeTranscription] 🔧 Stripped cumulative prefix "${leadingNoise}" from final — deduped to "${deduplicatedIncoming}"`);
+            }
+          }
+        }
+      }
+      
+      // NORMAL CASE: Final is trustworthy — append to finalized, clear volatile.
+      // Use deduplicatedIncoming which has had any cumulative prefix stripped.
+      const textToFinalize = deduplicatedIncoming || incoming;
+      session.finalizedText = prevFinalized ? `${prevFinalized} ${textToFinalize}` : textToFinalize;
       session.currentVolatile = '';
       return session.finalizedText.trim();
     } else {
